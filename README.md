@@ -9,7 +9,7 @@ Convai enables NPCs with intelligence such that they can converse naturally with
 - [WIP Tutorial Series](https://www.youtube.com/playlist?list=PLn_7tCx0Chipba-OJ6sU0f7DhETQ8FPAJ)
 - [Metahuman Demo Project](https://drive.google.com/drive/u/4/folders/1HNcghI9SG1NpCUaJWRX9Yh28HUF00-U0)
 
-# Character Conversation
+## Character Conversation
 Allows you to define a character and interact with it in real-time from inside the game, the possible functionalities include:
 
 - Creating a character using a backstory, name and voice type.
@@ -17,14 +17,14 @@ Allows you to define a character and interact with it in real-time from inside t
 - Update an existing character's name, voice and backstory.
 
 
-# Character Action
+## Character Action
 Allows your character to respond with intelligent actions based on player's interaction.
 
-# Speech To Text
+## Speech To Text
 Allows transcription of spoken audio to text.
 
-# Text To Speech
+## Text To Speech
 Creates a Sound Wave object containing audio for the corresponding text
 
-# Voice Capture
+## Voice Capture
 Allows very easy voice recording through microphone.
