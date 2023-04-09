@@ -55,13 +55,13 @@ void UConvaiChatbotComponent::LoadCharacter(FString NewCharacterID)
 	ConvaiGetDetails();
 }
 
-void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, uint32 InToken)
+void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, uint32 InToken)
 {
-	if (!IsValid(InEnvironment) && InGenerateActions)
-	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: Environment is not valid"));
-		return;
-	}
+	//if (!(IsValid(InEnvironment) || IsValid(Environment)) && InGenerateActions)
+	//{
+	//	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: Environment is not valid"));
+	//	return;
+	//}
 
 	if (!IsValid(InConvaiPlayerComponent))
 	{
@@ -81,29 +81,43 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	//	return;
 	//}
 
+
+	if (GenerateActions && IsValid(InEnvironment))
+		Environment = InEnvironment;
+
+	FString Error;
+	if (GenerateActions && !UConvaiActions::ValidateEnvironment(Environment, Error))
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartGetResponseStream: %s"), *Error);
+		UE_LOG(ConvaiPlayerLog, Log, TEXT("StartGetResponseStream: Environment object seems to have issues -> setting GenerateActions to false"));
+		GenerateActions = false;
+	}
+
 	if (IsProcessing())
 	{
 		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: character is still processing the response, use \"Is Processing\" function to find out if a character is still processing the response or not"));
 		return;
 	}
 
-	UserText = FString("");
+	UserText = InputText;
+	TextInput = UserText.Len()>0;
 	GenerateActions = InGenerateActions;
-	Environment = InEnvironment;
 	VoiceResponse = InVoiceResponse;
 	ReplicateVoiceToNetwork = RunOnServer;
 	Token = InToken;
-	TextInput = false;
 
-	CurrentConvaiPlayerComponent = InConvaiPlayerComponent;
-	StreamInProgress = true;
+	if (!TextInput)
+	{
+		CurrentConvaiPlayerComponent = InConvaiPlayerComponent;
+		StreamInProgress = true;
+	}
 
 	Start_GRPC_Request();
 }
 
 void UConvaiChatbotComponent::StartGetResponseStreamWithText(FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer)
 {
-	if (!IsValid(InEnvironment) && InGenerateActions)
+	if (!(IsValid(InEnvironment) || IsValid(Environment)) && InGenerateActions)
 	{
 		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStreamWithText Environment is not valid"));
 		return;
@@ -123,7 +137,8 @@ void UConvaiChatbotComponent::StartGetResponseStreamWithText(FString InputText, 
 
 	UserText = InputText;
 	GenerateActions = InGenerateActions;
-	Environment = InEnvironment;
+	if (IsValid(InEnvironment))
+		Environment = InEnvironment;	
 	VoiceResponse = InVoiceResponse;
 	ReplicateVoiceToNetwork = RunOnServer;
 	TextInput = true;
@@ -289,11 +304,13 @@ void UConvaiChatbotComponent::ClearTimeOutTimer()
 
 void UConvaiChatbotComponent::BeginPlay()
 {
-	Super::BeginPlay();
+	Environment = NewObject<UConvaiEnvironment>();
 
 	// Get character details
 	if (CharacterID != "")
 		ConvaiGetDetails();
+
+	Super::BeginPlay();
 }
 
 void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -359,6 +376,13 @@ UConvaiChatBotGetDetailsProxy* UConvaiChatbotComponent::ConvaiGetDetails()
 {
 	ConvaiChatBotGetDetailsDelegate.BindUFunction(this, "OnConvaiGetDetailsCompleted");
 
+	if (IsValid(ConvaiChatBotGetDetailsProxy))
+	{
+		ConvaiChatBotGetDetailsProxy->OnSuccess.Clear();
+		ConvaiChatBotGetDetailsProxy->OnFailure.Clear();
+	}
+
+
 	ConvaiChatBotGetDetailsProxy = UConvaiChatBotGetDetailsProxy::CreateCharacterGetDetailsProxy(this, CharacterID);
 	ConvaiChatBotGetDetailsProxy->OnSuccess.Add(ConvaiChatBotGetDetailsDelegate);
 	ConvaiChatBotGetDetailsProxy->OnFailure.Add(ConvaiChatBotGetDetailsDelegate);
@@ -381,4 +405,5 @@ void UConvaiChatbotComponent::OnConvaiGetDetailsCompleted(FString ReceivedCharac
 	ReadyPlayerMeLink = ReceivedReadyPlayerMeLink;
 
 	OnCharacterDataLoadEvent.Broadcast(true);
+	ConvaiChatBotGetDetailsProxy = nullptr;
 }

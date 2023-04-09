@@ -131,6 +131,11 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
 		}
 	}
 
+	if (!IsValid(GetWorld()))
+	{
+		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: GetWorld() is Invalid!"));
+		return;
+	}
 
 	// TODO (Mohamed): take number of channels in consideration when calculating the duration
 	// Duration = PCM Data Size / (Sample Rate * Bytes per sample)
@@ -142,12 +147,6 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
 
 	// New Duration = Remaining Duration + New Duration
 	float TotalAudioDuration = CurrentRemainingAudioDuration + NewAudioDuration;
-
-	if (!IsValid(GetWorld()))
-	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: GetWorld() is Invalid!"));
-		return;
-	}
 
 	GetWorld()->GetTimerManager().SetTimer(AudioFinishedTimerHandle, this, &UConvaiAudioStreamer::onAudioFinished, TotalAudioDuration, false);
 	if (!IsTalking)

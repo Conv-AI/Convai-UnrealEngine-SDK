@@ -108,6 +108,8 @@ private:
 
 	grpc::CompletionQueue* cq_;
 
+	uint32 NumberOfAudioBytesSent = 0;
+
 private:
 	// Inputs
 	FString URL;

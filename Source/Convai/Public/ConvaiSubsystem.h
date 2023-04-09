@@ -39,7 +39,9 @@ namespace grpc
 
 	template <class W, class R>
 	class ClientAsyncReaderWriter;
+	class ChannelCredentials;
 }
+
 
 //namespace service
 //{
@@ -56,11 +58,7 @@ DECLARE_DELEGATE_OneParam(FgRPC_Delegate, bool);
 
 class FgRPCClient : public FRunnable {
 public:
-    FgRPCClient(std::shared_ptr<grpc::Channel> channel)
-        //: stub_(ConvaiService::NewStub(channel))
-        : channel(channel)
-        , bIsRunning(false) 
-    {}
+	FgRPCClient(std::string target, const std::shared_ptr<grpc::ChannelCredentials>& creds);
 
     std::unique_ptr<service::ConvaiService::Stub> GetNewStub();
 
@@ -74,6 +72,10 @@ public:
     virtual uint32 Run() override;
 
     void StartStub();
+
+	void CreateChannel();
+
+	void OnStateChange(bool ok);
 
     virtual void Exit() override;
 
@@ -90,7 +92,11 @@ private:
     // server's exposed services.
     std::unique_ptr<service::ConvaiService::Stub> stub_;
 
-    std::shared_ptr<grpc::Channel> channel;
+    std::shared_ptr<grpc::Channel> Channel;
+	std::shared_ptr<grpc::ChannelCredentials> Creds;
+	std::string Target;
+
+	FgRPC_Delegate OnStateChangeDelegate;
 
     // The producer-consumer queue we use to communicate asynchronously with the
     // gRPC runtime.
