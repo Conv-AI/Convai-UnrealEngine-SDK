@@ -38,6 +38,14 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (WorldContext = "WorldContextObject", AutoCreateRefTerm = "IncludedCharacters, ExcludedCharacters"))
 		static void ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlayerController* PlayerController, float Radius, bool PlaneView, TArray<UObject*> IncludedCharacters, TArray<UObject*> ExcludedCharacters, UConvaiChatbotComponent*& ConvaiCharacter, bool& Found);
 
+	UFUNCTION(BlueprintCallable, Category = "Convai")
+	static void SetAPI_Key(FString API_Key);	
+	
+	UFUNCTION(BlueprintPure, Category = "Convai")
+	static FString GetAPI_Key();
+
+
+
 	static USoundWave* DecodeMP3(TArray<uint8> InMP3Bytes);
 
 	static void PCMDataToWav(TArray<uint8> InPCMBytes, TArray<uint8>& OutWaveFileData, int NumChannels, int SampleRate);

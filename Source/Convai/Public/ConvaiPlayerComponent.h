@@ -68,6 +68,7 @@ public:
 	UFUNCTION(Server, Reliable, Category = "Convai|VoiceNetworking")
 	void StartTalkingServer(
 		class UConvaiChatbotComponent* ConvaiChatbotComponent,
+		bool EnvironemntSent,
 		const TArray<FString>& Actions,
 		const TArray<FConvaiObjectEntry>& Objects,
 		const TArray<FConvaiObjectEntry>& Characters,
@@ -101,6 +102,7 @@ public:
 	void SendTextServer(
 		UConvaiChatbotComponent* ConvaiChatbotComponent,
 		const FString& Text,
+		bool EnvironemntSent,
 		const TArray<FString>& Actions,
 		const TArray<FConvaiObjectEntry>& Objects,
 		const TArray<FConvaiObjectEntry>& Characters,

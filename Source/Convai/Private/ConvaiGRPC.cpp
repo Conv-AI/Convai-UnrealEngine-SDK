@@ -300,14 +300,29 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 		for (FConvaiObjectEntry object : Environment->Objects) // Add Objects
 		{
 			ActionConfig_Object* action_config_object = action_config->add_objects();
-			action_config_object->set_name(TCHAR_TO_ANSI(*object.Name));
+			FString FinalName = object.Name;
+			if (object.Description.Len())
+			{
+				FinalName = FinalName.Append(*FString(" <"));
+				FinalName = FinalName.Append(*object.Description);
+				FinalName = FinalName.Append(">");
+			}
+			action_config_object->set_name(TCHAR_TO_ANSI(*FinalName));
 			action_config_object->set_description(TCHAR_TO_ANSI(*object.Description));
 		}
 
 		for (FConvaiObjectEntry character : Environment->Characters) // Add Characters
 		{
 			ActionConfig_Character* action_config_character = action_config->add_characters();
-			action_config_character->set_name(TCHAR_TO_ANSI(*character.Name));
+			FString FinalName = character.Name;
+			if (character.Description.Len())
+			{
+				FinalName = FinalName.Append(*FString(" <"));
+				FinalName = FinalName.Append(*character.Description);
+				FinalName = FinalName.Append(">");
+			}
+
+			action_config_character->set_name(TCHAR_TO_ANSI(*FinalName));
 			action_config_character->set_bio(TCHAR_TO_ANSI(*character.Description));
 		}
 
@@ -368,11 +383,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 
 	//UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWrite"));
 
-
-
-
-	//UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWrite"));
-
 	UConvaiSubsystem* ConvaiSubsystem = GetConvaiSubsystem(WorldPtr.Get());
 
 	// Clear the request data to make it ready to hold the new data we are going to send
@@ -416,10 +426,12 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 			// Load the audio data to the request
 			get_response_data->set_audio_data(Data.GetData(), Data.Num()); // UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWrite: Sending %d bytes"), DataLen);
 		}
-	}
 
+		NumberOfAudioBytesSent += Data.Num();
+	}
 	// Prepare the request
 	request.set_allocated_get_response_data(get_response_data);
+
 
 
 	// #if ConvaiDebugMode
@@ -459,7 +471,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWriteDone(bool ok)
 	}
 
 	UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWriteDone"));
-
+	UE_LOG(ConvaiGRPCLog, Log, TEXT("NumberOfAudioBytesSent %i"), NumberOfAudioBytesSent);
 
 
 	// Tell the server early on that we are ready to finish the stream any time it wishes
@@ -496,9 +508,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		// Broadcast the Session ID
 		OnSessionIDReceived.ExecuteIfBound(SessionID);
 
-#if ConvaiDebugMode
-		//UE_LOG(ConvaiGRPCLog, Log, TEXT("SessionID: %s"), *SessionID);
-#endif 
 	}
 
 

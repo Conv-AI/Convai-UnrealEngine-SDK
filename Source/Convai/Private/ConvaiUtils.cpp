@@ -12,6 +12,7 @@
 #include "Math/Vector.h"
 #include "Camera/PlayerCameraManager.h"
 #include "UObject/UObjectHash.h"
+#include "../Convai.h"
 
 #include "ConvaiChatbotComponent.h"
 
@@ -227,11 +228,23 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 			FocuseDotThresshold = CurrentFocuseDot;
 			ConvaiCharacter = CurrentConvaiCharacter;
 			Found = true;
-			UE_LOG(ConvaiUtilsLog, Log, TEXT("GetLookedAtCharacter: Found! %s = %f"), *CurrentConvaiCharacter->GetFullName(), FocuseDotThresshold);
+			//UE_LOG(ConvaiUtilsLog, Log, TEXT("GetLookedAtCharacter: Found! %s = %f"), *CurrentConvaiCharacter->GetFullName(), FocuseDotThresshold);
 
 		}
 	}
 }
+
+void UConvaiUtils::SetAPI_Key(FString API_Key)
+{
+	Convai::Get().GetConvaiSettings()->API_Key = API_Key;
+}
+
+
+FString UConvaiUtils::GetAPI_Key()
+{
+	return Convai::Get().GetConvaiSettings()->API_Key;
+}
+
 
 namespace
 {
@@ -268,9 +281,6 @@ namespace
 	}
 
 }
-
-
-
 
 USoundWave* UConvaiUtils::DecodeMP3(TArray<uint8> InMP3Bytes) {
 

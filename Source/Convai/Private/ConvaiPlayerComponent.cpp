@@ -216,13 +216,13 @@ void UConvaiPlayerComponent::StartTalking(
 		return;
 	}
 
-	FString Error;
-	if (GenerateActions && !UConvaiActions::ValidateEnvironment(Environment, Error))
-	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: %s"), *Error);
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking: Environment object seems to have issues -> setting GenerateActions to false"));
-		GenerateActions = false;
-	}
+	//FString Error;
+	//if (GenerateActions && !UConvaiActions::ValidateEnvironment(Environment, Error))
+	//{
+	//	UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: %s"), *Error);
+	//	UE_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking: Environment object seems to have issues -> setting GenerateActions to false"));
+	//	GenerateActions = false;
+	//}
 
 
 	if (!IsValid(ConvaiChatbotComponent))
@@ -252,14 +252,14 @@ void UConvaiPlayerComponent::StartTalking(
 	
 	if (RunOnServer)
 	{
-		if (GenerateActions)
-			StartTalkingServer(ConvaiChatbotComponent, Environment->Actions, Environment->Objects, Environment->Characters, Environment->MainCharacter, GenerateActions, VoiceResponse, StreamPlayerMic);
+		if (IsValid(Environment))
+			StartTalkingServer(ConvaiChatbotComponent, true, Environment->Actions, Environment->Objects, Environment->Characters, Environment->MainCharacter, GenerateActions, VoiceResponse, StreamPlayerMic);
 		else
-			StartTalkingServer(ConvaiChatbotComponent, TArray<FString>(), TArray<FConvaiObjectEntry>(), TArray<FConvaiObjectEntry>(), FConvaiObjectEntry(), GenerateActions, VoiceResponse, StreamPlayerMic);
+			StartTalkingServer(ConvaiChatbotComponent, false, TArray<FString>(), TArray<FConvaiObjectEntry>(), TArray<FConvaiObjectEntry>(), FConvaiObjectEntry(), GenerateActions, VoiceResponse, StreamPlayerMic);
 	}
 	else
 	{
-		ConvaiChatbotComponent->StartGetResponseStream(this, Environment, GenerateActions, VoiceResponse, false, Token);
+		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, false, Token);
 	}
 }
 
@@ -320,6 +320,7 @@ void UConvaiPlayerComponent::FinishTalking()
 
 void UConvaiPlayerComponent::StartTalkingServer_Implementation(
 	class UConvaiChatbotComponent* ConvaiChatbotComponent,
+	bool EnvironemntSent,
 	const TArray<FString>& Actions,
 	const TArray<FConvaiObjectEntry>& Objects,
 	const TArray<FConvaiObjectEntry>& Characters,
@@ -338,7 +339,7 @@ void UConvaiPlayerComponent::StartTalkingServer_Implementation(
 	if (IsValid(ConvaiChatbotComponent))
 	{
 		UConvaiEnvironment* Environment = nullptr;
-		if (GenerateActions)
+		if (EnvironemntSent)
 		{
 			if (IsValid(ConvaiChatbotComponent->Environment))
 				Environment = ConvaiChatbotComponent->Environment;
@@ -352,7 +353,7 @@ void UConvaiPlayerComponent::StartTalkingServer_Implementation(
 			Environment->Objects = Objects;
 			Environment->MainCharacter = MainCharacter;
 		}
-		ConvaiChatbotComponent->StartGetResponseStream(this, Environment, GenerateActions, VoiceResponse, true, Token);
+		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, true, Token);
 	}
 }
 
@@ -364,13 +365,13 @@ void UConvaiPlayerComponent::FinishTalkingServer_Implementation()
 
 void UConvaiPlayerComponent::SendText(UConvaiChatbotComponent* ConvaiChatbotComponent, FString Text, UConvaiEnvironment* Environment, bool GenerateActions, bool VoiceResponse, bool RunOnServer)
 {
-	FString Error;
-	if (GenerateActions && !UConvaiActions::ValidateEnvironment(Environment, Error))
-	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendText: %s"), *Error);
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("SendText: Environment object seems to have issues -> setting GenerateActions to false"));
-		GenerateActions = false;
-	}
+	//FString Error;
+	//if (GenerateActions && !UConvaiActions::ValidateEnvironment(Environment, Error))
+	//{
+	//	UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendText: %s"), *Error);
+	//	UE_LOG(ConvaiPlayerLog, Log, TEXT("SendText: Environment object seems to have issues -> setting GenerateActions to false"));
+	//	GenerateActions = false;
+	//}
 
 
 	if (!IsValid(ConvaiChatbotComponent))
@@ -379,24 +380,31 @@ void UConvaiPlayerComponent::SendText(UConvaiChatbotComponent* ConvaiChatbotComp
 		return;
 	}
 
+	if (Text.Len() == 0)
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendText: Text is empty"));
+		return;
+	}
+
 	ReplicateVoiceToNetwork = RunOnServer;
 
 	if (RunOnServer)
 	{
-		if (GenerateActions)
-			SendTextServer(ConvaiChatbotComponent, Text, Environment->Actions, Environment->Objects, Environment->Characters, Environment->MainCharacter, GenerateActions, VoiceResponse);
+		if (IsValid(Environment))
+			SendTextServer(ConvaiChatbotComponent, Text, true, Environment->Actions, Environment->Objects, Environment->Characters, Environment->MainCharacter, GenerateActions, VoiceResponse);
 		else
-			SendTextServer(ConvaiChatbotComponent, Text, TArray<FString>(), TArray<FConvaiObjectEntry>(), TArray<FConvaiObjectEntry>(), FConvaiObjectEntry(), GenerateActions, VoiceResponse);
+			SendTextServer(ConvaiChatbotComponent, Text, false, TArray<FString>(), TArray<FConvaiObjectEntry>(), TArray<FConvaiObjectEntry>(), FConvaiObjectEntry(), GenerateActions, VoiceResponse);
 	}
 	else
 	{
-		ConvaiChatbotComponent->StartGetResponseStreamWithText(Text, Environment, GenerateActions, VoiceResponse, false);
+		ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, false, Token);
 	}
 }
 
 void UConvaiPlayerComponent::SendTextServer_Implementation(
 	UConvaiChatbotComponent* ConvaiChatbotComponent,
 	const FString& Text,
+	bool EnvironemntSent,
 	const TArray<FString>& Actions,
 	const TArray<FConvaiObjectEntry>& Objects,
 	const TArray<FConvaiObjectEntry>& Characters,
@@ -423,7 +431,7 @@ void UConvaiPlayerComponent::SendTextServer_Implementation(
 	Environment->Objects = Objects;
 	Environment->MainCharacter = MainCharacter;
 
-	ConvaiChatbotComponent->StartGetResponseStreamWithText(Text, Environment, GenerateActions, VoiceResponse, true);
+	ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, true, Token);
 }
 
 bool UConvaiPlayerComponent::ShouldMuteLocal()

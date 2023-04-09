@@ -7,6 +7,7 @@ THIRD_PARTY_INCLUDES_START
 
 // grpc includes
 #include <grpc++/grpc++.h>
+#include <chrono>
 THIRD_PARTY_INCLUDES_END
 
 
@@ -64,6 +65,16 @@ namespace
 		CertCloseStore(hRootCertStore, 0);
 		return result;
 	}
+
+	char* grpc_connectivity_state_str[] =
+	{
+		"GRPC_CHANNEL_IDLE",
+		"GRPC_CHANNEL_CONNECTING",
+		"GRPC_CHANNEL_READY",
+		"GRPC_CHANNEL_TRANSIENT_FAILURE",
+		"GRPC_CHANNEL_SHUTDOWN"
+	};
+
 };
 
 
@@ -94,12 +105,59 @@ uint32 FgRPCClient::Run()
 
 void FgRPCClient::StartStub()
 {
+	OnStateChangeDelegate = FgRPC_Delegate::CreateRaw(this, &FgRPCClient::OnStateChange);
+	CreateChannel();
+
 	bIsRunning = true;
 	Thread.Reset(FRunnableThread::Create(this, TEXT("gRPC_Stub")));
 }
 
+void FgRPCClient::CreateChannel()
+{
+	UE_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC Creating Channel..."));
+	Channel = grpc::CreateChannel(Target, Creds);
+	
+	//Channel->NotifyOnStateChange(grpc_connectivity_state::GRPC_CHANNEL_CONNECTING, std::chrono::system_clock::time_point().max(), &cq_, (void*)&OnStateChangeDelegate);
+}
+
+void FgRPCClient::OnStateChange(bool ok)
+{
+	//if (!bIsRunning)
+	//	return;
+
+	grpc_connectivity_state state;
+	
+	if (Channel)
+		state = Channel->GetState(true);
+	else
+		state = grpc_connectivity_state::GRPC_CHANNEL_SHUTDOWN;
+
+
+	if (state == grpc_connectivity_state::GRPC_CHANNEL_SHUTDOWN)
+	{
+		if (!bIsRunning)
+		{
+			UE_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel state changed to %s... Attempting to reconnect"), *FString(grpc_connectivity_state_str[state]));
+			CreateChannel();
+		}
+		else
+		{
+			UE_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC channel state changed to %s... Closing"), *FString(grpc_connectivity_state_str[state]));
+		}
+		//Channel->NotifyOnStateChange(state, std::chrono::system_clock::time_point().max(), &cq_, (void*)&OnStateChangeDelegate);
+	}
+	else
+	{
+		UE_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC channel state changed to %s"), *FString(grpc_connectivity_state_str[state]));
+		Channel->NotifyOnStateChange(state, std::chrono::system_clock::time_point().max(), &cq_, (void*)&OnStateChangeDelegate);
+	}
+}
+
 void FgRPCClient::Exit()
 {
+	//Channel.reset();
+	//Channel = nullptr;
+
 	if (!bIsRunning)
 	{
 		return;
@@ -114,9 +172,24 @@ void FgRPCClient::Exit()
 	//Thread->Kill();
 }
 
+FgRPCClient::FgRPCClient(std::string InTarget,
+	const std::shared_ptr<grpc::ChannelCredentials>& InCreds)
+	: bIsRunning(false),
+	Target(InTarget),
+	Creds(InCreds)
+{
+}
+
 std::unique_ptr<ConvaiService::Stub> FgRPCClient::GetNewStub()
 {
-	return ConvaiService::NewStub(channel);
+	grpc_connectivity_state state = Channel->GetState(false);
+
+	if (state != grpc_connectivity_state::GRPC_CHANNEL_READY)
+	{
+		UE_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel not ready yet.. Current State: %s"), *FString(grpc_connectivity_state_str[state]));
+		//return nullptr;
+	}
+	return ConvaiService::NewStub(Channel);
 }
 
 CompletionQueue* FgRPCClient::GetCompletionQueue()
@@ -133,11 +206,11 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	auto channel_creds = grpc::SslCredentials(getSslOptions());
 	//grpc::CreateChannel("stream.convai.com", channel_creds)
-	gRPC_Runnable = MakeShareable(new FgRPCClient(
-		grpc::CreateChannel("stream.convai.com", channel_creds)
-	));
+	//Channel = grpc::CreateChannel("stream.convai.com", channel_creds);
+
+	auto channel_creds = grpc::SslCredentials(getSslOptions());
+	gRPC_Runnable = MakeShareable(new FgRPCClient(std::string("stream.convai.com"), channel_creds));
 
 	gRPC_Runnable->StartStub();
 	UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Started"));

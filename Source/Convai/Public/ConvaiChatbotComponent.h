@@ -50,8 +50,8 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (DisplayName = "Is Talking"))
 		bool GetIsTalking();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Convai", Replicated)
-		FString CharacterID;
+	UPROPERTY(EditAnywhere, Category = "Convai", Replicated, BlueprintSetter = LoadCharacter)
+	FString CharacterID;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
 		FString CharacterName;
@@ -76,7 +76,7 @@ public:
 	/**
 	 *    Contains all relevant objects and characters in the scene including the (Player), and also all the actions doable by the character
 	 */
-	UPROPERTY(BlueprintReadOnly, Category = "Convai")
+	UPROPERTY(BlueprintReadWrite, Category = "Convai")
 		UConvaiEnvironment* Environment;
 
 	/**
@@ -86,9 +86,9 @@ public:
 		void ResetConversation();	
 	
 	/**
-	 *    Load a new character using its ID
+	 *    Loads a new character using its ID
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Convai")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Convai")
 	void LoadCharacter(FString NewCharacterID);
 
 public:
@@ -113,7 +113,7 @@ public:
 
 public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
-	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool VoiceResponse, bool RunOnServer, uint32 InToken);
+	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool VoiceResponse, bool RunOnServer, uint32 InToken);
 
 	//UFUNCTION(BlueprintCallable, DisplayName = "Send Text")
 	void StartGetResponseStreamWithText(FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer);

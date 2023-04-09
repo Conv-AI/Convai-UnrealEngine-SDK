@@ -50,7 +50,7 @@ public:
 
 	/** The bio/description for the chracter/object*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
-		FString Description;
+	FString Description;
 
 	friend bool operator==(const FConvaiObjectEntry& lhs, const FConvaiObjectEntry& rhs)
 	{
@@ -91,13 +91,17 @@ struct FConvaiResultAction
 {
 	GENERATED_BODY()
 
-		/** The action to be made*/
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
-		FString Action;
+	/** The action to be made*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
+	FString Action;
 
 	/** The object or character whom the action is to be made on*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
 		FConvaiObjectEntry RelatedObjectOrCharacter;
+
+	/** The actual string of the action without any preprocessing*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
+	FString ActionString;
 
 	/** Has extra parameters*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
@@ -243,6 +247,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
 		TArray<FConvaiObjectEntry> Characters;
 
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
 	FConvaiObjectEntry MainCharacter;
 };
 
