@@ -6,6 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "LipSyncInterface.h"
+#include "Math/UnrealMathUtility.h"
 
 // THIRD_PARTY_INCLUDES_START
 #include "opus.h"
@@ -105,8 +106,11 @@ bool UConvaiAudioStreamer::ShouldMuteGlobal()
 
 void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
 {
-	uint32 PCM_DataSize = VoiceDataSize;
+	if (IsVoiceCurrentlyFading())
+		StopVoice();
+	ResetVoiceFade();
 
+	uint32 PCM_DataSize = VoiceDataSize;
 
 	if (ContainsHeaderData)
 	{
@@ -183,20 +187,86 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
 		Play();
 	}
 
-
-
 	if (ContainsHeaderData)
 	{
 		// Play only the PCM data which start after 44 bytes
 		SoundWaveProcedural->QueueAudio(VoiceData + 44, VoiceDataSize - 44);
         PlayLipSync(VoiceData + 44, VoiceDataSize - 44, SampleRate,
                             NumChannels);
+		ResetVoiceFade();
 	}
 	else
 	{
 		SoundWaveProcedural->QueueAudio(VoiceData, VoiceDataSize);
         PlayLipSync(VoiceData, VoiceDataSize, SampleRate, NumChannels);
 	}
+}
+
+void UConvaiAudioStreamer::StopVoice()
+{
+	if (!IsTalking)
+		return;
+	SoundWaveProcedural->ResetAudio();
+	//ResetVoiceFade();
+	StopLipSync();
+	onAudioFinished();
+	ClearAudioFinishedTimer();
+}
+
+void UConvaiAudioStreamer::StopVoiceWithFade(float InVoiceFadeOutDuration)
+{
+	if (!IsTalking)
+		return;
+
+	if (!IsValid(GetWorld()))
+	{
+		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: GetWorld() is Invalid!"));
+		return;
+	}
+
+	float CurrentRemainingAudioDuration = GetWorld()->GetTimerManager().GetTimerRemaining(AudioFinishedTimerHandle);
+	TotalVoiceFadeOutTime = FMath::Min(InVoiceFadeOutDuration, CurrentRemainingAudioDuration);
+	RemainingVoiceFadeOutTime = TotalVoiceFadeOutTime;
+
+	if (TotalVoiceFadeOutTime <= 0)
+		StopVoice();
+}
+
+void UConvaiAudioStreamer::ResetVoiceFade()
+{
+	if (IsValid(SoundWaveProcedural))
+		SoundWaveProcedural->Volume = 1.0f;
+	TotalVoiceFadeOutTime = 0;
+	RemainingVoiceFadeOutTime = 0;
+}
+
+void UConvaiAudioStreamer::UpdateVoiceFade(float DeltaTime)
+{
+	if (!IsVoiceCurrentlyFading() || !IsValid(SoundWaveProcedural))
+		return;
+	RemainingVoiceFadeOutTime -= DeltaTime;
+	if (RemainingVoiceFadeOutTime <= 0)
+	{
+		StopVoice();
+		return;
+	}
+	float AudioVolume = RemainingVoiceFadeOutTime / TotalVoiceFadeOutTime;
+	SoundWaveProcedural->Volume = AudioVolume;
+}
+
+bool UConvaiAudioStreamer::IsVoiceCurrentlyFading()
+{
+	return (TotalVoiceFadeOutTime > 0 && IsTalking);
+}
+
+void UConvaiAudioStreamer::ClearAudioFinishedTimer()
+{
+	if (!IsValid(GetWorld()))
+	{
+		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("ClearAudioFinishedTimer: GetWorld() is Invalid!"));
+		return;
+	}
+	GetWorld()->GetTimerManager().ClearTimer(AudioFinishedTimerHandle);
 }
 
 // Not used
@@ -235,36 +305,6 @@ void UConvaiAudioStreamer::BeginPlay()
 	// Initialize the audio component
 	bAutoActivate = true;
 	bAlwaysPlay = true;
-	PitchMultiplier = 1.0f;
-	VolumeMultiplier = 1.0f;
-	bIsUISound = false;
-	AttenuationSettings = nullptr;
-	bOverrideAttenuation = false;
-	bAllowSpatialization = false;
-
-
-	// Initialize the Procedural soundwave
-	//SoundWaveProcedural = NewObject<USoundWaveProcedural>();
-	//SoundWaveProcedural->SetSampleRate(ConvaiConstants::VoiceCaptureSampleRate);
-	//SoundWaveProcedural->NumChannels = 1;
-	//SoundWaveProcedural->Duration = INDEFINITELY_LOOPING_DURATION;
-	//SoundWaveProcedural->SoundGroup = SOUNDGROUP_Voice;
-	//SoundWaveProcedural->bLooping = false;
-	//SoundWaveProcedural->bProcedural = true;
-	//SoundWaveProcedural->Pitch = 1.0f;
-	//SoundWaveProcedural->Volume = 1.0f;
-	//SoundWaveProcedural->AttenuationSettings = nullptr;
-	//SoundWaveProcedural->bDebug = true;
-	//SoundWaveProcedural->VirtualizationMode = EVirtualizationMode::PlayWhenSilent;
-
-	////SoundWaveProcedural->
-
-
-	////if (!GetOwner()->HasAuthority())
-	//{
-	//	SetSound(SoundWaveProcedural);
-	//	Play();
-	//}
 
 	// Find the LipSync component
     auto LipSyncComponents = (GetOwner()->GetComponentsByInterface(UConvaiLipSyncInterface::StaticClass()));
@@ -281,6 +321,8 @@ void UConvaiAudioStreamer::BeginPlay()
 void UConvaiAudioStreamer::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	UpdateVoiceFade(DeltaTime);
 
 	int32 BytesPerFrame = EncoderFrameSize * EncoderNumChannels * sizeof(opus_int16);
 	if (AudioDataBuffer.Num() >= BytesPerFrame && Encoder)
@@ -328,6 +370,15 @@ void UConvaiAudioStreamer::PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize,
 	{
         ConvaiLipSync->ConvaiProcessLipSync(InPCMData, InPCMDataSize, InSampleRate, InNumChannels);
 		ConvaiLipSync->OnVisemesDataReady.BindUObject(this, &UConvaiAudioStreamer::OnVisemesReadyCallback);
+	}
+}
+
+void UConvaiAudioStreamer::StopLipSync()
+{
+	if (ConvaiLipSync)
+	{
+		ConvaiLipSync->ConvaiStopLipSync();
+		ConvaiLipSync->OnVisemesDataReady.ExecuteIfBound(); // TODO (Mohamed): This is redundant and should be removed once all users update their OVR lipsync plugin
 	}
 }
 
