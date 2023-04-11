@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - Bug where voice was not being attenuated when traveling far away from the character.
 
 **Updated**
-- `ConvaiBasePlayer` to allow players to talk as fast as they would like without being told to slow down.
+- `ConvaiBasePlayer` blueprint to allow players to talk at their own pace.
 
 # Release 2.1.1
 **Fixed**
