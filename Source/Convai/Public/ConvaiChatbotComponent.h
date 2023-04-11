@@ -80,6 +80,12 @@ public:
 		UConvaiEnvironment* Environment;
 
 	/**
+	 *    Time in seconds, for the character's voice audio to gradually degrade until it is completely turned off when interrupted.
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai")
+	float InterruptVoiceFadeOutDuration;
+
+	/**
 	 *    Reset the conversation with the character and remove previous memory, this is the same as setting the session ID property to -1.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Convai")
@@ -115,8 +121,8 @@ public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
 	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool VoiceResponse, bool RunOnServer, uint32 InToken);
 
-	//UFUNCTION(BlueprintCallable, DisplayName = "Send Text")
-	void StartGetResponseStreamWithText(FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer);
+	UFUNCTION(BlueprintCallable, Category = "Convai")
+	void InterruptSpeech(float InVoiceFadeOutDuration);
 
 private:
 	// UActorComponent interface
@@ -185,4 +191,8 @@ private:
 
 	bool StreamInProgress = false; // Are we receiving mic audio from player?
 	FTimerHandle TimeOutTimerHandle; // Timeout handler for player not sending audio data through mic
+
+	FString LastTranscription;
+	bool ReceivedFinalTranscription;
+	bool ReceivedFinalData;
 };

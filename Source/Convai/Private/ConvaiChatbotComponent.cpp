@@ -15,6 +15,7 @@ DEFINE_LOG_CATEGORY(ConvaiChatbotComponentLog);
 UConvaiChatbotComponent::UConvaiChatbotComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	InterruptVoiceFadeOutDuration = 1.0;
 }
 
 void UConvaiChatbotComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -57,30 +58,17 @@ void UConvaiChatbotComponent::LoadCharacter(FString NewCharacterID)
 
 void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, uint32 InToken)
 {
-	//if (!(IsValid(InEnvironment) || IsValid(Environment)) && InGenerateActions)
-	//{
-	//	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: Environment is not valid"));
-	//	return;
-	//}
-
 	if (!IsValid(InConvaiPlayerComponent))
 	{
 		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: ConvaiPlayerComponent is not valid"));
 		return;
 	}
 
-	if (IsValid(CurrentConvaiPlayerComponent) && CheckTokenValidity())
+	if (IsValid(CurrentConvaiPlayerComponent) && CurrentConvaiPlayerComponent != InConvaiPlayerComponent && CheckTokenValidity())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: character is currently being talked to by a player, make sure to run \"Finish Talking\""));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: character is currently being talked to by another player, make sure to run \"Finish Talking\""));
 		return;
 	}
-
-	//if (IsInConversation())
-	//{
-	//	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: character is currently in an on-going conversation with a player, use \"Is In Conversation\" function to find out if a character is in a conversation or not"));
-	//	return;
-	//}
-
 
 	if (GenerateActions && IsValid(InEnvironment))
 		Environment = InEnvironment;
@@ -93,10 +81,15 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 		GenerateActions = false;
 	}
 
-	if (IsProcessing())
+	//if (IsProcessing())
+	//{
+	//	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: character is still processing the recent response, use \"Is Processing\" BP function to find out if a character is currently processing the response or not"));
+	//	return;
+	//}
+
+	if (GetIsTalking() || IsProcessing())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: character is still processing the response, use \"Is Processing\" function to find out if a character is still processing the response or not"));
-		return;
+		InterruptSpeech(InterruptVoiceFadeOutDuration);
 	}
 
 	UserText = InputText;
@@ -115,35 +108,20 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	Start_GRPC_Request();
 }
 
-void UConvaiChatbotComponent::StartGetResponseStreamWithText(FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer)
+void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 {
-	if (!(IsValid(InEnvironment) || IsValid(Environment)) && InGenerateActions)
+	if (GetIsTalking() || IsProcessing())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStreamWithText Environment is not valid"));
-		return;
+		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("InterruptSpeech: Interrupting character"));
+		onFinishedReceivingData();
+		StopVoiceWithFade(InVoiceFadeOutDuration);
+
+		if (ReceivedFinalTranscription == false)
+			OnTranscriptionReceived(LastTranscription, true, true);
+
+		if (ReceivedFinalData == false)
+			onResponseDataReceived(FString(""), TArray<uint8>(), 0, true);
 	}
-
-	if (IsValid(CurrentConvaiPlayerComponent) && CheckTokenValidity())
-	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStreamWithText: character is currently being talked to by a player, make sure to run \"Finish Talking\" "));
-		return;
-	}
-
-	if (IsInConversation())
-	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStreamWithText: character is currently in an on-going conversation with a player, use \"Is In Conversation\" function to find out if a character is in a conversation or not"));
-		return;
-	}
-
-	UserText = InputText;
-	GenerateActions = InGenerateActions;
-	if (IsValid(InEnvironment))
-		Environment = InEnvironment;	
-	VoiceResponse = InVoiceResponse;
-	ReplicateVoiceToNetwork = RunOnServer;
-	TextInput = true;
-
-	Start_GRPC_Request();
 }
 
 void UConvaiChatbotComponent::Start_GRPC_Request()
@@ -229,6 +207,8 @@ void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, boo
 		{
 			OnTranscriptionReceivedEvent.Broadcast(Transcription, IsTranscriptionReady, IsFinal);
 		});
+	LastTranscription = Transcription;
+	ReceivedFinalTranscription = IsFinal;
 }
 
 void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal)
@@ -245,6 +225,7 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 			// Send text and audio duration to blueprint event
 			OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, AudioDuration, IsFinal);
 		});
+	ReceivedFinalData = IsFinal;
 }
 
 void UConvaiChatbotComponent::onSessionIDReceived(const FString ReceivedSessionID)
@@ -260,9 +241,12 @@ void UConvaiChatbotComponent::onActionSequenceReceived(const TArray<FConvaiResul
 
 void UConvaiChatbotComponent::onFinishedReceivingData()
 {
-	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent Request Finished!"));
-	Unbind_GRPC_Request_Delegates();
-	ConvaiGRPCGetResponseProxy = nullptr;
+	if (ConvaiGRPCGetResponseProxy)
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent Request Finished!"));
+		Unbind_GRPC_Request_Delegates();
+		ConvaiGRPCGetResponseProxy = nullptr;
+	}
 }
 
 void UConvaiChatbotComponent::onFailure()
