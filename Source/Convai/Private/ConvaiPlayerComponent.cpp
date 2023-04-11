@@ -398,6 +398,9 @@ void UConvaiPlayerComponent::SendText(UConvaiChatbotComponent* ConvaiChatbotComp
 	else
 	{
 		ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, false, Token);
+
+		// Invalidate the token by generating a new one
+		GenerateNewToken();
 	}
 }
 
@@ -432,6 +435,9 @@ void UConvaiPlayerComponent::SendTextServer_Implementation(
 	Environment->MainCharacter = MainCharacter;
 
 	ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, true, Token);
+
+	// Invalidate the token by generating a new one
+	GenerateNewToken();
 }
 
 bool UConvaiPlayerComponent::ShouldMuteLocal()
