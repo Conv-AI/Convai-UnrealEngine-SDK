@@ -26,26 +26,35 @@ class UConvaiAudioStreamer : public UAudioComponent
 	DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(FOVRLipSyncVisemesDataReadySignature, UConvaiAudioStreamer, OnVisemesReady);
 
 public:
-
-	//void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	// Send the encoded audio from the server to all clients (including the server again)
+	/** Send the encoded audio from the server to all clients (including the server again) */
 	UFUNCTION(NetMulticast, Reliable, Category = "VoiceNetworking")
 	void BroadcastVoiceDataToClients(TArray<uint8> const& EncodedVoiceData, uint32 SampleRate, uint32 NumChannels, uint32 SizeBeforeEncode);
 
-	// Send the encoded audio from a client(/server) to the server, it should call at the end BroadcastVoiceDataToClients() 
+	/** Send the encoded audio from a client(/server) to the server, it should call at the end BroadcastVoiceDataToClients() */
 	UFUNCTION(Server, Reliable, Category = "VoiceNetworking")
 	virtual void ProcessEncodedVoiceData(TArray<uint8> const& EncodedVoiceData, uint32 SampleRate, uint32 NumChannels, uint32 SizeBeforeEncode);
 
-	// If we should play audio on same client
+	/** If we should play audio on same client */
 	virtual bool ShouldMuteLocal();
 
-	// If we should play audio on other clients
+	/** If we should play audio on other clients */
 	virtual bool ShouldMuteGlobal();
 
 	virtual void OnServerAudioReceived(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData = true, uint32 SampleRate = 21000, uint32 NumChannels = 1) {};
 
 	void PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData=true, uint32 SampleRate=21000, uint32 NumChannels=1);
+
+	void StopVoice();
+
+	void StopVoiceWithFade(float InRemainingVoiceFadeOutTime);
+
+	void ResetVoiceFade();
+
+	void UpdateVoiceFade(float DeltaTime);
+
+	bool IsVoiceCurrentlyFading();
+
+	void ClearAudioFinishedTimer();
 
 	bool IsLocal();
 
@@ -61,31 +70,26 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Convai|LipSync")
 	FOVRLipSyncVisemesDataReadySignature OnVisemesReady;
 
-	/**
-	* Returns true, if an LipSync Component was available and attached to the character
-	*/
+	/** Returns true, if an LipSync Component was available and attached to the character */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|LipSync")
 	bool SupportsLipSync();
 
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceNetworking", Replicated)
 	bool ReplicateVoiceToNetwork;
 
 public:
 	// UActorComponent interface
 	virtual void BeginPlay() override;
-	//virtual void OnRegister() override;
-	//virtual void OnUnregister() override;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	// End UActorComponent interface
 
-	//~ Begin UObject Interface.
+	// UObject Interface.
 	virtual void BeginDestroy() override;
 
 public:
 
 	FTimerHandle AudioFinishedTimerHandle;
 	bool IsTalking = false;
+	float TotalVoiceFadeOutTime;
+	float RemainingVoiceFadeOutTime;
 
 	UPROPERTY()
 	USoundWaveProcedural* SoundWaveProcedural;
@@ -98,6 +102,8 @@ public:
 	void PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize,
                          uint32 InSampleRate, uint32 InNumChannels);
 
+	void StopLipSync();
+
 	void OnVisemesReadyCallback();
 
 	UFUNCTION(BlueprintPure, Category = "Convai|LipSync", Meta = (Tooltip = "Returns last predicted viseme scores"))
@@ -105,7 +111,6 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Convai|LipSync", Meta = (Tooltip = "Returns list of viseme names"))
 	const TArray<FString> GetVisemeNames() const;
-
 
 	// Should be called in the game thread
 	void AddPCMDataToSend(TArray<uint8> PCMDataToAdd, bool ContainsHeaderData = true, uint32 SampleRate = 21000, uint32 NumChannels = 1);
