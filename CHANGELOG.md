@@ -4,8 +4,8 @@ All notable changes to this project will be documented in this file.
 # Release 2.1.2
 **Added**
 - Voice interrupts with fading.
-- InterruptSpeech BP function to `Convai Chatbot` component.
-- InterruptVoiceFadeOutDuration variable to `Convai Chatbot` component.
+- `Interrupt Speech` BP function to `Convai Chatbot` component.
+- `Interrupt Voice Fade Out Duration` variable to `Convai Chatbot` component.
 
 **Fixed**
 - Bug where the character would stop responding when being talked to via text then voice.
