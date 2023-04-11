@@ -3,16 +3,16 @@ All notable changes to this project will be documented in this file.
 
 # Release 2.1.2
 **Added**
-- Voice interrupts with fading.
-- `Interrupt Speech` BP function to `Convai Chatbot` component.
-- `Interrupt Voice Fade Out Duration` variable to `Convai Chatbot` component.
+- Character voice interrupts with fading.
+- `Interrupt Voice Fade Out Duration` variable to control voice fade duration and was added to the `Convai Chatbot` component.
+- `Interrupt Speech` BP function to force a speech interruption, and was added to `Convai Chatbot` component.
 
 **Fixed**
 - Bug where the character would stop responding when being talked to via text then voice.
 - Bug where voice was not being attenuated when traveling far away from the character.
 
 **Updated**
-- ConvaiBasePlayer to allow players to talk as fast as they would like without being told to slow down.
+- `ConvaiBasePlayer` to allow players to talk as fast as they would like without being told to slow down.
 
 # Release 2.1.1
 **Fixed**
