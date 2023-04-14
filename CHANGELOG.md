@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 2.1.3
+**Updated**
+- MetaHuman face animation now looks more natural.
+
 # Release 2.1.2
 **Added**
 - Character voice interrupts with fading.
@@ -52,6 +56,7 @@ All notable changes to this project will be documented in this file.
 - Backward compatibility with projects that implemented V1.x of the plugin.
 
 # Release 2.0.1
+**Fixed**
 - Editor crash with gRPC.
 
 # Release 2.0.0
