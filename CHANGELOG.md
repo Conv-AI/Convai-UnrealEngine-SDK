@@ -1,9 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-# Release 2.1.3
+# Release 2.2.0
 **Updated**
 - MetaHuman face animation now looks more natural.
+- MetaHuman lip-sync is smoothed out to avoid rough transitions.
+
+**Added**
+- `ConvaiPlayerWithVoiceActivation` blueprint which adds voice activation functionality instead of push-to-talk.
 
 # Release 2.1.2
 **Added**
