@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-# Release 2.2.0
+# Release 2.1.3
 **Added**
 - `ConvaiPlayerWithVoiceActivation` blueprint which adds voice activation functionality instead of push-to-talk.
 
