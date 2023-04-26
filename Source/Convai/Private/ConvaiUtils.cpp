@@ -5,7 +5,6 @@
 #include "Misc/FileHelper.h"
 #include "Http.h"
 #include "Containers/UnrealString.h"
-#include <AudioDecoder.h>
 #include "Sound/SoundWave.h"
 #include "UObject/Object.h"
 #include "GameFramework/PlayerController.h"
@@ -13,6 +12,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "UObject/UObjectHash.h"
 #include "../Convai.h"
+#include "Math/UnrealMathUtility.h"
 
 #include "ConvaiChatbotComponent.h"
 
@@ -155,12 +155,12 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 		UConvaiChatbotComponent* CurrentConvaiCharacter = Cast<UConvaiChatbotComponent>(ConvaiCharacters[CharacterIndex]);
 		check(CurrentConvaiCharacter);
 
-		if (!IsValid(CurrentConvaiCharacter) || CurrentConvaiCharacter->IsPendingKill())
+		if (!IsValid(CurrentConvaiCharacter))
 			continue;
 
 
 		AActor* Owner = CurrentConvaiCharacter->GetOwner();
-		
+
 		if (Owner == nullptr || CurrentConvaiCharacter->GetWorld() != World)
 			continue;
 
@@ -282,27 +282,6 @@ namespace
 
 }
 
-USoundWave* UConvaiUtils::DecodeMP3(TArray<uint8> InMP3Bytes) {
-
-	//return nullptr;
-	 //Getting basic audio information
-	float Duration;
-	int NumOfChannels;
-	int SampleRate;
-
-	char* OutputBytes = nullptr;
-	unsigned long DataSize = AudioDecodeMP3((char*)InMP3Bytes.GetData(), InMP3Bytes.Num(), OutputBytes, Duration, NumOfChannels, SampleRate);
-
-	if (DataSize <= 0)
-		return nullptr;
-
-	TArray<uint8> OutDecodedBytes = TArray<uint8>((uint8*)OutputBytes, DataSize);
-
-	//UE_LOG(ConvaiUtilsLog, Warning, TEXT("%d %d %d %d"), DataSize, Duration, NumOfChannels, SampleRate);
-	return UConvaiUtils::PCMDataToSoundWav(OutDecodedBytes, NumOfChannels, SampleRate);
-
-}
-
 void UConvaiUtils::PCMDataToWav(TArray<uint8> InPCMBytes, TArray<uint8>& OutWaveFileData, int NumChannels, int SampleRate)
 {
 	SerializeWaveFile(OutWaveFileData, InPCMBytes.GetData(), InPCMBytes.Num(), NumChannels, SampleRate);
@@ -325,4 +304,65 @@ USoundWave* UConvaiUtils::PCMDataToSoundWav(TArray<uint8> InPCMBytes, int NumCha
 USoundWave* UConvaiUtils::WavDataToSoundWave(TArray<uint8> InWavData)
 {
 	return WavDataToSoundwave(InWavData);
+}
+
+void UConvaiUtils::ResampleAudio(float currentSampleRate, float targetSampleRate, int numChannels, bool reduceToMono, const TArray<int16>& currentPcmData, int numSamplesToConvert, TArray<int16>& outResampledPcmData)
+{
+	// Calculate the ratio of input to output sample rates
+	float sampleRateRatio = currentSampleRate / targetSampleRate;
+
+	// Determine the number of output channels
+	int outNumChannels = reduceToMono ? 1 : numChannels;
+
+	// Determine the number of frames to iterate over
+	int32 numFramesToConvert = FMath::CeilToInt((float)numSamplesToConvert / (float)numChannels);
+
+	// Calculate the number output frames
+	int32 numOutputFrames = FMath::CeilToInt(numFramesToConvert * targetSampleRate / currentSampleRate);
+
+	// Resize the output array to the expected size
+	outResampledPcmData.Reset(numOutputFrames * outNumChannels);
+
+	// Initialize variables for tracking the current and next frame indices
+	float currentFrameIndex = 0.0f;
+	float nextFrameIndex = 0.0f;
+
+	// Iterate over the frames and resample the audio
+	for (;;)
+	{
+		// Calculate the next frame index
+		nextFrameIndex += sampleRateRatio;
+
+		if (currentFrameIndex >= numFramesToConvert || nextFrameIndex > numFramesToConvert)
+		{
+			break;
+		}
+
+		// Calculate the number of input samples to average over
+		int32 numInputSamplesToAverage = FMath::CeilToInt(nextFrameIndex - currentFrameIndex);
+
+
+		// Initialize the sum of the input samples
+		int32 sumOfInputSamples = 0;
+
+		// Sum the input samples
+		for (int channel = 0; channel < outNumChannels; ++channel)
+		{
+			for (int inputSampleIndex = 0; inputSampleIndex < numInputSamplesToAverage; ++inputSampleIndex)
+			{
+				int32 currentSampleIndex = FMath::FloorToInt(currentFrameIndex + inputSampleIndex) * numChannels + channel;
+				int16 currentSampleValue = currentPcmData[currentSampleIndex];
+				sumOfInputSamples += currentSampleValue;
+			}
+
+			// Calculate the average of the input samples
+			int16 averageSampleValue = (int16)(sumOfInputSamples / numInputSamplesToAverage);
+
+			// Add the resampled sample to the output array
+			outResampledPcmData.Add(averageSampleValue);
+		}
+
+		// Update the current frame index
+		currentFrameIndex = nextFrameIndex;
+	}
 }

@@ -44,16 +44,13 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Convai")
 	static FString GetAPI_Key();
 
-
-
-	static USoundWave* DecodeMP3(TArray<uint8> InMP3Bytes);
-
 	static void PCMDataToWav(TArray<uint8> InPCMBytes, TArray<uint8>& OutWaveFileData, int NumChannels, int SampleRate);
 
 	static USoundWave* PCMDataToSoundWav(TArray<uint8> InPCMBytes, int NumChannels, int SampleRate);
 
 	static USoundWave* WavDataToSoundWave(TArray<uint8> InWavData);
 
+	static void ResampleAudio(float currentSampleRate, float targetSampleRate, int numChannels, bool reduceToMono, const TArray<int16>& currentPcmData, int numSamplesToConvert, TArray<int16>& outResampledPcmData);
 
 };
 
