@@ -10,7 +10,7 @@
 #include "DSP/BufferVectorOperations.h"
 #include "ConvaiPlayerComponent.generated.h"
 
-#define TIME_BETWEEN_VOICE_UPDATES_SECS 1
+#define TIME_BETWEEN_VOICE_UPDATES_SECS 0.1
 
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiPlayerLog, Log, All);
 
