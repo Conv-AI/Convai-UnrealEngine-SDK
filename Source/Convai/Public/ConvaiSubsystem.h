@@ -118,6 +118,8 @@ public:
 	virtual void Deinitialize() override;
 	// End USubsystem
 
+	void GetAndroidMicPermission();
+
 public:
     TSharedPtr<FgRPCClient> gRPC_Runnable;
 };

@@ -1,10 +1,9 @@
 // Copyright 2022 Convai Inc. All Rights Reserved.
 
 #include "ConvaiSubsystem.h"
+#include "ConvaiAndroid.h"
 
 THIRD_PARTY_INCLUDES_START
-#include <wincrypt.h>
-
 // grpc includes
 #include <grpc++/grpc++.h>
 #include <chrono>
@@ -22,8 +21,11 @@ DEFINE_LOG_CATEGORY(ConvaiSubsystemLog);
 
 using grpc::SslCredentialsOptions;
 
-namespace 
+#if PLATFORM_WINDOWS
+#include <wincrypt.h>
+namespace
 {
+
 	std::string utf8Encode(const std::wstring& wstr)
 	{
 		if (wstr.empty())
@@ -65,8 +67,12 @@ namespace
 		CertCloseStore(hRootCertStore, 0);
 		return result;
 	}
+};
+#endif
 
-	char* grpc_connectivity_state_str[] =
+namespace
+{
+	const char* grpc_connectivity_state_str[] =
 	{
 		"GRPC_CHANNEL_IDLE",
 		"GRPC_CHANNEL_CONNECTING",
@@ -206,14 +212,17 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	//grpc::CreateChannel("stream.convai.com", channel_creds)
-	//Channel = grpc::CreateChannel("stream.convai.com", channel_creds);
-
+#if PLATFORM_WINDOWS
 	auto channel_creds = grpc::SslCredentials(getSslOptions());
+#elif PLATFORM_ANDROID
+	auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions());
+#endif
 	gRPC_Runnable = MakeShareable(new FgRPCClient(std::string("stream.convai.com"), channel_creds));
 
 	gRPC_Runnable->StartStub();
 	UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Started"));
+
+	GetAndroidMicPermission();
 }
 
 void UConvaiSubsystem::Deinitialize()
@@ -221,4 +230,10 @@ void UConvaiSubsystem::Deinitialize()
 	gRPC_Runnable->Exit();
 	Super::Deinitialize();
 	UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Stopped"));
+}
+
+void UConvaiSubsystem::GetAndroidMicPermission()
+{
+	if (!UConvaiAndroid::ConvaiAndroidHasMicrophonePermission())
+		UConvaiAndroid::ConvaiAndroidAskMicrophonePermission();
 }
