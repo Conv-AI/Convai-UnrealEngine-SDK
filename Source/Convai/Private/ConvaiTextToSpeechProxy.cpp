@@ -96,7 +96,8 @@ void UConvaiTextToSpeechProxy::Activate()
 	JsonWriter->WriteValue("transcript", Transcript);
 	JsonWriter->WriteValue("voice", VoiceStr);
 	JsonWriter->WriteValue("filename", FString("testAudio"));
-	JsonWriter->WriteValue("encoding", (VoiceStr.ToLower() == "female" || VoiceStr.ToLower() == "male")? FString("wav") : FString("mp3"));
+	//JsonWriter->WriteValue("encoding", (VoiceStr.ToLower() == "female" || VoiceStr.ToLower() == "male")? FString("wav") : FString("mp3"));
+	JsonWriter->WriteValue("encoding", FString("wav"));
 	JsonWriter->WriteObjectEnd();
 	JsonWriter->Close();
 	// Insert the content into the request
@@ -133,14 +134,8 @@ void UConvaiTextToSpeechProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 		return;
 	}
 
-	if (VoiceStr.ToLower() == "female" || VoiceStr.ToLower() == "male")
-	{
-		this->SoundWave = UConvaiUtils::WavDataToSoundWave(ResponsePtr->GetContent()); // use this if in WAV format
-	}
-	else
-	{
-		this->SoundWave = UConvaiUtils::DecodeMP3(ResponsePtr->GetContent()); // use this if the received content is in MP3 Format
-	}
+	this->SoundWave = UConvaiUtils::WavDataToSoundWave(ResponsePtr->GetContent());
+
 	//this->SoundWave = UConvaiUtils::PCMDataToSoundWav(ResponsePtr->GetContent(), 1, 44100); // use this if in PCM format
 	if (this->SoundWave == nullptr)
 	{
