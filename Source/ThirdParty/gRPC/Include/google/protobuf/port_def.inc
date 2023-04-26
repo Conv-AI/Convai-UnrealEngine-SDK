@@ -557,7 +557,7 @@
 #define PROTOBUF_CONSTINIT
 #endif
 
-#if _MSC_VER
+#ifdef _MSC_VER
 #define PROTOBUF_DISABLE_MSVC_UNION_WARNING \
   __pragma(warning(push)) \
   __pragma(warning(disable : 4582)) \
