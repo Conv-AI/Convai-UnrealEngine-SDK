@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "Http.h"
-#include "ConviDefinitions.h"
+#include "ConvaiDefinitions.h"
 #include "ConvaiTextToSpeechProxy.generated.h"
 
 class USoundWave;

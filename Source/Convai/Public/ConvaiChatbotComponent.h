@@ -4,7 +4,7 @@
 //#include "CoreMinimal.h"
 #include "Components/AudioComponent.h"
 #include "ConvaiAudioStreamer.h"
-#include "ConviDefinitions.h"
+#include "ConvaiDefinitions.h"
 
 #include "ConvaiChatbotComponent.generated.h"
 

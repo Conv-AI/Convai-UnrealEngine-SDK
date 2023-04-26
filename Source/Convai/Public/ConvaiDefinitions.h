@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ConviDefinitions.generated.h"
+#include "ConvaiDefinitions.generated.h"
 
 
 UENUM(BlueprintType)
@@ -271,7 +271,7 @@ namespace ConvaiConstants
 		// Buffer sizes
 		VoiceCaptureRingBufferCapacity = 1024 * 1024,
 		VoiceCaptureBufferSize = 1024 * 1024,
-		VoiceCaptureSampleRate = 12000,
+		VoiceCaptureSampleRate = 16000,
 		VoiceCaptureChunk = 2084,
 		VoiceStreamMaxChunk = 4096,
 		PlayerTimeOut = 2500 /* 2500 ms*/,

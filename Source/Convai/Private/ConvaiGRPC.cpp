@@ -3,7 +3,7 @@
 
 #include "ConvaiGRPC.h"
 #include "../Convai.h"
-#include "ConviDefinitions.h"
+#include "ConvaiDefinitions.h"
 #include "ConvaiActionUtils.h"
 #include "ConvaiUtils.h"
 #include "JsonObjectConverter.h"
@@ -16,7 +16,7 @@ THIRD_PARTY_INCLUDES_START
 THIRD_PARTY_INCLUDES_END
 
 // Needed for CURL to work
-#pragma comment (lib, "crypt32.lib")
+//#pragma comment (lib, "crypt32.lib")
 
 DEFINE_LOG_CATEGORY(ConvaiGRPCLog);
 
@@ -68,7 +68,7 @@ namespace {
 
 
 
-	char* StatusCodeStr[] =
+	const char* StatusCodeStr[] =
 	{
 	"OK",
 	"CANCELLED",

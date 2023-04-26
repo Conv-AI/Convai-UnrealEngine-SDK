@@ -4,7 +4,7 @@
 //#include "CoreMinimal.h"
 // #undef UpdateResource
 #include "Components/AudioComponent.h"
-#include "ConviDefinitions.h"
+#include "ConvaiDefinitions.h"
 #include "Interfaces/VoiceCodec.h"
 
 #include "ConvaiAudioStreamer.generated.h"

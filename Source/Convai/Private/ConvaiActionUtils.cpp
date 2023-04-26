@@ -3,7 +3,7 @@
 
 #include "ConvaiActionUtils.h"
 #include "Internationalization/Regex.h"
-#include "ConviDefinitions.h"
+#include "ConvaiDefinitions.h"
 
 DEFINE_LOG_CATEGORY(ConvaiActionUtilsLog);
 
