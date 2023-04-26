@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "2.2.0",
+	"VersionName": "2.3.0",
 	"FriendlyName": "Convai",
 	"Description": "Adds new blueprint functions to integrate Convai API.",
 	"Category": "Runtime",
@@ -16,15 +16,20 @@
 		{
 			"Name": "Convai",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
+			"LoadingPhase": "PreDefault",
 			"WhitelistPlatforms": [
-				"Win64"
+				"Win64",
+				"Android"
 			]
 		}
 	],
 	"Plugins": [
 		{
 			"Name": "AudioCapture",
+			"Enabled": true
+		},
+		{
+			"Name": "AndroidPermission",
 			"Enabled": true
 		}
 	]
