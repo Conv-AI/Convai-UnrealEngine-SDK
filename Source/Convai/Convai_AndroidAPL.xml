@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- // Copyright 2022 Convai Inc. All Rights Reserved. -->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+	<!-- init section is always evaluated once per architecture -->
+	<trace enable="true"/>
+	<init>
+		<log text="AndroidAPITemplate init"/>		
+	</init>
+
+  <androidManifestUpdates>
+
+    <addPermission android:name="android.permission.RECORD_AUDIO" />
+
+  </androidManifestUpdates>
+
+  <!-- optional additions to proguard -->
+  <proguardAdditions>
+    <insert><![CDATA[
+      -keepattributes Signature
+      -dontskipnonpubliclibraryclassmembers
+
+     -keepclassmembers class com.epicgames.ue4.GameActivity {
+            public <methods>;
+            public <fields>;
+     }
+    ]]></insert>
+  </proguardAdditions>
+
+  <gradleProperties>
+    <insert>
+      android.useAndroidX=true
+      android.enableJetifier=true
+    </insert>
+  </gradleProperties>
+  
+  <buildscriptGradleAdditions>
+    <insert>
+      dependencies
+      {
+      repositories {
+      // Check that you have the following line (if not, add it):
+      google()  // Google's Maven repository
+      }
+      classpath 'com.google.gms:google-services:4.3.3' // google-services plugin
+      }
+    </insert>
+  </buildscriptGradleAdditions>
+
+  <buildGradleAdditions>
+    <!-- Needs to be same version number as play-services -->
+    <insert>
+
+      dependencies
+      {
+      implementation 'com.google.android.play:core:1.9.0'
+      }
+
+      allprojects {
+      def mappings = [
+      'android.support.annotation': 'androidx.annotation',
+      'android.arch.lifecycle': 'androidx.lifecycle',
+      'android.support.v4.app.NotificationCompat': 'androidx.core.app.NotificationCompat',
+      'android.support.v4.app.ActivityCompat': 'androidx.core.app.ActivityCompat',
+      'android.support.v4.content.ContextCompat': 'androidx.core.content.ContextCompat',
+      'android.support.v13.app.FragmentCompat': 'androidx.legacy.app.FragmentCompat',
+      'android.arch.lifecycle.Lifecycle': 'androidx.lifecycle.Lifecycle',
+      'android.arch.lifecycle.LifecycleObserver': 'androidx.lifecycle.LifecycleObserver',
+      'android.arch.lifecycle.OnLifecycleEvent': 'androidx.lifecycle.OnLifecycleEvent',
+      'android.arch.lifecycle.ProcessLifecycleOwner': 'androidx.lifecycle.ProcessLifecycleOwner',
+      ]
+
+      beforeEvaluate { project ->
+      project.rootProject.projectDir.traverse(type: groovy.io.FileType.FILES, nameFilter: ~/.*\.java$/) { f ->
+      mappings.each { entry ->
+      if (f.getText('UTF-8').contains(entry.key)) {
+      println "Updating ${entry.key} to ${entry.value} in file ${f}"
+      ant.replace(file: f, token: entry.key, value: entry.value)
+      }
+      }
+      }
+      }
+      }
+
+    </insert>
+  </buildGradleAdditions>
+  
+  <resourceCopies>
+    <!-- Copy the generated resource file to be packaged -->
+  </resourceCopies>
+
+  <AARImports>
+  </AARImports>
+  
+  <!-- optional additions to the GameActivity imports in GameActivity.java -->
+	<gameActivityImportAdditions>
+	  <insert>
+      import java.util.HashSet;
+      import java.util.Arrays;
+      import android.os.Handler;
+
+      import android.util.Log;
+      import android.media.AudioRecord;
+      import android.media.AudioFormat;
+      import android.media.MediaRecorder;
+      import android.media.AudioTrack;
+
+      import androidx.core.app.ActivityCompat;
+      import androidx.core.content.ContextCompat;
+      import android.Manifest;
+      import android.media.audiofx.AcousticEchoCanceler;
+    </insert>
+	</gameActivityImportAdditions>
+	
+
+	<!-- optional additions to the GameActivity class in GameActivity.java -->
+	<gameActivityClassAdditions>
+		<insert>
+		<![CDATA[
+    
+    /* JNI UE4 Native */
+    private static native void dataMicPayload(short[] dataMic, int readSize);
+     
+     /* VAR */
+    AudioRecord microphone = null;
+    Thread threadMicro = null;
+    AudioTrack audioplayback;
+  RunnableVoice runableVoice;
+       
+       private boolean isPermissionAllowedMic = false;
+       
+       
+    /* FUNC */
+    
+    public void AndroidThunkJava_AndroidAskPermissionMicrophone(){     
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
+    }
+      
+    public boolean AndroidThunkJava_AndroidHasPermissionMicrophone(){   
+        boolean res = false;
+        res = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+        android.util.Log.d("AndroidRateApp","UPL permission " + res);
+        return res;
+    } 
+      
+		public boolean AndroidThunkJava_AndroidStartMicrophone(int sampleRateToUse) {
+    
+        android.util.Log.d("AndroidRateApp","UPL microphone sampleRateToUse " + sampleRateToUse);
+        
+        if(!isPermissionAllowedMic){
+            isPermissionAllowedMic = AndroidThunkJava_AndroidHasPermissionMicrophone();            
+            if(!isPermissionAllowedMic) return false;
+        }
+        
+        
+        if(microphone == null){
+            final int sampleRate = sampleRateToUse;
+            final int channelConfig = AudioFormat.CHANNEL_IN_MONO;
+            final int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+
+            final int minBufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
+            microphone = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, sampleRate, channelConfig, audioFormat, minBufferSize );
+
+            if(AcousticEchoCanceler.isAvailable()){
+                AcousticEchoCanceler aec = AcousticEchoCanceler.create(microphone.getAudioSessionId());
+                if (aec != null) {
+                    aec.setEnabled(true);
+                   android.util.Log.d("AndroidRateApp","echo cancelation ok VOICE_COMMUNICATION");
+                } else {
+                   android.util.Log.d("AndroidRateApp","echo cancelation not ok VOICE_COMMUNICATION");
+                }
+            }
+            microphone.startRecording();
+          
+            runableVoice = new RunnableVoice(minBufferSize);
+            runableVoice.microphoneThread = microphone;
+            
+            threadMicro = new Thread(runableVoice);
+
+      
+            threadMicro.start();
+        }
+                
+        microphone.startRecording();
+        runableVoice.setthreadMicroRunning(true);
+        
+         return true;
+		}
+    
+    public void AndroidThunkJava_AndroidStopMicrophone() {
+        android.util.Log.d("AndroidRateApp","UPL AndroidThunkJava_AndroidStopMicrophone setthreadMicroRunning");
+        runableVoice.setthreadMicroRunning(false);
+        //threadMicro.stop();
+        microphone.stop();
+        runableVoice.setthreadMicroRunning(false);
+        //microphone.release();
+    }
+		
+
+    public class RunnableVoice implements Runnable {
+         public volatile boolean threadMicroRunning = false;
+         public  AudioRecord microphoneThread = null;
+         int minBufferSize;
+         
+         public RunnableVoice(int minBufferSize){
+          this.minBufferSize = minBufferSize;
+         }
+        
+          public void setthreadMicroRunning(boolean threadMicroRunning){
+            this.threadMicroRunning = threadMicroRunning;
+               android.util.Log.d("AndroidRateApp","UPL setthreadMicroRunning " +  this.threadMicroRunning);
+           }
+         
+        @Override
+        public void run() {
+          try {
+            short[] buffer = new short[minBufferSize / 2];
+            while (true) {   
+                  if(threadMicroRunning){
+                      int readSize = microphoneThread.read(buffer, 0, buffer.length);
+                      android.util.Log.d("AndroidRateApp","UPL microphone data  / 2 " + readSize +" "+buffer[0]);
+                      dataMicPayload(buffer, readSize);
+                  }                               
+            }
+          } catch(Exception e){
+            e.printStackTrace();
+          }
+        }
+    }
+    
+		]]>
+		</insert>
+	</gameActivityClassAdditions>
+	
+	<!-- optional additions to GameActivity onCreate metadata reading in GameActivity.java -->
+	<gameActivityReadMetadataAdditions>
+	<insert>
+
+  </insert>
+	</gameActivityReadMetadataAdditions>
+	
+	<!-- optional additions to GameActivity onCreate in GameActivity.java -->
+	<gameActivityOnCreateAdditions>
+		<insert>
+		<![CDATA[
+    
+		]]>
+		</insert>
+	</gameActivityOnCreateAdditions>
+
+	<!-- optional additions to GameActivity onDestroy in GameActivity.java -->
+	<gameActivityOnDestroyAdditions>
+		<insert>
+		
+		</insert>
+	</gameActivityOnDestroyAdditions>
+	
+	
+	<!-- optional additions to GameActivity onStart in GameActivity.java -->
+	<gameActivityOnStartAdditions>
+		<insert>
+		
+		</insert>
+	</gameActivityOnStartAdditions>
+
+	<!-- optional additions to GameActivity onStop in GameActivity.java -->
+	<gameActivityOnStopAdditions>
+		<insert>
+		
+		</insert>
+	</gameActivityOnStopAdditions>
+	
+
+	<!-- optional additions to GameActivity onPause in GameActivity.java	-->
+	<gameActivityOnPauseAdditions>
+    <insert>
+    <![CDATA[
+    ]]>
+    </insert>
+  </gameActivityOnPauseAdditions>
+
+
+  <!-- optional additions to GameActivity onResume in GameActivity.java	-->
+  <gameActivityOnResumeAdditions>
+    <insert>
+    </insert>
+  </gameActivityOnResumeAdditions>
+
+
+	<!-- optional additions to GameActivity onActivityResult in GameActivity.java -->
+	<gameActivityOnActivityResultAdditions>
+		<insert>
+		</insert>
+    </gameActivityOnActivityResultAdditions>
+	
+
+	<!-- optional libraries to load in GameActivity.java before libUE4.so -->
+	<soLoadLibrary>
+		<!-- need this if plugin enabled and supported architecture, even if not packaged for GearVR -->
+	</soLoadLibrary>
+</root>
