@@ -7,13 +7,19 @@
 #include "RingBuffer.h"
 #include "ConvaiAudioStreamer.h"
 #include "Net/OnlineBlueprintCallProxyBase.h"
+#include "DSP/BufferVectorOperations.h"
 #include "ConvaiPlayerComponent.generated.h"
+
+#define TIME_BETWEEN_VOICE_UPDATES_SECS 1
 
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiPlayerLog, Log, All);
 
 DECLARE_DELEGATE(FonDataReceived_Delegate);
 
-class IVoiceCapture;
+// class IVoiceCapture;
+class UConvaiAudioCaptureComponent;
+
+
 
 // TODO (Mohamed): Ensure both Chatbot and Player components have the same ReplicateVoiceToNetwork value
 // TODO (Mohamed): Send Text should also be handled in this class (UConvaiPlayerComponent) like we did with voice
@@ -25,7 +31,7 @@ class UConvaiPlayerComponent : public UConvaiAudioStreamer
 
 	UConvaiPlayerComponent();
 
-	void Init();
+	bool Init();
 
 public:
 
@@ -149,9 +155,6 @@ public:
 		return Token == TokenToCheck;
 	}
 
-
-
-
 private:
 
 	uint32 GenerateNewToken()
@@ -163,7 +166,7 @@ private:
 	UPROPERTY()
 	USoundWaveProcedural* VoiceCaptureSoundWaveProcedural;
 
-	TSharedPtr<IVoiceCapture> VoiceCapture;
+	//TSharedPtr<IVoiceCapture> VoiceCapture;
 
 	// Buffer used with recording
 	TArray<uint8> VoiceCaptureBuffer;
@@ -172,12 +175,21 @@ private:
 	// TODO (Mohamed): use TCircularAudioBuffer instead
 	TRingBuffer<uint8> VoiceCaptureRingBuffer;
 
+	TWeakObjectPtr<UConvaiAudioCaptureComponent> AudioCaptureComponent;
+
+	void UpdateVoiceCapture(float DeltaTime);
+	void StartVoiceChunkCapture();
+	void StopVoiceChunkCapture();
+	void ReadRecordedBuffer(Audio::AlignedFloatBuffer& RecordedBuffer, float& OutNumChannels, float& OutSampleRate);
+
 	FonDataReceived_Delegate onDataReceived_Delegate;
 
 	bool IsRecording = false;
 	bool IsStreaming = false;
 	bool IsInit = false;
 	bool bShouldMuteGlobal;
+
+	float RemainingTimeUntilNextUpdate = 0;
 
 	// Used by a consumer (e.g. chatbot component) to validate if this player component is still streaming audio data to it
 	uint32 Token;

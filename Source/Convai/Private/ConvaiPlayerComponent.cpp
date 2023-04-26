@@ -6,36 +6,79 @@
 #include "Misc/FileHelper.h"
 #include "Http.h"
 #include "ConvaiUtils.h"
-#include "VoiceModule.h"
 #include "Containers/UnrealString.h"
 #include "Kismet/GameplayStatics.h"
-#include "ConviDefinitions.h"
+#include "ConvaiDefinitions.h"
 #include "ConvaiActionUtils.h"
-
 #include "ConvaiChatbotComponent.h"
-
+#include "AudioMixerBlueprintLibrary.h"
+#include "Engine/GameEngine.h"
 #include "Sound/SoundWave.h"
+#include "ConvaiAudioCaptureComponent.h"
+#include "AudioDevice.h"
+#include "AudioMixerDevice.h"
+
 
 DEFINE_LOG_CATEGORY(ConvaiPlayerLog);
+
+static FAudioDevice* GetAudioDeviceFromWorldContext(const UObject* WorldContextObject)
+{
+	UWorld* ThisWorld = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	if (!ThisWorld || !ThisWorld->bAllowAudioPlayback || ThisWorld->GetNetMode() == NM_DedicatedServer)
+	{
+		return nullptr;
+	}
+
+	return ThisWorld->GetAudioDevice().GetAudioDevice();
+}
+
+static Audio::FMixerDevice* GetAudioMixerDeviceFromWorldContext(const UObject* WorldContextObject)
+{
+	if (FAudioDevice* AudioDevice = GetAudioDeviceFromWorldContext(WorldContextObject))
+	{
+		if (!AudioDevice->IsAudioMixerEnabled())
+		{
+			return nullptr;
+		}
+		else
+		{
+			return static_cast<Audio::FMixerDevice*>(AudioDevice);
+		}
+	}
+	return nullptr;
+}
 
 UConvaiPlayerComponent::UConvaiPlayerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	bAutoActivate = true;
+	IsInit = false;
 	VoiceCaptureRingBuffer.Init(ConvaiConstants::VoiceCaptureRingBufferCapacity);
 	VoiceCaptureBuffer.Empty(ConvaiConstants::VoiceCaptureBufferSize);
+	AudioCaptureComponent = CreateDefaultSubobject<UConvaiAudioCaptureComponent>(TEXT("ConvaiAudioCapture"));
+	AudioCaptureComponent->SetupAttachment(this);
+
+	const FString FoundSubmixPath = "/ConvAI/Submixes/AudioInput.AudioInput";
+	auto _FoundSubmix = ConstructorHelpers::FObjectFinder<USoundSubmixBase>(*FoundSubmixPath).Object;
+	if (_FoundSubmix != nullptr) {
+		AudioCaptureComponent->SoundSubmix = _FoundSubmix;
+	}
+	else
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("UConvaiPlayerComponent: Audio Submix was not found, please ensure an audio submix exists at this directory: \"/ConvAI/Submixes/AudioInput\" then restart the Unreal Engine or "));
+	}
 }
  
-void UConvaiPlayerComponent::Init()
+bool UConvaiPlayerComponent::Init()
 {
-	if (VoiceCapture)
+	if (IsInit)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("VoiceCapture is already init"));
-		return;
+		UE_LOG(ConvaiPlayerLog, Log, TEXT("AudioCaptureComponent is already init"));
+		return true;
 	}
 
 	FString commandMicNoiseGateThreshold = "voice.MicNoiseGateThreshold  0.01";
-	FString commandSilenceDetectionThreshold = "voice.SilenceDetectionThreshold 0.01";
+	FString commandSilenceDetectionThreshold = "voice.SilenceDetectionThreshold 0.001";
 
 	APlayerController* PController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (PController)
@@ -44,145 +87,175 @@ void UConvaiPlayerComponent::Init()
 		PController->ConsoleCommand(*commandSilenceDetectionThreshold, true);
 	}
 
-	VoiceCapture = FVoiceModule::Get().CreateVoiceCapture("", ConvaiConstants::VoiceCaptureSampleRate, 1);
-	if (VoiceCapture.IsValid())
+	AudioCaptureComponent = Cast<UConvaiAudioCaptureComponent>(GetOwner()->GetComponentByClass(UConvaiAudioCaptureComponent::StaticClass()));
+	if (!AudioCaptureComponent.IsValid())
 	{
-		//UE_LOG(ConvaiPlayerLog, Warning, TEXT("UConvaiPlayerComponent::Init VoiceCapture.IsValid()  valid VoiceCapture->GetBufferSize() %d"), VoiceCapture->GetBufferSize());
-		IsInit = true;
-	}
-	else 
-	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("VoiceCapture is not valid - Please check that 1) you have edited DefaultEngine.ini as in the documentation/tutorials, and 2) your microphone is connected and is set as the default input"));
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("Init: AudioCaptureComponent is not valid"));
+		return false;
 	}
 
+	IsInit = true;
 	Token = 0;
+	return true;
 }
 
 void UConvaiPlayerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!IsInit)
-	{
-			return;
-	}
-
-	if (!VoiceCapture.IsValid())
+	if (!IsInit || !AudioCaptureComponent.IsValid())
 	{
 		return;
 	}
 
-	//UE_LOG(ConvaiPlayerLog, Log, TEXT("GetIsStreaming(): %d"), int(GetIsStreaming()));
+	UpdateVoiceCapture(DeltaTime);
+}
 
-
-	uint32 VoiceCaptureBytesAvailable = 0;
-	EVoiceCaptureState::Type CaptureState = VoiceCapture->GetCaptureState(VoiceCaptureBytesAvailable);
-
-	if (CaptureState != EVoiceCaptureState::Ok || VoiceCaptureBytesAvailable == 0)
-	{
-		//UE_LOG(ConvaiPlayerLog, Log, TEXT("CaptureState: %d, VoiceCaptureBytesAvailable: %d"), int(CaptureState), VoiceCaptureBytesAvailable);
-		return;
+void UConvaiPlayerComponent::UpdateVoiceCapture(float DeltaTime)
+{
+	if (IsRecording || IsStreaming) {
+		RemainingTimeUntilNextUpdate -= DeltaTime;
+		if (RemainingTimeUntilNextUpdate <= 0)
+		{
+			FAudioThread::RunCommandOnAudioThread([this]()
+				{
+					StopVoiceChunkCapture();
+					StartVoiceChunkCapture();
+				});
+			RemainingTimeUntilNextUpdate = TIME_BETWEEN_VOICE_UPDATES_SECS;
+		}
 	}
+	else
+	{
+		RemainingTimeUntilNextUpdate = 0;
+	}
+}
 
-	TArray<uint8> TempBuffer;
-	TempBuffer.SetNumUninitialized(VoiceCaptureBytesAvailable);
+void UConvaiPlayerComponent::StartVoiceChunkCapture()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("StartVoiceChunkCapture() in VoiceCaptureComp.cpp")));
+	//UE_LOG(LogTemp, Warning, TEXT("StartVoiceChunkCapture() in VoiceCaptureComp.cpp"));
+	UAudioMixerBlueprintLibrary::StartRecordingOutput(this, TIME_BETWEEN_VOICE_UPDATES_SECS*2, Cast<USoundSubmix>(AudioCaptureComponent->SoundSubmix));
+}
 
-	// get current voice data
-	uint64 OutSampleCounter = 0;
-	uint32 OutAvailableVoiceData = 0;
-	VoiceCapture->GetVoiceData(TempBuffer.GetData(), VoiceCaptureBytesAvailable, OutAvailableVoiceData, OutSampleCounter);
+void UConvaiPlayerComponent::ReadRecordedBuffer(Audio::AlignedFloatBuffer& RecordedBuffer, float& OutNumChannels, float& OutSampleRate)
+{
+	if (Audio::FMixerDevice* MixerDevice = GetAudioMixerDeviceFromWorldContext(this))
+	{
+		// call the thing here.
+		RecordedBuffer = MixerDevice->StopRecording(Cast<USoundSubmix>(AudioCaptureComponent->SoundSubmix), OutNumChannels, OutSampleRate);
 
-	//UE_LOG(ConvaiPlayerLog, Log, TEXT("VoiceCaptureBytesAvailable: %d bytes | OutAvailableVoiceData: %d | TempBuffer.Num(): %d bytes"), VoiceCaptureBytesAvailable, OutAvailableVoiceData, TempBuffer.Num());
-	//UE_LOG(ConvaiPlayerLog, Log, TEXT("OutAvailableVoiceData: %d bytes| VoiceCaptureBuffer.Num(): %d bytes "), OutAvailableVoiceData, VoiceCaptureBuffer.Num());
+		if (RecordedBuffer.Num() == 0)
+		{
+			UE_LOG(ConvaiPlayerLog, Warning, TEXT("ReadRecordedBuffer: No audio data. Did you call Start Recording Output?"));
+		}
+	}
+	else
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("ReadRecordedBuffer: Could not get MixerDevice"));
+	}
+}
+
+void UConvaiPlayerComponent::StopVoiceChunkCapture()
+{
+	//USoundWave* SoundWaveMic = UAudioMixerBlueprintLibrary::StopRecordingOutput(this, EAudioRecordingExportType::SoundWave, "Convsound", "ConvSound", Cast<USoundSubmix>(AudioCaptureComponent->SoundSubmix));
+
+	float NumChannels;
+	float SampleRate;
+	Audio::AlignedFloatBuffer RecordedBuffer = Audio::AlignedFloatBuffer();
+
+	ReadRecordedBuffer(RecordedBuffer, NumChannels, SampleRate);
+	//NumChannels = 2;
+	//SampleRate = ConvaiConstants::VoiceCaptureSampleRate;
+
+	if (RecordedBuffer.Num() == 0)
+		return;
+
+	Audio::TSampleBuffer<int16> Int16Buffer = Audio::TSampleBuffer<int16>(RecordedBuffer, NumChannels, SampleRate);
+	TArray<int16> OutConverted;
+
+	if (NumChannels > 1 || SampleRate != ConvaiConstants::VoiceCaptureSampleRate)
+	{
+		UConvaiUtils::ResampleAudio(SampleRate, ConvaiConstants::VoiceCaptureSampleRate, NumChannels, true, (TArray<int16>)Int16Buffer.GetArrayView(), Int16Buffer.GetNumSamples(), OutConverted);
+	}
+	else
+	{
+		OutConverted = (TArray<int16>)Int16Buffer.GetArrayView();
+	}
+	//OutConverted = (TArray<int16>)Int16Buffer.GetArrayView();
+	//OutConverted = TArray<int16>(Int16Buffer.GetData(), Int16Buffer.GetNumSamples());
+
+	UE_LOG(ConvaiPlayerLog, Log, TEXT("Int16Buffer.GetNumSamples() %i, NumChannels %f,  SampleRate %f"), Int16Buffer.GetNumSamples(), NumChannels, SampleRate);
+	UE_LOG(ConvaiPlayerLog, Log, TEXT("OutConverted.Num() %i"), OutConverted.Num());
+
+
 
 	if (!ReplicateVoiceToNetwork)
 	{
 		if (IsRecording)
-			VoiceCaptureBuffer.Append(TempBuffer);
+			VoiceCaptureBuffer.Append((uint8*)OutConverted.GetData(), OutConverted.Num()*sizeof(int16));
 
 		if (IsStreaming)
-			VoiceCaptureRingBuffer.Enqueue(TempBuffer.GetData(), TempBuffer.Num());
+			VoiceCaptureRingBuffer.Enqueue((uint8*)OutConverted.GetData(), OutConverted.Num() * sizeof(int16));
 
 		onDataReceived_Delegate.ExecuteIfBound();
 	}
 	else
 	{
 		// Stream voice data
-		AddPCMDataToSend(TempBuffer, false, ConvaiConstants::VoiceCaptureSampleRate, 1);
+		AddPCMDataToSend(TArray<uint8>((uint8*)OutConverted.GetData(), OutConverted.Num() * sizeof(int16)), false, ConvaiConstants::VoiceCaptureSampleRate, 1);
 	}
-
 }
 
 void UConvaiPlayerComponent::StartRecording()
 {
-	if (!IsInit)
-	{
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("StartRecording Initializing..."));
-		Init();
-		if (!VoiceCapture)
-			return;
-	}
-
-	if (VoiceCapture && !VoiceCapture.IsValid())
-	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartRecording VoiceCapture is not valid"));
-		IsInit = false;
-		IsRecording = false;
-		return;
-	}
-
 	if (IsRecording)
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartRecording: already recording!"));
 		return;
 	}
 
+	if (IsStreaming)
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartRecording: already talking!"));
+		return;
+	}
+
+	if (!IsInit)
+	{
+		UE_LOG(ConvaiPlayerLog, Log, TEXT("StartRecording: Initializing..."));
+		if (!Init())
+		{
+			UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartRecording: Could not initialize"));
+			return;
+		}
+	}
+
 	UE_LOG(ConvaiPlayerLog, Log, TEXT("Started Recording "));
-	VoiceCapture->Start();
-	IsRecording = true;
+	AudioCaptureComponent->Start();    //Start the AudioCaptureComponent
+
+	// reset audio buffers
+	StartVoiceChunkCapture();
+	StopVoiceChunkCapture();
 	VoiceCaptureBuffer.Empty(ConvaiConstants::VoiceCaptureBufferSize);
+
+	IsRecording = true;
 }
 
 USoundWave* UConvaiPlayerComponent::FinishRecording()
 {
 	if (!IsRecording)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StopRecording did not start recording"));
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("FinishRecording: did not start recording"));
 		return nullptr;
 	}
-
-	if (VoiceCapture && !VoiceCapture.IsValid())
-	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StopRecording VoiceCapture is not valid"));
-		return nullptr;
-	}
-
-
-	if (!VoiceCapture->IsCapturing()) 
-	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StopRecording voice capture is not capturing"));
-		return nullptr;
-	}
-
-
 
 	UE_LOG(ConvaiPlayerLog, Log, TEXT("Stopped Recording "));
-	VoiceCapture->Stop();
-	IsRecording = false;
-
-	if (VoiceCaptureBuffer.Num() <100)
-	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StopRecording too little voice data: %d"), VoiceCaptureBuffer.Num());
-		return nullptr;
-	}
-
-	//UE_LOG(ConvaiPlayerLog, Log, TEXT("VoiceCaptureBuffer.Num() final: %d bytes "), VoiceCaptureBuffer.Num());
+	StopVoiceChunkCapture();
 	USoundWave* OutSoundWave = UConvaiUtils::PCMDataToSoundWav(VoiceCaptureBuffer, 1, ConvaiConstants::VoiceCaptureSampleRate);
-	//UE_LOG(ConvaiPlayerLog, Log, TEXT("OutSoundWave->GetDuration(): %d seconds "), OutSoundWave->GetDuration());
-	
-	//USoundWave* OutSoundWave = UConvaiUtils::WavDataToSoundWave(VoiceCaptureBuffer);
-
-
+	AudioCaptureComponent->Stop();  //stop the AudioCaptureComponent
+	UE_LOG(ConvaiPlayerLog, Log, TEXT("OutSoundWave->GetDuration(): %d seconds "), OutSoundWave->GetDuration());
+	IsRecording = false;
 	return OutSoundWave;
 }
 
@@ -194,43 +267,33 @@ void UConvaiPlayerComponent::StartTalking(
 	bool RunOnServer,
 	bool StreamPlayerMic)
 {
-	if (!IsInit)
-	{
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking Initializing..."));
-		Init();
-		if (!VoiceCapture)
-			return;
-	}
-
-	if (VoiceCapture && !VoiceCapture.IsValid())
-	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking VoiceCapture is not valid"));
-		IsInit = false;
-		IsStreaming = false;
-		return;
-	}
-
 	if (IsStreaming)
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: already talking!"));
 		return;
 	}
 
-	//FString Error;
-	//if (GenerateActions && !UConvaiActions::ValidateEnvironment(Environment, Error))
-	//{
-	//	UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: %s"), *Error);
-	//	UE_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking: Environment object seems to have issues -> setting GenerateActions to false"));
-	//	GenerateActions = false;
-	//}
+	if (IsRecording)
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: already recording!"));
+		return;
+	}
 
+	if (!IsInit)
+	{
+		UE_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking Initializing..."));
+		if (!Init())
+		{
+			UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking Could not initialize"));
+			return;
+		}
+	}
 
 	if (!IsValid(ConvaiChatbotComponent))
 	{
-		
 		if (RunOnServer)
 		{
-			UE_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking: ConvaiChatbotComponent is not valid, will stream voice chat to network instead"));
+			UE_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking: ConvaiChatbotComponent is not valid, will still stream voice chat to network"));
 		}
 		else
 		{
@@ -241,12 +304,14 @@ void UConvaiPlayerComponent::StartTalking(
 
 	UE_LOG(ConvaiPlayerLog, Log, TEXT("Started Talking"));
 
-	
+	AudioCaptureComponent->Start();    //Start the AudioCaptureComponent
 
-	VoiceCapture->Start();
+	// reset audio buffers
+	StartVoiceChunkCapture();
+	StopVoiceChunkCapture();
+
 	IsStreaming = true;
 	VoiceCaptureRingBuffer.Empty();
-
 
 	ReplicateVoiceToNetwork = RunOnServer;
 	
@@ -271,21 +336,9 @@ void UConvaiPlayerComponent::FinishTalking()
 		return;
 	}
 
-	if (!VoiceCapture || !VoiceCapture.IsValid())
-	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking VoiceCapture is not valid"));
-		return;
-	}
-
-
-	if (!VoiceCapture->IsCapturing())
-	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking voice capture is not capturing"));
-		return;
-	}
-
-
-	VoiceCapture->Stop();
+	UE_LOG(ConvaiPlayerLog, Log, TEXT("Finished Talking"));
+	StopVoiceChunkCapture();
+	AudioCaptureComponent->Stop();  //stop the AudioCaptureComponent
 	IsStreaming = false;
 
 	if (ReplicateVoiceToNetwork)
@@ -299,23 +352,6 @@ void UConvaiPlayerComponent::FinishTalking()
 	}
 
 	UE_LOG(ConvaiPlayerLog, Log, TEXT("Finished Talking"));
-
-	//if (!IsValid(ConvaiChatbotComponent))
-	//{
-	//	UE_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking: ConvaiChatbotComponent is not valid"));
-	//	return;
-	//}
-
-	//FinishStreaming();
-
-	//if (ReplicateVoiceToNetwork)
-	//{
-	//	FinishTalkingServer(ConvaiChatbotComponent);
-	//}
-	//else
-	//{
-	//	ConvaiChatbotComponent->FinishGetResponseStream();
-	//}
 }
 
 void UConvaiPlayerComponent::StartTalkingServer_Implementation(
