@@ -3,7 +3,7 @@
 	"Version": 1,
 	"VersionName": "2.3.0",
 	"FriendlyName": "Convai",
-	"Description": "Adds new blueprint functions to integrate Convai API.",
+	"Description": "Adds new blueprint functions and components to integrate Convai API.",
 	"Category": "Runtime",
 	"CreatedBy": "Convai Inc.",
 	"CreatedByURL": "https://convai.com/",
