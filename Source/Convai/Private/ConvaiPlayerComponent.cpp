@@ -99,6 +99,92 @@ bool UConvaiPlayerComponent::Init()
 	return true;
 }
 
+bool UConvaiPlayerComponent::GetDefaultCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo)
+{
+	if (!AudioCaptureComponent.IsValid())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetDefaultCaptureDeviceInfo: AudioCaptureComponent is not valid"));
+		return false;
+	}
+
+	return false;
+}
+
+bool UConvaiPlayerComponent::GetCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo, int DeviceIndex)
+{
+	if (!AudioCaptureComponent.IsValid())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetCaptureDeviceInfo: AudioCaptureComponent is not valid"));
+		return false;
+	}
+	Audio::FCaptureDeviceInfo OutDeviceInfo;
+	if (AudioCaptureComponent->GetCaptureDeviceInfo(OutDeviceInfo, DeviceIndex))
+	{
+		OutInfo.bSupportsHardwareAEC = OutDeviceInfo.bSupportsHardwareAEC;
+		OutInfo.LongDeviceId = OutDeviceInfo.DeviceId;
+		OutInfo.DeviceName = OutDeviceInfo.DeviceName;
+		OutInfo.InputChannels = OutDeviceInfo.InputChannels;
+		OutInfo.PreferredSampleRate = OutDeviceInfo.PreferredSampleRate;
+		OutInfo.DeviceIndex = DeviceIndex;
+		return true;
+	}
+
+	return false;
+}
+
+
+TMap<int, FCaptureDeviceInfoBP> UConvaiPlayerComponent::GetCaptureDevicesAvailable()
+{
+	TMap<int, FCaptureDeviceInfoBP> FCaptureDevicesInfoBP;
+	if (!AudioCaptureComponent.IsValid())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetCaptureDevicesAvailable: AudioCaptureComponent is not valid"));
+		return FCaptureDevicesInfoBP;
+	}
+
+	int i = 0;
+	for (auto DeviceInfo : AudioCaptureComponent->GetCaptureDevicesAvailable())
+	{
+		FCaptureDeviceInfoBP CaptureDeviceInfoBP;
+		CaptureDeviceInfoBP.bSupportsHardwareAEC = DeviceInfo.bSupportsHardwareAEC;
+		CaptureDeviceInfoBP.LongDeviceId = DeviceInfo.DeviceId;
+		CaptureDeviceInfoBP.DeviceName = DeviceInfo.DeviceName;
+		CaptureDeviceInfoBP.InputChannels = DeviceInfo.InputChannels;
+		CaptureDeviceInfoBP.PreferredSampleRate = DeviceInfo.PreferredSampleRate;
+		CaptureDeviceInfoBP.DeviceIndex = i++;
+		FCaptureDevicesInfoBP.Add(CaptureDeviceInfoBP.DeviceIndex, CaptureDeviceInfoBP);
+	}
+	return FCaptureDevicesInfoBP;
+}
+
+void UConvaiPlayerComponent::GetActiveCaptureDevice(FCaptureDeviceInfoBP& OutInfo)
+{
+	if (!AudioCaptureComponent.IsValid())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetActiveCaptureDevice: AudioCaptureComponent is not valid"));
+		return;
+	}
+	Audio::FCaptureDeviceInfo OutDeviceInfo;
+	int SelectedDeviceIndex = AudioCaptureComponent->GetActiveCaptureDevice(OutDeviceInfo);
+	OutInfo.bSupportsHardwareAEC = OutDeviceInfo.bSupportsHardwareAEC;
+	OutInfo.LongDeviceId = OutDeviceInfo.DeviceId;
+	OutInfo.DeviceName = OutDeviceInfo.DeviceName;
+	OutInfo.InputChannels = OutDeviceInfo.InputChannels;
+	OutInfo.PreferredSampleRate = OutDeviceInfo.PreferredSampleRate;
+	OutInfo.DeviceIndex = SelectedDeviceIndex;
+
+}
+
+bool UConvaiPlayerComponent::SetCaptureDevice(int DeviceIndex)
+{
+	if (!AudioCaptureComponent.IsValid())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDevice: AudioCaptureComponent is not valid"));
+		return false;
+	}
+	return AudioCaptureComponent->SetCaptureDevice(DeviceIndex);
+}
+
 void UConvaiPlayerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -147,7 +233,7 @@ void UConvaiPlayerComponent::ReadRecordedBuffer(Audio::AlignedFloatBuffer& Recor
 
 		if (RecordedBuffer.Num() == 0)
 		{
-			UE_LOG(ConvaiPlayerLog, Warning, TEXT("ReadRecordedBuffer: No audio data. Did you call Start Recording Output?"));
+			//UE_LOG(ConvaiPlayerLog, Warning, TEXT("ReadRecordedBuffer: No audio data. Did you call Start Recording Output?"));
 		}
 	}
 	else

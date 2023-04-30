@@ -24,6 +24,31 @@ class UConvaiAudioCaptureComponent;
 // TODO (Mohamed): Ensure both Chatbot and Player components have the same ReplicateVoiceToNetwork value
 // TODO (Mohamed): Send Text should also be handled in this class (UConvaiPlayerComponent) like we did with voice
 
+USTRUCT(BlueprintType)
+struct FCaptureDeviceInfoBP
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
+	FString DeviceName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
+	int DeviceIndex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
+	FString LongDeviceId;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
+	int InputChannels;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
+	int PreferredSampleRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
+	bool bSupportsHardwareAEC;
+};
+
+
 UCLASS(meta = (BlueprintSpawnableComponent), DisplayName = "Convai Player")
 class UConvaiPlayerComponent : public UConvaiAudioStreamer
 {
@@ -34,6 +59,21 @@ class UConvaiPlayerComponent : public UConvaiAudioStreamer
 	bool Init();
 
 public:
+
+	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
+	bool GetDefaultCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo);
+
+	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
+	bool GetCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo, int DeviceIndex);
+
+	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
+	TMap<int, FCaptureDeviceInfoBP> GetCaptureDevicesAvailable();
+
+	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
+	void GetActiveCaptureDevice(FCaptureDeviceInfoBP& OutInfo);
+
+	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
+	bool SetCaptureDevice(int DeviceIndex);
 
 	/**
 	 *    Start recording audio from the microphone, use "Finish Recording" function afterwards
