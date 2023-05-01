@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
+// using Tools.DotNETCommon;
 
 
 
@@ -21,6 +22,26 @@ public class Convai : ModuleRules
 	{
 		get { return Path.GetFullPath(Path.Combine(ModulePath, "../ThirdParty/")); }
 	}
+
+    // private bool IsUE426
+    // {
+    //     get
+    //     {
+    //         //var VersionFilePath = Path.Combine(UnrealBuildTool.EngineDirectory.FullName, "Build" + Path.DirectorySeparatorChar + "Build.version");
+
+    //         FileReference BuildVersionFile = BuildVersion.GetDefaultFileName();
+
+    //         BuildVersion Version;
+    //         if (BuildVersion.TryRead(BuildVersionFile, out Version))
+    //         {
+    //             if (Version.MajorVersion == 4 && Version.MinorVersion == 26)
+    //             {
+    //                 return true;
+    //             }
+    //         }
+    //         return false;
+    //     }
+    // }
 
     private ConvaiPlatform GetConvaiPlatformInstance(ReadOnlyTargetRules Target)
     {
@@ -39,16 +60,25 @@ public class Convai : ModuleRules
         return PlatformInstance;
     }
 
-    private bool ConfigurePlatform(string Platform, UnrealTargetConfiguration Configuration)
+    private bool ConfigurePlatform(ReadOnlyTargetRules Target, UnrealTargetConfiguration Configuration)
     {
         //Convai thirdparty libraries root path
         string root = ThirdPartyPath;
         foreach (var arch in ConvaiPlatformInstance.Architectures())
         {
-            string fullPath = root + "grpc/" + "lib/" + ConvaiPlatformInstance.LibrariesPath + arch;
-            PublicAdditionalLibraries.AddRange(Directory.GetFiles(fullPath));
-            // foreach (var a in PublicAdditionalLibraries)
-            //     Console.WriteLine(a);
+            string grpcPath = root + "grpc/" + "lib/" + ConvaiPlatformInstance.LibrariesPath + arch;
+            PublicAdditionalLibraries.AddRange(Directory.GetFiles(grpcPath));
+            //if (Target.Platform == UnrealTargetPlatform.Android)
+            //{
+                //string openSSLPath = root + "OpenSSL/" + "lib/" + ConvaiPlatformInstance.LibrariesPath + arch;
+                //PublicAdditionalLibraries.AddRange(Directory.GetFiles(openSSLPath));
+                //PrivateIncludePaths.AddRange(
+                //    new string[] {
+                //    Path.Combine(ThirdPartyPath, "OpenSSL", "Include"),
+                //    });
+            //}
+            //foreach (var a in PublicAdditionalLibraries)
+            //    Console.WriteLine(a);
         }
         return false;
     }
@@ -106,6 +136,7 @@ public class Convai : ModuleRules
         PrivateIncludePaths.AddRange(
             new string[] {
 					Path.Combine(ThirdPartyPath, "gRPC", "Include"),
+					//Path.Combine(ThirdPartyPath, "OpenSSL\\1.1.1k\\include\\Android\\openssl"),
 			});
 
 
@@ -116,11 +147,9 @@ public class Convai : ModuleRules
 		}
 
         //ThirdParty Libraries
-        ConfigurePlatform(Target.Platform.ToString(), Target.Configuration);
+        ConfigurePlatform(Target, Target.Configuration);
     }
 }
-
-
 
 public abstract class ConvaiPlatform
 {
@@ -152,7 +181,7 @@ public class ConvaiPlatform_Win64 : ConvaiPlatform
 public class ConvaiPlatform_Android : ConvaiPlatform
 {
     public override string LibrariesPath { get { return "android/"; } }
-    public override List<string> Architectures() { return new List<string> { "armeabi-v7a/", "arm64-v8a/", "x86_64/" }; }
+    public override List<string> Architectures() { return new List<string> { "armeabi-v7a/", "arm64-v8a/" }; }
     public override string LibraryPrefixName { get { return "lib"; } }
     public override string LibraryPostfixName { get { return ".a"; } }
 }
