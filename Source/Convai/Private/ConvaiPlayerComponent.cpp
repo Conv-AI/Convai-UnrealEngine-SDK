@@ -17,6 +17,8 @@
 #include "ConvaiAudioCaptureComponent.h"
 #include "AudioDevice.h"
 #include "AudioMixerDevice.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Sound/SoundSubmix.h"
 
 
 DEFINE_LOG_CATEGORY(ConvaiPlayerLog);
