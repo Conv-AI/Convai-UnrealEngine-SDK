@@ -67,13 +67,20 @@ public:
 	bool GetCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo, int DeviceIndex);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
-	TMap<int, FCaptureDeviceInfoBP> GetCaptureDevicesAvailable();
+	TArray<FCaptureDeviceInfoBP> GetAvailableCaptureDeviceDetails();
+
+	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
+	TArray<FString> GetAvailableCaptureDeviceNames();
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
 	void GetActiveCaptureDevice(FCaptureDeviceInfoBP& OutInfo);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
-	bool SetCaptureDevice(int DeviceIndex);
+	bool SetCaptureDeviceByIndex(int DeviceIndex);
+
+	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
+	bool SetCaptureDeviceByName(FString DeviceName);
+
 
 	/**
 	 *    Start recording audio from the microphone, use "Finish Recording" function afterwards
