@@ -3,12 +3,18 @@
 #include "ConvaiChatBotProxy.h"
 #include "Sound/SoundWave.h"
 #include "../Convai.h"
+#include "ConvaiDefinitions.h"
 #include "ConvaiUtils.h"
 #include "Containers/UnrealString.h"
 #include "Sound/SoundWave.h"
 #include "Misc/Base64.h"
 #include "Engine.h"
 #include "JsonObjectConverter.h"
+
+#include "IImageWrapper.h"
+#include "IImageWrapperModule.h"
+#include "TextureResource.h"
+#include "Engine/Texture2D.h"
 
 
 DEFINE_LOG_CATEGORY(ConvaiBotHttpLog);
@@ -937,6 +943,8 @@ void UConvaiChatBotGetDetailsProxy::onHttpRequestComplete(FHttpRequestPtr Reques
 		voice_type		= JsonValue->AsObject()->GetStringField("voice_type");
 		//timestamp		= JsonValue->AsObject()->GetStringField("timestamp");
 		backstory		= JsonValue->AsObject()->GetStringField("backstory");
+		LanguageCode = JsonValue->AsObject()->GetStringField("language_code");
+		AvatarImageLink = FString("https://convai.com/_next/static/images/placeholder-3d-cab6463359f6ccedb4cda311c4056788.jpg");
 
 		const TSharedPtr<FJsonObject>* model_details;
 		if (JsonValue->AsObject()->TryGetObjectField(TEXT("model_details"), model_details))
@@ -944,8 +952,11 @@ void UConvaiChatBotGetDetailsProxy::onHttpRequestComplete(FHttpRequestPtr Reques
 			if ((*model_details)->TryGetStringField(TEXT("modelLink"), ReadyPlayerMeLink))
 			{
 				// Make sure ReadyPlayerMeLink is not null or empty
-				if (ReadyPlayerMeLink != "NULL" && ReadyPlayerMeLink.Len()>0)
+				if (ReadyPlayerMeLink != "NULL" && ReadyPlayerMeLink.Len() > 0)
+				{
 					HasReadyPlayerMeLink = true;
+					(*model_details)->TryGetStringField(TEXT("modelPlaceholder"), AvatarImageLink);
+				}
 			}
 		}
 
@@ -971,8 +982,10 @@ void UConvaiChatBotGetDetailsProxy::failed()
 	OnFailure.Broadcast(character_name,
 		voice_type,
 		backstory,
+		LanguageCode,
 		HasReadyPlayerMeLink,
-		ReadyPlayerMeLink);
+		ReadyPlayerMeLink,
+		AvatarImageLink);
 	finish();
 }
 
@@ -982,8 +995,10 @@ void UConvaiChatBotGetDetailsProxy::success()
 	OnSuccess.Broadcast(character_name,
 		voice_type,
 		backstory,
+		LanguageCode,
 		HasReadyPlayerMeLink,
-		ReadyPlayerMeLink);
+		ReadyPlayerMeLink,
+		AvatarImageLink);
 	finish();
 }
 
@@ -1123,3 +1138,156 @@ void UConvaiChatBotGetCharsProxy::finish()
 {
 }
 
+
+
+
+
+UConvaiDownloadImageProxy* UConvaiDownloadImageProxy::CreateDownloadImageProxy(UObject* WorldContextObject, FString URL)
+{
+	UConvaiDownloadImageProxy* Proxy = NewObject<UConvaiDownloadImageProxy>();
+	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	Proxy->URL = URL;
+	return Proxy;
+}
+
+void UConvaiDownloadImageProxy::Activate()
+{
+	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
+
+	UWorld* World = WorldPtr.Get();
+
+	if (!World)
+	{
+		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
+		failed();
+		return;
+	}
+
+	FHttpModule* Http = &FHttpModule::Get();
+	if (!Http)
+	{
+		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		failed();
+		return;
+	}
+
+	// Remove trailing slash if present
+	if (URL.EndsWith("/")) {
+		URL.RemoveAt(URL.Len() - 1, 1, false);
+	}
+
+	// Create the request
+	FHttpRequestRef Request = Http->CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &UConvaiDownloadImageProxy::onHttpRequestComplete);
+	Request->SetVerb("GET");
+	Request->SetURL(URL);
+
+	// Run the request
+	if (!Request->ProcessRequest()) failed();
+}
+
+void UConvaiDownloadImageProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful)
+{
+	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
+	{
+		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
+		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+
+		failed();
+		return;
+	}
+
+	if (ResponsePtr->GetContentLength() <= 0)
+	{
+		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to download image - Received 0 bytes"));
+	}
+
+	// Load image data into memory buffer
+	TArray<uint8> ImageData = ResponsePtr->GetContent();
+
+	// Detect image format using file extension in URL
+	FString FileExtension = FPaths::GetExtension(URL);
+	EImageFormat ImageFormat = EImageFormat::Invalid;
+	if (FileExtension.Equals("jpg", ESearchCase::IgnoreCase) || FileExtension.Equals("jpeg", ESearchCase::IgnoreCase)) {
+		ImageFormat = EImageFormat::JPEG;
+	}
+	else if (FileExtension.Equals("png", ESearchCase::IgnoreCase)) {
+		ImageFormat = EImageFormat::PNG;
+	}
+	else if (FileExtension.Equals("bmp", ESearchCase::IgnoreCase)) {
+		ImageFormat = EImageFormat::BMP;
+	}
+
+	if (ImageFormat == EImageFormat::Invalid)
+	{
+		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not detect Image format from URL - Assuming PNG"));
+		ImageFormat = EImageFormat::PNG;
+	}
+
+	// Decode image using ImageWrapper
+	IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(ImageFormat);
+	if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num())) 
+	{
+		TArray<uint8> UncompressedImageData;
+		if (ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, UncompressedImageData)) 
+		{
+			// Create texture from image data
+			Image = UTexture2D::CreateTransient(ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), PF_B8G8R8A8);
+			if (Image) {
+				FTexture2DMipMap& Mip = Image->PlatformData->Mips[0];
+				void* Data = Mip.BulkData.Lock(LOCK_READ_WRITE);
+				FMemory::Memcpy(Data, UncompressedImageData.GetData(), UncompressedImageData.Num());
+				Mip.BulkData.Unlock();
+				Image->UpdateResource();
+
+				success();
+				return;
+			}
+			else
+			{
+				UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not create Image texture"));
+				failed();
+			}
+		}
+		else
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("ImageWrapper->GetRaw was not successful"));
+			failed();
+		}
+	}
+	else
+	{
+		if (!ImageWrapper.IsValid())
+		{
+
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("ImageWrapper is not valid"));
+		}
+		else
+		{
+			//FString ImageFormatString = UEnum::GetValueAsString(ImageFormat); // Convert enum to string
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Image data was not in the expected form - expected: %d"), ImageFormat);
+		}
+		failed();
+	}
+
+
+
+	
+}
+
+void UConvaiDownloadImageProxy::failed()
+{
+	OnFailure.Broadcast(Image);
+	finish();
+}
+
+void UConvaiDownloadImageProxy::success()
+{
+	OnSuccess.Broadcast(Image);
+	finish();
+}
+
+void UConvaiDownloadImageProxy::finish()
+{
+}

@@ -374,7 +374,7 @@ UConvaiChatBotGetDetailsProxy* UConvaiChatbotComponent::ConvaiGetDetails()
 	return ConvaiChatBotGetDetailsProxy;
 }
 
-void UConvaiChatbotComponent::OnConvaiGetDetailsCompleted(FString ReceivedCharacterName, FString ReceivedVoiceType, FString ReceivedBackstory, bool HasReadyPlayerMeLink, FString ReceivedReadyPlayerMeLink)
+void UConvaiChatbotComponent::OnConvaiGetDetailsCompleted(FString ReceivedCharacterName, FString ReceivedVoiceType, FString ReceivedBackstory, FString ReceivedLanguageCode, bool HasReadyPlayerMeLink, FString ReceivedReadyPlayerMeLink, FString ReceivedAvatarImageLink)
 {
 	if (ReceivedCharacterName == "" && ReceivedVoiceType == "" && ReceivedBackstory == "")
 	{
@@ -386,7 +386,9 @@ void UConvaiChatbotComponent::OnConvaiGetDetailsCompleted(FString ReceivedCharac
 	CharacterName = ReceivedCharacterName;
 	VoiceType = ReceivedVoiceType;
 	Backstory = ReceivedBackstory;
+	LanguageCode = ReceivedLanguageCode;
 	ReadyPlayerMeLink = ReceivedReadyPlayerMeLink;
+	AvatarImageLink = ReceivedAvatarImageLink;
 
 	OnCharacterDataLoadEvent.Broadcast(true);
 	ConvaiChatBotGetDetailsProxy = nullptr;
