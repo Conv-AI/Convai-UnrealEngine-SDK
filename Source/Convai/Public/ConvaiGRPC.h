@@ -4,7 +4,7 @@
 
 #include "ConvaiSubsystem.h"
 
-#include "ConvaiDefinitions.h"
+
 #include "CoreMinimal.h"
 #include "Sound/SoundWave.h"
 #include "Net/OnlineBlueprintCallProxyBase.h"
