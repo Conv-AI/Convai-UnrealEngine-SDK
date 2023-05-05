@@ -16,6 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FBotQueryHttpResponseCallbackSigna
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FBotQueryHttpResponseWithUserTextCallbackSignature, USoundWave*, AudioContent, FString, BotText, FString, UserQuery, FString, NewSessionID, FString, ClassifiedAction);
 
 class USoundWave;
+class UTexture2D;
 
 /**
  * 
@@ -282,12 +283,14 @@ class UConvaiChatBotUpdateProxy : public UOnlineBlueprintCallProxyBase
 
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FBotGetDetailsHttpResponseCallbackSignature
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_SevenParams(FBotGetDetailsHttpResponseCallbackSignature
 	, FString, character_name
 	, FString, voice_type
 	, FString, backstory
+	, FString, LanguageCode
 	, bool, HasReadyPlayerMeLink
-	, FString, ReadyPlayerMeLink);
+	, FString, ReadyPlayerMeLink
+	, FString, AvatarImageLink);
 
 UCLASS()
 class UConvaiChatBotGetDetailsProxy : public UOnlineBlueprintCallProxyBase
@@ -339,15 +342,15 @@ public:
 	FString voice_type;
 	//FString timestamp;
 	FString backstory;
+	FString LanguageCode;
 	bool HasReadyPlayerMeLink;
 	FString ReadyPlayerMeLink;
+	FString AvatarImageLink;
+
 
 	// Pointer to the world
 	TWeakObjectPtr<UWorld> WorldPtr;
 };
-
-
-
 
 
 
@@ -399,6 +402,59 @@ class UConvaiChatBotGetCharsProxy : public UOnlineBlueprintCallProxyBase
 
 	// Outputs
 	TArray<FString> CharIDs;
+
+	// Pointer to the world
+	TWeakObjectPtr<UWorld> WorldPtr;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDownloadImageHttpResponseCallbackSignature, UTexture2D*, Image);
+
+UCLASS()
+class UConvaiDownloadImageProxy : public UOnlineBlueprintCallProxyBase
+{
+	GENERATED_BODY()
+
+	// Called when there is a successful http response
+	UPROPERTY(BlueprintAssignable)
+	FDownloadImageHttpResponseCallbackSignature OnSuccess;
+
+	// Called when there is an unsuccessful http response
+	UPROPERTY(BlueprintAssignable)
+	FDownloadImageHttpResponseCallbackSignature OnFailure;
+
+
+
+
+	/**
+	 *    Gets all character IDs created by the user.
+	 */
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai Download Image", WorldContext = "WorldContextObject"), Category = "Convai|REST API")
+		static UConvaiDownloadImageProxy* CreateDownloadImageProxy(UObject* WorldContextObject, FString URL);
+
+	virtual void Activate() override;
+
+	void onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful);
+
+	void failed();
+	void success();
+	void finish();
+
+	FString URL;
+
+	// Outputs
+	UTexture2D* Image;
 
 	// Pointer to the world
 	TWeakObjectPtr<UWorld> WorldPtr;

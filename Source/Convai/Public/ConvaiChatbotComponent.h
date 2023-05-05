@@ -63,7 +63,13 @@ public:
 		FString Backstory;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
-		FString ReadyPlayerMeLink;
+	FString LanguageCode;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
+	FString ReadyPlayerMeLink;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
+	FString AvatarImageLink;
 
 	/**
 	 *    Used to track memory of a previous conversation, set to -1 means no previous conversation,
@@ -142,7 +148,8 @@ private:
 	TScriptDelegate<FWeakObjectPtr> ConvaiChatBotGetDetailsDelegate;
 
 	UFUNCTION()
-	void OnConvaiGetDetailsCompleted(FString ReceivedCharacterName, FString ReceivedVoiceType, FString ReceivedBackstory, bool HasReadyPlayerMeLink, FString ReceivedReadyPlayerMeLink);
+	void OnConvaiGetDetailsCompleted(FString ReceivedCharacterName, FString ReceivedVoiceType, FString ReceivedBackstory, FString ReceivedLanguageCode, bool HasReadyPlayerMeLink, FString ReceivedReadyPlayerMeLink, FString ReceivedAvatarImageLink);
+
 
 private:
 	// Used when both the voice component ring buffer is empty and we have already sent all the current audio data over the stream
