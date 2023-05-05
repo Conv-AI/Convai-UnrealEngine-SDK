@@ -43,13 +43,13 @@ namespace Audio
 		{
 			Audio::FCaptureDeviceInfo DeviceInfo;
 			AudioCapture.GetCaptureDeviceInfo(DeviceInfo, DeviceIndex);
-			UE_LOG(ConvaiAudioLog, Log, TEXT("DeviceIndex: %d, InputDeviceID: %d - name: %s - channels:%d - NumDevices:%d"), DeviceIndex, InputDeviceID, *DeviceInfo.DeviceName, DeviceInfo.InputChannels, NumDevices);
+			//UE_LOG(ConvaiAudioLog, Log, TEXT("DeviceIndex: %d, InputDeviceID: %d - name: %s - channels:%d - NumDevices:%d"), DeviceIndex, InputDeviceID, *DeviceInfo.DeviceName, DeviceInfo.InputChannels, NumDevices);
 			bool IsInput = DeviceInfo.InputChannels > 0;
 			if (!IsInput)
 			{
 				continue;
 			}
-			UE_LOG(ConvaiAudioLog, Log, TEXT("DeviceIndex: %d, is an input - name: %s"), DeviceIndex, *DeviceInfo.DeviceName);
+			//UE_LOG(ConvaiAudioLog, Log, TEXT("DeviceIndex: %d, is an input - name: %s"), DeviceIndex, *DeviceInfo.DeviceName);
 			if (NumInputDevices == InputDeviceID)
 			{
 				return DeviceIndex;
