@@ -17,8 +17,6 @@
 #include "ConvaiAudioCaptureComponent.h"
 #include "AudioDevice.h"
 #include "AudioMixerDevice.h"
-#include "UObject/ConstructorHelpers.h"
-#include "Sound/SoundSubmix.h"
 
 
 DEFINE_LOG_CATEGORY(ConvaiPlayerLog);
@@ -134,13 +132,12 @@ bool UConvaiPlayerComponent::GetCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo,
 	return false;
 }
 
-
-TMap<int, FCaptureDeviceInfoBP> UConvaiPlayerComponent::GetCaptureDevicesAvailable()
+TArray<FCaptureDeviceInfoBP> UConvaiPlayerComponent::GetAvailableCaptureDeviceDetails()
 {
-	TMap<int, FCaptureDeviceInfoBP> FCaptureDevicesInfoBP;
+	TArray<FCaptureDeviceInfoBP> FCaptureDevicesInfoBP;
 	if (!AudioCaptureComponent.IsValid())
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetCaptureDevicesAvailable: AudioCaptureComponent is not valid"));
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetAvailableCaptureDeviceDetails: AudioCaptureComponent is not valid"));
 		return FCaptureDevicesInfoBP;
 	}
 
@@ -154,10 +151,28 @@ TMap<int, FCaptureDeviceInfoBP> UConvaiPlayerComponent::GetCaptureDevicesAvailab
 		CaptureDeviceInfoBP.InputChannels = DeviceInfo.InputChannels;
 		CaptureDeviceInfoBP.PreferredSampleRate = DeviceInfo.PreferredSampleRate;
 		CaptureDeviceInfoBP.DeviceIndex = i++;
-		FCaptureDevicesInfoBP.Add(CaptureDeviceInfoBP.DeviceIndex, CaptureDeviceInfoBP);
+		FCaptureDevicesInfoBP.Add(CaptureDeviceInfoBP);
 	}
 	return FCaptureDevicesInfoBP;
 }
+
+TArray<FString> UConvaiPlayerComponent::GetAvailableCaptureDeviceNames()
+{
+	TArray<FString> AvailableDeviceNames;
+	if (!AudioCaptureComponent.IsValid())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetAvailableCaptureDeviceNames: AudioCaptureComponent is not valid"));
+		return AvailableDeviceNames;
+	}
+
+	for (auto CaptureDeviceInfo : GetAvailableCaptureDeviceDetails())
+	{
+		AvailableDeviceNames.Add(CaptureDeviceInfo.DeviceName);
+	}
+
+	return AvailableDeviceNames;
+}
+
 
 void UConvaiPlayerComponent::GetActiveCaptureDevice(FCaptureDeviceInfoBP& OutInfo)
 {
@@ -174,17 +189,60 @@ void UConvaiPlayerComponent::GetActiveCaptureDevice(FCaptureDeviceInfoBP& OutInf
 	OutInfo.InputChannels = OutDeviceInfo.InputChannels;
 	OutInfo.PreferredSampleRate = OutDeviceInfo.PreferredSampleRate;
 	OutInfo.DeviceIndex = SelectedDeviceIndex;
-
 }
 
-bool UConvaiPlayerComponent::SetCaptureDevice(int DeviceIndex)
+bool UConvaiPlayerComponent::SetCaptureDeviceByIndex(int DeviceIndex)
 {
 	if (!AudioCaptureComponent.IsValid())
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDevice: AudioCaptureComponent is not valid"));
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByIndex: AudioCaptureComponent is not valid"));
 		return false;
 	}
+
+	if (DeviceIndex >= GetAvailableCaptureDeviceDetails().Num())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByIndex: Invalid Device Index: %d - Max possible index: %d."), DeviceIndex, GetAvailableCaptureDeviceDetails().Num() - 1);
+		return false;
+	}
+
 	return AudioCaptureComponent->SetCaptureDevice(DeviceIndex);
+}
+
+bool UConvaiPlayerComponent::SetCaptureDeviceByName(FString DeviceName)
+{
+	if (!AudioCaptureComponent.IsValid())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: AudioCaptureComponent is not valid"));
+		return false;
+	}
+
+	bool bDeviceFound = false;
+	int DeviceIndex = -1;
+	for (auto CaptureDeviceInfo : GetAvailableCaptureDeviceDetails())
+	{
+		if (CaptureDeviceInfo.DeviceName == DeviceName)
+		{
+			bDeviceFound = true;
+			DeviceIndex = CaptureDeviceInfo.DeviceIndex;
+		}
+	}
+
+	TArray<FString> AvailableDeviceNames;
+
+	if (!bDeviceFound)
+	{
+		AvailableDeviceNames = GetAvailableCaptureDeviceNames();
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: Could not find Device name: %s - Available Device names are: [%s]."), *DeviceName, *FString::Join(AvailableDeviceNames, *FString(" - ")));
+		return false;
+	}
+
+	if (!SetCaptureDeviceByIndex(DeviceIndex))
+	{
+		AvailableDeviceNames = GetAvailableCaptureDeviceNames();
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: SetCaptureDeviceByIndex failed for index: %d and device name: %s - Available Device names are: [%s]."), DeviceIndex, *DeviceName , *FString::Join(AvailableDeviceNames, *FString(" - ")));
+		return false;
+	}
+	return true;
 }
 
 void UConvaiPlayerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
