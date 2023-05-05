@@ -103,22 +103,8 @@ void UConvaiTextToSpeechProxy::Activate()
 	// Insert the content into the request
 	Request->SetContentAsString(JsonString);
 
-	//int Count = Request->GetContent().Num();
-	//const uint8* In = Request->GetContent().GetData();
-	//FString Result;
-	//Result.Empty();
-
-	//while (Count)
-	//{
-	//	int16 Value = *In;
-
-	//	Result += TCHAR(Value);
-
-	//	++In;
-	//	Count--;
-	//}
-
-	//UE_LOG(ConvaiT2SHttpLog, Warning, TEXT("%s"), *Result);
+	// Debug
+	//UE_LOG(ConvaiT2SHttpLog, Warning, TEXT("%s"), *UConvaiUtils::ByteArrayToString(Request->GetContent()));
 
 	// Initiate the request
 	if (!Request->ProcessRequest()) failed();
