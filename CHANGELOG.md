@@ -1,6 +1,33 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 2.3.0
+**Added**
+- **Beta** Android support.
+- Audio permission on Android.
+- Mini-Example demo project.
+- Mic input device selection functionalities:
+    - SetCaptureDeviceByName.
+    - SetCaptureDeviceByIndex.
+    - GetActiveCaptureDevice.
+    - GetAvailableCaptureDeviceNames.
+    - GetAvailableCaptureDeviceDetails.
+    - GetCaptureDeviceInfo.
+    - GetDefaultCaptureDeviceInfo.
+- Mic settings menu widget blueprint with the `ConvaiBasePlayer` blueprint.
+- language code and avatar image link outputs to the `ConvaiGetCharacterDetails` function.
+- `Convai Download Image` function to download images.
+- Convai attribution logo widget.
+
+**Updated**
+- Audio capturing by implementing `ConvaiAudioCaptureComponent` to replace `IVoiceModule` for audio capture.
+- `glTFRuntime` in the MetaHuman demo project and `ConvaiReadyPlayerMe` plugin bundle.
+
+**Fixed**
+- C++ project error on restart.
+- Microphone issues on some clients.
+- Dark face for ReadyPlayerMe avatars.
+
 # Release 2.2.0
 **Added**
 - `ConvaiPlayerWithVoiceActivation` blueprint which adds voice activation functionality instead of push-to-talk.
