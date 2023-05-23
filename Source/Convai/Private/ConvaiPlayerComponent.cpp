@@ -173,7 +173,6 @@ TArray<FString> UConvaiPlayerComponent::GetAvailableCaptureDeviceNames()
 	return AvailableDeviceNames;
 }
 
-
 void UConvaiPlayerComponent::GetActiveCaptureDevice(FCaptureDeviceInfoBP& OutInfo)
 {
 	if (!AudioCaptureComponent.IsValid())
@@ -649,6 +648,14 @@ void UConvaiPlayerComponent::OnServerAudioReceived(uint8* VoiceData, uint32 Voic
 void UConvaiPlayerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	if (!IsInit)
+	{
+		if (!Init())
+		{
+			UE_LOG(ConvaiPlayerLog, Warning, TEXT("Could not initialize Audio Decoder"));
+			return;
+		}
+	}
 }
 
 bool UConvaiPlayerComponent::ConsumeStreamingBuffer(uint8* Buffer, uint32 length)
