@@ -41,8 +41,14 @@ public:
 	/**
 	* Returns true, if the character is still processing and has not received the full response yet.
 	*/
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (DisplayName = "Is Thinking"))
+	bool IsProcessing();
+
+	/**
+	* Returns true, if the character is currently listening to a player.
+	*/
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai")
-		bool IsProcessing();
+	bool IsListening();
 
 	/**
 	* Returns true, if the character is currently talking.
