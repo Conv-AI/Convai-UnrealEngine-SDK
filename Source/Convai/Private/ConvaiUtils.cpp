@@ -289,6 +289,9 @@ void UConvaiUtils::PCMDataToWav(TArray<uint8> InPCMBytes, TArray<uint8>& OutWave
 
 USoundWave* UConvaiUtils::PCMDataToSoundWav(TArray<uint8> InPCMBytes, int NumChannels, int SampleRate)
 {
+	if (InPCMBytes.Num() <= 44)
+		return nullptr;
+
 	TArray<uint8> OutSerializeWave;
 	// insert the .wav format headers at the beggining of the PCM data
 	SerializeWaveFile(OutSerializeWave, InPCMBytes.GetData(), InPCMBytes.Num(), NumChannels, SampleRate);
