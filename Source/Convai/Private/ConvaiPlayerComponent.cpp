@@ -357,7 +357,7 @@ void UConvaiPlayerComponent::StartVoiceChunkCapture()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("StartVoiceChunkCapture() in VoiceCaptureComp.cpp")));
 	//UE_LOG(LogTemp, Warning, TEXT("StartVoiceChunkCapture() in VoiceCaptureComp.cpp"));
-	UAudioMixerBlueprintLibrary::StartRecordingOutput(this, TIME_BETWEEN_VOICE_UPDATES_SECS*2, Cast<USoundSubmix>(AudioCaptureComponent->SoundSubmix));
+	UAudioMixerBlueprintLibrary::StartRecordingOutput(this, TIME_BETWEEN_VOICE_UPDATES_SECS*1, Cast<USoundSubmix>(AudioCaptureComponent->SoundSubmix));
 }
 
 void UConvaiPlayerComponent::ReadRecordedBuffer(Audio::AlignedFloatBuffer& RecordedBuffer, float& OutNumChannels, float& OutSampleRate)
@@ -473,9 +473,11 @@ USoundWave* UConvaiPlayerComponent::FinishRecording()
 
 	UE_LOG(ConvaiPlayerLog, Log, TEXT("Stopped Recording "));
 	StopVoiceChunkCapture();
+
 	USoundWave* OutSoundWave = UConvaiUtils::PCMDataToSoundWav(VoiceCaptureBuffer, 1, ConvaiConstants::VoiceCaptureSampleRate);
 	AudioCaptureComponent->Stop();  //stop the AudioCaptureComponent
-	UE_LOG(ConvaiPlayerLog, Log, TEXT("OutSoundWave->GetDuration(): %d seconds "), OutSoundWave->GetDuration());
+	if (IsValid(OutSoundWave))
+		UE_LOG(ConvaiPlayerLog, Log, TEXT("OutSoundWave->GetDuration(): %d seconds "), OutSoundWave->GetDuration());
 	IsRecording = false;
 	return OutSoundWave;
 }
