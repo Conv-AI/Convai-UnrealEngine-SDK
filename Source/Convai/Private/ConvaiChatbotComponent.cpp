@@ -40,6 +40,11 @@ bool UConvaiChatbotComponent::IsProcessing()
 	return (IsValid(ConvaiGRPCGetResponseProxy));
 }
 
+bool UConvaiChatbotComponent::IsListening()
+{
+	return (StreamInProgress);
+}
+
 bool UConvaiChatbotComponent::GetIsTalking()
 {
 	return IsTalking;
@@ -93,7 +98,7 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	}
 
 	UserText = InputText;
-	TextInput = UserText.Len()>0;
+	TextInput = UserText.Len() > 0;
 	GenerateActions = InGenerateActions;
 	VoiceResponse = InVoiceResponse;
 	ReplicateVoiceToNetwork = RunOnServer;
@@ -382,7 +387,7 @@ void UConvaiChatbotComponent::OnConvaiGetDetailsCompleted(FString ReceivedCharac
 		OnCharacterDataLoadEvent.Broadcast(false);
 		return;
 	}
-	
+
 	CharacterName = ReceivedCharacterName;
 	VoiceType = ReceivedVoiceType;
 	Backstory = ReceivedBackstory;
