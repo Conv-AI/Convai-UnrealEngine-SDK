@@ -244,6 +244,35 @@ bool UConvaiPlayerComponent::SetCaptureDeviceByName(FString DeviceName)
 	return true;
 }
 
+void UConvaiPlayerComponent::SetMicrophoneVolumeMultiplier(float InVolumeMultiplier, bool& Success)
+{
+	Success = false;
+	if (!AudioCaptureComponent.IsValid())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetMicrophoneVolumeMultiplier: AudioCaptureComponent is not valid"));
+		return;
+	}
+	AudioCaptureComponent->SetVolumeMultiplier(InVolumeMultiplier);
+	Success = true;
+}
+
+void UConvaiPlayerComponent::GetMicrophoneVolumeMultiplier(float& OutVolumeMultiplier, bool& Success)
+{
+	Success = false;
+	if (!AudioCaptureComponent.IsValid())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetMicrophoneVolumeMultiplier: AudioCaptureComponent is not valid"));
+		return;
+	}
+	auto InternalAudioComponent = AudioCaptureComponent->GetAudioComponent();
+	if (!InternalAudioComponent)
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetMicrophoneVolumeMultiplier: InternalAudioComponent is not valid"));
+	}
+	OutVolumeMultiplier = InternalAudioComponent->VolumeMultiplier;
+	Success = true;
+}
+
 // void UConvaiPlayerComponent::GetIfHardwareFeatureIsSupported(EHardwareInputFeatureBP FeatureType, bool& Success)
 // {
 // 	Success = false;

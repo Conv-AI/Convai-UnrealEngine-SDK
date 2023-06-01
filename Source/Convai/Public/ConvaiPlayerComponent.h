@@ -87,6 +87,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
 	bool SetCaptureDeviceByName(FString DeviceName);
 
+	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
+	void SetMicrophoneVolumeMultiplier(float InVolumeMultiplier, bool& Success);
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|Microphone")
+	void GetMicrophoneVolumeMultiplier(float& OutVolumeMultiplier, bool& Success);
+
 	// UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
 	// void GetIfHardwareFeatureIsSupported(EHardwareInputFeatureBP FeatureType, bool& Success);
 
