@@ -244,6 +244,54 @@ bool UConvaiPlayerComponent::SetCaptureDeviceByName(FString DeviceName)
 	return true;
 }
 
+// void UConvaiPlayerComponent::GetIfHardwareFeatureIsSupported(EHardwareInputFeatureBP FeatureType, bool& Success)
+// {
+// 	Success = false;
+// 	if (!AudioCaptureComponent.IsValid())
+// 	{
+// 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetIfHardwareFeatureIsSupported: AudioCaptureComponent is not valid"));
+// 		return;
+// 	}
+
+// 	auto CaptureSynth = AudioCaptureComponent->GetCaptureSynth();
+// 	if (CaptureSynth == nullptr)
+// 	{
+// 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetIfHardwareFeatureIsSupported: CaptureSynth is not valid"));
+// 		return;
+// 	}
+
+// 	auto AudioCapture = CaptureSynth->GetAudioCapture();
+// 	if (AudioCapture == nullptr)
+// 	{
+// 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetIfHardwareFeatureIsSupported: AudioCapture is not valid"));
+// 		return;
+// 	}
+// 	Success = AudioCapture->GetIfHardwareFeatureIsSupported((Audio::EHardwareInputFeature)FeatureType);
+// }
+
+// void UConvaiPlayerComponent::SetHardwareFeatureEnabled(EHardwareInputFeatureBP FeatureType, bool bIsEnabled, bool& Success)
+// {
+// 	bool HardwareFeatureIsSupported;
+// 	GetIfHardwareFeatureIsSupported(FeatureType, HardwareFeatureIsSupported);
+// 	if (!HardwareFeatureIsSupported)
+// 	{
+// 		if (!bIsEnabled)
+// 		{
+// 			Success = true;
+// 			return;
+// 		}
+// 		else
+// 		{
+// 			Success = false;
+// 			return;
+// 		}
+// 	}
+
+// 	auto AudioCapture = AudioCaptureComponent->GetCaptureSynth()->GetAudioCapture();
+// 	AudioCapture->SetHardwareFeatureEnabled((Audio::EHardwareInputFeature)FeatureType, bIsEnabled);
+// 	Success = true;
+// }
+
 void UConvaiPlayerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

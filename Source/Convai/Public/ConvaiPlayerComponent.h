@@ -19,7 +19,13 @@ DECLARE_DELEGATE(FonDataReceived_Delegate);
 // class IVoiceCapture;
 class UConvaiAudioCaptureComponent;
 
-
+// UENUM(BlueprintType)
+// enum class EHardwareInputFeatureBP : uint8
+// {
+// 	EchoCancellation,
+// 	NoiseSuppression,
+// 	AutomaticGainControl
+// };
 
 // TODO (Mohamed): Ensure both Chatbot and Player components have the same ReplicateVoiceToNetwork value
 // TODO (Mohamed): Send Text should also be handled in this class (UConvaiPlayerComponent) like we did with voice
@@ -81,6 +87,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
 	bool SetCaptureDeviceByName(FString DeviceName);
 
+	// UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
+	// void GetIfHardwareFeatureIsSupported(EHardwareInputFeatureBP FeatureType, bool& Success);
+
+	// UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
+	// void SetHardwareFeatureEnabled(EHardwareInputFeatureBP FeatureType, bool bIsEnabled, bool& Success);
 
 	/**
 	 *    Start recording audio from the microphone, use "Finish Recording" function afterwards
