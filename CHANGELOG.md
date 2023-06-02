@@ -1,5 +1,23 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+# Release 2.4.0
+**Added**
+- Added 'IsListening' function to detect when the character is actively listening to the player.
+- Enhanced Mic Controls: Added the 'SetMicrophoneVolumeMultiplier' and 'GetMicrophoneVolumeMultiplier' functions to allow better control over audio settings. A mic gain slider has also been introduced for easy adjustments to the Mic widget.
+- Extended Language Support: Increased Voice Capture Sample Rate to 16kHz, improving support for Korean Speech-To-Text.
+
+**Updated**
+- User Interface: The UI is now only initialized if the blueprint is controlled by a player, providing a smoother user experience.
+- Blueprint Organization: Reorganized blueprints for easier navigation, complete with improved commentary for better understanding.
+- Animation Tuning: The talking animation has been toned down to offer a more natural visual experience.
+
+**Fixed**
+- Player Component Acquisition: Resolved an issue where obtaining the player component in the mic widget was problematic.
+- Packaging Issues: Addressed packaging issues with ConvaiOVRLipSync and a problem where fonts disappeared after packaging.
+- Texture Display: Fixed a grey texture issue with the ReadyPlayerMe character in the demo project.
+- Crash Issues: Fixed instances where crashes occurred due to logging an invalid variable and during mic recordings when no audio data was available.
+- Component Initialization: Fixed ConvaiAudioComponent initialization errors.
+- Missing Player Controller in the Demo Map.
 
 <<<<<<< HEAD
 # Release 2.3.0
