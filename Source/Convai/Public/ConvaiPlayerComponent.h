@@ -36,22 +36,22 @@ struct FCaptureDeviceInfoBP
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
-	FString DeviceName;
+	FString DeviceName = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
-	int DeviceIndex;
+	int DeviceIndex = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
-	FString LongDeviceId;
+	FString LongDeviceId = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
-	int InputChannels;
+	int InputChannels = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
-	int PreferredSampleRate;
+	int PreferredSampleRate = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Convai|Microphone")
-	bool bSupportsHardwareAEC;
+	bool bSupportsHardwareAEC = 0;
 };
 
 
