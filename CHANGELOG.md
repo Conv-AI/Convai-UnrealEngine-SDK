@@ -19,7 +19,6 @@ All notable changes to this project will be documented in this file.
 - Component Initialization: Fixed ConvaiAudioComponent initialization errors.
 - Missing Player Controller in the Demo Map.
 
-<<<<<<< HEAD
 # Release 2.3.0
 **Added**
 - **Beta** Android support.
@@ -47,8 +46,6 @@ All notable changes to this project will be documented in this file.
 - Microphone issues on some clients.
 - Dark face for ReadyPlayerMe avatars.
 
-=======
->>>>>>> 383efca (Update CHANGELOG.md)
 # Release 2.2.0
 **Added**
 - `ConvaiPlayerWithVoiceActivation` blueprint which adds voice activation functionality instead of push-to-talk.
