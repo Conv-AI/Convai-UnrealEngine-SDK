@@ -8,6 +8,7 @@
 #include "ConvaiUtils.h"
 #include "JsonObjectConverter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/GameInstance.h"
 // #include <chrono>   
 #include <string>
 
