@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 # Release 2.4.0
 **Added**
+- Added Unreal Engine 5.2 Support.
 - Added 'IsListening' function to detect when the character is actively listening to the player.
 - Enhanced Mic Controls: Added the 'SetMicrophoneVolumeMultiplier' and 'GetMicrophoneVolumeMultiplier' functions to allow better control over audio settings. A mic gain slider has also been introduced for easy adjustments to the Mic widget.
 - Extended Language Support: Increased Voice Capture Sample Rate to 16kHz, improving support for Korean Speech-To-Text.
