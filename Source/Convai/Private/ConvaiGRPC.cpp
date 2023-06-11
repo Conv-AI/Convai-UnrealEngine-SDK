@@ -517,13 +517,22 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		std::string UserQuery_std = reply->user_query().text_data();
 		bool IsTranscriptionReady = reply->user_query().is_final();
 		bool IsFinalTranscription = reply->user_query().end_of_response();
-		OnTranscriptionReceived.ExecuteIfBound(FString(UserQuery_std.c_str()), IsTranscriptionReady, IsFinalTranscription);
+
+		// Convert UTF8 to UTF16 FString
+		FString text_string = UConvaiUtils::FUTF8ToFString(UserQuery_std.c_str());
+
+		OnTranscriptionReceived.ExecuteIfBound(text_string, IsTranscriptionReady, IsFinalTranscription);
 		//UE_LOG(ConvaiGRPCLog, Log, TEXT("UserQuery: %s, Final: %d"), *FString(UserQuery_std.c_str()), IsFinalUserQuery);
 	}
 	else if (reply->has_audio_response()) // Is there an audio response
 	{
 		// Grab bot text
-		FString text_string(reply->audio_response().text_data().c_str());
+		//FString text_string(reply->audio_response().text_data().c_str());
+
+		std::string text_string_std = reply->audio_response().text_data();
+
+		// Convert UTF8 to UTF16 FString
+		FString text_string = UConvaiUtils::FUTF8ToFString(text_string_std.c_str());
 
 		// Grab bot audio
 		::std::string audio_data = reply->audio_response().audio_data();
