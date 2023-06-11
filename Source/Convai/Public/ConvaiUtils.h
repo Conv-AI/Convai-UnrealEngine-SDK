@@ -52,6 +52,7 @@ public:
 
 	static void ResampleAudio(float currentSampleRate, float targetSampleRate, int numChannels, bool reduceToMono, const TArray<int16>& currentPcmData, int numSamplesToConvert, TArray<int16>& outResampledPcmData);
 
+	static FString FUTF8ToFString(const char* StringToConvert);
 };
 
 

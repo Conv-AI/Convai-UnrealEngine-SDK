@@ -369,3 +369,14 @@ void UConvaiUtils::ResampleAudio(float currentSampleRate, float targetSampleRate
 		currentFrameIndex = nextFrameIndex;
 	}
 }
+
+FString UConvaiUtils::FUTF8ToFString(const char* StringToConvert)
+{
+	// Create a TCHAR (wide string) from the UTF-8 string using Unreal's FUTF8ToTCHAR class
+	FUTF8ToTCHAR Converter(StringToConvert);
+
+	// Create an FString from the converted wide string
+	FString text_string(Converter.Get());
+
+	return text_string;
+}
