@@ -1,5 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+# Release 2.5.0
+**Added**
+- Font support for non-English languages
+- Updated UI
 # Release 2.4.0
 **Added**
 - Added Unreal Engine 5.2 Support.
