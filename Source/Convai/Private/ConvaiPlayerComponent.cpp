@@ -559,7 +559,6 @@ void UConvaiPlayerComponent::FinishTalking()
 		return;
 	}
 
-	UE_LOG(ConvaiPlayerLog, Log, TEXT("Finished Talking"));
 	StopVoiceChunkCapture();
 	AudioCaptureComponent->Stop();  //stop the AudioCaptureComponent
 	IsStreaming = false;
