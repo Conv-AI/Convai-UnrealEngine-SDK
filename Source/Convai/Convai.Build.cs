@@ -88,7 +88,7 @@ public class Convai : ModuleRules
         DefaultBuildSettings = BuildSettingsVersion.Latest;
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         ConvaiPlatformInstance = GetConvaiPlatformInstance(Target);
-        bUsePrecompiled = true;
+        //bUsePrecompiled = true;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", 
 			"CoreUObject",
