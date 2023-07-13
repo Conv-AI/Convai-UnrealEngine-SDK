@@ -1,5 +1,8 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+# Release 2.5.1
+- Added official Android support to the plugin on the marketplace
+- Fixed issue with Behaviour Tree where unhandled actions were not sent to the character blueprint
 # Release 2.5.0
 **Added**
 - Font support for non-English languages
