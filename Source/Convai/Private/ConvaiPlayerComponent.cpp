@@ -62,6 +62,7 @@ UConvaiPlayerComponent::UConvaiPlayerComponent()
 	auto _FoundSubmix = ConstructorHelpers::FObjectFinder<USoundSubmixBase>(*FoundSubmixPath).Object;
 	if (_FoundSubmix != nullptr) {
 		AudioCaptureComponent->SoundSubmix = _FoundSubmix;
+        UE_LOG(ConvaiPlayerLog, Log, TEXT("UConvaiPlayerComponent: Found submix \"AudioInput\""));
 	}
 	else
 	{
