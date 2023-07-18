@@ -67,18 +67,12 @@ public class Convai : ModuleRules
         foreach (var arch in ConvaiPlatformInstance.Architectures())
         {
             string grpcPath = root + "grpc/" + "lib/" + ConvaiPlatformInstance.LibrariesPath + arch;
-            PublicAdditionalLibraries.AddRange(Directory.GetFiles(grpcPath));
-            //if (Target.Platform == UnrealTargetPlatform.Android)
-            //{
-                //string openSSLPath = root + "OpenSSL/" + "lib/" + ConvaiPlatformInstance.LibrariesPath + arch;
-                //PublicAdditionalLibraries.AddRange(Directory.GetFiles(openSSLPath));
-                //PrivateIncludePaths.AddRange(
-                //    new string[] {
-                //    Path.Combine(ThirdPartyPath, "OpenSSL", "Include"),
-                //    });
-            //}
-            //foreach (var a in PublicAdditionalLibraries)
-            //    Console.WriteLine(a);
+            
+            // Add files that end with .lib
+            PublicAdditionalLibraries.AddRange(Directory.GetFiles(grpcPath, "*.lib"));
+
+            // Add files that end with .a
+            PublicAdditionalLibraries.AddRange(Directory.GetFiles(grpcPath, "*.a"));
         }
         return false;
     }
@@ -128,16 +122,30 @@ public class Convai : ModuleRules
         //PublicDefinitions.Add("PROTOBUF_INLINE_NOT_IN_HEADERS=0");
         //PublicDefinitions.Add("GPR_FORBID_UNREACHABLE_CODE=0");
         PublicDefinitions.Add("ConvaiDebugMode=1");
-
         PublicDefinitions.Add("GOOGLE_PROTOBUF_NO_RTTI");
         PublicDefinitions.Add("GPR_FORBID_UNREACHABLE_CODE");
         PublicDefinitions.Add("GRPC_ALLOW_EXCEPTIONS=0");
+        if (Target.Platform == UnrealTargetPlatform.Mac)
+        {
+            PublicDefinitions.Add("GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE=0");
+            PublicDefinitions.Add("GOOGLE_PROTOBUF_USE_UNALIGNED=0");
+            PublicDefinitions.Add("PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0");
+        }
 
-        PrivateIncludePaths.AddRange(
-            new string[] {
-					Path.Combine(ThirdPartyPath, "gRPC", "Include"),
-					//Path.Combine(ThirdPartyPath, "OpenSSL\\1.1.1k\\include\\Android\\openssl"),
-			});
+        if (Target.Platform == UnrealTargetPlatform.Mac || Target.Platform == UnrealTargetPlatform.IOS)
+        {
+            PrivateIncludePaths.AddRange(
+                new string[] {
+                        Path.Combine(ThirdPartyPath, "gRPC", "Include_apple"),
+                });
+        }
+        else
+        {
+            PrivateIncludePaths.AddRange(
+                new string[] {
+                        Path.Combine(ThirdPartyPath, "gRPC", "Include"),
+                });
+        }
 
 
 
@@ -186,6 +194,15 @@ public class ConvaiPlatform_Android : ConvaiPlatform
     public override string LibraryPostfixName { get { return ".a"; } }
 }
 
+public class ConvaiPlatform_Mac : ConvaiPlatform
+{
+   public override string LibrariesPath { get { return "mac/"; } }
+   public override List<string> Architectures() { return new List<string> { "" }; }
+   public override string LibraryPrefixName { get { return "lib"; } }
+   public override string LibraryPostfixName { get { return ".a"; } }
+}
+
+
 //public class ConvaiPlatform_Linux : ConvaiPlatform
 //{
 //    public override string LibrariesPath { get { return "linux/"; } }
@@ -197,18 +214,6 @@ public class ConvaiPlatform_Android : ConvaiPlatform
 //public class ConvaiPlatform_PS5 : ConvaiPlatform
 //{
 //    public override string LibrariesPath { get { return "ps5/"; } }
-//    public override List<string> Architectures() { return new List<string> { "" }; }
-//    public override string LibraryPrefixName { get { return "lib"; } }
-//    public override string LibraryPostfixName { get { return ".a"; } }
-//}
-
-//public class ConvaiPlatform_Mac : ConvaiPlatform
-//{
-//    public override string ConfigurationDir(UnrealTargetConfiguration Configuration)
-//    {
-//        return "";
-//    }
-//    public override string LibrariesPath { get { return "mac/"; } }
 //    public override List<string> Architectures() { return new List<string> { "" }; }
 //    public override string LibraryPrefixName { get { return "lib"; } }
 //    public override string LibraryPostfixName { get { return ".a"; } }
