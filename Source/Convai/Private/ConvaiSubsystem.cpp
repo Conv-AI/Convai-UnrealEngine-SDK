@@ -181,8 +181,8 @@ void FgRPCClient::Exit()
 FgRPCClient::FgRPCClient(std::string InTarget,
 	const std::shared_ptr<grpc::ChannelCredentials>& InCreds)
 	: bIsRunning(false),
-	Target(InTarget),
-	Creds(InCreds)
+	Creds(InCreds),
+	Target(InTarget)
 {
 }
 
@@ -214,7 +214,7 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 #if PLATFORM_WINDOWS
 	auto channel_creds = grpc::SslCredentials(getSslOptions());
-#elif PLATFORM_ANDROID
+#else
 	auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions());
 #endif
 	gRPC_Runnable = MakeShareable(new FgRPCClient(std::string("stream.convai.com"), channel_creds));
@@ -222,7 +222,13 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	gRPC_Runnable->StartStub();
 	UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Started"));
 
+	#if PLATFORM_ANDROID
 	GetAndroidMicPermission();
+	#endif
+
+	#ifdef __APPLE__
+    GetAppleMicPermission();
+	#endif
 }
 
 void UConvaiSubsystem::Deinitialize()

@@ -8,7 +8,7 @@
 #include "HAL/Runnable.h"
 
 THIRD_PARTY_INCLUDES_START
-#include "gRPC/service.grpc.pb.h"
+#include "Proto/service.grpc.pb.h"
 #undef min
 #undef max
 #undef UpdateResource
@@ -26,6 +26,10 @@ THIRD_PARTY_INCLUDES_START
 THIRD_PARTY_INCLUDES_END
 
 #include "ConvaiSubsystem.generated.h"
+
+#ifdef __APPLE__
+extern bool GetAppleMicPermission();
+#endif
 
 namespace grpc
 {
