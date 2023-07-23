@@ -36,7 +36,7 @@ public:
 	* Returns true, if the character is being talked to, is talking, or is processing the response.
 	*/
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai")
-		bool IsInConversation();
+	bool IsInConversation();
 
 	/**
 	* Returns true, if the character is still processing and has not received the full response yet.
@@ -54,27 +54,27 @@ public:
 	* Returns true, if the character is currently talking.
 	*/
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (DisplayName = "Is Talking"))
-		bool GetIsTalking();
+	bool GetIsTalking();
 
 	UPROPERTY(EditAnywhere, Category = "Convai", Replicated, BlueprintSetter = LoadCharacter)
 	FString CharacterID;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
-		FString CharacterName;
+	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated)
+	FString CharacterName;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
-		FString VoiceType;
+	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated)
+	FString VoiceType;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
-		FString Backstory;
+	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated)
+	FString Backstory;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated)
 	FString LanguageCode;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated)
 	FString ReadyPlayerMeLink;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated)
 	FString AvatarImageLink;
 
 	/**
@@ -83,13 +83,13 @@ public:
 	 *    conversation and then set it back later on to resume a conversation
 	 */
 	UPROPERTY(BlueprintReadWrite, Category = "Convai", Replicated)
-		FString SessionID = "-1";
+	FString SessionID = "-1";
 
 	/**
 	 *    Contains all relevant objects and characters in the scene including the (Player), and also all the actions doable by the character
 	 */
 	UPROPERTY(BlueprintReadWrite, Category = "Convai")
-		UConvaiEnvironment* Environment;
+	UConvaiEnvironment* Environment;
 
 	/**
 	 *    Time in seconds, for the character's voice audio to gradually degrade until it is completely turned off when interrupted.
@@ -101,7 +101,7 @@ public:
 	 *    Reset the conversation with the character and remove previous memory, this is the same as setting the session ID property to -1.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Convai")
-		void ResetConversation();	
+	void ResetConversation();	
 	
 	/**
 	 *    Loads a new character using its ID
