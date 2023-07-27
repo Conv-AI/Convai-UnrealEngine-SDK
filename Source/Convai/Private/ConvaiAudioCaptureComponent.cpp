@@ -273,7 +273,8 @@ bool UConvaiAudioCaptureComponent::Init(int32& SampleRate)
 		}
 		else
 		{
-			UE_LOG(ConvaiAudioLog, Warning, TEXT("Audio capture components only support mono and stereo mic input."));
+			UE_LOG(ConvaiAudioLog, Warning, TEXT("Audio capture components only support mono and stereo mic input - Audio might be mangeled."));
+			return true;
 		}
 
 	}
