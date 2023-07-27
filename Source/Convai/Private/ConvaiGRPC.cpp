@@ -396,7 +396,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 	if (UserQuery.Len())
 	{
 		// Add in the text data
-		get_response_data->set_text_data(TCHAR_TO_ANSI(*UserQuery));
+		get_response_data->set_text_data(TCHAR_TO_UTF8(*UserQuery));
 		IsThisTheFinalWrite = true;
 	}
 	else
@@ -435,10 +435,10 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 
 
 
-	// #if ConvaiDebugMode
-	//     FString DebugString(request.DebugString().c_str());
-	//     UE_LOG(ConvaiGRPCLog, Warning, TEXT("request: %s"), *DebugString);
-	// #endif 
+	 //#if ConvaiDebugMode
+	 //    FString DebugString(request.DebugString().c_str());
+	 //    UE_LOG(ConvaiGRPCLog, Warning, TEXT("request: %s"), *DebugString);
+	 //#endif 
 
 	if (IsThisTheFinalWrite)
 	{
