@@ -1,2 +1,40 @@
-*.a
-*.lib
+# Unreal Engine .gitignore
+# Note: Adjust this to fit the specifics of your project if necessary
+
+# Ignore all folders in the project root except Source and Resources
+/*/
+!/Source/
+!/Resources/
+
+# Ignore intermediate build files
+Binaries/
+Intermediate/
+
+# Ignore all .generated.h files
+*.generated.h
+
+# Ignore asset files (Unreal uses a binary format, which doesn't work well with Git)
+*.uasset
+*.umap
+
+# Ignore log files
+Saved/Logs/
+
+# Ignore user-specific files
+Saved/Config/Windows/
+Saved/Config/Linux/
+Saved/Config/Mac/
+Saved/StagedBuilds/
+
+# Ignore thirdparty libs
+Source/ThirdParty/gRPC/lib/
+
+# Ignore Visual Studio user-specific files
+*.suo
+*.user
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+*.VC.db-shm
+*.VC.db-wal
