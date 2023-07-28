@@ -1,12 +1,25 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+# Release 2.6.0
+**Added**
+- Mac Support.
+- New MetaHuman body animations and Facial expressions.
+- Realusion characters support.
+
+**Updated**
+- Improved MetaHuman lipsync.
+
+**Fixed**
+- Sending non-english text won't get processed.
+- Potential microphone issue when it gets detected as zero channel.
+
 # Release 2.5.1
-- Added official Android support to the plugin on the marketplace
-- Fixed issue with Behaviour Tree where unhandled actions were not sent to the character blueprint
+- Added official Android support to the plugin on the marketplace.
+- Fixed issue with Behaviour Tree where unhandled actions were not sent to the character blueprint.
 # Release 2.5.0
 **Added**
-- Font support for non-English languages
-- Updated UI
+- Font support for non-English languages.
+- Updated UI.
 # Release 2.4.0
 **Added**
 - Added Unreal Engine 5.2 Support.
