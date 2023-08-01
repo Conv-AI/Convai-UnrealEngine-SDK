@@ -23,26 +23,6 @@ public class Convai : ModuleRules
 		get { return Path.GetFullPath(Path.Combine(ModulePath, "../ThirdParty/")); }
 	}
 
-    // private bool IsUE426
-    // {
-    //     get
-    //     {
-    //         //var VersionFilePath = Path.Combine(UnrealBuildTool.EngineDirectory.FullName, "Build" + Path.DirectorySeparatorChar + "Build.version");
-
-    //         FileReference BuildVersionFile = BuildVersion.GetDefaultFileName();
-
-    //         BuildVersion Version;
-    //         if (BuildVersion.TryRead(BuildVersionFile, out Version))
-    //         {
-    //             if (Version.MajorVersion == 4 && Version.MinorVersion == 26)
-    //             {
-    //                 return true;
-    //             }
-    //         }
-    //         return false;
-    //     }
-    // }
-
     private ConvaiPlatform GetConvaiPlatformInstance(ReadOnlyTargetRules Target)
     {
         var ConvaiPlatformType = System.Type.GetType("ConvaiPlatform_" + Target.Platform.ToString());
@@ -78,28 +58,23 @@ public class Convai : ModuleRules
     }
 
     public Convai(ReadOnlyTargetRules Target) : base(Target)
-	{
+    {
+        // Common Settings
         DefaultBuildSettings = BuildSettingsVersion.Latest;
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        PrecompileForTargets = PrecompileTargetsType.Any;
         ConvaiPlatformInstance = GetConvaiPlatformInstance(Target);
-        //bUsePrecompiled = true;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", 
-			"CoreUObject",
-			"Engine",
-			"InputCore" ,
-			"HTTP", 
-			"Json",
-			"JsonUtilities",        
-			"AudioMixer",
-			"AudioCaptureCore",
-			"AudioCapture",
-			"Voice",
-            "SignalProcessing",
-			"libOpus",
-            "OpenSSL",
-            "zlib"
-        });
+        
+        PrivateIncludePaths.AddRange(new string[] { "Convai/Private" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" , "HTTP", "Json", "JsonUtilities", "AudioMixer", "AudioCaptureCore", "AudioCapture", "Voice", "SignalProcessing", "libOpus", "OpenSSL", "zlib" });
+        PrivateDependencyModuleNames.AddRange(new string[] { });
+        PublicDefinitions.AddRange(new string[] { "ConvaiDebugMode=1", "GOOGLE_PROTOBUF_NO_RTTI", "GPR_FORBID_UNREACHABLE_CODE", "GRPC_ALLOW_EXCEPTIONS=0" });
+
+        // Target Platform Specific Settings
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            bUsePrecompiled = true;
+        }
 
         if (Target.Platform == UnrealTargetPlatform.Android)
         {
@@ -108,53 +83,25 @@ public class Convai : ModuleRules
             AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(BuildPath, "Convai_AndroidAPL.xml"));
         }
 
-
-        PrivateDependencyModuleNames.AddRange(new string[] {  });
-
-		// Opus codec thirdparty dependency
-		AddEngineThirdPartyPrivateStaticDependencies(Target, "libOpus");
-
-        AddEngineThirdPartyPrivateStaticDependencies(Target, "OpenSSL");
-        AddEngineThirdPartyPrivateStaticDependencies(Target, "zlib");
-
-
-
-        //PublicDefinitions.Add("PROTOBUF_INLINE_NOT_IN_HEADERS=0");
-        //PublicDefinitions.Add("GPR_FORBID_UNREACHABLE_CODE=0");
-        PublicDefinitions.Add("ConvaiDebugMode=1");
-        PublicDefinitions.Add("GOOGLE_PROTOBUF_NO_RTTI");
-        PublicDefinitions.Add("GPR_FORBID_UNREACHABLE_CODE");
-        PublicDefinitions.Add("GRPC_ALLOW_EXCEPTIONS=0");
         if (Target.Platform == UnrealTargetPlatform.Mac)
         {
-            PublicDefinitions.Add("GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE=0");
-            PublicDefinitions.Add("GOOGLE_PROTOBUF_USE_UNALIGNED=0");
-            PublicDefinitions.Add("PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0");
+            PublicDefinitions.AddRange(new string[] { "GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE=0", "GOOGLE_PROTOBUF_USE_UNALIGNED=0", "PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0" });
         }
 
         if (Target.Platform == UnrealTargetPlatform.Mac || Target.Platform == UnrealTargetPlatform.IOS)
         {
-            PrivateIncludePaths.AddRange(
-                new string[] {
-                        Path.Combine(ThirdPartyPath, "gRPC", "Include_apple"),
-                });
+            PrivateIncludePaths.AddRange(new string[] { Path.Combine(ThirdPartyPath, "gRPC", "Include_apple") });
         }
         else
         {
-            PrivateIncludePaths.AddRange(
-                new string[] {
-                        Path.Combine(ThirdPartyPath, "gRPC", "Include"),
-                });
+            PrivateIncludePaths.AddRange(new string[] { Path.Combine(ThirdPartyPath, "gRPC", "Include") });
         }
 
+        // ThirdParty Libraries
+        AddEngineThirdPartyPrivateStaticDependencies(Target, "libOpus");
+        AddEngineThirdPartyPrivateStaticDependencies(Target, "OpenSSL");
+        AddEngineThirdPartyPrivateStaticDependencies(Target, "zlib");
 
-
-        //if (Target.Platform == UnrealTargetPlatform.Win64)
-        {
-			PrecompileForTargets = PrecompileTargetsType.Any;
-		}
-
-        //ThirdParty Libraries
         ConfigurePlatform(Target, Target.Configuration);
     }
 }
