@@ -539,6 +539,8 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		TArray<uint8> VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 44), audio_data.length() - 44);
 		bool IsFinalResponse = reply->audio_response().end_of_response();
 
+		UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse text_string: %s"), *text_string);
+
 		// Broadcast the audio and text
 		OnDataReceived.ExecuteIfBound(text_string, VoiceData, reply->audio_response().audio_config().sample_rate_hertz(), IsFinalResponse);
 	}
