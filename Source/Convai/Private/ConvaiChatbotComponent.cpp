@@ -8,6 +8,7 @@
 #include "Sound/SoundWaveProcedural.h"
 #include "Net/UnrealNetwork.h"
 #include "ConvaiChatBotProxy.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "ConvaiGRPC.h"
 
 DEFINE_LOG_CATEGORY(ConvaiChatbotComponentLog);
@@ -115,6 +116,12 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 
 void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 {
+	// Broadcast to clients
+	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
+	{
+		Broadcast_InterruptSpeech(InVoiceFadeOutDuration);
+	}
+
 	if (GetIsTalking() || IsProcessing())
 	{
 		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("InterruptSpeech: Interrupting character"));
@@ -126,6 +133,15 @@ void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 
 		if (ReceivedFinalData == false)
 			onResponseDataReceived(FString(""), TArray<uint8>(), 0, true);
+	}
+}
+
+void UConvaiChatbotComponent::Broadcast_InterruptSpeech_Implementation(float InVoiceFadeOutDuration)
+{
+	// Execute if you are a client
+	if (!UKismetSystemLibrary::IsServer(this))
+	{
+		InterruptSpeech(InVoiceFadeOutDuration);
 	}
 }
 
@@ -206,8 +222,47 @@ void UConvaiChatbotComponent::onMicrophoneDataReceived()
 //	}
 //}
 
+void UConvaiChatbotComponent::Broadcast_OnTranscriptionReceived_Implementation(const FString& Transcription, bool IsTranscriptionReady, bool IsFinal)
+{
+	// Execute if you are a client
+	if (!UKismetSystemLibrary::IsServer(this))
+	{
+		OnTranscriptionReceived(Transcription, IsTranscriptionReady, IsFinal);
+	}
+}
+
+void UConvaiChatbotComponent::Broadcast_onResponseDataReceived_Implementation(const FString& ReceivedText, bool IsFinal)
+{
+	if (!UKismetSystemLibrary::IsServer(this))
+	{
+		onResponseDataReceived(ReceivedText, TArray<uint8>(), 0, IsFinal);
+	}
+}
+
+void UConvaiChatbotComponent::Broadcast_onSessionIDReceived_Implementation(const FString& ReceivedSessionID)
+{
+	if (!UKismetSystemLibrary::IsServer(this))
+	{
+		onSessionIDReceived(ReceivedSessionID);
+	}
+}
+
+void UConvaiChatbotComponent::Broadcast_onActionSequenceReceived_Implementation(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions)
+{
+	if (!UKismetSystemLibrary::IsServer(this))
+	{
+		onActionSequenceReceived(ReceivedSequenceOfActions);
+	}
+}
+
 void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, bool IsTranscriptionReady, bool IsFinal)
 {
+	// Broadcast to clients
+	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
+	{
+		Broadcast_OnTranscriptionReceived(Transcription, IsTranscriptionReady, IsFinal);
+	}
+
 	AsyncTask(ENamedThreads::GameThread, [this, Transcription, IsTranscriptionReady, IsFinal]
 		{
 			OnTranscriptionReceivedEvent.Broadcast(Transcription, IsTranscriptionReady, IsFinal);
@@ -218,6 +273,12 @@ void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, boo
 
 void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal)
 {
+	// Broadcast to clients
+	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
+	{
+		Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+	}
+
 	AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal]
 		{
 			float AudioDuration = 0;
@@ -235,11 +296,23 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 
 void UConvaiChatbotComponent::onSessionIDReceived(const FString ReceivedSessionID)
 {
+	// Broadcast to clients
+	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
+	{
+		Broadcast_onSessionIDReceived(ReceivedSessionID);
+	}
+
 	SessionID = ReceivedSessionID;
 }
 
 void UConvaiChatbotComponent::onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions)
 {
+	// Broadcast to clients
+	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
+	{
+		Broadcast_onActionSequenceReceived(ReceivedSequenceOfActions);
+	}
+
 	// Broadcast the actions
 	AsyncTask(ENamedThreads::GameThread, [this, ReceivedSequenceOfActions] {OnActionReceivedEvent.Broadcast(ReceivedSequenceOfActions); });
 }

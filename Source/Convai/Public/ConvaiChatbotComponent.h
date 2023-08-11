@@ -133,8 +133,15 @@ public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
 	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool VoiceResponse, bool RunOnServer, uint32 InToken);
 
-	UFUNCTION(BlueprintCallable, Category = "Convai")
+	// Interrupts the current speech with a provided fade-out duration. 
+	// The fade-out duration is controlled by the parameter 'InVoiceFadeOutDuration'.
 	void InterruptSpeech(float InVoiceFadeOutDuration);
+
+	// Broadcasts an interruption of the current speech across a network, with a provided fade-out duration.
+	// This function ensures that the interruption is communicated reliably to all connected clients.
+	// The fade-out duration is controlled by the parameter 'InVoiceFadeOutDuration'.
+	UFUNCTION(NetMulticast, Reliable, Category = "VoiceNetworking")
+	void Broadcast_InterruptSpeech(float InVoiceFadeOutDuration);
 
 private:
 	// UActorComponent interface
@@ -179,6 +186,15 @@ private:
 	void Cleanup(bool StreamConnectionFinished = false);
 
 private:
+	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
+	void Broadcast_OnTranscriptionReceived(const FString& Transcription, bool IsTranscriptionReady, bool IsFinal);
+	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
+	void Broadcast_onResponseDataReceived(const FString& ReceivedText, bool IsFinal);
+	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
+	void Broadcast_onSessionIDReceived(const FString& ReceivedSessionID);
+	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
+	void Broadcast_onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
+
 	void OnTranscriptionReceived(FString Transcription, bool IsTranscriptionReady, bool IsFinal);
 	void onResponseDataReceived(FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal);
 	void onSessionIDReceived(FString ReceivedSessionID);
