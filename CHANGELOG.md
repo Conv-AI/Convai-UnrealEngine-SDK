@@ -2,14 +2,16 @@
 All notable changes to this project will be documented in this file.
 
 # Release 2.6.1
+**Added**
+- High-Quality character voices support in multiplayer.
+
 **Updated**
 - Updated Documentation.
-- Inreased actions accuracy.
-- Replicate Chatbot events in multiplayer for easier networking integration.
+- Increased Actions accuracy.
+- Replicate Chatbot events in multiplayer for easier integration in multiplayer apps.
 
 **Fixed**
 - LipSync lag.
-- High-Quality voices were not working in multiplayer.
 - Interrupting a character in multilayer would sometimes not interrupt it on all other clients.
 
 # Release 2.6.0
