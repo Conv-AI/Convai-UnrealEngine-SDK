@@ -7,6 +7,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "LipSyncInterface.h"
 #include "Math/UnrealMathUtility.h"
+#include "ConvaiUtils.h"
 
 // THIRD_PARTY_INCLUDES_START
 #include "opus.h"
@@ -428,6 +429,22 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 		}
 	}
 
+
+	InNumChannels = FMath::Max((int)InNumChannels, 1);
+
+	TArray<int16> OutConverted;
+	
+	if (ReplicateVoiceToNetwork && (InNumChannels > 1 || InSampleRate > 24000))
+	{
+		UConvaiUtils::ResampleAudio(InSampleRate, 24000, InNumChannels, true, (int16*)PCMDataToAdd.GetData(), PCMDataToAdd.Num()/2, OutConverted);
+		InSampleRate = 24000;
+		InNumChannels = 1;
+	}
+	else
+	{
+		OutConverted = TArray<int16>((int16*)PCMDataToAdd.GetData(), PCMDataToAdd.Num()/2);
+	}
+
 	// Send it over to the encoder if we are to stream the voice audio to other clients
 	if (ReplicateVoiceToNetwork)
 	{
@@ -439,12 +456,12 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 			InitEncoder(InSampleRate, InNumChannels, EAudioEncodeHint::VoiceEncode_Voice);
 			UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Initialized Encoder with SampleRate:%d and Channels:%d"), EncoderSampleRate, EncoderNumChannels);
 		}
-		AudioDataBuffer.Append(PCMDataToAdd);
+		AudioDataBuffer.Append((uint8*)OutConverted.GetData(), OutConverted.Num()*2);
 	}
 	else if (!ShouldMuteLocal())
 	{
 		// Just play it locally
-		PlayVoiceData(PCMDataToAdd.GetData(), PCMDataToAdd.Num(), false, InSampleRate, InNumChannels);
+		PlayVoiceData((uint8*)OutConverted.GetData(), OutConverted.Num()*2, false, InSampleRate, InNumChannels);
 	}
 }
 
