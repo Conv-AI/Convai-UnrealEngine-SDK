@@ -309,7 +309,7 @@ USoundWave* UConvaiUtils::WavDataToSoundWave(TArray<uint8> InWavData)
 	return WavDataToSoundwave(InWavData);
 }
 
-void UConvaiUtils::ResampleAudio(float currentSampleRate, float targetSampleRate, int numChannels, bool reduceToMono, const TArray<int16>& currentPcmData, int numSamplesToConvert, TArray<int16>& outResampledPcmData)
+void UConvaiUtils::ResampleAudio(float currentSampleRate, float targetSampleRate, int numChannels, bool reduceToMono, int16* currentPcmData, int numSamplesToConvert, TArray<int16>& outResampledPcmData)
 {
 	// Calculate the ratio of input to output sample rates
 	float sampleRateRatio = currentSampleRate / targetSampleRate;
@@ -344,7 +344,6 @@ void UConvaiUtils::ResampleAudio(float currentSampleRate, float targetSampleRate
 		// Calculate the number of input samples to average over
 		int32 numInputSamplesToAverage = FMath::CeilToInt(nextFrameIndex - currentFrameIndex);
 
-
 		// Initialize the sum of the input samples
 		int32 sumOfInputSamples = 0;
 
@@ -354,7 +353,7 @@ void UConvaiUtils::ResampleAudio(float currentSampleRate, float targetSampleRate
 			for (int inputSampleIndex = 0; inputSampleIndex < numInputSamplesToAverage; ++inputSampleIndex)
 			{
 				int32 currentSampleIndex = FMath::FloorToInt(currentFrameIndex + inputSampleIndex) * numChannels + channel;
-				int16 currentSampleValue = currentPcmData[currentSampleIndex];
+				int16 currentSampleValue = *(currentPcmData + currentSampleIndex);
 				sumOfInputSamples += currentSampleValue;
 			}
 
@@ -370,6 +369,12 @@ void UConvaiUtils::ResampleAudio(float currentSampleRate, float targetSampleRate
 	}
 }
 
+void UConvaiUtils::ResampleAudio(float currentSampleRate, float targetSampleRate, int numChannels, bool reduceToMono, const TArray<int16>& currentPcmData, int numSamplesToConvert, TArray<int16>& outResampledPcmData)
+{
+	// Call the other function using this instance
+	ResampleAudio(currentSampleRate, targetSampleRate, numChannels, reduceToMono, (int16*)currentPcmData.GetData(), numSamplesToConvert, outResampledPcmData);
+}
+
 FString UConvaiUtils::FUTF8ToFString(const char* StringToConvert)
 {
 	// Create a TCHAR (wide string) from the UTF-8 string using Unreal's FUTF8ToTCHAR class
@@ -379,4 +384,50 @@ FString UConvaiUtils::FUTF8ToFString(const char* StringToConvert)
 	FString text_string(Converter.Get());
 
 	return text_string;
+}
+
+int UConvaiUtils::LevenshteinDistance(const FString& s, const FString& t)
+{
+	// Degenerate cases
+	if (s == t) return 0;
+	if (s.Len() == 0) return t.Len();
+	if (t.Len() == 0) return s.Len();
+
+	// Create two work vectors of integer distances
+	TArray<int32> v0;
+	v0.Init(0, t.Len() + 1);
+	TArray<int32> v1;
+	v1.Init(0, t.Len() + 1);
+
+	// Initialize v0 (the previous row of distances)
+	// This row is A[0][i]: edit distance for an empty s
+	// The distance is just the number of characters to delete from t
+	for (int32 i = 0; i < v0.Num(); i++)
+	{
+		v0[i] = i;
+	}
+
+	for (int32 i = 0; i < s.Len(); i++)
+	{
+		// Calculate v1 (current row distances) from the previous row v0
+
+		// First element of v1 is A[i+1][0]
+		// Edit distance is delete (i+1) characters from s to match an empty t
+		v1[0] = i + 1;
+
+		// Use formula to fill in the rest of the row
+		for (int32 j = 0; j < t.Len(); j++)
+		{
+			int32 cost = (s[i] == t[j]) ? 0 : 2; // Here, we change the cost of substitution to 2
+			v1[j + 1] = FMath::Min3(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost);
+		}
+
+		// Copy v1 (current row) to v0 (previous row) for next iteration
+		for (int32 j = 0; j < v0.Num(); j++)
+		{
+			v0[j] = v1[j];
+		}
+	}
+
+	return v1[t.Len()];
 }

@@ -24,19 +24,19 @@ class UConvaiUtils : public UBlueprintFunctionLibrary
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Utils")
-		static void StereoToMono(TArray<uint8> stereoWavBytes, TArray<uint8>& monoWavBytes);
+	static void StereoToMono(TArray<uint8> stereoWavBytes, TArray<uint8>& monoWavBytes);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Utils")
-		static bool ReadFileAsByteArray(FString FilePath, TArray<uint8>& Bytes);
+	static bool ReadFileAsByteArray(FString FilePath, TArray<uint8>& Bytes);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Utils")
-		static bool SaveByteArrayAsFile(FString FilePath, TArray<uint8> Bytes);
+	static bool SaveByteArrayAsFile(FString FilePath, TArray<uint8> Bytes);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Utils")
-		static FString ByteArrayToString(TArray<uint8> Bytes);
+	static FString ByteArrayToString(TArray<uint8> Bytes);
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (WorldContext = "WorldContextObject", AutoCreateRefTerm = "IncludedCharacters, ExcludedCharacters"))
-		static void ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlayerController* PlayerController, float Radius, bool PlaneView, TArray<UObject*> IncludedCharacters, TArray<UObject*> ExcludedCharacters, UConvaiChatbotComponent*& ConvaiCharacter, bool& Found);
+	static void ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlayerController* PlayerController, float Radius, bool PlaneView, TArray<UObject*> IncludedCharacters, TArray<UObject*> ExcludedCharacters, UConvaiChatbotComponent*& ConvaiCharacter, bool& Found);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai")
 	static void SetAPI_Key(FString API_Key);	
@@ -50,9 +50,13 @@ public:
 
 	static USoundWave* WavDataToSoundWave(TArray<uint8> InWavData);
 
+	static void ResampleAudio(float currentSampleRate, float targetSampleRate, int numChannels, bool reduceToMono, int16* currentPcmData, int numSamplesToConvert, TArray<int16>& outResampledPcmData);
+
 	static void ResampleAudio(float currentSampleRate, float targetSampleRate, int numChannels, bool reduceToMono, const TArray<int16>& currentPcmData, int numSamplesToConvert, TArray<int16>& outResampledPcmData);
 
 	static FString FUTF8ToFString(const char* StringToConvert);
+
+	static int LevenshteinDistance(const FString& s, const FString& t);
 };
 
 

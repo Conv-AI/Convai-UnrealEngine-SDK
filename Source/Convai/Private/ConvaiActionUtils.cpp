@@ -2,10 +2,61 @@
 
 
 #include "ConvaiActionUtils.h"
+#include "ConvaiUtils.h"
 #include "Internationalization/Regex.h"
 #include "ConvaiDefinitions.h"
 
 DEFINE_LOG_CATEGORY(ConvaiActionUtilsLog);
+
+namespace
+{
+	int32 CountWords(const FString& str)
+	{
+		if (str.Len() == 0) return 0;
+
+		TArray<FString> words;
+		str.ParseIntoArray(words, TEXT(" "), true);
+
+		return words.Num();
+	}
+
+	FString KeepNWords(const FString& StringToBeParsed, const FString& CandidateString)
+	{
+		TArray<FString> words;
+		StringToBeParsed.ParseIntoArray(words, TEXT(" "), true);
+
+		int32 N = CountWords(CandidateString);
+
+		FString result;
+		for (int32 i = 0; i < FMath::Min(N, words.Num()); i++)
+		{
+			result += words[i] + " ";
+		}
+
+		// Trim trailing space
+		result = result.LeftChop(1);
+
+		return result;
+	}
+
+	FString FindClosestString(FString Input, const TArray<FString>& StringArray)
+	{
+		FString ClosestString;
+		int32 MinDistance = MAX_int32;
+
+		for (auto& String : StringArray)
+		{
+			int32 Distance = UConvaiUtils::LevenshteinDistance(Input, String);
+			if (Distance < MinDistance)
+			{
+				MinDistance = Distance;
+				ClosestString = String;
+			}
+		}
+
+		return ClosestString;
+	}
+};
 
 FString UConvaiActions::ExtractText(FString Action, FString ActionResult)
 {
@@ -56,6 +107,24 @@ FString UConvaiActions::RemoveDesc(FString str)
 	return str;
 }
 
+FString UConvaiActions::FindAction(FString ActionToBeParsed, TArray<FString> Actions)
+{
+	FString ClosestAction;
+	int32 MinDistance = MAX_int32;
+	for (auto a : Actions)
+	{
+		a = RemoveDesc(a);
+		ActionToBeParsed = KeepNWords(ActionToBeParsed, a);
+		int32 Distance = UConvaiUtils::LevenshteinDistance(ActionToBeParsed, a);
+		if (Distance < MinDistance)
+		{
+			MinDistance = Distance;
+			ClosestAction = a;
+		}
+	}
+	return ClosestAction;
+}
+
 bool UConvaiActions::ParseAction(UConvaiEnvironment* Environment, FString ActionToBeParsed, FConvaiResultAction& ConvaiResultAction)
 {
 	FString ActionToAdd;
@@ -63,14 +132,7 @@ bool UConvaiActions::ParseAction(UConvaiEnvironment* Environment, FString Action
 	ConvaiResultAction.ActionString = ActionToBeParsed;
 
 	// find actions
-	for (auto a : Environment->Actions)
-	{
-		a = RemoveDesc(a);
-		if (ActionToBeParsed.Find(a) >= 0)
-		{
-			ActionToAdd = a;
-		}
-	}
+	ActionToAdd = FindAction(ActionToBeParsed, Environment->Actions);
 
 	// find characters
 	for (auto c : Environment->Characters)

@@ -24,6 +24,8 @@ public:
 	// Extract number from an action result (e.g. Waits for 5 seconds -> 5)
 	static float ExtractNumber(FString ActionResult);
 
+	static FString FindAction(FString ActionToBeParsed, TArray<FString> Actions);
+
 	// Removes inner descriptions from a string e.g. (Waits for <time in seconds> becomes Waits for)
 	static FString RemoveDesc(FString str);
 
