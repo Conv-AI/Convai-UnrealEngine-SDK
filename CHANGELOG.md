@@ -1,16 +1,28 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+
+# Release 2.6.1
+**Updated**
+- Updated Documentation.
+- Inreased actions accuracy.
+- Replicate Chatbot events in multiplayer for easier networking integration.
+
+**Fixed**
+- LipSync lag.
+- High-Quality voices were not working in multiplayer.
+- Interrupting a character in multilayer would sometimes not interrupt it on all other clients.
+
 # Release 2.6.0
 **Added**
 - Mac Support.
 - New MetaHuman body animations and Facial expressions.
-- Realusion characters support.
+- Reallusion characters support.
 
 **Updated**
 - Improved MetaHuman lipsync.
 
 **Fixed**
-- Sending non-english text won't get processed.
+- Sending non-English text won't get processed.
 - Potential microphone issue when it gets detected as zero channel.
 
 # Release 2.5.1
