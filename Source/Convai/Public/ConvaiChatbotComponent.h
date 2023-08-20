@@ -135,6 +135,7 @@ public:
 
 	// Interrupts the current speech with a provided fade-out duration. 
 	// The fade-out duration is controlled by the parameter 'InVoiceFadeOutDuration'.
+	UFUNCTION(BlueprintCallable, Category = "Convai")
 	void InterruptSpeech(float InVoiceFadeOutDuration);
 
 	// Broadcasts an interruption of the current speech across a network, with a provided fade-out duration.
