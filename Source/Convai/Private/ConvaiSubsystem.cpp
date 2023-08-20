@@ -121,8 +121,11 @@ void FgRPCClient::StartStub()
 void FgRPCClient::CreateChannel()
 {
 	UE_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC Creating Channel..."));
-	Channel = grpc::CreateChannel(Target, Creds);
-	
+	grpc::ChannelArguments args;
+	args.SetMaxReceiveMessageSize(2147483647);
+
+	Channel = grpc::CreateCustomChannel(Target, Creds, args);
+
 	//Channel->NotifyOnStateChange(grpc_connectivity_state::GRPC_CHANNEL_CONNECTING, std::chrono::system_clock::time_point().max(), &cq_, (void*)&OnStateChangeDelegate);
 }
 
