@@ -1,5 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+# Release 2.7.0
+**Added**
+- Full multiplayer support with real-time AI avatar conversations and voice chat.
+- Environment awareness for AI avatars to do actions on surrounding objects and other players in multiplayer.
+- Player name customization feature.
+- Toggle for switching between client and server API keys.
+- Multiplayer support for animations: Reallusion, Ready Player Me, and Unreal Engine Metahumans.
+- Chat UI with multiplayer chat replication.
+
+**Updated**
+- Three distinct modes for Chat UI added for a more intuitive user experience.
+
+**Fixed**
+- Game crash issue caused by curse words.
+- Bug where non-English texts were not processed correctly.
+- "Upstream Max Limit Exceeded" error when using the gRPC API.
 
 # Release 2.6.1
 **Added**
