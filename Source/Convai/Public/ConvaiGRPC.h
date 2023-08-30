@@ -48,7 +48,7 @@ public:
 	FConvaiGRPCOnEventSignature OnFailure;
 
 	//UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai GRPC Test", WorldContext = "WorldContextObject"), Category = "Convai|gRPC")
-	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions);
+	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key);
 
 	void Activate();
 
@@ -113,7 +113,7 @@ private:
 private:
 	// Inputs
 	FString URL;
-	FString API_key;
+	FString API_Key;
 	FString UserQuery;
 	bool VoiceResponse;
 	FString CharID;

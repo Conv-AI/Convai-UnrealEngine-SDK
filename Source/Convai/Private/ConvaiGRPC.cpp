@@ -11,6 +11,7 @@
 #include "Engine/GameInstance.h"
 // #include <chrono>   
 #include <string>
+#include "Engine/EngineTypes.h"
 
 THIRD_PARTY_INCLUDES_START
 #include <grpc++/grpc++.h>
@@ -37,38 +38,6 @@ using service::ConvaiService;
 
 
 namespace {
-	UConvaiSubsystem* GetConvaiSubsystem(const UObject* WorldContextObject)
-	{
-		//UWorld* World = WorldPtr.Get();
-
-		if (!WorldContextObject)
-		{
-			UE_LOG(ConvaiGRPCLog, Warning, TEXT("WorldContextObject ptr is invalid!"));
-			return nullptr;
-		}
-
-		UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(WorldContextObject);
-		if (!GameInstance)
-		{
-			UE_LOG(ConvaiSubsystemLog, Warning, TEXT("Could not get pointer to a GameInstance"));
-			return nullptr;
-		}
-
-
-		if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
-		{
-			return ConvaiSubsystem;
-		}
-		else
-		{
-			UE_LOG(ConvaiSubsystemLog, Warning, TEXT("Could not get pointer to Convai Subsystem"));
-			return nullptr;
-		}
-
-	}
-
-
-
 	const char* StatusCodeStr[] =
 	{
 	"OK",
@@ -89,11 +58,10 @@ namespace {
 	"UNAVAILABLE",
 	"DATA_LOSS",
 	"DO_NOT_USE" };
-
 }
 
 
-UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions)
+UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
 {
 	UConvaiGRPCGetResponseProxy* Proxy = NewObject<UConvaiGRPCGetResponseProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
@@ -103,7 +71,7 @@ UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetRes
 	Proxy->VoiceResponse = VoiceResponse;
 	Proxy->Environment = Environment;
 	Proxy->GenerateActions = GenerateActions;
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+	Proxy->API_Key = API_Key;
 
 	return Proxy;
 }
@@ -119,7 +87,7 @@ void UConvaiGRPCGetResponseProxy::Activate()
 	reply = std::unique_ptr<service::GetResponseResponse>(new service::GetResponseResponse());
 
 	// Form Validation
-	if (!UConvaiFormValidation::ValidateAPIKey(API_key) || !(UConvaiFormValidation::ValidateCharacterID(CharID)) || !(UConvaiFormValidation::ValidateSessionID(SessionID)))
+	if (!UConvaiFormValidation::ValidateAPIKey(API_Key) || !(UConvaiFormValidation::ValidateCharacterID(CharID)) || !(UConvaiFormValidation::ValidateSessionID(SessionID)))
 	{
 		OnFailure.ExecuteIfBound();
 		return;
@@ -132,7 +100,7 @@ void UConvaiGRPCGetResponseProxy::Activate()
 		return;
 	}
 
-	UConvaiSubsystem* ConvaiSubsystem = GetConvaiSubsystem(WorldPtr.Get());
+	UConvaiSubsystem* ConvaiSubsystem = UConvaiUtils::GetConvaiSubsystem(WorldPtr.Get());
 	if (!ConvaiSubsystem)
 	{
 		UE_LOG(ConvaiGRPCLog, Warning, TEXT("Convai Subsystem is not valid"));
@@ -158,10 +126,37 @@ void UConvaiGRPCGetResponseProxy::Activate()
 		return;
 	}
 
-	//ClientContext context;
-	//std::chrono::system_clock::time_point deadline =
-	//	std::chrono::system_clock::now() + std::chrono::milliseconds(3000);
-	//client_context.set_deadline(deadline);
+	bool Found;
+	FString VersionName;
+	FString EngineVersion;
+	FString PlatformName;
+	FString PluginEngineVersion;
+	FString FriendlyName;
+
+	UConvaiUtils::GetPluginInfo(FString("Convai"), Found, VersionName, FriendlyName, PluginEngineVersion);
+	UConvaiUtils::GetPlatformInfo(EngineVersion, PlatformName);
+
+	// Add metadata
+	client_context.AddMetadata("engine", "Unreal Engine");
+	client_context.AddMetadata("engine_version", TCHAR_TO_UTF8(*EngineVersion));
+	client_context.AddMetadata("engine", "Unreal Engine");
+
+	client_context.AddMetadata("engine", "Unreal Engine");
+	client_context.AddMetadata("engine_version", TCHAR_TO_UTF8(*EngineVersion));
+	client_context.AddMetadata("platform_name", TCHAR_TO_UTF8(*PlatformName));
+
+	if (Found)
+	{
+		client_context.AddMetadata("plugin_engine_version", TCHAR_TO_UTF8(*PluginEngineVersion));
+		client_context.AddMetadata("plugin_version", TCHAR_TO_UTF8(*VersionName));
+		client_context.AddMetadata("plugin_base_name", TCHAR_TO_UTF8(*FriendlyName));
+	}
+	else
+	{
+		client_context.AddMetadata("plugin_engine_version", "Unknown");
+		client_context.AddMetadata("plugin_version", "Unknown");
+		client_context.AddMetadata("plugin_base_name", "Unknown");
+	}
 
 	// Initialize the stream
 	stream_handler = stub_->AsyncGetResponse(&client_context, cq_, (void*)&OnInitStreamDelegate);
@@ -338,7 +333,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	// Create the config object that holds Audio and Action configs
 	GetResponseRequest_GetResponseConfig* getResponseConfig = new GetResponseRequest_GetResponseConfig();
-	getResponseConfig->set_api_key(TCHAR_TO_ANSI(*API_key));
+	getResponseConfig->set_api_key(TCHAR_TO_ANSI(*API_Key));
 	getResponseConfig->set_session_id(TCHAR_TO_ANSI(*SessionID));
 	getResponseConfig->set_character_id(TCHAR_TO_ANSI(*CharID));
 	if (GenerateActions)
@@ -383,8 +378,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 	}
 
 	//UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWrite"));
-
-	UConvaiSubsystem* ConvaiSubsystem = GetConvaiSubsystem(WorldPtr.Get());
 
 	// Clear the request data to make it ready to hold the new data we are going to send
 	request.Clear();
@@ -489,17 +482,12 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		return;
 	}
 
-
 	if (!ok && !status.ok())
 	{
 		LogAndEcecuteFailure("OnStreamRead");
 		return;
 	}
 	//UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamRead"));
-
-
-
-	UConvaiSubsystem* ConvaiSubsystem = GetConvaiSubsystem(WorldPtr.Get());
 
 	// Grab the session ID
 	std::string SessionID_std = reply->session_id();
@@ -536,7 +524,11 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 
 		// Grab bot audio
 		::std::string audio_data = reply->audio_response().audio_data();
-		TArray<uint8> VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 44), audio_data.length() - 44);
+		TArray<uint8> VoiceData;
+		if (reply->audio_response().audio_data().length() > 44)
+		{
+			VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 44), audio_data.length() - 44);
+		}
 		bool IsFinalResponse = reply->audio_response().end_of_response();
 
 		// Broadcast the audio and text
