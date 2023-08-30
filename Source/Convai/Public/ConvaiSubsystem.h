@@ -19,6 +19,7 @@ THIRD_PARTY_INCLUDES_START
 #undef InterlockedAnd
 #undef InterlockedIncrement
 #undef InterlockedDecrement
+#undef InterlockedCompareExchange
 #undef FastFence
 #undef MemoryBarrier
 #undef Yield
