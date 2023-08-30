@@ -156,6 +156,8 @@ public:
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
 		void AddObject(FConvaiObjectEntry Object)
 	{
+		// Replace old object that has the same name with the new object
+		RemoveObject(Object.Name);
 		Objects.AddUnique(Object);
 	}
 
@@ -194,6 +196,8 @@ public:
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
 		void AddCharacter(FConvaiObjectEntry Character)
 	{
+		// Replace old character that has the same name with the new character
+		RemoveCharacter(Character.Name);
 		Characters.AddUnique(Character);
 	}
 
