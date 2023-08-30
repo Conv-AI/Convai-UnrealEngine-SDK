@@ -12,6 +12,7 @@ DECLARE_LOG_CATEGORY_EXTERN(ConvaiFormValidationLog, Log, All);
 class USoundWave;
 class APlayerController;
 class UObject;
+class UConvaiSubsystem;
 
 /**
  *
@@ -22,6 +23,8 @@ class UConvaiUtils : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+
+	static UConvaiSubsystem* GetConvaiSubsystem(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Utils")
 	static void StereoToMono(TArray<uint8> stereoWavBytes, TArray<uint8>& monoWavBytes);
@@ -37,12 +40,24 @@ public:
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (WorldContext = "WorldContextObject", AutoCreateRefTerm = "IncludedCharacters, ExcludedCharacters"))
 	static void ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlayerController* PlayerController, float Radius, bool PlaneView, TArray<UObject*> IncludedCharacters, TArray<UObject*> ExcludedCharacters, UConvaiChatbotComponent*& ConvaiCharacter, bool& Found);
+	
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (WorldContext = "WorldContextObject"))
+	static void ConvaiGetAllPlayerComponents(UObject* WorldContextObject, TArray<class UConvaiPlayerComponent*>& ConvaiPlayerComponents);
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (WorldContext = "WorldContextObject"))
+	static void ConvaiGetAllChatbotComponents(UObject* WorldContextObject, TArray<class UConvaiChatbotComponent*>& ConvaiChatbotComponents);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai")
 	static void SetAPI_Key(FString API_Key);	
 	
 	UFUNCTION(BlueprintPure, Category = "Convai")
 	static FString GetAPI_Key();
+
+	UFUNCTION(BlueprintPure, Category = "Convai")
+	static void GetPluginInfo(FString PluginName, bool& Found, FString& VersionName, FString& EngineVersion, FString& FriendlyName);
+
+	UFUNCTION(BlueprintPure, Category = "Convai")
+	static void GetPlatformInfo(FString& EngineVersion, FString& PlatformName);
 
 	static void PCMDataToWav(TArray<uint8> InPCMBytes, TArray<uint8>& OutWaveFileData, int NumChannels, int SampleRate);
 
@@ -57,6 +72,7 @@ public:
 	static FString FUTF8ToFString(const char* StringToConvert);
 
 	static int LevenshteinDistance(const FString& s, const FString& t);
+
 };
 
 

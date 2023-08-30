@@ -11,13 +11,49 @@
 #include "Math/Vector.h"
 #include "Camera/PlayerCameraManager.h"
 #include "UObject/UObjectHash.h"
-#include "../Convai.h"
 #include "Math/UnrealMathUtility.h"
+#include "Kismet/GameplayStatics.h"
 
+
+#include "../Convai.h"
 #include "ConvaiChatbotComponent.h"
+
+#include "Interfaces/IPluginManager.h"
+#include "Engine/EngineTypes.h"
+
 
 DEFINE_LOG_CATEGORY(ConvaiUtilsLog);
 DEFINE_LOG_CATEGORY(ConvaiFormValidationLog);
+
+UConvaiSubsystem* UConvaiUtils::GetConvaiSubsystem(const UObject* WorldContextObject)
+{
+	//UWorld* World = WorldPtr.Get();
+
+	if (!WorldContextObject)
+	{
+		UE_LOG(ConvaiGRPCLog, Warning, TEXT("WorldContextObject ptr is invalid!"));
+		return nullptr;
+	}
+
+	UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(WorldContextObject);
+	if (!GameInstance)
+	{
+		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get pointer to a GameInstance"));
+		return nullptr;
+	}
+
+
+	if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
+	{
+		return ConvaiSubsystem;
+	}
+	else
+	{
+		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get pointer to Convai Subsystem"));
+		return nullptr;
+	}
+
+}
 
 void UConvaiUtils::StereoToMono(TArray<uint8> stereoWavBytes, TArray<uint8>& monoWavBytes)
 {
@@ -73,18 +109,15 @@ void UConvaiUtils::StereoToMono(TArray<uint8> stereoWavBytes, TArray<uint8>& mon
 	}
 }
 
-
 bool UConvaiUtils::ReadFileAsByteArray(FString FilePath, TArray<uint8>& Bytes)
 {
 	return FFileHelper::LoadFileToArray(Bytes, *FilePath, 0);
 }
 
-
 bool UConvaiUtils::SaveByteArrayAsFile(FString FilePath, TArray<uint8> Bytes)
 {
 	return FFileHelper::SaveArrayToFile(Bytes, *FilePath);
 }
-
 
 FString UConvaiUtils::ByteArrayToString(TArray<uint8> Bytes)
 {
@@ -234,21 +267,113 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 	}
 }
 
+void UConvaiUtils::ConvaiGetAllPlayerComponents(UObject* WorldContextObject, TArray<class UConvaiPlayerComponent*>& ConvaiPlayerComponents)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	if (!World)
+	{
+		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
+		return;
+	}
+
+	ConvaiPlayerComponents.Empty();
+
+	TArray<UObject*> ConvaiPlayerComponentsObjects;
+	GetObjectsOfClass(UConvaiPlayerComponent::StaticClass(), ConvaiPlayerComponentsObjects, true, RF_ClassDefaultObject);
+
+	for (int32 Index = 0; Index < ConvaiPlayerComponentsObjects.Num(); ++Index)
+	{
+		UConvaiPlayerComponent* CurrentConvaiPlayer = Cast<UConvaiPlayerComponent>(ConvaiPlayerComponentsObjects[Index]);
+
+		if (!IsValid(CurrentConvaiPlayer))
+			continue;
+
+		AActor* Owner = CurrentConvaiPlayer->GetOwner();
+
+		if (Owner == nullptr || CurrentConvaiPlayer->GetWorld() != World)
+			continue;
+
+		ConvaiPlayerComponents.Add(CurrentConvaiPlayer);
+	}
+}
+
+void UConvaiUtils::ConvaiGetAllChatbotComponents(UObject* WorldContextObject, TArray<class UConvaiChatbotComponent*>& ConvaiChatbotComponents)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	if (!World)
+	{
+		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
+		return;
+	}
+
+	ConvaiChatbotComponents.Empty();
+
+	TArray<UObject*> ConvaiChatbotComponentsObjects;
+	GetObjectsOfClass(UConvaiChatbotComponent::StaticClass(), ConvaiChatbotComponentsObjects, true, RF_ClassDefaultObject);
+
+	for (int32 Index = 0; Index < ConvaiChatbotComponentsObjects.Num(); ++Index)
+	{
+		UConvaiChatbotComponent* CurrentConvaiChatbot = Cast<UConvaiChatbotComponent>(ConvaiChatbotComponentsObjects[Index]);
+
+		if (!IsValid(CurrentConvaiChatbot))
+			continue;
+
+		AActor* Owner = CurrentConvaiChatbot->GetOwner();
+
+		if (Owner == nullptr || CurrentConvaiChatbot->GetWorld() != World)
+			continue;
+
+		ConvaiChatbotComponents.Add(CurrentConvaiChatbot);
+	}
+}
+
 void UConvaiUtils::SetAPI_Key(FString API_Key)
 {
 	Convai::Get().GetConvaiSettings()->API_Key = API_Key;
 }
-
 
 FString UConvaiUtils::GetAPI_Key()
 {
 	return Convai::Get().GetConvaiSettings()->API_Key;
 }
 
+void UConvaiUtils::GetPluginInfo(FString PluginName, bool& Found, FString& VersionName, FString& EngineVersion, FString& FriendlyName)
+{
+	IPluginManager& PluginManager = IPluginManager::Get();
+	TSharedPtr<IPlugin> Plugin = PluginManager.FindPlugin(PluginName);
+	Found = false;
+
+	if (Plugin.IsValid())
+	{
+		const FPluginDescriptor& PluginDescriptor = Plugin->GetDescriptor();
+		VersionName = PluginDescriptor.VersionName;
+		EngineVersion = PluginDescriptor.EngineVersion;
+		FriendlyName = PluginDescriptor.FriendlyName;
+		Found = true;
+	}
+}
+
+void UConvaiUtils::GetPlatformInfo(FString& EngineVersion, FString& PlatformName)
+{
+	// Get the global engine version
+	EngineVersion = FEngineVersion::Current().ToString();
+
+	// Get the platform name
+#if PLATFORM_WINDOWS
+	PlatformName = TEXT("Windows");
+#elif PLATFORM_MAC
+	PlatformName = TEXT("Mac");
+#elif PLATFORM_LINUX
+	PlatformName = TEXT("Linux");
+#elif PLATFORM_ANDROID
+	PlatformName = TEXT("Android");
+#else
+	PlatformName = TEXT("Unknown");
+#endif
+}
 
 namespace
 {
-
 	USoundWave* WavDataToSoundwave(TArray<uint8> Data)
 	{
 		FWaveModInfo WaveInfo;
@@ -279,8 +404,7 @@ namespace
 			return nullptr;
 		}
 	}
-
-}
+};
 
 void UConvaiUtils::PCMDataToWav(TArray<uint8> InPCMBytes, TArray<uint8>& OutWaveFileData, int NumChannels, int SampleRate)
 {
