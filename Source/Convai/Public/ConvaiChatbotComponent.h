@@ -10,10 +10,19 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiChatbotComponentLog, Log, All);
 
-DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(FOnTranscriptionReceivedSignature, UConvaiChatbotComponent, OnTranscriptionReceivedEvent, FString, Transcription, bool, IsTranscriptionReady, bool, IsFinal);
-DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_FourParams(FOnTextReceivedSignature, UConvaiChatbotComponent, OnTextReceivedEvent, FString, CharacterName, FString, BotText, float, AudioDuration, bool, IsFinal);
-DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnActionReceivedSignature, UConvaiChatbotComponent, OnActionReceivedEvent, const TArray<FConvaiResultAction>&, SequenceOfActions);
-DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnCharacterDataLoadSignature, UConvaiChatbotComponent, OnCharacterDataLoadEvent, bool, Success);
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(FOnTranscriptionReceivedSignature_Deprecated, UConvaiChatbotComponent, OnTranscriptionReceivedEvent, FString, Transcription, bool, IsTranscriptionReady, bool, IsFinal);
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_SixParams(FOnTranscriptionReceivedSignature_V2, UConvaiChatbotComponent, OnTranscriptionReceivedEvent_V2, UConvaiChatbotComponent*, ChatbotComponent, UConvaiPlayerComponent*, InteractingPlayerComponent, FString, PlayerName, FString, Transcription, bool, IsTranscriptionReady, bool, IsFinal);
+
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_FourParams(FOnTextReceivedSignature_Deprecated, UConvaiChatbotComponent, OnTextReceivedEvent, FString, CharacterName, FString, BotText, float, AudioDuration, bool, IsFinal);
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_SixParams(FOnTextReceivedSignature_V2, UConvaiChatbotComponent, OnTextReceivedEvent_V2, UConvaiChatbotComponent*, ChatbotComponent, UConvaiPlayerComponent*, InteractingPlayerComponent, FString, CharacterName, FString, BotText, float, AudioDuration, bool, IsFinal);
+
+
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnActionReceivedSignature_Deprecated, UConvaiChatbotComponent, OnActionReceivedEvent, const TArray<FConvaiResultAction>&, SequenceOfActions);
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(FOnActionReceivedSignature_V2, UConvaiChatbotComponent, OnActionReceivedEvent_V2, UConvaiChatbotComponent*, ChatbotComponent, UConvaiPlayerComponent*, InteractingPlayerComponent, const TArray<FConvaiResultAction>&, SequenceOfActions);
+
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnCharacterDataLoadSignature_Deprecated, UConvaiChatbotComponent, OnCharacterDataLoadEvent, bool, Success);
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnCharacterDataLoadSignature_V2, UConvaiChatbotComponent, OnCharacterDataLoadEvent_V2, UConvaiChatbotComponent*, ChatbotComponent, bool, Success);
+
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(FOnFailureSignature, UConvaiChatbotComponent, OnFailureEvent);
 // TODO (Mohamed): Manage onDestroy/onEndPlay - should end any on-going streams
 
@@ -77,6 +86,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated)
 	FString AvatarImageLink;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated, meta = (DisplayName = "Interacting Player"))
+	UConvaiPlayerComponent* CurrentConvaiPlayerComponent;
+
 	/**
 	 *    Used to track memory of a previous conversation, set to -1 means no previous conversation,
 	 *	  this property will change as you talk to the character, you can save the session ID for a
@@ -111,19 +123,27 @@ public:
 
 public:
 	/** Called when a new action is received from the API */
+	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "_DEPRECATED On Actions Received"))
+	FOnActionReceivedSignature_Deprecated OnActionReceivedEvent;
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Actions Received"))
-	FOnActionReceivedSignature OnActionReceivedEvent;
+	FOnActionReceivedSignature_V2 OnActionReceivedEvent_V2;
 
 	/** Called when new text is received from the API, AudioDuration = 0 if no audio was received */
+	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "_DEPRECATED On Text Received"))
+	FOnTextReceivedSignature_Deprecated OnTextReceivedEvent;
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Text Received"))
-	FOnTextReceivedSignature OnTextReceivedEvent;
+	FOnTextReceivedSignature_V2 OnTextReceivedEvent_V2;
 
 	/** Called when new transcription is available */
+	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "_DEPRECATED On Transcription Received"))
+	FOnTranscriptionReceivedSignature_Deprecated OnTranscriptionReceivedEvent;
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Transcription Received"))
-	FOnTranscriptionReceivedSignature OnTranscriptionReceivedEvent;
+	FOnTranscriptionReceivedSignature_V2 OnTranscriptionReceivedEvent_V2;
 
+	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "_DEPRECATED On Character Data Loaded"))
+	FOnCharacterDataLoadSignature_Deprecated OnCharacterDataLoadEvent;
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Character Data Loaded"))
-	FOnCharacterDataLoadSignature OnCharacterDataLoadEvent;
+	FOnCharacterDataLoadSignature_V2 OnCharacterDataLoadEvent_V2;
 
 	/** Called there is an error */
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Failure"))
@@ -131,7 +151,7 @@ public:
 
 public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
-	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool VoiceResponse, bool RunOnServer, uint32 InToken);
+	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAPI_Key, FString OverrideAPI_Key, uint32 InToken);
 
 	// Interrupts the current speech with a provided fade-out duration. 
 	// The fade-out duration is controlled by the parameter 'InVoiceFadeOutDuration'.
@@ -145,12 +165,12 @@ public:
 	void Broadcast_InterruptSpeech(float InVoiceFadeOutDuration);
 
 private:
-	// UActorComponent interface
+	// AActorComponent interface
 	virtual void BeginPlay() override;
 	//virtual void OnRegister() override;
 	//virtual void OnUnregister() override;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	// End UActorComponent interface
+	// End AActorComponent interface
 
 	//~ Begin UObject Interface.
 	virtual void BeginDestroy() override;
@@ -163,7 +183,6 @@ private:
 
 	UFUNCTION()
 	void OnConvaiGetDetailsCompleted(FString ReceivedCharacterName, FString ReceivedVoiceType, FString ReceivedBackstory, FString ReceivedLanguageCode, bool HasReadyPlayerMeLink, FString ReceivedReadyPlayerMeLink, FString ReceivedAvatarImageLink);
-
 
 private:
 	// Used when both the voice component ring buffer is empty and we have already sent all the current audio data over the stream
@@ -178,7 +197,7 @@ private:
 	void ClearTimeOutTimer();
 
 private:
-	void Start_GRPC_Request();
+	void Start_GRPC_Request(bool UseOverrideAPI_Key, FString OverrideAPI_Key);
 
 	void Bind_GRPC_Request_Delegates();
 
@@ -209,9 +228,6 @@ private:
 
 	UPROPERTY()
 	UConvaiGRPCGetResponseProxy* ConvaiGRPCGetResponseProxy;
-
-	UPROPERTY()
-	UConvaiPlayerComponent* CurrentConvaiPlayerComponent;
 
 	bool GenerateActions; // Should we generate actions
 	bool TextInput; // Whether  to use text or audio as input to the API
