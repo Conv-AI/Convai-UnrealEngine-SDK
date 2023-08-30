@@ -62,9 +62,23 @@ class UConvaiPlayerComponent : public UConvaiAudioStreamer
 
 	UConvaiPlayerComponent();
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	bool Init();
 
 public:
+
+	UPROPERTY(EditAnywhere, Category = "Convai", Replicated, BlueprintSetter = SetPlayerName)
+	FString PlayerName;
+
+	/**
+	 *    Sets a new player name
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Convai")
+	void SetPlayerName(FString NewPlayerName);
+
+	UFUNCTION(Server, Reliable, Category = "Convai|Network")
+	void SetPlayerNameServer(const FString& NewPlayerName);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
 	bool GetDefaultCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo);
@@ -127,7 +141,8 @@ public:
 		bool GenerateActions,
 		bool VoiceResponse,
 		bool RunOnServer,
-		bool StreamPlayerMic);
+		bool StreamPlayerMic,
+		bool UseServerAPI_Key);
 	
 	/**
 	* Stops streaming microphone audio to the character.
@@ -135,7 +150,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
 	void FinishTalking();
 
-	UFUNCTION(Server, Reliable, Category = "Convai|VoiceNetworking")
+	UFUNCTION(Server, Reliable, Category = "Convai|Network")
 	void StartTalkingServer(
 		class UConvaiChatbotComponent* ConvaiChatbotComponent,
 		bool EnvironemntSent,
@@ -145,9 +160,11 @@ public:
 		FConvaiObjectEntry MainCharacter,
 		bool GenerateActions,
 		bool VoiceResponse,
-		bool StreamPlayerMic);
+		bool StreamPlayerMic,
+		bool UseServerAPI_Key,
+		const FString& ClientAPI_Key);
 
-	UFUNCTION(Server, Reliable, Category = "Convai|VoiceNetworking")
+	UFUNCTION(Server, Reliable, Category = "Convai|Network")
 	void FinishTalkingServer();
 
 	/**
@@ -166,9 +183,10 @@ public:
 			UConvaiEnvironment* Environment,
 			bool GenerateActions,
 			bool VoiceResponse,
-			bool RunOnServer);
+			bool RunOnServer,
+			bool UseServerAPI_Key);
 
-	UFUNCTION(Server, Reliable, Category = "Convai|VoiceNetworking")
+	UFUNCTION(Server, Reliable, Category = "Convai|Network")
 	void SendTextServer(
 		UConvaiChatbotComponent* ConvaiChatbotComponent,
 		const FString& Text,
@@ -178,7 +196,9 @@ public:
 		const TArray<FConvaiObjectEntry>& Characters,
 		FConvaiObjectEntry MainCharacter,
 		bool GenerateActions,
-		bool VoiceResponse);
+		bool VoiceResponse,
+		bool UseServerAPI_Key,
+		const FString& ClientAPI_Key);
 
 	virtual bool ShouldMuteLocal() override;
 
@@ -192,7 +212,7 @@ public:
 
 	bool ConsumeStreamingBuffer(uint8* Buffer, uint32 length);
 
-	UFUNCTION(Server, Reliable, Category = "Convai|VoiceNetworking")
+	UFUNCTION(Server, Reliable, Category = "Convai|Network")
 	void SetIsStreamingServer(bool value);
 
 	// Returns true if microphone audio is being streamed, false otherwise.
