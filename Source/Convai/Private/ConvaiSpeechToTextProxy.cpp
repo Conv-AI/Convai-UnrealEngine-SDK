@@ -58,15 +58,27 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromSoundWa
 
 	//Proxy->Payload.SetNum(SoundWave->TotalSamples * 2);
 	uint8* PCMData = nullptr;
+	TArray<uint8> RawPCMData;
+	int32 OutSampleRate = -1;
 	//int32 numBytes = SoundWave->GeneratePCMData(PCMData, SoundWave->TotalSamples);
 
-	if (SoundWave->RawPCMData == nullptr) {
-		UE_LOG(ConvaiS2THttpLog, Warning, TEXT("RawPCMData is invalid!"));
+	if (SoundWave->RawPCMData == nullptr || SoundWave->RawPCMDataSize <= 0) {
+		UE_LOG(LogTemp, Display, TEXT("SoundWave PCM Data is compressed. Starting Decompressing....."));
+		RawPCMData = UConvaiUtils::ExtractPCMDataFromSoundWave(SoundWave, OutSampleRate);
+
+		if (RawPCMData.Num() > 0) {
+			UE_LOG(LogTemp, Display, TEXT("SoundWave PCM Data decompression successfully done....."));
+		}
+		else {
+			UE_LOG(LogTemp,Warning,TEXT("SoundWave couldn't be decompressed successuflly !!!"));
+		}
+		//UE_LOG(ConvaiS2THttpLog, Warning, TEXT("RawPCMData is invalid!"));
+	}
+	else {
+		RawPCMData = TArray<uint8>(SoundWave->RawPCMData, SoundWave->RawPCMDataSize);
 	}
 
 	//TArray<uint8> AudioBuffer(SoundWave->RawPCMData, SoundWave->RawPCMDataSize);
-	TArray<uint8> RawPCMData;
-	RawPCMData = TArray<uint8>(SoundWave->RawPCMData, SoundWave->RawPCMDataSize);
 
 	SerializeWaveFile(Proxy->Payload, RawPCMData.GetData(), RawPCMData.Num(), SoundWave->NumChannels, SoundWave->GetSampleRateForCurrentPlatform());
 

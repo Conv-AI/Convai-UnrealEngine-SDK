@@ -59,6 +59,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Convai")
 	static void GetPlatformInfo(FString& EngineVersion, FString& PlatformName);
 
+	static TArray<uint8> ExtractPCMDataFromSoundWave(USoundWave* SoundWave, int32& OutSampleRate);
+
 	static void PCMDataToWav(TArray<uint8> InPCMBytes, TArray<uint8>& OutWaveFileData, int NumChannels, int SampleRate);
 
 	static USoundWave* PCMDataToSoundWav(TArray<uint8> InPCMBytes, int NumChannels, int SampleRate);
@@ -74,7 +76,6 @@ public:
 	static int LevenshteinDistance(const FString& s, const FString& t);
 
 };
-
 
 UCLASS()
 class UConvaiFormValidation : public UBlueprintFunctionLibrary
