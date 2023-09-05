@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "2.7.0",
+	"VersionName": "2.8.0",
 	"FriendlyName": "Convai",
 	"Description": "Adds new blueprint functions and components to integrate Convai API.",
 	"Category": "Runtime",
