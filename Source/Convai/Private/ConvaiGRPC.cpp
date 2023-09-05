@@ -540,7 +540,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		FString SequenceString = UConvaiUtils::FUTF8ToFString(reply->action_response().action().c_str());
 
 #if ConvaiDebugMode
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse Complete Action String: %s"), *SequenceString);
+		UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse SequenceString: %s"), *SequenceString);
 #endif 
 
 		// Parse the actions
