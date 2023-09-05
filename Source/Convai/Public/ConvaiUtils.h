@@ -47,17 +47,22 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (WorldContext = "WorldContextObject"))
 	static void ConvaiGetAllChatbotComponents(UObject* WorldContextObject, TArray<class UConvaiChatbotComponent*>& ConvaiChatbotComponents);
 
-	UFUNCTION(BlueprintCallable, Category = "Convai")
+	UFUNCTION(BlueprintCallable, Category = "Convai|Settings")
 	static void SetAPI_Key(FString API_Key);	
 	
-	UFUNCTION(BlueprintPure, Category = "Convai")
+	UFUNCTION(BlueprintPure, Category = "Convai|Settings")
 	static FString GetAPI_Key();
+
+	UFUNCTION(BlueprintPure, Category = "Convai|Settings")
+	static bool IsNewActionSystemEnabled();
 
 	UFUNCTION(BlueprintPure, Category = "Convai")
 	static void GetPluginInfo(FString PluginName, bool& Found, FString& VersionName, FString& EngineVersion, FString& FriendlyName);
 
 	UFUNCTION(BlueprintPure, Category = "Convai")
 	static void GetPlatformInfo(FString& EngineVersion, FString& PlatformName);
+
+	static TArray<uint8> ExtractPCMDataFromSoundWave(USoundWave* SoundWave, int32& OutSampleRate);
 
 	static void PCMDataToWav(TArray<uint8> InPCMBytes, TArray<uint8>& OutWaveFileData, int NumChannels, int SampleRate);
 
