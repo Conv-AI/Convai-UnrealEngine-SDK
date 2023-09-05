@@ -537,16 +537,16 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 	else if (reply->has_action_response()) // Is there an action response
 	{
 		// Convert Action string to FString
-		FString SequenceString(reply->action_response().action().c_str());
+		FString SequenceString = UConvaiUtils::FUTF8ToFString(reply->action_response().action().c_str());
 
 #if ConvaiDebugMode
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse SequenceString: %s"), *SequenceString);
+		UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse Complete Action String: %s"), *SequenceString);
 #endif 
 
 		// Parse the actions
 		TArray<FConvaiResultAction> SequenceOfActions;
-		TArray<FString> Sequence;
-		SequenceString.ParseIntoArray(Sequence, TEXT(","), true);
+		TArray<FString> Sequence = UConvaiActions::SmartSplit(SequenceString);
+
 		for (auto s : Sequence)
 		{
 			FConvaiResultAction ConvaiResultAction;
