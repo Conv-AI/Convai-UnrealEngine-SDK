@@ -44,6 +44,9 @@ public:
 
 	void PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData=true, uint32 SampleRate=21000, uint32 NumChannels=1);
 
+	// UFUNCTION(BlueprintCallable, Category = "Convai")
+	void ForcePlayVoice(USoundWave* VoiceToPlay);
+
 	void StopVoice();
 
 	void StopVoiceWithFade(float InRemainingVoiceFadeOutTime);
@@ -69,6 +72,8 @@ public:
 	/** Called when there are LipSync visemes available */
 	UPROPERTY(BlueprintAssignable, Category = "Convai|LipSync")
 	FOVRLipSyncVisemesDataReadySignature OnVisemesReady;
+
+	IConvaiLipSyncInterface* FindFirstLipSyncComponent();
 
 	/** Returns true, if an LipSync Component was available and attached to the character */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|LipSync")

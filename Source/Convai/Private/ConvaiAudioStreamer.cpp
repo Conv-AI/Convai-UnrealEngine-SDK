@@ -203,6 +203,13 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
 	}
 }
 
+void UConvaiAudioStreamer::ForcePlayVoice(USoundWave* VoiceToPlay)
+{
+	int32 SampleRate;
+	TArray<uint8> PCMData = UConvaiUtils::ExtractPCMDataFromSoundWave(VoiceToPlay, SampleRate);
+	PlayVoiceData(PCMData.GetData(), PCMData.Num(), false, SampleRate, 1);
+}
+
 void UConvaiAudioStreamer::StopVoice()
 {
 	if (!IsTalking)
@@ -295,8 +302,29 @@ bool UConvaiAudioStreamer::IsLocal()
 	return false;
 }
 
+IConvaiLipSyncInterface* UConvaiAudioStreamer::FindFirstLipSyncComponent()
+{
+	// Find the LipSync component
+	auto LipSyncComponents = (GetOwner()->GetComponentsByInterface(UConvaiLipSyncInterface::StaticClass()));
+	if (LipSyncComponents.Num())
+	{
+		ConvaiLipSync = Cast<IConvaiLipSyncInterface>(LipSyncComponents[0]);
+	}
+	else
+	{
+		ConvaiLipSync = nullptr;
+	}
+
+	return ConvaiLipSync;
+}
+
 bool UConvaiAudioStreamer::SupportsLipSync()
 {
+	if (ConvaiLipSync == nullptr)
+	{
+		FindFirstLipSyncComponent();
+	}
+
 	return ConvaiLipSync != nullptr;
 }
 
@@ -307,16 +335,7 @@ void UConvaiAudioStreamer::BeginPlay()
 	bAutoActivate = true;
 	bAlwaysPlay = true;
 
-	// Find the LipSync component
-    auto LipSyncComponents = (GetOwner()->GetComponentsByInterface(UConvaiLipSyncInterface::StaticClass()));
-    if (LipSyncComponents.Num()) 
-	{
-        ConvaiLipSync = Cast<IConvaiLipSyncInterface>(LipSyncComponents[0]);
-	}
-	else
-	{
-		ConvaiLipSync = nullptr;
-	}
+	FindFirstLipSyncComponent();
 }
 
 void UConvaiAudioStreamer::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
