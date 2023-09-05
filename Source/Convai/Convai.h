@@ -20,6 +20,10 @@ public:
 	/* API Key Issued from the website */
 	UPROPERTY(Config, EditAnywhere, Category = "Convai API")
 	FString API_Key;
+
+	/* API Key Issued from the website */
+	UPROPERTY(Config, EditAnywhere, Category = "Convai API", meta = (DisplayName = "Enable New Action System (Experimental)"))
+	bool EnableNewActionSystem;
 };
 
 
