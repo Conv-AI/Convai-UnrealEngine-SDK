@@ -18,6 +18,9 @@ class UConvaiActions : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 public:
 
+	// Function to split a string based on commas, but ignoring commas within quotes
+	static TArray<FString> SmartSplit(const FString& SequenceString);
+
 	// Extract text from an action result (e.g. Says "I love AI" -> I love AI)
 	static FString ExtractText(FString Action, FString ActionResult);
 

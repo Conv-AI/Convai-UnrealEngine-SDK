@@ -58,6 +58,40 @@ namespace
 	}
 };
 
+TArray<FString> UConvaiActions::SmartSplit(const FString& SequenceString)
+{
+	TArray<FString> Result;
+	FString CurrentString = "";
+	bool InQuotes = false;
+
+	for (int i = 0; i < SequenceString.Len(); ++i)
+	{
+		TCHAR CurrentChar = SequenceString[i];
+
+		if (CurrentChar == '\"')
+		{
+			InQuotes = !InQuotes;
+		}
+
+		if (CurrentChar == ',' && !InQuotes)
+		{
+			Result.Add(CurrentString.TrimStartAndEnd());
+			CurrentString = "";
+		}
+		else
+		{
+			CurrentString += CurrentChar;
+		}
+	}
+
+	if (!CurrentString.IsEmpty())
+	{
+		Result.Add(CurrentString.TrimStartAndEnd());
+	}
+
+	return Result;
+}
+
 FString UConvaiActions::ExtractText(FString Action, FString ActionResult)
 {
 	FString ExtraText = "";
