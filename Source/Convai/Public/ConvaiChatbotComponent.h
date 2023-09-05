@@ -89,6 +89,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated, meta = (DisplayName = "Interacting Player"))
 	UConvaiPlayerComponent* CurrentConvaiPlayerComponent;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Convai|Actions", Replicated)
+	TArray<FConvaiResultAction> ActionsQueue;
+
 	/**
 	 *    Used to track memory of a previous conversation, set to -1 means no previous conversation,
 	 *	  this property will change as you talk to the character, you can save the session ID for a
@@ -120,6 +123,78 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Convai")
 	void LoadCharacter(FString NewCharacterID);
+
+	/**
+	 * Appends a TArray of FConvaiResultAction items to the existing ActionsQueue.
+	 * If ActionsQueue is not empty, it takes the first element, appends the new array to it,
+	 * and then reassigns it back to ActionsQueue. If ActionsQueue is empty, it simply sets ActionsQueue to the new array.
+	 *
+	 * @param NewActions Array of FConvaiResultAction items to be appended.
+	 *
+	 * @category Convai
+	 */
+	 void AppendActionsToQueue(TArray<FConvaiResultAction> NewActions);
+
+	/**
+	 * Marks the current action as completed and handles post-execution logic.
+	 *
+	 * @param IsSuccessful A boolean flag indicating whether the executed action was successful or not. If true, the next action in the queue will be processed. If false, the current action will be retried.
+	 * @param Delay A float value representing the time in seconds to wait before attempting either the next action or retrying the current action, depending on the value of IsSuccessful.
+	 *
+	 * @note This function should be invoked after each action execution to manage the action queue.
+	 *
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Convai|Actions")
+	void HandleActionCompletion(bool IsSuccessful, float Delay);
+
+	/**
+	 * Checks if the ActionsQueue managed by the Convai chatbot component is empty.
+	 *
+	 * @return Returns true if the ActionsQueue is empty; otherwise, returns false.
+	 *
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Convai|Actions")
+	bool IsActionsQueueEmpty();
+
+	/**
+	 * Fetches the first action from the ActionsQueue managed by the Convai chatbot component.
+	 *
+	 * @param ConvaiResultAction Reference to a struct that will be populated with the details of the first action in the queue.
+	 *
+	 * @return Returns true if there is at least one action in the ActionsQueue and the struct has been successfully populated; otherwise, returns false.
+	 *
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Convai|Actions")
+	bool FetchFirstAction(FConvaiResultAction& ConvaiResultAction);
+
+	/**
+	 * Removes the first action from the ActionsQueue managed by the Convai chatbot component.
+	 *
+	 * @return Returns true if an action was successfully removed; otherwise, returns false.
+	 *
+	 */
+	bool DequeueAction();
+
+	/**
+	 * Starts executing the first action in the ActionsQueue by calling TriggerNamedBlueprintAction.
+	 *
+	 * @return Returns true if the first action was successfully started; otherwise, returns false.
+	 *
+	 */
+	UFUNCTION()
+	bool StartFirstAction();
+
+	/**
+	 * Triggers a specified Blueprint event or function on the owning actor based on the given action name and parameters.
+	 *
+	 * @param ActionName The name of the Blueprint event or function to trigger. This event or function should exist in the Blueprint that owns this component.
+	 * @param ConvaiActionStruct A struct containing additional data or parameters to pass to the Blueprint event or function.
+	 *
+	 * @note The function attempts to dynamically find and call a Blueprint event or function in the owning actor's class. If the Blueprint event or function does not exist or if the signature doesn't match, the function will log a warning.
+	 *
+	 */
+	bool TriggerNamedBlueprintAction(const FString& ActionName, FConvaiResultAction ConvaiActionStruct);
+
 
 public:
 	/** Called when a new action is received from the API */

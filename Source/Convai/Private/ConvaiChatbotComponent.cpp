@@ -32,6 +32,7 @@ void UConvaiChatbotComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	DOREPLIFETIME(UConvaiChatbotComponent, Backstory);
 	DOREPLIFETIME(UConvaiChatbotComponent, ReadyPlayerMeLink);
 	DOREPLIFETIME(UConvaiChatbotComponent, CurrentConvaiPlayerComponent);
+	DOREPLIFETIME(UConvaiChatbotComponent, ActionsQueue);
 }
 
 bool UConvaiChatbotComponent::IsInConversation()
@@ -63,6 +64,163 @@ void UConvaiChatbotComponent::LoadCharacter(FString NewCharacterID)
 {
 	CharacterID = NewCharacterID;
 	ConvaiGetDetails();
+}
+
+void UConvaiChatbotComponent::AppendActionsToQueue(TArray<FConvaiResultAction> NewActions)
+{
+	if (ActionsQueue.Num() > 0)
+	{
+		FConvaiResultAction FirstAction = ActionsQueue[0];
+		NewActions.Insert(FirstAction, 0);
+		ActionsQueue = NewActions;
+	}
+	else
+	{
+		ActionsQueue = NewActions;
+	}
+}
+
+void UConvaiChatbotComponent::HandleActionCompletion(bool IsSuccessful, float Delay)
+{
+	if (!UConvaiUtils::IsNewActionSystemEnabled())
+	{
+
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("HandleActionCompletion: New Action System is not enabled in settings"));
+		return;
+	}
+
+
+	if (IsSuccessful)
+		DequeueAction();
+
+	if (IsActionsQueueEmpty())
+		return;
+
+	// Create a timer to call StartFirstAction after a delay
+	if (Delay > 0.0f)
+	{
+		FTimerHandle TimerHandle;
+		FTimerDelegate TimerDelegate;
+
+		// Bind the function with parameters
+		TimerDelegate.BindUFunction(this, FName("StartFirstAction"));
+
+		// Set the timer
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, Delay, false);
+	}
+	else
+	{
+		// Call the function immediately
+		StartFirstAction();
+	}
+}
+
+bool UConvaiChatbotComponent::IsActionsQueueEmpty()
+{
+	if (!UConvaiUtils::IsNewActionSystemEnabled())
+	{
+
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("IsActionsQueueEmpty: New Action System is not enabled in settings"));
+		return true;
+	}
+
+	return ActionsQueue.Num() == 0;
+}
+
+bool UConvaiChatbotComponent::FetchFirstAction(FConvaiResultAction& ConvaiResultAction)
+{
+	if (!UConvaiUtils::IsNewActionSystemEnabled())
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("FetchFirstAction: New Action System is not enabled in settings"));
+		return false;
+	}
+
+	if (ActionsQueue.Num() == 0)
+		return false;
+
+	ConvaiResultAction = ActionsQueue[0];
+	return true;
+}
+
+bool UConvaiChatbotComponent::DequeueAction()
+{
+	if (ActionsQueue.Num() > 0)
+	{
+		ActionsQueue.RemoveAt(0);
+		return true;
+	}
+	return false;
+}
+
+bool UConvaiChatbotComponent::StartFirstAction()
+{
+	FConvaiResultAction ConvaiResultAction;
+	if (FetchFirstAction(ConvaiResultAction))
+	{
+		if (ConvaiResultAction.Action.Compare(FString("None"), ESearchCase::IgnoreCase) == 0)
+		{
+			HandleActionCompletion(true, 0);
+			return true;
+		}
+
+		AsyncTask(ENamedThreads::GameThread, [this, ConvaiResultAction]
+		{
+			TriggerNamedBlueprintAction(ConvaiResultAction.Action, ConvaiResultAction);
+		});
+		return true;
+	}
+	return false;
+}
+
+bool UConvaiChatbotComponent::TriggerNamedBlueprintAction(const FString& ActionName, FConvaiResultAction ConvaiActionStruct)
+{
+	if (AActor* Owner = GetOwner())
+	{
+		UFunction* Function = Owner->FindFunction(FName(*ActionName));
+
+		if (Function)
+		{
+			// Check the function signature
+			bool bCanCall = false;
+			TFieldIterator<FProperty> PropIt(Function);
+			if (PropIt)
+			{
+				FProperty* ParamProp = *PropIt;
+				if (ParamProp->GetClass() == FStructProperty::StaticClass())
+				{
+					FStructProperty* StructProp = Cast<FStructProperty>(ParamProp);
+					if (StructProp && StructProp->Struct == FConvaiResultAction::StaticStruct())
+					{
+						bCanCall = true;
+					}
+				}
+			}
+			else
+			{
+				bCanCall = true; // No parameters
+			}
+
+			if (bCanCall)
+			{
+				Owner->ProcessEvent(Function, PropIt ? &ConvaiActionStruct : nullptr);
+				return true;
+			}
+			else
+			{
+				UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Found a function/event with the same name of action: %s.\
+					 However, could not run due to mismatched parameter type. Make sure the function/event has no input parameters or take a parameter of type \"ConvaiResultAction\""), *ActionName);
+			}
+		}
+		else
+		{
+			//UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("TriggerNamedBlueprintAction: Could not find an event or function with action name: %s"), *ActionName);
+		}
+	}
+	else
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Could not find pointer to owner"));
+	}
+	return false;
 }
 
 void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAPI_Key, FString OverrideAPI_Key, uint32 InToken)
@@ -332,6 +490,17 @@ void UConvaiChatbotComponent::onActionSequenceReceived(const TArray<FConvaiResul
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
 		Broadcast_onActionSequenceReceived(ReceivedSequenceOfActions);
+	}
+
+	if (UConvaiUtils::IsNewActionSystemEnabled())
+	{
+		bool ActionsAlreadyStarted = !IsActionsQueueEmpty();
+
+		// Fill the current queue of actions
+		AppendActionsToQueue(ReceivedSequenceOfActions);
+
+		if (!ActionsAlreadyStarted)
+			StartFirstAction();
 	}
 
 	// Broadcast the actions
