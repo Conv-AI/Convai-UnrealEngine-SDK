@@ -182,13 +182,13 @@ bool UConvaiChatbotComponent::TriggerNamedBlueprintAction(const FString& ActionN
 		{
 			// Check the function signature
 			bool bCanCall = false;
-			TFieldIterator<FProperty> PropIt(Function);
+			TFieldIterator<FStructProperty> PropIt(Function);
 			if (PropIt)
 			{
-				FProperty* ParamProp = *PropIt;
-				if (ParamProp->GetClass() == FStructProperty::StaticClass())
+				FStructProperty* StructProp = *PropIt;
+				if (StructProp->GetClass() == FStructProperty::StaticClass())
 				{
-					FStructProperty* StructProp = Cast<FStructProperty>(ParamProp);
+					//FStructProperty* StructProp = Cast<FStructProperty>(ParamProp);
 					if (StructProp && StructProp->Struct == FConvaiResultAction::StaticStruct())
 					{
 						bCanCall = true;
