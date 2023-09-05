@@ -515,13 +515,18 @@ TArray<uint8> UConvaiUtils::ExtractPCMDataFromSoundWave(USoundWave* SoundWave, i
 		return PCMData;
 	}
 
-	TSharedPtr<SongBufferData> SongBuffer;
-	if (DecompressUSoundWave(SoundWave, SongBuffer) && SongBuffer.IsValid())
-	{
-		PCMData = SongBuffer->RawPCMData;
-		OutSampleRate = SongBuffer->BufferInfo.SampleRate;
+	if (SoundWave->RawPCMData > 0) {
+		PCMData.append(SoundWave->RawPCMData, SoundWave->RawPCMDataSize);
+		OutSampleRate = SoundWave->GetSampleRateForCurrentPlatform();
 	}
-
+	else {
+		TSharedPtr<SongBufferData> SongBuffer;
+		if (DecompressUSoundWave(SoundWave, SongBuffer) && SongBuffer.IsValid())
+		{
+			PCMData = SongBuffer->RawPCMData;
+			OutSampleRate = SongBuffer->BufferInfo.SampleRate;
+		}
+	}
 	return PCMData;
 }
 
