@@ -6,6 +6,8 @@
 #include "Http.h"
 #include "Containers/UnrealString.h"
 #include "Sound/SoundWave.h"
+#include "AudioDevice.h"
+#include "Interfaces/IAudioFormat.h"
 #include "UObject/Object.h"
 #include "GameFramework/PlayerController.h"
 #include "Math/Vector.h"
@@ -14,12 +16,15 @@
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/GameplayStatics.h"
 
-
 #include "../Convai.h"
 #include "ConvaiChatbotComponent.h"
 
 #include "Interfaces/IPluginManager.h"
 #include "Engine/EngineTypes.h"
+
+#if ENGINE_MAJOR_VERSION == 5
+#include "AudioDecompress.h"
+#endif
 
 
 DEFINE_LOG_CATEGORY(ConvaiUtilsLog);
@@ -374,6 +379,39 @@ void UConvaiUtils::GetPlatformInfo(FString& EngineVersion, FString& PlatformName
 
 namespace
 {
+	// This struct contains information about the sound buffer.
+	struct SongBufferInfo
+	{
+		int32 NumChannels;
+		float Duration;
+		int32 SampleRate;
+		int32 RawPCMDataSize;
+
+		SongBufferInfo() : RawPCMDataSize(0), NumChannels(0), Duration(0), SampleRate(0) {}
+
+		SongBufferInfo(int32 PCMDataSize, int32 numChannels, float duration, int32 sampleRate)
+			: RawPCMDataSize(PCMDataSize), NumChannels(numChannels), Duration(duration), SampleRate(sampleRate)
+		{
+		}
+	};
+
+	// this struct contains the sound buffer + information about it.
+	struct SongBufferData
+	{
+		TArray<uint8> RawPCMData;
+		SongBufferInfo BufferInfo;
+
+		// default to nothing.
+		SongBufferData() : SongBufferData(0, 0, 0, 0) {}
+
+		// allocate memory as we populate the structure.
+		SongBufferData(int32 PCMDataSize, int32 numChannels, float duration, int32 sampleRate)
+			: BufferInfo(PCMDataSize, numChannels, duration, sampleRate)
+		{
+			RawPCMData.SetNumZeroed(PCMDataSize);
+		}
+	};
+
 	USoundWave* WavDataToSoundwave(TArray<uint8> Data)
 	{
 		FWaveModInfo WaveInfo;
@@ -404,7 +442,93 @@ namespace
 			return nullptr;
 		}
 	}
+
+	bool DecompressUSoundWave(USoundWave* soundWave, TSharedPtr<SongBufferData>& Out_SongBufferData)
+	{
+		FAudioDevice* audioDevice = GEngine ? GEngine->GetMainAudioDeviceRaw() : nullptr;
+
+		if (!audioDevice || !soundWave || soundWave->GetName() == TEXT("None"))
+			return false;
+
+		bool breturn = false;
+
+		// Ensure we have the sound data. Compressed format is fine.
+		soundWave->InitAudioResource(audioDevice->GetRuntimeFormat(soundWave));
+
+		// Create a decoder for this audio. We want the PCM data.
+		ICompressedAudioInfo* AudioInfo = audioDevice->CreateCompressedAudioInfo(soundWave);
+
+		// Decompress complete audio to this buffer
+		FSoundQualityInfo QualityInfo = { 0 };
+#if ENGINE_MAJOR_VERSION == 4
+		if (AudioInfo->ReadCompressedInfo(soundWave->ResourceData, soundWave->ResourceSize, &QualityInfo))
+		{
+			Out_SongBufferData = TSharedPtr<SongBufferData>(new SongBufferData(
+				QualityInfo.SampleDataSize, QualityInfo.NumChannels, QualityInfo.Duration, QualityInfo.SampleRate));
+
+			// Decompress all the sample data into preallocated memory now
+			AudioInfo->ExpandFile(Out_SongBufferData->RawPCMData.GetData(), &QualityInfo);
+
+			breturn = true;
+		}
+#else
+		FAudioDevice* AudioDevice = GEngine->GetMainAudioDeviceRaw();
+		if (AudioDevice)
+		{
+			FName format = AudioDevice->GetRuntimeFormat(soundWave);
+			soundWave->InitAudioResource(format);
+		}
+
+		const uint8* ResourceData = soundWave->GetResourceData();
+		uint32 ResourceSize = soundWave->GetResourceSize();
+
+		if (!ResourceData || ResourceSize <= 0)
+		{
+			return breturn;
+		}
+
+		if (AudioInfo->ReadCompressedInfo(ResourceData, ResourceSize, &QualityInfo))
+		{
+			Out_SongBufferData = TSharedPtr<SongBufferData>(new SongBufferData(
+				QualityInfo.SampleDataSize, QualityInfo.NumChannels, QualityInfo.Duration, QualityInfo.SampleRate));
+
+			// Decompress all the sample data into preallocated memory now
+			AudioInfo->ExpandFile(Out_SongBufferData->RawPCMData.GetData(), &QualityInfo);
+
+			breturn = true;
+		}
+#endif
+		// Clean up.
+		delete AudioInfo;
+
+		return breturn;
+	}
 };
+
+TArray<uint8> UConvaiUtils::ExtractPCMDataFromSoundWave(USoundWave* SoundWave, int32& OutSampleRate)
+{
+	TArray<uint8> PCMData;
+
+	if (!SoundWave)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SoundWave is null!"));
+		return PCMData;
+	}
+
+	if (SoundWave->RawPCMData > 0) {
+		PCMData.append(SoundWave->RawPCMData, SoundWave->RawPCMDataSize);
+		OutSampleRate = SoundWave->GetSampleRateForCurrentPlatform();
+	}
+	else {
+		TSharedPtr<SongBufferData> SongBuffer;
+		if (DecompressUSoundWave(SoundWave, SongBuffer) && SongBuffer.IsValid())
+		{
+			PCMData = SongBuffer->RawPCMData;
+			OutSampleRate = SongBuffer->BufferInfo.SampleRate;
+		}
+	}
+	return PCMData;
+}
 
 void UConvaiUtils::PCMDataToWav(TArray<uint8> InPCMBytes, TArray<uint8>& OutWaveFileData, int NumChannels, int SampleRate)
 {
