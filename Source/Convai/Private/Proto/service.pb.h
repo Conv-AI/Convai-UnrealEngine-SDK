@@ -4,10 +4,6 @@
 
 #ifndef GOOGLE_PROTOBUF_INCLUDED_service_2eproto
 #define GOOGLE_PROTOBUF_INCLUDED_service_2eproto
-#if defined(_MSC_VER)
-#pragma warning (disable:4946) // reinterpret_cast used between related classes: 'class1' and 'class2'
-#pragma warning (disable:4800) // 'type' : forcing value to bool 'true' or 'false' (performance warning)
-#endif
 
 #include <limits>
 #include <string>
@@ -65,6 +61,9 @@ extern AudioConfigDefaultTypeInternal _AudioConfig_default_instance_;
 class GetResponseRequest;
 struct GetResponseRequestDefaultTypeInternal;
 extern GetResponseRequestDefaultTypeInternal _GetResponseRequest_default_instance_;
+class GetResponseRequestSingle;
+struct GetResponseRequestSingleDefaultTypeInternal;
+extern GetResponseRequestSingleDefaultTypeInternal _GetResponseRequestSingle_default_instance_;
 class GetResponseRequest_GetResponseConfig;
 struct GetResponseRequest_GetResponseConfigDefaultTypeInternal;
 extern GetResponseRequest_GetResponseConfigDefaultTypeInternal _GetResponseRequest_GetResponseConfig_default_instance_;
@@ -80,6 +79,9 @@ extern GetResponseResponse_ActionResponseDefaultTypeInternal _GetResponseRespons
 class GetResponseResponse_AudioResponse;
 struct GetResponseResponse_AudioResponseDefaultTypeInternal;
 extern GetResponseResponse_AudioResponseDefaultTypeInternal _GetResponseResponse_AudioResponse_default_instance_;
+class GetResponseResponse_BehaviorTreeResponse;
+struct GetResponseResponse_BehaviorTreeResponseDefaultTypeInternal;
+extern GetResponseResponse_BehaviorTreeResponseDefaultTypeInternal _GetResponseResponse_BehaviorTreeResponse_default_instance_;
 class GetResponseResponse_UserTranscript;
 struct GetResponseResponse_UserTranscriptDefaultTypeInternal;
 extern GetResponseResponse_UserTranscriptDefaultTypeInternal _GetResponseResponse_UserTranscript_default_instance_;
@@ -95,6 +97,9 @@ extern STTRequestDefaultTypeInternal _STTRequest_default_instance_;
 class STTResponse;
 struct STTResponseDefaultTypeInternal;
 extern STTResponseDefaultTypeInternal _STTResponse_default_instance_;
+class TriggerConfig;
+struct TriggerConfigDefaultTypeInternal;
+extern TriggerConfigDefaultTypeInternal _TriggerConfig_default_instance_;
 }  // namespace service
 PROTOBUF_NAMESPACE_OPEN
 template<> ::service::ActionConfig* Arena::CreateMaybeMessage<::service::ActionConfig>(Arena*);
@@ -102,16 +107,19 @@ template<> ::service::ActionConfig_Character* Arena::CreateMaybeMessage<::servic
 template<> ::service::ActionConfig_Object* Arena::CreateMaybeMessage<::service::ActionConfig_Object>(Arena*);
 template<> ::service::AudioConfig* Arena::CreateMaybeMessage<::service::AudioConfig>(Arena*);
 template<> ::service::GetResponseRequest* Arena::CreateMaybeMessage<::service::GetResponseRequest>(Arena*);
+template<> ::service::GetResponseRequestSingle* Arena::CreateMaybeMessage<::service::GetResponseRequestSingle>(Arena*);
 template<> ::service::GetResponseRequest_GetResponseConfig* Arena::CreateMaybeMessage<::service::GetResponseRequest_GetResponseConfig>(Arena*);
 template<> ::service::GetResponseRequest_GetResponseData* Arena::CreateMaybeMessage<::service::GetResponseRequest_GetResponseData>(Arena*);
 template<> ::service::GetResponseResponse* Arena::CreateMaybeMessage<::service::GetResponseResponse>(Arena*);
 template<> ::service::GetResponseResponse_ActionResponse* Arena::CreateMaybeMessage<::service::GetResponseResponse_ActionResponse>(Arena*);
 template<> ::service::GetResponseResponse_AudioResponse* Arena::CreateMaybeMessage<::service::GetResponseResponse_AudioResponse>(Arena*);
+template<> ::service::GetResponseResponse_BehaviorTreeResponse* Arena::CreateMaybeMessage<::service::GetResponseResponse_BehaviorTreeResponse>(Arena*);
 template<> ::service::GetResponseResponse_UserTranscript* Arena::CreateMaybeMessage<::service::GetResponseResponse_UserTranscript>(Arena*);
 template<> ::service::HelloRequest* Arena::CreateMaybeMessage<::service::HelloRequest>(Arena*);
 template<> ::service::HelloResponse* Arena::CreateMaybeMessage<::service::HelloResponse>(Arena*);
 template<> ::service::STTRequest* Arena::CreateMaybeMessage<::service::STTRequest>(Arena*);
 template<> ::service::STTResponse* Arena::CreateMaybeMessage<::service::STTResponse>(Arena*);
+template<> ::service::TriggerConfig* Arena::CreateMaybeMessage<::service::TriggerConfig>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace service {
 
@@ -239,6 +247,8 @@ class AudioConfig final :
 
   enum : int {
     kSampleRateHertzFieldNumber = 1,
+    kDisableAudioFieldNumber = 2,
+    kEnableFacialDataFieldNumber = 3,
   };
   // int32 sample_rate_hertz = 1;
   void clear_sample_rate_hertz();
@@ -247,6 +257,24 @@ class AudioConfig final :
   private:
   int32_t _internal_sample_rate_hertz() const;
   void _internal_set_sample_rate_hertz(int32_t value);
+  public:
+
+  // bool disable_audio = 2;
+  void clear_disable_audio();
+  bool disable_audio() const;
+  void set_disable_audio(bool value);
+  private:
+  bool _internal_disable_audio() const;
+  void _internal_set_disable_audio(bool value);
+  public:
+
+  // bool enable_facial_data = 3;
+  void clear_enable_facial_data();
+  bool enable_facial_data() const;
+  void set_enable_facial_data(bool value);
+  private:
+  bool _internal_enable_facial_data() const;
+  void _internal_set_enable_facial_data(bool value);
   public:
 
   // @@protoc_insertion_point(class_scope:service.AudioConfig)
@@ -258,6 +286,161 @@ class AudioConfig final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     int32_t sample_rate_hertz_;
+    bool disable_audio_;
+    bool enable_facial_data_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class TriggerConfig final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.TriggerConfig) */ {
+ public:
+  inline TriggerConfig() : TriggerConfig(nullptr) {}
+  ~TriggerConfig() override;
+  explicit PROTOBUF_CONSTEXPR TriggerConfig(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  TriggerConfig(const TriggerConfig& from);
+  TriggerConfig(TriggerConfig&& from) noexcept
+    : TriggerConfig() {
+    *this = ::std::move(from);
+  }
+
+  inline TriggerConfig& operator=(const TriggerConfig& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline TriggerConfig& operator=(TriggerConfig&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const TriggerConfig& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const TriggerConfig* internal_default_instance() {
+    return reinterpret_cast<const TriggerConfig*>(
+               &_TriggerConfig_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(TriggerConfig& a, TriggerConfig& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(TriggerConfig* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(TriggerConfig* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  TriggerConfig* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<TriggerConfig>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const TriggerConfig& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const TriggerConfig& from) {
+    TriggerConfig::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(TriggerConfig* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.TriggerConfig";
+  }
+  protected:
+  explicit TriggerConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTriggerMessageFieldNumber = 1,
+  };
+  // string trigger_message = 1;
+  void clear_trigger_message();
+  const std::string& trigger_message() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_trigger_message(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_trigger_message();
+  PROTOBUF_NODISCARD std::string* release_trigger_message();
+  void set_allocated_trigger_message(std::string* trigger_message);
+  private:
+  const std::string& _internal_trigger_message() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_trigger_message(const std::string& value);
+  std::string* _internal_mutable_trigger_message();
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.TriggerConfig)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr trigger_message_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -313,7 +496,7 @@ class ActionConfig_Character final :
                &_ActionConfig_Character_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   friend void swap(ActionConfig_Character& a, ActionConfig_Character& b) {
     a.Swap(&b);
@@ -482,7 +665,7 @@ class ActionConfig_Object final :
                &_ActionConfig_Object_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(ActionConfig_Object& a, ActionConfig_Object& b) {
     a.Swap(&b);
@@ -651,7 +834,7 @@ class ActionConfig final :
                &_ActionConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(ActionConfig& a, ActionConfig& b) {
     a.Swap(&b);
@@ -731,6 +914,7 @@ class ActionConfig final :
     kCharactersFieldNumber = 2,
     kObjectsFieldNumber = 3,
     kClassificationFieldNumber = 4,
+    kCurrentAttentionObjectFieldNumber = 6,
     kContextLevelFieldNumber = 5,
   };
   // repeated string actions = 1;
@@ -807,6 +991,20 @@ class ActionConfig final :
   std::string* _internal_mutable_classification();
   public:
 
+  // string current_attention_object = 6;
+  void clear_current_attention_object();
+  const std::string& current_attention_object() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_current_attention_object(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_current_attention_object();
+  PROTOBUF_NODISCARD std::string* release_current_attention_object();
+  void set_allocated_current_attention_object(std::string* current_attention_object);
+  private:
+  const std::string& _internal_current_attention_object() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_current_attention_object(const std::string& value);
+  std::string* _internal_mutable_current_attention_object();
+  public:
+
   // int32 context_level = 5;
   void clear_context_level();
   int32_t context_level() const;
@@ -828,6 +1026,7 @@ class ActionConfig final :
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::service::ActionConfig_Character > characters_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::service::ActionConfig_Object > objects_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr classification_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr current_attention_object_;
     int32_t context_level_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -890,7 +1089,7 @@ class STTRequest final :
                &_STTRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(STTRequest& a, STTRequest& b) {
     a.Swap(&b);
@@ -1080,7 +1279,7 @@ class STTResponse final :
                &_STTResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(STTResponse& a, STTResponse& b) {
     a.Swap(&b);
@@ -1233,7 +1432,7 @@ class GetResponseRequest_GetResponseConfig final :
                &_GetResponseRequest_GetResponseConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(GetResponseRequest_GetResponseConfig& a, GetResponseRequest_GetResponseConfig& b) {
     a.Swap(&b);
@@ -1310,6 +1509,7 @@ class GetResponseRequest_GetResponseConfig final :
     kApiKeyFieldNumber = 3,
     kSessionIdFieldNumber = 4,
     kSpeakerFieldNumber = 7,
+    kLanguageCodeFieldNumber = 8,
     kAudioConfigFieldNumber = 5,
     kActionConfigFieldNumber = 6,
   };
@@ -1369,6 +1569,20 @@ class GetResponseRequest_GetResponseConfig final :
   std::string* _internal_mutable_speaker();
   public:
 
+  // string language_code = 8;
+  void clear_language_code();
+  const std::string& language_code() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_language_code(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_language_code();
+  PROTOBUF_NODISCARD std::string* release_language_code();
+  void set_allocated_language_code(std::string* language_code);
+  private:
+  const std::string& _internal_language_code() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_language_code(const std::string& value);
+  std::string* _internal_mutable_language_code();
+  public:
+
   // .service.AudioConfig audio_config = 5;
   bool has_audio_config() const;
   private:
@@ -1417,6 +1631,7 @@ class GetResponseRequest_GetResponseConfig final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr api_key_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr session_id_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr speaker_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr language_code_;
     ::service::AudioConfig* audio_config_;
     ::service::ActionConfig* action_config_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -1472,6 +1687,7 @@ class GetResponseRequest_GetResponseData final :
   enum InputTypeCase {
     kAudioData = 1,
     kTextData = 2,
+    kTriggerData = 3,
     INPUT_TYPE_NOT_SET = 0,
   };
 
@@ -1480,7 +1696,7 @@ class GetResponseRequest_GetResponseData final :
                &_GetResponseRequest_GetResponseData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   friend void swap(GetResponseRequest_GetResponseData& a, GetResponseRequest_GetResponseData& b) {
     a.Swap(&b);
@@ -1555,6 +1771,7 @@ class GetResponseRequest_GetResponseData final :
   enum : int {
     kAudioDataFieldNumber = 1,
     kTextDataFieldNumber = 2,
+    kTriggerDataFieldNumber = 3,
   };
   // bytes audio_data = 1;
   bool has_audio_data() const;
@@ -1592,6 +1809,24 @@ class GetResponseRequest_GetResponseData final :
   std::string* _internal_mutable_text_data();
   public:
 
+  // .service.TriggerConfig trigger_data = 3;
+  bool has_trigger_data() const;
+  private:
+  bool _internal_has_trigger_data() const;
+  public:
+  void clear_trigger_data();
+  const ::service::TriggerConfig& trigger_data() const;
+  PROTOBUF_NODISCARD ::service::TriggerConfig* release_trigger_data();
+  ::service::TriggerConfig* mutable_trigger_data();
+  void set_allocated_trigger_data(::service::TriggerConfig* trigger_data);
+  private:
+  const ::service::TriggerConfig& _internal_trigger_data() const;
+  ::service::TriggerConfig* _internal_mutable_trigger_data();
+  public:
+  void unsafe_arena_set_allocated_trigger_data(
+      ::service::TriggerConfig* trigger_data);
+  ::service::TriggerConfig* unsafe_arena_release_trigger_data();
+
   void clear_input_type();
   InputTypeCase input_type_case() const;
   // @@protoc_insertion_point(class_scope:service.GetResponseRequest.GetResponseData)
@@ -1599,6 +1834,7 @@ class GetResponseRequest_GetResponseData final :
   class _Internal;
   void set_has_audio_data();
   void set_has_text_data();
+  void set_has_trigger_data();
 
   inline bool has_input_type() const;
   inline void clear_has_input_type();
@@ -1612,6 +1848,7 @@ class GetResponseRequest_GetResponseData final :
         ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
       ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr audio_data_;
       ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr text_data_;
+      ::service::TriggerConfig* trigger_data_;
     } input_type_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     uint32_t _oneof_case_[1];
@@ -1676,7 +1913,7 @@ class GetResponseRequest final :
                &_GetResponseRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   friend void swap(GetResponseRequest& a, GetResponseRequest& b) {
     a.Swap(&b);
@@ -1821,6 +2058,183 @@ class GetResponseRequest final :
 };
 // -------------------------------------------------------------------
 
+class GetResponseRequestSingle final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.GetResponseRequestSingle) */ {
+ public:
+  inline GetResponseRequestSingle() : GetResponseRequestSingle(nullptr) {}
+  ~GetResponseRequestSingle() override;
+  explicit PROTOBUF_CONSTEXPR GetResponseRequestSingle(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  GetResponseRequestSingle(const GetResponseRequestSingle& from);
+  GetResponseRequestSingle(GetResponseRequestSingle&& from) noexcept
+    : GetResponseRequestSingle() {
+    *this = ::std::move(from);
+  }
+
+  inline GetResponseRequestSingle& operator=(const GetResponseRequestSingle& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline GetResponseRequestSingle& operator=(GetResponseRequestSingle&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const GetResponseRequestSingle& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const GetResponseRequestSingle* internal_default_instance() {
+    return reinterpret_cast<const GetResponseRequestSingle*>(
+               &_GetResponseRequestSingle_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  friend void swap(GetResponseRequestSingle& a, GetResponseRequestSingle& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(GetResponseRequestSingle* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(GetResponseRequestSingle* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  GetResponseRequestSingle* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<GetResponseRequestSingle>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const GetResponseRequestSingle& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const GetResponseRequestSingle& from) {
+    GetResponseRequestSingle::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GetResponseRequestSingle* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.GetResponseRequestSingle";
+  }
+  protected:
+  explicit GetResponseRequestSingle(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kResponseConfigFieldNumber = 1,
+    kResponseDataFieldNumber = 2,
+  };
+  // .service.GetResponseRequest response_config = 1;
+  bool has_response_config() const;
+  private:
+  bool _internal_has_response_config() const;
+  public:
+  void clear_response_config();
+  const ::service::GetResponseRequest& response_config() const;
+  PROTOBUF_NODISCARD ::service::GetResponseRequest* release_response_config();
+  ::service::GetResponseRequest* mutable_response_config();
+  void set_allocated_response_config(::service::GetResponseRequest* response_config);
+  private:
+  const ::service::GetResponseRequest& _internal_response_config() const;
+  ::service::GetResponseRequest* _internal_mutable_response_config();
+  public:
+  void unsafe_arena_set_allocated_response_config(
+      ::service::GetResponseRequest* response_config);
+  ::service::GetResponseRequest* unsafe_arena_release_response_config();
+
+  // .service.GetResponseRequest response_data = 2;
+  bool has_response_data() const;
+  private:
+  bool _internal_has_response_data() const;
+  public:
+  void clear_response_data();
+  const ::service::GetResponseRequest& response_data() const;
+  PROTOBUF_NODISCARD ::service::GetResponseRequest* release_response_data();
+  ::service::GetResponseRequest* mutable_response_data();
+  void set_allocated_response_data(::service::GetResponseRequest* response_data);
+  private:
+  const ::service::GetResponseRequest& _internal_response_data() const;
+  ::service::GetResponseRequest* _internal_mutable_response_data();
+  public:
+  void unsafe_arena_set_allocated_response_data(
+      ::service::GetResponseRequest* response_data);
+  ::service::GetResponseRequest* unsafe_arena_release_response_data();
+
+  // @@protoc_insertion_point(class_scope:service.GetResponseRequestSingle)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::service::GetResponseRequest* response_config_;
+    ::service::GetResponseRequest* response_data_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
 class GetResponseResponse_AudioResponse final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.GetResponseResponse.AudioResponse) */ {
  public:
@@ -1869,7 +2283,7 @@ class GetResponseResponse_AudioResponse final :
                &_GetResponseResponse_AudioResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    11;
 
   friend void swap(GetResponseResponse_AudioResponse& a, GetResponseResponse_AudioResponse& b) {
     a.Swap(&b);
@@ -1944,6 +2358,7 @@ class GetResponseResponse_AudioResponse final :
   enum : int {
     kAudioDataFieldNumber = 1,
     kTextDataFieldNumber = 3,
+    kFaceDataFieldNumber = 5,
     kAudioConfigFieldNumber = 2,
     kEndOfResponseFieldNumber = 4,
   };
@@ -1973,6 +2388,20 @@ class GetResponseResponse_AudioResponse final :
   const std::string& _internal_text_data() const;
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_text_data(const std::string& value);
   std::string* _internal_mutable_text_data();
+  public:
+
+  // string face_data = 5;
+  void clear_face_data();
+  const std::string& face_data() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_face_data(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_face_data();
+  PROTOBUF_NODISCARD std::string* release_face_data();
+  void set_allocated_face_data(std::string* face_data);
+  private:
+  const std::string& _internal_face_data() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_face_data(const std::string& value);
+  std::string* _internal_mutable_face_data();
   public:
 
   // .service.AudioConfig audio_config = 2;
@@ -2012,6 +2441,7 @@ class GetResponseResponse_AudioResponse final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr audio_data_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr text_data_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr face_data_;
     ::service::AudioConfig* audio_config_;
     bool end_of_response_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -2069,7 +2499,7 @@ class GetResponseResponse_ActionResponse final :
                &_GetResponseResponse_ActionResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    12;
 
   friend void swap(GetResponseResponse_ActionResponse& a, GetResponseResponse_ActionResponse& b) {
     a.Swap(&b);
@@ -2174,6 +2604,191 @@ class GetResponseResponse_ActionResponse final :
 };
 // -------------------------------------------------------------------
 
+class GetResponseResponse_BehaviorTreeResponse final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.GetResponseResponse.BehaviorTreeResponse) */ {
+ public:
+  inline GetResponseResponse_BehaviorTreeResponse() : GetResponseResponse_BehaviorTreeResponse(nullptr) {}
+  ~GetResponseResponse_BehaviorTreeResponse() override;
+  explicit PROTOBUF_CONSTEXPR GetResponseResponse_BehaviorTreeResponse(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  GetResponseResponse_BehaviorTreeResponse(const GetResponseResponse_BehaviorTreeResponse& from);
+  GetResponseResponse_BehaviorTreeResponse(GetResponseResponse_BehaviorTreeResponse&& from) noexcept
+    : GetResponseResponse_BehaviorTreeResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline GetResponseResponse_BehaviorTreeResponse& operator=(const GetResponseResponse_BehaviorTreeResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline GetResponseResponse_BehaviorTreeResponse& operator=(GetResponseResponse_BehaviorTreeResponse&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const GetResponseResponse_BehaviorTreeResponse& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const GetResponseResponse_BehaviorTreeResponse* internal_default_instance() {
+    return reinterpret_cast<const GetResponseResponse_BehaviorTreeResponse*>(
+               &_GetResponseResponse_BehaviorTreeResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    13;
+
+  friend void swap(GetResponseResponse_BehaviorTreeResponse& a, GetResponseResponse_BehaviorTreeResponse& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(GetResponseResponse_BehaviorTreeResponse* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(GetResponseResponse_BehaviorTreeResponse* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  GetResponseResponse_BehaviorTreeResponse* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<GetResponseResponse_BehaviorTreeResponse>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const GetResponseResponse_BehaviorTreeResponse& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const GetResponseResponse_BehaviorTreeResponse& from) {
+    GetResponseResponse_BehaviorTreeResponse::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GetResponseResponse_BehaviorTreeResponse* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.GetResponseResponse.BehaviorTreeResponse";
+  }
+  protected:
+  explicit GetResponseResponse_BehaviorTreeResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kBtCodeFieldNumber = 1,
+    kBtConstantsFieldNumber = 2,
+    kNarrativeSectionIdFieldNumber = 3,
+  };
+  // string bt_code = 1;
+  void clear_bt_code();
+  const std::string& bt_code() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_bt_code(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_bt_code();
+  PROTOBUF_NODISCARD std::string* release_bt_code();
+  void set_allocated_bt_code(std::string* bt_code);
+  private:
+  const std::string& _internal_bt_code() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_bt_code(const std::string& value);
+  std::string* _internal_mutable_bt_code();
+  public:
+
+  // string bt_constants = 2;
+  void clear_bt_constants();
+  const std::string& bt_constants() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_bt_constants(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_bt_constants();
+  PROTOBUF_NODISCARD std::string* release_bt_constants();
+  void set_allocated_bt_constants(std::string* bt_constants);
+  private:
+  const std::string& _internal_bt_constants() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_bt_constants(const std::string& value);
+  std::string* _internal_mutable_bt_constants();
+  public:
+
+  // string narrative_section_id = 3;
+  void clear_narrative_section_id();
+  const std::string& narrative_section_id() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_narrative_section_id(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_narrative_section_id();
+  PROTOBUF_NODISCARD std::string* release_narrative_section_id();
+  void set_allocated_narrative_section_id(std::string* narrative_section_id);
+  private:
+  const std::string& _internal_narrative_section_id() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_narrative_section_id(const std::string& value);
+  std::string* _internal_mutable_narrative_section_id();
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.GetResponseResponse.BehaviorTreeResponse)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr bt_code_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr bt_constants_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr narrative_section_id_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
 class GetResponseResponse_UserTranscript final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.GetResponseResponse.UserTranscript) */ {
  public:
@@ -2222,7 +2837,7 @@ class GetResponseResponse_UserTranscript final :
                &_GetResponseResponse_UserTranscript_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    14;
 
   friend void swap(GetResponseResponse_UserTranscript& a, GetResponseResponse_UserTranscript& b) {
     a.Swap(&b);
@@ -2397,6 +3012,7 @@ class GetResponseResponse final :
     kAudioResponse = 3,
     kDebugLog = 4,
     kUserQuery = 5,
+    kBtResponse = 6,
     RESPONSE_TYPE_NOT_SET = 0,
   };
 
@@ -2405,7 +3021,7 @@ class GetResponseResponse final :
                &_GetResponseResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    15;
 
   friend void swap(GetResponseResponse& a, GetResponseResponse& b) {
     a.Swap(&b);
@@ -2477,6 +3093,7 @@ class GetResponseResponse final :
 
   typedef GetResponseResponse_AudioResponse AudioResponse;
   typedef GetResponseResponse_ActionResponse ActionResponse;
+  typedef GetResponseResponse_BehaviorTreeResponse BehaviorTreeResponse;
   typedef GetResponseResponse_UserTranscript UserTranscript;
 
   // accessors -------------------------------------------------------
@@ -2487,6 +3104,7 @@ class GetResponseResponse final :
     kAudioResponseFieldNumber = 3,
     kDebugLogFieldNumber = 4,
     kUserQueryFieldNumber = 5,
+    kBtResponseFieldNumber = 6,
   };
   // string session_id = 1;
   void clear_session_id();
@@ -2574,6 +3192,24 @@ class GetResponseResponse final :
       ::service::GetResponseResponse_UserTranscript* user_query);
   ::service::GetResponseResponse_UserTranscript* unsafe_arena_release_user_query();
 
+  // .service.GetResponseResponse.BehaviorTreeResponse bt_response = 6;
+  bool has_bt_response() const;
+  private:
+  bool _internal_has_bt_response() const;
+  public:
+  void clear_bt_response();
+  const ::service::GetResponseResponse_BehaviorTreeResponse& bt_response() const;
+  PROTOBUF_NODISCARD ::service::GetResponseResponse_BehaviorTreeResponse* release_bt_response();
+  ::service::GetResponseResponse_BehaviorTreeResponse* mutable_bt_response();
+  void set_allocated_bt_response(::service::GetResponseResponse_BehaviorTreeResponse* bt_response);
+  private:
+  const ::service::GetResponseResponse_BehaviorTreeResponse& _internal_bt_response() const;
+  ::service::GetResponseResponse_BehaviorTreeResponse* _internal_mutable_bt_response();
+  public:
+  void unsafe_arena_set_allocated_bt_response(
+      ::service::GetResponseResponse_BehaviorTreeResponse* bt_response);
+  ::service::GetResponseResponse_BehaviorTreeResponse* unsafe_arena_release_bt_response();
+
   void clear_response_type();
   ResponseTypeCase response_type_case() const;
   // @@protoc_insertion_point(class_scope:service.GetResponseResponse)
@@ -2583,6 +3219,7 @@ class GetResponseResponse final :
   void set_has_audio_response();
   void set_has_debug_log();
   void set_has_user_query();
+  void set_has_bt_response();
 
   inline bool has_response_type() const;
   inline void clear_has_response_type();
@@ -2599,6 +3236,7 @@ class GetResponseResponse final :
       ::service::GetResponseResponse_AudioResponse* audio_response_;
       ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr debug_log_;
       ::service::GetResponseResponse_UserTranscript* user_query_;
+      ::service::GetResponseResponse_BehaviorTreeResponse* bt_response_;
     } response_type_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     uint32_t _oneof_case_[1];
@@ -2657,7 +3295,7 @@ class HelloRequest final :
                &_HelloRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    16;
 
   friend void swap(HelloRequest& a, HelloRequest& b) {
     a.Swap(&b);
@@ -2810,7 +3448,7 @@ class HelloResponse final :
                &_HelloResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    17;
 
   friend void swap(HelloResponse& a, HelloResponse& b) {
     a.Swap(&b);
@@ -2942,6 +3580,100 @@ inline void AudioConfig::_internal_set_sample_rate_hertz(int32_t value) {
 inline void AudioConfig::set_sample_rate_hertz(int32_t value) {
   _internal_set_sample_rate_hertz(value);
   // @@protoc_insertion_point(field_set:service.AudioConfig.sample_rate_hertz)
+}
+
+// bool disable_audio = 2;
+inline void AudioConfig::clear_disable_audio() {
+  _impl_.disable_audio_ = false;
+}
+inline bool AudioConfig::_internal_disable_audio() const {
+  return _impl_.disable_audio_;
+}
+inline bool AudioConfig::disable_audio() const {
+  // @@protoc_insertion_point(field_get:service.AudioConfig.disable_audio)
+  return _internal_disable_audio();
+}
+inline void AudioConfig::_internal_set_disable_audio(bool value) {
+  
+  _impl_.disable_audio_ = value;
+}
+inline void AudioConfig::set_disable_audio(bool value) {
+  _internal_set_disable_audio(value);
+  // @@protoc_insertion_point(field_set:service.AudioConfig.disable_audio)
+}
+
+// bool enable_facial_data = 3;
+inline void AudioConfig::clear_enable_facial_data() {
+  _impl_.enable_facial_data_ = false;
+}
+inline bool AudioConfig::_internal_enable_facial_data() const {
+  return _impl_.enable_facial_data_;
+}
+inline bool AudioConfig::enable_facial_data() const {
+  // @@protoc_insertion_point(field_get:service.AudioConfig.enable_facial_data)
+  return _internal_enable_facial_data();
+}
+inline void AudioConfig::_internal_set_enable_facial_data(bool value) {
+  
+  _impl_.enable_facial_data_ = value;
+}
+inline void AudioConfig::set_enable_facial_data(bool value) {
+  _internal_set_enable_facial_data(value);
+  // @@protoc_insertion_point(field_set:service.AudioConfig.enable_facial_data)
+}
+
+// -------------------------------------------------------------------
+
+// TriggerConfig
+
+// string trigger_message = 1;
+inline void TriggerConfig::clear_trigger_message() {
+  _impl_.trigger_message_.ClearToEmpty();
+}
+inline const std::string& TriggerConfig::trigger_message() const {
+  // @@protoc_insertion_point(field_get:service.TriggerConfig.trigger_message)
+  return _internal_trigger_message();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void TriggerConfig::set_trigger_message(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.trigger_message_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:service.TriggerConfig.trigger_message)
+}
+inline std::string* TriggerConfig::mutable_trigger_message() {
+  std::string* _s = _internal_mutable_trigger_message();
+  // @@protoc_insertion_point(field_mutable:service.TriggerConfig.trigger_message)
+  return _s;
+}
+inline const std::string& TriggerConfig::_internal_trigger_message() const {
+  return _impl_.trigger_message_.Get();
+}
+inline void TriggerConfig::_internal_set_trigger_message(const std::string& value) {
+  
+  _impl_.trigger_message_.Set(value, GetArenaForAllocation());
+}
+inline std::string* TriggerConfig::_internal_mutable_trigger_message() {
+  
+  return _impl_.trigger_message_.Mutable(GetArenaForAllocation());
+}
+inline std::string* TriggerConfig::release_trigger_message() {
+  // @@protoc_insertion_point(field_release:service.TriggerConfig.trigger_message)
+  return _impl_.trigger_message_.Release();
+}
+inline void TriggerConfig::set_allocated_trigger_message(std::string* trigger_message) {
+  if (trigger_message != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.trigger_message_.SetAllocated(trigger_message, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.trigger_message_.IsDefault()) {
+    _impl_.trigger_message_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:service.TriggerConfig.trigger_message)
 }
 
 // -------------------------------------------------------------------
@@ -3379,6 +4111,56 @@ inline void ActionConfig::_internal_set_context_level(int32_t value) {
 inline void ActionConfig::set_context_level(int32_t value) {
   _internal_set_context_level(value);
   // @@protoc_insertion_point(field_set:service.ActionConfig.context_level)
+}
+
+// string current_attention_object = 6;
+inline void ActionConfig::clear_current_attention_object() {
+  _impl_.current_attention_object_.ClearToEmpty();
+}
+inline const std::string& ActionConfig::current_attention_object() const {
+  // @@protoc_insertion_point(field_get:service.ActionConfig.current_attention_object)
+  return _internal_current_attention_object();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void ActionConfig::set_current_attention_object(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.current_attention_object_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:service.ActionConfig.current_attention_object)
+}
+inline std::string* ActionConfig::mutable_current_attention_object() {
+  std::string* _s = _internal_mutable_current_attention_object();
+  // @@protoc_insertion_point(field_mutable:service.ActionConfig.current_attention_object)
+  return _s;
+}
+inline const std::string& ActionConfig::_internal_current_attention_object() const {
+  return _impl_.current_attention_object_.Get();
+}
+inline void ActionConfig::_internal_set_current_attention_object(const std::string& value) {
+  
+  _impl_.current_attention_object_.Set(value, GetArenaForAllocation());
+}
+inline std::string* ActionConfig::_internal_mutable_current_attention_object() {
+  
+  return _impl_.current_attention_object_.Mutable(GetArenaForAllocation());
+}
+inline std::string* ActionConfig::release_current_attention_object() {
+  // @@protoc_insertion_point(field_release:service.ActionConfig.current_attention_object)
+  return _impl_.current_attention_object_.Release();
+}
+inline void ActionConfig::set_allocated_current_attention_object(std::string* current_attention_object) {
+  if (current_attention_object != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.current_attention_object_.SetAllocated(current_attention_object, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.current_attention_object_.IsDefault()) {
+    _impl_.current_attention_object_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:service.ActionConfig.current_attention_object)
 }
 
 // -------------------------------------------------------------------
@@ -3983,6 +4765,56 @@ inline void GetResponseRequest_GetResponseConfig::set_allocated_speaker(std::str
   // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequest.GetResponseConfig.speaker)
 }
 
+// string language_code = 8;
+inline void GetResponseRequest_GetResponseConfig::clear_language_code() {
+  _impl_.language_code_.ClearToEmpty();
+}
+inline const std::string& GetResponseRequest_GetResponseConfig::language_code() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequest.GetResponseConfig.language_code)
+  return _internal_language_code();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void GetResponseRequest_GetResponseConfig::set_language_code(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.language_code_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:service.GetResponseRequest.GetResponseConfig.language_code)
+}
+inline std::string* GetResponseRequest_GetResponseConfig::mutable_language_code() {
+  std::string* _s = _internal_mutable_language_code();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequest.GetResponseConfig.language_code)
+  return _s;
+}
+inline const std::string& GetResponseRequest_GetResponseConfig::_internal_language_code() const {
+  return _impl_.language_code_.Get();
+}
+inline void GetResponseRequest_GetResponseConfig::_internal_set_language_code(const std::string& value) {
+  
+  _impl_.language_code_.Set(value, GetArenaForAllocation());
+}
+inline std::string* GetResponseRequest_GetResponseConfig::_internal_mutable_language_code() {
+  
+  return _impl_.language_code_.Mutable(GetArenaForAllocation());
+}
+inline std::string* GetResponseRequest_GetResponseConfig::release_language_code() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequest.GetResponseConfig.language_code)
+  return _impl_.language_code_.Release();
+}
+inline void GetResponseRequest_GetResponseConfig::set_allocated_language_code(std::string* language_code) {
+  if (language_code != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.language_code_.SetAllocated(language_code, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.language_code_.IsDefault()) {
+    _impl_.language_code_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequest.GetResponseConfig.language_code)
+}
+
 // -------------------------------------------------------------------
 
 // GetResponseRequest_GetResponseData
@@ -4139,6 +4971,80 @@ inline void GetResponseRequest_GetResponseData::set_allocated_text_data(std::str
     _impl_.input_type_.text_data_.InitAllocated(text_data, GetArenaForAllocation());
   }
   // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequest.GetResponseData.text_data)
+}
+
+// .service.TriggerConfig trigger_data = 3;
+inline bool GetResponseRequest_GetResponseData::_internal_has_trigger_data() const {
+  return input_type_case() == kTriggerData;
+}
+inline bool GetResponseRequest_GetResponseData::has_trigger_data() const {
+  return _internal_has_trigger_data();
+}
+inline void GetResponseRequest_GetResponseData::set_has_trigger_data() {
+  _impl_._oneof_case_[0] = kTriggerData;
+}
+inline void GetResponseRequest_GetResponseData::clear_trigger_data() {
+  if (_internal_has_trigger_data()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete _impl_.input_type_.trigger_data_;
+    }
+    clear_has_input_type();
+  }
+}
+inline ::service::TriggerConfig* GetResponseRequest_GetResponseData::release_trigger_data() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequest.GetResponseData.trigger_data)
+  if (_internal_has_trigger_data()) {
+    clear_has_input_type();
+    ::service::TriggerConfig* temp = _impl_.input_type_.trigger_data_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    _impl_.input_type_.trigger_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::service::TriggerConfig& GetResponseRequest_GetResponseData::_internal_trigger_data() const {
+  return _internal_has_trigger_data()
+      ? *_impl_.input_type_.trigger_data_
+      : reinterpret_cast< ::service::TriggerConfig&>(::service::_TriggerConfig_default_instance_);
+}
+inline const ::service::TriggerConfig& GetResponseRequest_GetResponseData::trigger_data() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequest.GetResponseData.trigger_data)
+  return _internal_trigger_data();
+}
+inline ::service::TriggerConfig* GetResponseRequest_GetResponseData::unsafe_arena_release_trigger_data() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:service.GetResponseRequest.GetResponseData.trigger_data)
+  if (_internal_has_trigger_data()) {
+    clear_has_input_type();
+    ::service::TriggerConfig* temp = _impl_.input_type_.trigger_data_;
+    _impl_.input_type_.trigger_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void GetResponseRequest_GetResponseData::unsafe_arena_set_allocated_trigger_data(::service::TriggerConfig* trigger_data) {
+  clear_input_type();
+  if (trigger_data) {
+    set_has_trigger_data();
+    _impl_.input_type_.trigger_data_ = trigger_data;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseRequest.GetResponseData.trigger_data)
+}
+inline ::service::TriggerConfig* GetResponseRequest_GetResponseData::_internal_mutable_trigger_data() {
+  if (!_internal_has_trigger_data()) {
+    clear_input_type();
+    set_has_trigger_data();
+    _impl_.input_type_.trigger_data_ = CreateMaybeMessage< ::service::TriggerConfig >(GetArenaForAllocation());
+  }
+  return _impl_.input_type_.trigger_data_;
+}
+inline ::service::TriggerConfig* GetResponseRequest_GetResponseData::mutable_trigger_data() {
+  ::service::TriggerConfig* _msg = _internal_mutable_trigger_data();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequest.GetResponseData.trigger_data)
+  return _msg;
 }
 
 inline bool GetResponseRequest_GetResponseData::has_input_type() const {
@@ -4311,6 +5217,190 @@ inline void GetResponseRequest::clear_has_request_type() {
 inline GetResponseRequest::RequestTypeCase GetResponseRequest::request_type_case() const {
   return GetResponseRequest::RequestTypeCase(_impl_._oneof_case_[0]);
 }
+// -------------------------------------------------------------------
+
+// GetResponseRequestSingle
+
+// .service.GetResponseRequest response_config = 1;
+inline bool GetResponseRequestSingle::_internal_has_response_config() const {
+  return this != internal_default_instance() && _impl_.response_config_ != nullptr;
+}
+inline bool GetResponseRequestSingle::has_response_config() const {
+  return _internal_has_response_config();
+}
+inline void GetResponseRequestSingle::clear_response_config() {
+  if (GetArenaForAllocation() == nullptr && _impl_.response_config_ != nullptr) {
+    delete _impl_.response_config_;
+  }
+  _impl_.response_config_ = nullptr;
+}
+inline const ::service::GetResponseRequest& GetResponseRequestSingle::_internal_response_config() const {
+  const ::service::GetResponseRequest* p = _impl_.response_config_;
+  return p != nullptr ? *p : reinterpret_cast<const ::service::GetResponseRequest&>(
+      ::service::_GetResponseRequest_default_instance_);
+}
+inline const ::service::GetResponseRequest& GetResponseRequestSingle::response_config() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequestSingle.response_config)
+  return _internal_response_config();
+}
+inline void GetResponseRequestSingle::unsafe_arena_set_allocated_response_config(
+    ::service::GetResponseRequest* response_config) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.response_config_);
+  }
+  _impl_.response_config_ = response_config;
+  if (response_config) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseRequestSingle.response_config)
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::release_response_config() {
+  
+  ::service::GetResponseRequest* temp = _impl_.response_config_;
+  _impl_.response_config_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::unsafe_arena_release_response_config() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequestSingle.response_config)
+  
+  ::service::GetResponseRequest* temp = _impl_.response_config_;
+  _impl_.response_config_ = nullptr;
+  return temp;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::_internal_mutable_response_config() {
+  
+  if (_impl_.response_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::service::GetResponseRequest>(GetArenaForAllocation());
+    _impl_.response_config_ = p;
+  }
+  return _impl_.response_config_;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::mutable_response_config() {
+  ::service::GetResponseRequest* _msg = _internal_mutable_response_config();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequestSingle.response_config)
+  return _msg;
+}
+inline void GetResponseRequestSingle::set_allocated_response_config(::service::GetResponseRequest* response_config) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete _impl_.response_config_;
+  }
+  if (response_config) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(response_config);
+    if (message_arena != submessage_arena) {
+      response_config = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, response_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.response_config_ = response_config;
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequestSingle.response_config)
+}
+
+// .service.GetResponseRequest response_data = 2;
+inline bool GetResponseRequestSingle::_internal_has_response_data() const {
+  return this != internal_default_instance() && _impl_.response_data_ != nullptr;
+}
+inline bool GetResponseRequestSingle::has_response_data() const {
+  return _internal_has_response_data();
+}
+inline void GetResponseRequestSingle::clear_response_data() {
+  if (GetArenaForAllocation() == nullptr && _impl_.response_data_ != nullptr) {
+    delete _impl_.response_data_;
+  }
+  _impl_.response_data_ = nullptr;
+}
+inline const ::service::GetResponseRequest& GetResponseRequestSingle::_internal_response_data() const {
+  const ::service::GetResponseRequest* p = _impl_.response_data_;
+  return p != nullptr ? *p : reinterpret_cast<const ::service::GetResponseRequest&>(
+      ::service::_GetResponseRequest_default_instance_);
+}
+inline const ::service::GetResponseRequest& GetResponseRequestSingle::response_data() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequestSingle.response_data)
+  return _internal_response_data();
+}
+inline void GetResponseRequestSingle::unsafe_arena_set_allocated_response_data(
+    ::service::GetResponseRequest* response_data) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.response_data_);
+  }
+  _impl_.response_data_ = response_data;
+  if (response_data) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseRequestSingle.response_data)
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::release_response_data() {
+  
+  ::service::GetResponseRequest* temp = _impl_.response_data_;
+  _impl_.response_data_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::unsafe_arena_release_response_data() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequestSingle.response_data)
+  
+  ::service::GetResponseRequest* temp = _impl_.response_data_;
+  _impl_.response_data_ = nullptr;
+  return temp;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::_internal_mutable_response_data() {
+  
+  if (_impl_.response_data_ == nullptr) {
+    auto* p = CreateMaybeMessage<::service::GetResponseRequest>(GetArenaForAllocation());
+    _impl_.response_data_ = p;
+  }
+  return _impl_.response_data_;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::mutable_response_data() {
+  ::service::GetResponseRequest* _msg = _internal_mutable_response_data();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequestSingle.response_data)
+  return _msg;
+}
+inline void GetResponseRequestSingle::set_allocated_response_data(::service::GetResponseRequest* response_data) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete _impl_.response_data_;
+  }
+  if (response_data) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(response_data);
+    if (message_arena != submessage_arena) {
+      response_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, response_data, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.response_data_ = response_data;
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequestSingle.response_data)
+}
+
 // -------------------------------------------------------------------
 
 // GetResponseResponse_AudioResponse
@@ -4525,6 +5615,56 @@ inline void GetResponseResponse_AudioResponse::set_end_of_response(bool value) {
   // @@protoc_insertion_point(field_set:service.GetResponseResponse.AudioResponse.end_of_response)
 }
 
+// string face_data = 5;
+inline void GetResponseResponse_AudioResponse::clear_face_data() {
+  _impl_.face_data_.ClearToEmpty();
+}
+inline const std::string& GetResponseResponse_AudioResponse::face_data() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.AudioResponse.face_data)
+  return _internal_face_data();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void GetResponseResponse_AudioResponse::set_face_data(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.face_data_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:service.GetResponseResponse.AudioResponse.face_data)
+}
+inline std::string* GetResponseResponse_AudioResponse::mutable_face_data() {
+  std::string* _s = _internal_mutable_face_data();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.AudioResponse.face_data)
+  return _s;
+}
+inline const std::string& GetResponseResponse_AudioResponse::_internal_face_data() const {
+  return _impl_.face_data_.Get();
+}
+inline void GetResponseResponse_AudioResponse::_internal_set_face_data(const std::string& value) {
+  
+  _impl_.face_data_.Set(value, GetArenaForAllocation());
+}
+inline std::string* GetResponseResponse_AudioResponse::_internal_mutable_face_data() {
+  
+  return _impl_.face_data_.Mutable(GetArenaForAllocation());
+}
+inline std::string* GetResponseResponse_AudioResponse::release_face_data() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.AudioResponse.face_data)
+  return _impl_.face_data_.Release();
+}
+inline void GetResponseResponse_AudioResponse::set_allocated_face_data(std::string* face_data) {
+  if (face_data != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.face_data_.SetAllocated(face_data, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.face_data_.IsDefault()) {
+    _impl_.face_data_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.AudioResponse.face_data)
+}
+
 // -------------------------------------------------------------------
 
 // GetResponseResponse_ActionResponse
@@ -4577,6 +5717,160 @@ inline void GetResponseResponse_ActionResponse::set_allocated_action(std::string
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.ActionResponse.action)
+}
+
+// -------------------------------------------------------------------
+
+// GetResponseResponse_BehaviorTreeResponse
+
+// string bt_code = 1;
+inline void GetResponseResponse_BehaviorTreeResponse::clear_bt_code() {
+  _impl_.bt_code_.ClearToEmpty();
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::bt_code() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+  return _internal_bt_code();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void GetResponseResponse_BehaviorTreeResponse::set_bt_code(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.bt_code_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::mutable_bt_code() {
+  std::string* _s = _internal_mutable_bt_code();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+  return _s;
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::_internal_bt_code() const {
+  return _impl_.bt_code_.Get();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::_internal_set_bt_code(const std::string& value) {
+  
+  _impl_.bt_code_.Set(value, GetArenaForAllocation());
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::_internal_mutable_bt_code() {
+  
+  return _impl_.bt_code_.Mutable(GetArenaForAllocation());
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::release_bt_code() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+  return _impl_.bt_code_.Release();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_allocated_bt_code(std::string* bt_code) {
+  if (bt_code != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.bt_code_.SetAllocated(bt_code, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.bt_code_.IsDefault()) {
+    _impl_.bt_code_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+}
+
+// string bt_constants = 2;
+inline void GetResponseResponse_BehaviorTreeResponse::clear_bt_constants() {
+  _impl_.bt_constants_.ClearToEmpty();
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::bt_constants() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+  return _internal_bt_constants();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void GetResponseResponse_BehaviorTreeResponse::set_bt_constants(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.bt_constants_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::mutable_bt_constants() {
+  std::string* _s = _internal_mutable_bt_constants();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+  return _s;
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::_internal_bt_constants() const {
+  return _impl_.bt_constants_.Get();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::_internal_set_bt_constants(const std::string& value) {
+  
+  _impl_.bt_constants_.Set(value, GetArenaForAllocation());
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::_internal_mutable_bt_constants() {
+  
+  return _impl_.bt_constants_.Mutable(GetArenaForAllocation());
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::release_bt_constants() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+  return _impl_.bt_constants_.Release();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_allocated_bt_constants(std::string* bt_constants) {
+  if (bt_constants != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.bt_constants_.SetAllocated(bt_constants, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.bt_constants_.IsDefault()) {
+    _impl_.bt_constants_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+}
+
+// string narrative_section_id = 3;
+inline void GetResponseResponse_BehaviorTreeResponse::clear_narrative_section_id() {
+  _impl_.narrative_section_id_.ClearToEmpty();
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::narrative_section_id() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+  return _internal_narrative_section_id();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void GetResponseResponse_BehaviorTreeResponse::set_narrative_section_id(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.narrative_section_id_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::mutable_narrative_section_id() {
+  std::string* _s = _internal_mutable_narrative_section_id();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+  return _s;
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::_internal_narrative_section_id() const {
+  return _impl_.narrative_section_id_.Get();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::_internal_set_narrative_section_id(const std::string& value) {
+  
+  _impl_.narrative_section_id_.Set(value, GetArenaForAllocation());
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::_internal_mutable_narrative_section_id() {
+  
+  return _impl_.narrative_section_id_.Mutable(GetArenaForAllocation());
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::release_narrative_section_id() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+  return _impl_.narrative_section_id_.Release();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_allocated_narrative_section_id(std::string* narrative_section_id) {
+  if (narrative_section_id != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.narrative_section_id_.SetAllocated(narrative_section_id, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.narrative_section_id_.IsDefault()) {
+    _impl_.narrative_section_id_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
 }
 
 // -------------------------------------------------------------------
@@ -5026,6 +6320,80 @@ inline ::service::GetResponseResponse_UserTranscript* GetResponseResponse::mutab
   return _msg;
 }
 
+// .service.GetResponseResponse.BehaviorTreeResponse bt_response = 6;
+inline bool GetResponseResponse::_internal_has_bt_response() const {
+  return response_type_case() == kBtResponse;
+}
+inline bool GetResponseResponse::has_bt_response() const {
+  return _internal_has_bt_response();
+}
+inline void GetResponseResponse::set_has_bt_response() {
+  _impl_._oneof_case_[0] = kBtResponse;
+}
+inline void GetResponseResponse::clear_bt_response() {
+  if (_internal_has_bt_response()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete _impl_.response_type_.bt_response_;
+    }
+    clear_has_response_type();
+  }
+}
+inline ::service::GetResponseResponse_BehaviorTreeResponse* GetResponseResponse::release_bt_response() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.bt_response)
+  if (_internal_has_bt_response()) {
+    clear_has_response_type();
+    ::service::GetResponseResponse_BehaviorTreeResponse* temp = _impl_.response_type_.bt_response_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    _impl_.response_type_.bt_response_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::service::GetResponseResponse_BehaviorTreeResponse& GetResponseResponse::_internal_bt_response() const {
+  return _internal_has_bt_response()
+      ? *_impl_.response_type_.bt_response_
+      : reinterpret_cast< ::service::GetResponseResponse_BehaviorTreeResponse&>(::service::_GetResponseResponse_BehaviorTreeResponse_default_instance_);
+}
+inline const ::service::GetResponseResponse_BehaviorTreeResponse& GetResponseResponse::bt_response() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.bt_response)
+  return _internal_bt_response();
+}
+inline ::service::GetResponseResponse_BehaviorTreeResponse* GetResponseResponse::unsafe_arena_release_bt_response() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:service.GetResponseResponse.bt_response)
+  if (_internal_has_bt_response()) {
+    clear_has_response_type();
+    ::service::GetResponseResponse_BehaviorTreeResponse* temp = _impl_.response_type_.bt_response_;
+    _impl_.response_type_.bt_response_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void GetResponseResponse::unsafe_arena_set_allocated_bt_response(::service::GetResponseResponse_BehaviorTreeResponse* bt_response) {
+  clear_response_type();
+  if (bt_response) {
+    set_has_bt_response();
+    _impl_.response_type_.bt_response_ = bt_response;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseResponse.bt_response)
+}
+inline ::service::GetResponseResponse_BehaviorTreeResponse* GetResponseResponse::_internal_mutable_bt_response() {
+  if (!_internal_has_bt_response()) {
+    clear_response_type();
+    set_has_bt_response();
+    _impl_.response_type_.bt_response_ = CreateMaybeMessage< ::service::GetResponseResponse_BehaviorTreeResponse >(GetArenaForAllocation());
+  }
+  return _impl_.response_type_.bt_response_;
+}
+inline ::service::GetResponseResponse_BehaviorTreeResponse* GetResponseResponse::mutable_bt_response() {
+  ::service::GetResponseResponse_BehaviorTreeResponse* _msg = _internal_mutable_bt_response();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.bt_response)
+  return _msg;
+}
+
 inline bool GetResponseResponse::has_response_type() const {
   return response_type_case() != RESPONSE_TYPE_NOT_SET;
 }
@@ -5174,6 +6542,12 @@ inline void HelloResponse::set_allocated_message(std::string* message) {
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -5186,12 +6560,6 @@ inline void HelloResponse::set_allocated_message(std::string* message) {
 #else
 // Generated by the protocol buffer compiler.  DO NOT EDIT!
 // source: service.proto
-
-#if defined(_MSC_VER)
-#pragma warning (disable:4946) // reinterpret_cast used between related classes: 'class1' and 'class2'
-#pragma warning (disable:4800) // 'type' : forcing value to bool 'true' or 'false' (performance warning)
-#endif
-
 
 #ifndef GOOGLE_PROTOBUF_INCLUDED_service_2eproto
 #define GOOGLE_PROTOBUF_INCLUDED_service_2eproto
@@ -5238,7 +6606,7 @@ struct TableStruct_service_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[15]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[18]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -5261,6 +6629,9 @@ extern AudioConfigDefaultTypeInternal _AudioConfig_default_instance_;
 class GetResponseRequest;
 class GetResponseRequestDefaultTypeInternal;
 extern GetResponseRequestDefaultTypeInternal _GetResponseRequest_default_instance_;
+class GetResponseRequestSingle;
+class GetResponseRequestSingleDefaultTypeInternal;
+extern GetResponseRequestSingleDefaultTypeInternal _GetResponseRequestSingle_default_instance_;
 class GetResponseRequest_GetResponseConfig;
 class GetResponseRequest_GetResponseConfigDefaultTypeInternal;
 extern GetResponseRequest_GetResponseConfigDefaultTypeInternal _GetResponseRequest_GetResponseConfig_default_instance_;
@@ -5276,6 +6647,9 @@ extern GetResponseResponse_ActionResponseDefaultTypeInternal _GetResponseRespons
 class GetResponseResponse_AudioResponse;
 class GetResponseResponse_AudioResponseDefaultTypeInternal;
 extern GetResponseResponse_AudioResponseDefaultTypeInternal _GetResponseResponse_AudioResponse_default_instance_;
+class GetResponseResponse_BehaviorTreeResponse;
+class GetResponseResponse_BehaviorTreeResponseDefaultTypeInternal;
+extern GetResponseResponse_BehaviorTreeResponseDefaultTypeInternal _GetResponseResponse_BehaviorTreeResponse_default_instance_;
 class GetResponseResponse_UserTranscript;
 class GetResponseResponse_UserTranscriptDefaultTypeInternal;
 extern GetResponseResponse_UserTranscriptDefaultTypeInternal _GetResponseResponse_UserTranscript_default_instance_;
@@ -5291,6 +6665,9 @@ extern STTRequestDefaultTypeInternal _STTRequest_default_instance_;
 class STTResponse;
 class STTResponseDefaultTypeInternal;
 extern STTResponseDefaultTypeInternal _STTResponse_default_instance_;
+class TriggerConfig;
+class TriggerConfigDefaultTypeInternal;
+extern TriggerConfigDefaultTypeInternal _TriggerConfig_default_instance_;
 }  // namespace service
 PROTOBUF_NAMESPACE_OPEN
 template<> ::service::ActionConfig* Arena::CreateMaybeMessage<::service::ActionConfig>(Arena*);
@@ -5298,16 +6675,19 @@ template<> ::service::ActionConfig_Character* Arena::CreateMaybeMessage<::servic
 template<> ::service::ActionConfig_Object* Arena::CreateMaybeMessage<::service::ActionConfig_Object>(Arena*);
 template<> ::service::AudioConfig* Arena::CreateMaybeMessage<::service::AudioConfig>(Arena*);
 template<> ::service::GetResponseRequest* Arena::CreateMaybeMessage<::service::GetResponseRequest>(Arena*);
+template<> ::service::GetResponseRequestSingle* Arena::CreateMaybeMessage<::service::GetResponseRequestSingle>(Arena*);
 template<> ::service::GetResponseRequest_GetResponseConfig* Arena::CreateMaybeMessage<::service::GetResponseRequest_GetResponseConfig>(Arena*);
 template<> ::service::GetResponseRequest_GetResponseData* Arena::CreateMaybeMessage<::service::GetResponseRequest_GetResponseData>(Arena*);
 template<> ::service::GetResponseResponse* Arena::CreateMaybeMessage<::service::GetResponseResponse>(Arena*);
 template<> ::service::GetResponseResponse_ActionResponse* Arena::CreateMaybeMessage<::service::GetResponseResponse_ActionResponse>(Arena*);
 template<> ::service::GetResponseResponse_AudioResponse* Arena::CreateMaybeMessage<::service::GetResponseResponse_AudioResponse>(Arena*);
+template<> ::service::GetResponseResponse_BehaviorTreeResponse* Arena::CreateMaybeMessage<::service::GetResponseResponse_BehaviorTreeResponse>(Arena*);
 template<> ::service::GetResponseResponse_UserTranscript* Arena::CreateMaybeMessage<::service::GetResponseResponse_UserTranscript>(Arena*);
 template<> ::service::HelloRequest* Arena::CreateMaybeMessage<::service::HelloRequest>(Arena*);
 template<> ::service::HelloResponse* Arena::CreateMaybeMessage<::service::HelloResponse>(Arena*);
 template<> ::service::STTRequest* Arena::CreateMaybeMessage<::service::STTRequest>(Arena*);
 template<> ::service::STTResponse* Arena::CreateMaybeMessage<::service::STTResponse>(Arena*);
+template<> ::service::TriggerConfig* Arena::CreateMaybeMessage<::service::TriggerConfig>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace service {
 
@@ -5426,6 +6806,8 @@ class AudioConfig PROTOBUF_FINAL :
 
   enum : int {
     kSampleRateHertzFieldNumber = 1,
+    kDisableAudioFieldNumber = 2,
+    kEnableFacialDataFieldNumber = 3,
   };
   // int32 sample_rate_hertz = 1;
   void clear_sample_rate_hertz();
@@ -5436,6 +6818,24 @@ class AudioConfig PROTOBUF_FINAL :
   void _internal_set_sample_rate_hertz(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
+  // bool disable_audio = 2;
+  void clear_disable_audio();
+  bool disable_audio() const;
+  void set_disable_audio(bool value);
+  private:
+  bool _internal_disable_audio() const;
+  void _internal_set_disable_audio(bool value);
+  public:
+
+  // bool enable_facial_data = 3;
+  void clear_enable_facial_data();
+  bool enable_facial_data() const;
+  void set_enable_facial_data(bool value);
+  private:
+  bool _internal_enable_facial_data() const;
+  void _internal_set_enable_facial_data(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:service.AudioConfig)
  private:
   class _Internal;
@@ -5444,6 +6844,151 @@ class AudioConfig PROTOBUF_FINAL :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::int32 sample_rate_hertz_;
+  bool disable_audio_;
+  bool enable_facial_data_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class TriggerConfig PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.TriggerConfig) */ {
+ public:
+  inline TriggerConfig() : TriggerConfig(nullptr) {}
+  virtual ~TriggerConfig();
+
+  TriggerConfig(const TriggerConfig& from);
+  TriggerConfig(TriggerConfig&& from) noexcept
+    : TriggerConfig() {
+    *this = ::std::move(from);
+  }
+
+  inline TriggerConfig& operator=(const TriggerConfig& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline TriggerConfig& operator=(TriggerConfig&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const TriggerConfig& default_instance();
+
+  static inline const TriggerConfig* internal_default_instance() {
+    return reinterpret_cast<const TriggerConfig*>(
+               &_TriggerConfig_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(TriggerConfig& a, TriggerConfig& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(TriggerConfig* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(TriggerConfig* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline TriggerConfig* New() const final {
+    return CreateMaybeMessage<TriggerConfig>(nullptr);
+  }
+
+  TriggerConfig* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<TriggerConfig>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const TriggerConfig& from);
+  void MergeFrom(const TriggerConfig& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(TriggerConfig* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.TriggerConfig";
+  }
+  protected:
+  explicit TriggerConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
+    return ::descriptor_table_service_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTriggerMessageFieldNumber = 1,
+  };
+  // string trigger_message = 1;
+  void clear_trigger_message();
+  const std::string& trigger_message() const;
+  void set_trigger_message(const std::string& value);
+  void set_trigger_message(std::string&& value);
+  void set_trigger_message(const char* value);
+  void set_trigger_message(const char* value, size_t size);
+  std::string* mutable_trigger_message();
+  std::string* release_trigger_message();
+  void set_allocated_trigger_message(std::string* trigger_message);
+  private:
+  const std::string& _internal_trigger_message() const;
+  void _internal_set_trigger_message(const std::string& value);
+  std::string* _internal_mutable_trigger_message();
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.TriggerConfig)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr trigger_message_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_service_2eproto;
 };
@@ -5490,7 +7035,7 @@ class ActionConfig_Character PROTOBUF_FINAL :
                &_ActionConfig_Character_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   friend void swap(ActionConfig_Character& a, ActionConfig_Character& b) {
     a.Swap(&b);
@@ -5651,7 +7196,7 @@ class ActionConfig_Object PROTOBUF_FINAL :
                &_ActionConfig_Object_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(ActionConfig_Object& a, ActionConfig_Object& b) {
     a.Swap(&b);
@@ -5812,7 +7357,7 @@ class ActionConfig PROTOBUF_FINAL :
                &_ActionConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(ActionConfig& a, ActionConfig& b) {
     a.Swap(&b);
@@ -5890,6 +7435,7 @@ class ActionConfig PROTOBUF_FINAL :
     kCharactersFieldNumber = 2,
     kObjectsFieldNumber = 3,
     kClassificationFieldNumber = 4,
+    kCurrentAttentionObjectFieldNumber = 6,
     kContextLevelFieldNumber = 5,
   };
   // repeated string actions = 1;
@@ -5968,6 +7514,22 @@ class ActionConfig PROTOBUF_FINAL :
   std::string* _internal_mutable_classification();
   public:
 
+  // string current_attention_object = 6;
+  void clear_current_attention_object();
+  const std::string& current_attention_object() const;
+  void set_current_attention_object(const std::string& value);
+  void set_current_attention_object(std::string&& value);
+  void set_current_attention_object(const char* value);
+  void set_current_attention_object(const char* value, size_t size);
+  std::string* mutable_current_attention_object();
+  std::string* release_current_attention_object();
+  void set_allocated_current_attention_object(std::string* current_attention_object);
+  private:
+  const std::string& _internal_current_attention_object() const;
+  void _internal_set_current_attention_object(const std::string& value);
+  std::string* _internal_mutable_current_attention_object();
+  public:
+
   // int32 context_level = 5;
   void clear_context_level();
   ::PROTOBUF_NAMESPACE_ID::int32 context_level() const;
@@ -5988,6 +7550,7 @@ class ActionConfig PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::service::ActionConfig_Character > characters_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::service::ActionConfig_Object > objects_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr classification_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr current_attention_object_;
   ::PROTOBUF_NAMESPACE_ID::int32 context_level_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_service_2eproto;
@@ -6041,7 +7604,7 @@ class STTRequest PROTOBUF_FINAL :
                &_STTRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(STTRequest& a, STTRequest& b) {
     a.Swap(&b);
@@ -6219,7 +7782,7 @@ class STTResponse PROTOBUF_FINAL :
                &_STTResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(STTResponse& a, STTResponse& b) {
     a.Swap(&b);
@@ -6362,7 +7925,7 @@ class GetResponseRequest_GetResponseConfig PROTOBUF_FINAL :
                &_GetResponseRequest_GetResponseConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(GetResponseRequest_GetResponseConfig& a, GetResponseRequest_GetResponseConfig& b) {
     a.Swap(&b);
@@ -6437,6 +8000,7 @@ class GetResponseRequest_GetResponseConfig PROTOBUF_FINAL :
     kApiKeyFieldNumber = 3,
     kSessionIdFieldNumber = 4,
     kSpeakerFieldNumber = 7,
+    kLanguageCodeFieldNumber = 8,
     kAudioConfigFieldNumber = 5,
     kActionConfigFieldNumber = 6,
   };
@@ -6504,6 +8068,22 @@ class GetResponseRequest_GetResponseConfig PROTOBUF_FINAL :
   std::string* _internal_mutable_speaker();
   public:
 
+  // string language_code = 8;
+  void clear_language_code();
+  const std::string& language_code() const;
+  void set_language_code(const std::string& value);
+  void set_language_code(std::string&& value);
+  void set_language_code(const char* value);
+  void set_language_code(const char* value, size_t size);
+  std::string* mutable_language_code();
+  std::string* release_language_code();
+  void set_allocated_language_code(std::string* language_code);
+  private:
+  const std::string& _internal_language_code() const;
+  void _internal_set_language_code(const std::string& value);
+  std::string* _internal_mutable_language_code();
+  public:
+
   // .service.AudioConfig audio_config = 5;
   bool has_audio_config() const;
   private:
@@ -6551,6 +8131,7 @@ class GetResponseRequest_GetResponseConfig PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr api_key_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr session_id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr speaker_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr language_code_;
   ::service::AudioConfig* audio_config_;
   ::service::ActionConfig* action_config_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -6597,6 +8178,7 @@ class GetResponseRequest_GetResponseData PROTOBUF_FINAL :
   enum InputTypeCase {
     kAudioData = 1,
     kTextData = 2,
+    kTriggerData = 3,
     INPUT_TYPE_NOT_SET = 0,
   };
 
@@ -6605,7 +8187,7 @@ class GetResponseRequest_GetResponseData PROTOBUF_FINAL :
                &_GetResponseRequest_GetResponseData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   friend void swap(GetResponseRequest_GetResponseData& a, GetResponseRequest_GetResponseData& b) {
     a.Swap(&b);
@@ -6678,6 +8260,7 @@ class GetResponseRequest_GetResponseData PROTOBUF_FINAL :
   enum : int {
     kAudioDataFieldNumber = 1,
     kTextDataFieldNumber = 2,
+    kTriggerDataFieldNumber = 3,
   };
   // bytes audio_data = 1;
   private:
@@ -6717,6 +8300,24 @@ class GetResponseRequest_GetResponseData PROTOBUF_FINAL :
   std::string* _internal_mutable_text_data();
   public:
 
+  // .service.TriggerConfig trigger_data = 3;
+  bool has_trigger_data() const;
+  private:
+  bool _internal_has_trigger_data() const;
+  public:
+  void clear_trigger_data();
+  const ::service::TriggerConfig& trigger_data() const;
+  ::service::TriggerConfig* release_trigger_data();
+  ::service::TriggerConfig* mutable_trigger_data();
+  void set_allocated_trigger_data(::service::TriggerConfig* trigger_data);
+  private:
+  const ::service::TriggerConfig& _internal_trigger_data() const;
+  ::service::TriggerConfig* _internal_mutable_trigger_data();
+  public:
+  void unsafe_arena_set_allocated_trigger_data(
+      ::service::TriggerConfig* trigger_data);
+  ::service::TriggerConfig* unsafe_arena_release_trigger_data();
+
   void clear_input_type();
   InputTypeCase input_type_case() const;
   // @@protoc_insertion_point(class_scope:service.GetResponseRequest.GetResponseData)
@@ -6724,6 +8325,7 @@ class GetResponseRequest_GetResponseData PROTOBUF_FINAL :
   class _Internal;
   void set_has_audio_data();
   void set_has_text_data();
+  void set_has_trigger_data();
 
   inline bool has_input_type() const;
   inline void clear_has_input_type();
@@ -6735,6 +8337,7 @@ class GetResponseRequest_GetResponseData PROTOBUF_FINAL :
     InputTypeUnion() {}
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr audio_data_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr text_data_;
+    ::service::TriggerConfig* trigger_data_;
   } input_type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -6790,7 +8393,7 @@ class GetResponseRequest PROTOBUF_FINAL :
                &_GetResponseRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   friend void swap(GetResponseRequest& a, GetResponseRequest& b) {
     a.Swap(&b);
@@ -6929,6 +8532,171 @@ class GetResponseRequest PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class GetResponseRequestSingle PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.GetResponseRequestSingle) */ {
+ public:
+  inline GetResponseRequestSingle() : GetResponseRequestSingle(nullptr) {}
+  virtual ~GetResponseRequestSingle();
+
+  GetResponseRequestSingle(const GetResponseRequestSingle& from);
+  GetResponseRequestSingle(GetResponseRequestSingle&& from) noexcept
+    : GetResponseRequestSingle() {
+    *this = ::std::move(from);
+  }
+
+  inline GetResponseRequestSingle& operator=(const GetResponseRequestSingle& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline GetResponseRequestSingle& operator=(GetResponseRequestSingle&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const GetResponseRequestSingle& default_instance();
+
+  static inline const GetResponseRequestSingle* internal_default_instance() {
+    return reinterpret_cast<const GetResponseRequestSingle*>(
+               &_GetResponseRequestSingle_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  friend void swap(GetResponseRequestSingle& a, GetResponseRequestSingle& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(GetResponseRequestSingle* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(GetResponseRequestSingle* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GetResponseRequestSingle* New() const final {
+    return CreateMaybeMessage<GetResponseRequestSingle>(nullptr);
+  }
+
+  GetResponseRequestSingle* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<GetResponseRequestSingle>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const GetResponseRequestSingle& from);
+  void MergeFrom(const GetResponseRequestSingle& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GetResponseRequestSingle* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.GetResponseRequestSingle";
+  }
+  protected:
+  explicit GetResponseRequestSingle(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
+    return ::descriptor_table_service_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kResponseConfigFieldNumber = 1,
+    kResponseDataFieldNumber = 2,
+  };
+  // .service.GetResponseRequest response_config = 1;
+  bool has_response_config() const;
+  private:
+  bool _internal_has_response_config() const;
+  public:
+  void clear_response_config();
+  const ::service::GetResponseRequest& response_config() const;
+  ::service::GetResponseRequest* release_response_config();
+  ::service::GetResponseRequest* mutable_response_config();
+  void set_allocated_response_config(::service::GetResponseRequest* response_config);
+  private:
+  const ::service::GetResponseRequest& _internal_response_config() const;
+  ::service::GetResponseRequest* _internal_mutable_response_config();
+  public:
+  void unsafe_arena_set_allocated_response_config(
+      ::service::GetResponseRequest* response_config);
+  ::service::GetResponseRequest* unsafe_arena_release_response_config();
+
+  // .service.GetResponseRequest response_data = 2;
+  bool has_response_data() const;
+  private:
+  bool _internal_has_response_data() const;
+  public:
+  void clear_response_data();
+  const ::service::GetResponseRequest& response_data() const;
+  ::service::GetResponseRequest* release_response_data();
+  ::service::GetResponseRequest* mutable_response_data();
+  void set_allocated_response_data(::service::GetResponseRequest* response_data);
+  private:
+  const ::service::GetResponseRequest& _internal_response_data() const;
+  ::service::GetResponseRequest* _internal_mutable_response_data();
+  public:
+  void unsafe_arena_set_allocated_response_data(
+      ::service::GetResponseRequest* response_data);
+  ::service::GetResponseRequest* unsafe_arena_release_response_data();
+
+  // @@protoc_insertion_point(class_scope:service.GetResponseRequestSingle)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::service::GetResponseRequest* response_config_;
+  ::service::GetResponseRequest* response_data_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
 class GetResponseResponse_AudioResponse PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.GetResponseResponse.AudioResponse) */ {
  public:
@@ -6970,7 +8738,7 @@ class GetResponseResponse_AudioResponse PROTOBUF_FINAL :
                &_GetResponseResponse_AudioResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    11;
 
   friend void swap(GetResponseResponse_AudioResponse& a, GetResponseResponse_AudioResponse& b) {
     a.Swap(&b);
@@ -7043,6 +8811,7 @@ class GetResponseResponse_AudioResponse PROTOBUF_FINAL :
   enum : int {
     kAudioDataFieldNumber = 1,
     kTextDataFieldNumber = 3,
+    kFaceDataFieldNumber = 5,
     kAudioConfigFieldNumber = 2,
     kEndOfResponseFieldNumber = 4,
   };
@@ -7076,6 +8845,22 @@ class GetResponseResponse_AudioResponse PROTOBUF_FINAL :
   const std::string& _internal_text_data() const;
   void _internal_set_text_data(const std::string& value);
   std::string* _internal_mutable_text_data();
+  public:
+
+  // string face_data = 5;
+  void clear_face_data();
+  const std::string& face_data() const;
+  void set_face_data(const std::string& value);
+  void set_face_data(std::string&& value);
+  void set_face_data(const char* value);
+  void set_face_data(const char* value, size_t size);
+  std::string* mutable_face_data();
+  std::string* release_face_data();
+  void set_allocated_face_data(std::string* face_data);
+  private:
+  const std::string& _internal_face_data() const;
+  void _internal_set_face_data(const std::string& value);
+  std::string* _internal_mutable_face_data();
   public:
 
   // .service.AudioConfig audio_config = 2;
@@ -7114,6 +8899,7 @@ class GetResponseResponse_AudioResponse PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr audio_data_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr text_data_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr face_data_;
   ::service::AudioConfig* audio_config_;
   bool end_of_response_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -7162,7 +8948,7 @@ class GetResponseResponse_ActionResponse PROTOBUF_FINAL :
                &_GetResponseResponse_ActionResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    12;
 
   friend void swap(GetResponseResponse_ActionResponse& a, GetResponseResponse_ActionResponse& b) {
     a.Swap(&b);
@@ -7264,6 +9050,185 @@ class GetResponseResponse_ActionResponse PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class GetResponseResponse_BehaviorTreeResponse PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.GetResponseResponse.BehaviorTreeResponse) */ {
+ public:
+  inline GetResponseResponse_BehaviorTreeResponse() : GetResponseResponse_BehaviorTreeResponse(nullptr) {}
+  virtual ~GetResponseResponse_BehaviorTreeResponse();
+
+  GetResponseResponse_BehaviorTreeResponse(const GetResponseResponse_BehaviorTreeResponse& from);
+  GetResponseResponse_BehaviorTreeResponse(GetResponseResponse_BehaviorTreeResponse&& from) noexcept
+    : GetResponseResponse_BehaviorTreeResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline GetResponseResponse_BehaviorTreeResponse& operator=(const GetResponseResponse_BehaviorTreeResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline GetResponseResponse_BehaviorTreeResponse& operator=(GetResponseResponse_BehaviorTreeResponse&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const GetResponseResponse_BehaviorTreeResponse& default_instance();
+
+  static inline const GetResponseResponse_BehaviorTreeResponse* internal_default_instance() {
+    return reinterpret_cast<const GetResponseResponse_BehaviorTreeResponse*>(
+               &_GetResponseResponse_BehaviorTreeResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    13;
+
+  friend void swap(GetResponseResponse_BehaviorTreeResponse& a, GetResponseResponse_BehaviorTreeResponse& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(GetResponseResponse_BehaviorTreeResponse* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(GetResponseResponse_BehaviorTreeResponse* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GetResponseResponse_BehaviorTreeResponse* New() const final {
+    return CreateMaybeMessage<GetResponseResponse_BehaviorTreeResponse>(nullptr);
+  }
+
+  GetResponseResponse_BehaviorTreeResponse* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<GetResponseResponse_BehaviorTreeResponse>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const GetResponseResponse_BehaviorTreeResponse& from);
+  void MergeFrom(const GetResponseResponse_BehaviorTreeResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GetResponseResponse_BehaviorTreeResponse* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.GetResponseResponse.BehaviorTreeResponse";
+  }
+  protected:
+  explicit GetResponseResponse_BehaviorTreeResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
+    return ::descriptor_table_service_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kBtCodeFieldNumber = 1,
+    kBtConstantsFieldNumber = 2,
+    kNarrativeSectionIdFieldNumber = 3,
+  };
+  // string bt_code = 1;
+  void clear_bt_code();
+  const std::string& bt_code() const;
+  void set_bt_code(const std::string& value);
+  void set_bt_code(std::string&& value);
+  void set_bt_code(const char* value);
+  void set_bt_code(const char* value, size_t size);
+  std::string* mutable_bt_code();
+  std::string* release_bt_code();
+  void set_allocated_bt_code(std::string* bt_code);
+  private:
+  const std::string& _internal_bt_code() const;
+  void _internal_set_bt_code(const std::string& value);
+  std::string* _internal_mutable_bt_code();
+  public:
+
+  // string bt_constants = 2;
+  void clear_bt_constants();
+  const std::string& bt_constants() const;
+  void set_bt_constants(const std::string& value);
+  void set_bt_constants(std::string&& value);
+  void set_bt_constants(const char* value);
+  void set_bt_constants(const char* value, size_t size);
+  std::string* mutable_bt_constants();
+  std::string* release_bt_constants();
+  void set_allocated_bt_constants(std::string* bt_constants);
+  private:
+  const std::string& _internal_bt_constants() const;
+  void _internal_set_bt_constants(const std::string& value);
+  std::string* _internal_mutable_bt_constants();
+  public:
+
+  // string narrative_section_id = 3;
+  void clear_narrative_section_id();
+  const std::string& narrative_section_id() const;
+  void set_narrative_section_id(const std::string& value);
+  void set_narrative_section_id(std::string&& value);
+  void set_narrative_section_id(const char* value);
+  void set_narrative_section_id(const char* value, size_t size);
+  std::string* mutable_narrative_section_id();
+  std::string* release_narrative_section_id();
+  void set_allocated_narrative_section_id(std::string* narrative_section_id);
+  private:
+  const std::string& _internal_narrative_section_id() const;
+  void _internal_set_narrative_section_id(const std::string& value);
+  std::string* _internal_mutable_narrative_section_id();
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.GetResponseResponse.BehaviorTreeResponse)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr bt_code_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr bt_constants_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr narrative_section_id_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
 class GetResponseResponse_UserTranscript PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.GetResponseResponse.UserTranscript) */ {
  public:
@@ -7305,7 +9270,7 @@ class GetResponseResponse_UserTranscript PROTOBUF_FINAL :
                &_GetResponseResponse_UserTranscript_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    14;
 
   friend void swap(GetResponseResponse_UserTranscript& a, GetResponseResponse_UserTranscript& b) {
     a.Swap(&b);
@@ -7470,6 +9435,7 @@ class GetResponseResponse PROTOBUF_FINAL :
     kAudioResponse = 3,
     kDebugLog = 4,
     kUserQuery = 5,
+    kBtResponse = 6,
     RESPONSE_TYPE_NOT_SET = 0,
   };
 
@@ -7478,7 +9444,7 @@ class GetResponseResponse PROTOBUF_FINAL :
                &_GetResponseResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    15;
 
   friend void swap(GetResponseResponse& a, GetResponseResponse& b) {
     a.Swap(&b);
@@ -7548,6 +9514,7 @@ class GetResponseResponse PROTOBUF_FINAL :
 
   typedef GetResponseResponse_AudioResponse AudioResponse;
   typedef GetResponseResponse_ActionResponse ActionResponse;
+  typedef GetResponseResponse_BehaviorTreeResponse BehaviorTreeResponse;
   typedef GetResponseResponse_UserTranscript UserTranscript;
 
   // accessors -------------------------------------------------------
@@ -7558,6 +9525,7 @@ class GetResponseResponse PROTOBUF_FINAL :
     kAudioResponseFieldNumber = 3,
     kDebugLogFieldNumber = 4,
     kUserQueryFieldNumber = 5,
+    kBtResponseFieldNumber = 6,
   };
   // string session_id = 1;
   void clear_session_id();
@@ -7648,6 +9616,24 @@ class GetResponseResponse PROTOBUF_FINAL :
       ::service::GetResponseResponse_UserTranscript* user_query);
   ::service::GetResponseResponse_UserTranscript* unsafe_arena_release_user_query();
 
+  // .service.GetResponseResponse.BehaviorTreeResponse bt_response = 6;
+  bool has_bt_response() const;
+  private:
+  bool _internal_has_bt_response() const;
+  public:
+  void clear_bt_response();
+  const ::service::GetResponseResponse_BehaviorTreeResponse& bt_response() const;
+  ::service::GetResponseResponse_BehaviorTreeResponse* release_bt_response();
+  ::service::GetResponseResponse_BehaviorTreeResponse* mutable_bt_response();
+  void set_allocated_bt_response(::service::GetResponseResponse_BehaviorTreeResponse* bt_response);
+  private:
+  const ::service::GetResponseResponse_BehaviorTreeResponse& _internal_bt_response() const;
+  ::service::GetResponseResponse_BehaviorTreeResponse* _internal_mutable_bt_response();
+  public:
+  void unsafe_arena_set_allocated_bt_response(
+      ::service::GetResponseResponse_BehaviorTreeResponse* bt_response);
+  ::service::GetResponseResponse_BehaviorTreeResponse* unsafe_arena_release_bt_response();
+
   void clear_response_type();
   ResponseTypeCase response_type_case() const;
   // @@protoc_insertion_point(class_scope:service.GetResponseResponse)
@@ -7657,6 +9643,7 @@ class GetResponseResponse PROTOBUF_FINAL :
   void set_has_audio_response();
   void set_has_debug_log();
   void set_has_user_query();
+  void set_has_bt_response();
 
   inline bool has_response_type() const;
   inline void clear_has_response_type();
@@ -7671,6 +9658,7 @@ class GetResponseResponse PROTOBUF_FINAL :
     ::service::GetResponseResponse_AudioResponse* audio_response_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr debug_log_;
     ::service::GetResponseResponse_UserTranscript* user_query_;
+    ::service::GetResponseResponse_BehaviorTreeResponse* bt_response_;
   } response_type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -7720,7 +9708,7 @@ class HelloRequest PROTOBUF_FINAL :
                &_HelloRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    16;
 
   friend void swap(HelloRequest& a, HelloRequest& b) {
     a.Swap(&b);
@@ -7863,7 +9851,7 @@ class HelloResponse PROTOBUF_FINAL :
                &_HelloResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    17;
 
   friend void swap(HelloResponse& a, HelloResponse& b) {
     a.Swap(&b);
@@ -7992,6 +9980,111 @@ inline void AudioConfig::_internal_set_sample_rate_hertz(::PROTOBUF_NAMESPACE_ID
 inline void AudioConfig::set_sample_rate_hertz(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_sample_rate_hertz(value);
   // @@protoc_insertion_point(field_set:service.AudioConfig.sample_rate_hertz)
+}
+
+// bool disable_audio = 2;
+inline void AudioConfig::clear_disable_audio() {
+  disable_audio_ = false;
+}
+inline bool AudioConfig::_internal_disable_audio() const {
+  return disable_audio_;
+}
+inline bool AudioConfig::disable_audio() const {
+  // @@protoc_insertion_point(field_get:service.AudioConfig.disable_audio)
+  return _internal_disable_audio();
+}
+inline void AudioConfig::_internal_set_disable_audio(bool value) {
+  
+  disable_audio_ = value;
+}
+inline void AudioConfig::set_disable_audio(bool value) {
+  _internal_set_disable_audio(value);
+  // @@protoc_insertion_point(field_set:service.AudioConfig.disable_audio)
+}
+
+// bool enable_facial_data = 3;
+inline void AudioConfig::clear_enable_facial_data() {
+  enable_facial_data_ = false;
+}
+inline bool AudioConfig::_internal_enable_facial_data() const {
+  return enable_facial_data_;
+}
+inline bool AudioConfig::enable_facial_data() const {
+  // @@protoc_insertion_point(field_get:service.AudioConfig.enable_facial_data)
+  return _internal_enable_facial_data();
+}
+inline void AudioConfig::_internal_set_enable_facial_data(bool value) {
+  
+  enable_facial_data_ = value;
+}
+inline void AudioConfig::set_enable_facial_data(bool value) {
+  _internal_set_enable_facial_data(value);
+  // @@protoc_insertion_point(field_set:service.AudioConfig.enable_facial_data)
+}
+
+// -------------------------------------------------------------------
+
+// TriggerConfig
+
+// string trigger_message = 1;
+inline void TriggerConfig::clear_trigger_message() {
+  trigger_message_.ClearToEmpty();
+}
+inline const std::string& TriggerConfig::trigger_message() const {
+  // @@protoc_insertion_point(field_get:service.TriggerConfig.trigger_message)
+  return _internal_trigger_message();
+}
+inline void TriggerConfig::set_trigger_message(const std::string& value) {
+  _internal_set_trigger_message(value);
+  // @@protoc_insertion_point(field_set:service.TriggerConfig.trigger_message)
+}
+inline std::string* TriggerConfig::mutable_trigger_message() {
+  // @@protoc_insertion_point(field_mutable:service.TriggerConfig.trigger_message)
+  return _internal_mutable_trigger_message();
+}
+inline const std::string& TriggerConfig::_internal_trigger_message() const {
+  return trigger_message_.Get();
+}
+inline void TriggerConfig::_internal_set_trigger_message(const std::string& value) {
+  
+  trigger_message_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void TriggerConfig::set_trigger_message(std::string&& value) {
+  
+  trigger_message_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.TriggerConfig.trigger_message)
+}
+inline void TriggerConfig::set_trigger_message(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  trigger_message_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.TriggerConfig.trigger_message)
+}
+inline void TriggerConfig::set_trigger_message(const char* value,
+    size_t size) {
+  
+  trigger_message_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.TriggerConfig.trigger_message)
+}
+inline std::string* TriggerConfig::_internal_mutable_trigger_message() {
+  
+  return trigger_message_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* TriggerConfig::release_trigger_message() {
+  // @@protoc_insertion_point(field_release:service.TriggerConfig.trigger_message)
+  return trigger_message_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void TriggerConfig::set_allocated_trigger_message(std::string* trigger_message) {
+  if (trigger_message != nullptr) {
+    
+  } else {
+    
+  }
+  trigger_message_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), trigger_message,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.TriggerConfig.trigger_message)
 }
 
 // -------------------------------------------------------------------
@@ -8481,6 +10574,67 @@ inline void ActionConfig::_internal_set_context_level(::PROTOBUF_NAMESPACE_ID::i
 inline void ActionConfig::set_context_level(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_context_level(value);
   // @@protoc_insertion_point(field_set:service.ActionConfig.context_level)
+}
+
+// string current_attention_object = 6;
+inline void ActionConfig::clear_current_attention_object() {
+  current_attention_object_.ClearToEmpty();
+}
+inline const std::string& ActionConfig::current_attention_object() const {
+  // @@protoc_insertion_point(field_get:service.ActionConfig.current_attention_object)
+  return _internal_current_attention_object();
+}
+inline void ActionConfig::set_current_attention_object(const std::string& value) {
+  _internal_set_current_attention_object(value);
+  // @@protoc_insertion_point(field_set:service.ActionConfig.current_attention_object)
+}
+inline std::string* ActionConfig::mutable_current_attention_object() {
+  // @@protoc_insertion_point(field_mutable:service.ActionConfig.current_attention_object)
+  return _internal_mutable_current_attention_object();
+}
+inline const std::string& ActionConfig::_internal_current_attention_object() const {
+  return current_attention_object_.Get();
+}
+inline void ActionConfig::_internal_set_current_attention_object(const std::string& value) {
+  
+  current_attention_object_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void ActionConfig::set_current_attention_object(std::string&& value) {
+  
+  current_attention_object_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.ActionConfig.current_attention_object)
+}
+inline void ActionConfig::set_current_attention_object(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  current_attention_object_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.ActionConfig.current_attention_object)
+}
+inline void ActionConfig::set_current_attention_object(const char* value,
+    size_t size) {
+  
+  current_attention_object_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.ActionConfig.current_attention_object)
+}
+inline std::string* ActionConfig::_internal_mutable_current_attention_object() {
+  
+  return current_attention_object_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* ActionConfig::release_current_attention_object() {
+  // @@protoc_insertion_point(field_release:service.ActionConfig.current_attention_object)
+  return current_attention_object_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void ActionConfig::set_allocated_current_attention_object(std::string* current_attention_object) {
+  if (current_attention_object != nullptr) {
+    
+  } else {
+    
+  }
+  current_attention_object_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), current_attention_object,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.ActionConfig.current_attention_object)
 }
 
 // -------------------------------------------------------------------
@@ -9155,6 +11309,67 @@ inline void GetResponseRequest_GetResponseConfig::set_allocated_speaker(std::str
   // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequest.GetResponseConfig.speaker)
 }
 
+// string language_code = 8;
+inline void GetResponseRequest_GetResponseConfig::clear_language_code() {
+  language_code_.ClearToEmpty();
+}
+inline const std::string& GetResponseRequest_GetResponseConfig::language_code() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequest.GetResponseConfig.language_code)
+  return _internal_language_code();
+}
+inline void GetResponseRequest_GetResponseConfig::set_language_code(const std::string& value) {
+  _internal_set_language_code(value);
+  // @@protoc_insertion_point(field_set:service.GetResponseRequest.GetResponseConfig.language_code)
+}
+inline std::string* GetResponseRequest_GetResponseConfig::mutable_language_code() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequest.GetResponseConfig.language_code)
+  return _internal_mutable_language_code();
+}
+inline const std::string& GetResponseRequest_GetResponseConfig::_internal_language_code() const {
+  return language_code_.Get();
+}
+inline void GetResponseRequest_GetResponseConfig::_internal_set_language_code(const std::string& value) {
+  
+  language_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void GetResponseRequest_GetResponseConfig::set_language_code(std::string&& value) {
+  
+  language_code_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.GetResponseRequest.GetResponseConfig.language_code)
+}
+inline void GetResponseRequest_GetResponseConfig::set_language_code(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  language_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.GetResponseRequest.GetResponseConfig.language_code)
+}
+inline void GetResponseRequest_GetResponseConfig::set_language_code(const char* value,
+    size_t size) {
+  
+  language_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.GetResponseRequest.GetResponseConfig.language_code)
+}
+inline std::string* GetResponseRequest_GetResponseConfig::_internal_mutable_language_code() {
+  
+  return language_code_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* GetResponseRequest_GetResponseConfig::release_language_code() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequest.GetResponseConfig.language_code)
+  return language_code_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void GetResponseRequest_GetResponseConfig::set_allocated_language_code(std::string* language_code) {
+  if (language_code != nullptr) {
+    
+  } else {
+    
+  }
+  language_code_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), language_code,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequest.GetResponseConfig.language_code)
+}
+
 // -------------------------------------------------------------------
 
 // GetResponseRequest_GetResponseData
@@ -9373,6 +11588,79 @@ inline void GetResponseRequest_GetResponseData::set_allocated_text_data(std::str
   // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequest.GetResponseData.text_data)
 }
 
+// .service.TriggerConfig trigger_data = 3;
+inline bool GetResponseRequest_GetResponseData::_internal_has_trigger_data() const {
+  return input_type_case() == kTriggerData;
+}
+inline bool GetResponseRequest_GetResponseData::has_trigger_data() const {
+  return _internal_has_trigger_data();
+}
+inline void GetResponseRequest_GetResponseData::set_has_trigger_data() {
+  _oneof_case_[0] = kTriggerData;
+}
+inline void GetResponseRequest_GetResponseData::clear_trigger_data() {
+  if (_internal_has_trigger_data()) {
+    if (GetArena() == nullptr) {
+      delete input_type_.trigger_data_;
+    }
+    clear_has_input_type();
+  }
+}
+inline ::service::TriggerConfig* GetResponseRequest_GetResponseData::release_trigger_data() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequest.GetResponseData.trigger_data)
+  if (_internal_has_trigger_data()) {
+    clear_has_input_type();
+      ::service::TriggerConfig* temp = input_type_.trigger_data_;
+    if (GetArena() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    input_type_.trigger_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::service::TriggerConfig& GetResponseRequest_GetResponseData::_internal_trigger_data() const {
+  return _internal_has_trigger_data()
+      ? *input_type_.trigger_data_
+      : reinterpret_cast< ::service::TriggerConfig&>(::service::_TriggerConfig_default_instance_);
+}
+inline const ::service::TriggerConfig& GetResponseRequest_GetResponseData::trigger_data() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequest.GetResponseData.trigger_data)
+  return _internal_trigger_data();
+}
+inline ::service::TriggerConfig* GetResponseRequest_GetResponseData::unsafe_arena_release_trigger_data() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:service.GetResponseRequest.GetResponseData.trigger_data)
+  if (_internal_has_trigger_data()) {
+    clear_has_input_type();
+    ::service::TriggerConfig* temp = input_type_.trigger_data_;
+    input_type_.trigger_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void GetResponseRequest_GetResponseData::unsafe_arena_set_allocated_trigger_data(::service::TriggerConfig* trigger_data) {
+  clear_input_type();
+  if (trigger_data) {
+    set_has_trigger_data();
+    input_type_.trigger_data_ = trigger_data;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseRequest.GetResponseData.trigger_data)
+}
+inline ::service::TriggerConfig* GetResponseRequest_GetResponseData::_internal_mutable_trigger_data() {
+  if (!_internal_has_trigger_data()) {
+    clear_input_type();
+    set_has_trigger_data();
+    input_type_.trigger_data_ = CreateMaybeMessage< ::service::TriggerConfig >(GetArena());
+  }
+  return input_type_.trigger_data_;
+}
+inline ::service::TriggerConfig* GetResponseRequest_GetResponseData::mutable_trigger_data() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequest.GetResponseData.trigger_data)
+  return _internal_mutable_trigger_data();
+}
+
 inline bool GetResponseRequest_GetResponseData::has_input_type() const {
   return input_type_case() != INPUT_TYPE_NOT_SET;
 }
@@ -9541,6 +11829,176 @@ inline void GetResponseRequest::clear_has_request_type() {
 inline GetResponseRequest::RequestTypeCase GetResponseRequest::request_type_case() const {
   return GetResponseRequest::RequestTypeCase(_oneof_case_[0]);
 }
+// -------------------------------------------------------------------
+
+// GetResponseRequestSingle
+
+// .service.GetResponseRequest response_config = 1;
+inline bool GetResponseRequestSingle::_internal_has_response_config() const {
+  return this != internal_default_instance() && response_config_ != nullptr;
+}
+inline bool GetResponseRequestSingle::has_response_config() const {
+  return _internal_has_response_config();
+}
+inline void GetResponseRequestSingle::clear_response_config() {
+  if (GetArena() == nullptr && response_config_ != nullptr) {
+    delete response_config_;
+  }
+  response_config_ = nullptr;
+}
+inline const ::service::GetResponseRequest& GetResponseRequestSingle::_internal_response_config() const {
+  const ::service::GetResponseRequest* p = response_config_;
+  return p != nullptr ? *p : reinterpret_cast<const ::service::GetResponseRequest&>(
+      ::service::_GetResponseRequest_default_instance_);
+}
+inline const ::service::GetResponseRequest& GetResponseRequestSingle::response_config() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequestSingle.response_config)
+  return _internal_response_config();
+}
+inline void GetResponseRequestSingle::unsafe_arena_set_allocated_response_config(
+    ::service::GetResponseRequest* response_config) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(response_config_);
+  }
+  response_config_ = response_config;
+  if (response_config) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseRequestSingle.response_config)
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::release_response_config() {
+  
+  ::service::GetResponseRequest* temp = response_config_;
+  response_config_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::unsafe_arena_release_response_config() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequestSingle.response_config)
+  
+  ::service::GetResponseRequest* temp = response_config_;
+  response_config_ = nullptr;
+  return temp;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::_internal_mutable_response_config() {
+  
+  if (response_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::service::GetResponseRequest>(GetArena());
+    response_config_ = p;
+  }
+  return response_config_;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::mutable_response_config() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequestSingle.response_config)
+  return _internal_mutable_response_config();
+}
+inline void GetResponseRequestSingle::set_allocated_response_config(::service::GetResponseRequest* response_config) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete response_config_;
+  }
+  if (response_config) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(response_config);
+    if (message_arena != submessage_arena) {
+      response_config = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, response_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  response_config_ = response_config;
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequestSingle.response_config)
+}
+
+// .service.GetResponseRequest response_data = 2;
+inline bool GetResponseRequestSingle::_internal_has_response_data() const {
+  return this != internal_default_instance() && response_data_ != nullptr;
+}
+inline bool GetResponseRequestSingle::has_response_data() const {
+  return _internal_has_response_data();
+}
+inline void GetResponseRequestSingle::clear_response_data() {
+  if (GetArena() == nullptr && response_data_ != nullptr) {
+    delete response_data_;
+  }
+  response_data_ = nullptr;
+}
+inline const ::service::GetResponseRequest& GetResponseRequestSingle::_internal_response_data() const {
+  const ::service::GetResponseRequest* p = response_data_;
+  return p != nullptr ? *p : reinterpret_cast<const ::service::GetResponseRequest&>(
+      ::service::_GetResponseRequest_default_instance_);
+}
+inline const ::service::GetResponseRequest& GetResponseRequestSingle::response_data() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequestSingle.response_data)
+  return _internal_response_data();
+}
+inline void GetResponseRequestSingle::unsafe_arena_set_allocated_response_data(
+    ::service::GetResponseRequest* response_data) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(response_data_);
+  }
+  response_data_ = response_data;
+  if (response_data) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseRequestSingle.response_data)
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::release_response_data() {
+  
+  ::service::GetResponseRequest* temp = response_data_;
+  response_data_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::unsafe_arena_release_response_data() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequestSingle.response_data)
+  
+  ::service::GetResponseRequest* temp = response_data_;
+  response_data_ = nullptr;
+  return temp;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::_internal_mutable_response_data() {
+  
+  if (response_data_ == nullptr) {
+    auto* p = CreateMaybeMessage<::service::GetResponseRequest>(GetArena());
+    response_data_ = p;
+  }
+  return response_data_;
+}
+inline ::service::GetResponseRequest* GetResponseRequestSingle::mutable_response_data() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequestSingle.response_data)
+  return _internal_mutable_response_data();
+}
+inline void GetResponseRequestSingle::set_allocated_response_data(::service::GetResponseRequest* response_data) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete response_data_;
+  }
+  if (response_data) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(response_data);
+    if (message_arena != submessage_arena) {
+      response_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, response_data, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  response_data_ = response_data;
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequestSingle.response_data)
+}
+
 // -------------------------------------------------------------------
 
 // GetResponseResponse_AudioResponse
@@ -9770,6 +12228,67 @@ inline void GetResponseResponse_AudioResponse::set_end_of_response(bool value) {
   // @@protoc_insertion_point(field_set:service.GetResponseResponse.AudioResponse.end_of_response)
 }
 
+// string face_data = 5;
+inline void GetResponseResponse_AudioResponse::clear_face_data() {
+  face_data_.ClearToEmpty();
+}
+inline const std::string& GetResponseResponse_AudioResponse::face_data() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.AudioResponse.face_data)
+  return _internal_face_data();
+}
+inline void GetResponseResponse_AudioResponse::set_face_data(const std::string& value) {
+  _internal_set_face_data(value);
+  // @@protoc_insertion_point(field_set:service.GetResponseResponse.AudioResponse.face_data)
+}
+inline std::string* GetResponseResponse_AudioResponse::mutable_face_data() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.AudioResponse.face_data)
+  return _internal_mutable_face_data();
+}
+inline const std::string& GetResponseResponse_AudioResponse::_internal_face_data() const {
+  return face_data_.Get();
+}
+inline void GetResponseResponse_AudioResponse::_internal_set_face_data(const std::string& value) {
+  
+  face_data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void GetResponseResponse_AudioResponse::set_face_data(std::string&& value) {
+  
+  face_data_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.GetResponseResponse.AudioResponse.face_data)
+}
+inline void GetResponseResponse_AudioResponse::set_face_data(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  face_data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.GetResponseResponse.AudioResponse.face_data)
+}
+inline void GetResponseResponse_AudioResponse::set_face_data(const char* value,
+    size_t size) {
+  
+  face_data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.GetResponseResponse.AudioResponse.face_data)
+}
+inline std::string* GetResponseResponse_AudioResponse::_internal_mutable_face_data() {
+  
+  return face_data_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* GetResponseResponse_AudioResponse::release_face_data() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.AudioResponse.face_data)
+  return face_data_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void GetResponseResponse_AudioResponse::set_allocated_face_data(std::string* face_data) {
+  if (face_data != nullptr) {
+    
+  } else {
+    
+  }
+  face_data_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), face_data,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.AudioResponse.face_data)
+}
+
 // -------------------------------------------------------------------
 
 // GetResponseResponse_ActionResponse
@@ -9833,6 +12352,193 @@ inline void GetResponseResponse_ActionResponse::set_allocated_action(std::string
   action_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), action,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.ActionResponse.action)
+}
+
+// -------------------------------------------------------------------
+
+// GetResponseResponse_BehaviorTreeResponse
+
+// string bt_code = 1;
+inline void GetResponseResponse_BehaviorTreeResponse::clear_bt_code() {
+  bt_code_.ClearToEmpty();
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::bt_code() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+  return _internal_bt_code();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_bt_code(const std::string& value) {
+  _internal_set_bt_code(value);
+  // @@protoc_insertion_point(field_set:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::mutable_bt_code() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+  return _internal_mutable_bt_code();
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::_internal_bt_code() const {
+  return bt_code_.Get();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::_internal_set_bt_code(const std::string& value) {
+  
+  bt_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_bt_code(std::string&& value) {
+  
+  bt_code_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_bt_code(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  bt_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_bt_code(const char* value,
+    size_t size) {
+  
+  bt_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::_internal_mutable_bt_code() {
+  
+  return bt_code_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::release_bt_code() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+  return bt_code_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_allocated_bt_code(std::string* bt_code) {
+  if (bt_code != nullptr) {
+    
+  } else {
+    
+  }
+  bt_code_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), bt_code,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.BehaviorTreeResponse.bt_code)
+}
+
+// string bt_constants = 2;
+inline void GetResponseResponse_BehaviorTreeResponse::clear_bt_constants() {
+  bt_constants_.ClearToEmpty();
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::bt_constants() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+  return _internal_bt_constants();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_bt_constants(const std::string& value) {
+  _internal_set_bt_constants(value);
+  // @@protoc_insertion_point(field_set:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::mutable_bt_constants() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+  return _internal_mutable_bt_constants();
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::_internal_bt_constants() const {
+  return bt_constants_.Get();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::_internal_set_bt_constants(const std::string& value) {
+  
+  bt_constants_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_bt_constants(std::string&& value) {
+  
+  bt_constants_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_bt_constants(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  bt_constants_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_bt_constants(const char* value,
+    size_t size) {
+  
+  bt_constants_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::_internal_mutable_bt_constants() {
+  
+  return bt_constants_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::release_bt_constants() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+  return bt_constants_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_allocated_bt_constants(std::string* bt_constants) {
+  if (bt_constants != nullptr) {
+    
+  } else {
+    
+  }
+  bt_constants_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), bt_constants,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.BehaviorTreeResponse.bt_constants)
+}
+
+// string narrative_section_id = 3;
+inline void GetResponseResponse_BehaviorTreeResponse::clear_narrative_section_id() {
+  narrative_section_id_.ClearToEmpty();
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::narrative_section_id() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+  return _internal_narrative_section_id();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_narrative_section_id(const std::string& value) {
+  _internal_set_narrative_section_id(value);
+  // @@protoc_insertion_point(field_set:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::mutable_narrative_section_id() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+  return _internal_mutable_narrative_section_id();
+}
+inline const std::string& GetResponseResponse_BehaviorTreeResponse::_internal_narrative_section_id() const {
+  return narrative_section_id_.Get();
+}
+inline void GetResponseResponse_BehaviorTreeResponse::_internal_set_narrative_section_id(const std::string& value) {
+  
+  narrative_section_id_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_narrative_section_id(std::string&& value) {
+  
+  narrative_section_id_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_narrative_section_id(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  narrative_section_id_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_narrative_section_id(const char* value,
+    size_t size) {
+  
+  narrative_section_id_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::_internal_mutable_narrative_section_id() {
+  
+  return narrative_section_id_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* GetResponseResponse_BehaviorTreeResponse::release_narrative_section_id() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
+  return narrative_section_id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void GetResponseResponse_BehaviorTreeResponse::set_allocated_narrative_section_id(std::string* narrative_section_id) {
+  if (narrative_section_id != nullptr) {
+    
+  } else {
+    
+  }
+  narrative_section_id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), narrative_section_id,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.BehaviorTreeResponse.narrative_section_id)
 }
 
 // -------------------------------------------------------------------
@@ -10331,6 +13037,79 @@ inline ::service::GetResponseResponse_UserTranscript* GetResponseResponse::mutab
   return _internal_mutable_user_query();
 }
 
+// .service.GetResponseResponse.BehaviorTreeResponse bt_response = 6;
+inline bool GetResponseResponse::_internal_has_bt_response() const {
+  return response_type_case() == kBtResponse;
+}
+inline bool GetResponseResponse::has_bt_response() const {
+  return _internal_has_bt_response();
+}
+inline void GetResponseResponse::set_has_bt_response() {
+  _oneof_case_[0] = kBtResponse;
+}
+inline void GetResponseResponse::clear_bt_response() {
+  if (_internal_has_bt_response()) {
+    if (GetArena() == nullptr) {
+      delete response_type_.bt_response_;
+    }
+    clear_has_response_type();
+  }
+}
+inline ::service::GetResponseResponse_BehaviorTreeResponse* GetResponseResponse::release_bt_response() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.bt_response)
+  if (_internal_has_bt_response()) {
+    clear_has_response_type();
+      ::service::GetResponseResponse_BehaviorTreeResponse* temp = response_type_.bt_response_;
+    if (GetArena() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    response_type_.bt_response_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::service::GetResponseResponse_BehaviorTreeResponse& GetResponseResponse::_internal_bt_response() const {
+  return _internal_has_bt_response()
+      ? *response_type_.bt_response_
+      : reinterpret_cast< ::service::GetResponseResponse_BehaviorTreeResponse&>(::service::_GetResponseResponse_BehaviorTreeResponse_default_instance_);
+}
+inline const ::service::GetResponseResponse_BehaviorTreeResponse& GetResponseResponse::bt_response() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.bt_response)
+  return _internal_bt_response();
+}
+inline ::service::GetResponseResponse_BehaviorTreeResponse* GetResponseResponse::unsafe_arena_release_bt_response() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:service.GetResponseResponse.bt_response)
+  if (_internal_has_bt_response()) {
+    clear_has_response_type();
+    ::service::GetResponseResponse_BehaviorTreeResponse* temp = response_type_.bt_response_;
+    response_type_.bt_response_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void GetResponseResponse::unsafe_arena_set_allocated_bt_response(::service::GetResponseResponse_BehaviorTreeResponse* bt_response) {
+  clear_response_type();
+  if (bt_response) {
+    set_has_bt_response();
+    response_type_.bt_response_ = bt_response;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseResponse.bt_response)
+}
+inline ::service::GetResponseResponse_BehaviorTreeResponse* GetResponseResponse::_internal_mutable_bt_response() {
+  if (!_internal_has_bt_response()) {
+    clear_response_type();
+    set_has_bt_response();
+    response_type_.bt_response_ = CreateMaybeMessage< ::service::GetResponseResponse_BehaviorTreeResponse >(GetArena());
+  }
+  return response_type_.bt_response_;
+}
+inline ::service::GetResponseResponse_BehaviorTreeResponse* GetResponseResponse::mutable_bt_response() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.bt_response)
+  return _internal_mutable_bt_response();
+}
+
 inline bool GetResponseResponse::has_response_type() const {
   return response_type_case() != RESPONSE_TYPE_NOT_SET;
 }
@@ -10501,6 +13280,12 @@ inline void HelloResponse::set_allocated_message(std::string* message) {
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -10510,5 +13295,4 @@ inline void HelloResponse::set_allocated_message(std::string* message) {
 
 #include <google/protobuf/port_undef.inc>
 #endif  // GOOGLE_PROTOBUF_INCLUDED_GOOGLE_PROTOBUF_INCLUDED_service_2eproto
-
 #endif

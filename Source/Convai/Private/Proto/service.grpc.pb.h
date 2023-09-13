@@ -7,7 +7,6 @@
 #ifndef GRPC_service_2eproto__INCLUDED
 #define GRPC_service_2eproto__INCLUDED
 
-// #undef verify
 #include "service.pb.h"
 
 #include <functional>
@@ -73,6 +72,15 @@ class ConvaiService final {
     std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::service::GetResponseRequest, ::service::GetResponseResponse>> PrepareAsyncGetResponse(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::service::GetResponseRequest, ::service::GetResponseResponse>>(PrepareAsyncGetResponseRaw(context, cq));
     }
+    std::unique_ptr< ::grpc::ClientReaderInterface< ::service::GetResponseResponse>> GetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request) {
+      return std::unique_ptr< ::grpc::ClientReaderInterface< ::service::GetResponseResponse>>(GetResponseSingleRaw(context, request));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>> AsyncGetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>>(AsyncGetResponseSingleRaw(context, request, cq, tag));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>> PrepareAsyncGetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>>(PrepareAsyncGetResponseSingleRaw(context, request, cq));
+    }
     class async_interface {
      public:
       virtual ~async_interface() {}
@@ -81,6 +89,7 @@ class ConvaiService final {
       virtual void HelloStream(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::HelloRequest,::service::HelloResponse>* reactor) = 0;
       virtual void SpeechToText(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::STTRequest,::service::STTResponse>* reactor) = 0;
       virtual void GetResponse(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::GetResponseRequest,::service::GetResponseResponse>* reactor) = 0;
+      virtual void GetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle* request, ::grpc::ClientReadReactor< ::service::GetResponseResponse>* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
@@ -97,6 +106,9 @@ class ConvaiService final {
     virtual ::grpc::ClientReaderWriterInterface< ::service::GetResponseRequest, ::service::GetResponseResponse>* GetResponseRaw(::grpc::ClientContext* context) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::service::GetResponseRequest, ::service::GetResponseResponse>* AsyncGetResponseRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::service::GetResponseRequest, ::service::GetResponseResponse>* PrepareAsyncGetResponseRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientReaderInterface< ::service::GetResponseResponse>* GetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request) = 0;
+    virtual ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>* AsyncGetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq, void* tag) = 0;
+    virtual ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>* PrepareAsyncGetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -135,6 +147,15 @@ class ConvaiService final {
     std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::service::GetResponseRequest, ::service::GetResponseResponse>> PrepareAsyncGetResponse(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::service::GetResponseRequest, ::service::GetResponseResponse>>(PrepareAsyncGetResponseRaw(context, cq));
     }
+    std::unique_ptr< ::grpc::ClientReader< ::service::GetResponseResponse>> GetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request) {
+      return std::unique_ptr< ::grpc::ClientReader< ::service::GetResponseResponse>>(GetResponseSingleRaw(context, request));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReader< ::service::GetResponseResponse>> AsyncGetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReader< ::service::GetResponseResponse>>(AsyncGetResponseSingleRaw(context, request, cq, tag));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReader< ::service::GetResponseResponse>> PrepareAsyncGetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReader< ::service::GetResponseResponse>>(PrepareAsyncGetResponseSingleRaw(context, request, cq));
+    }
     class async final :
       public StubInterface::async_interface {
      public:
@@ -143,6 +164,7 @@ class ConvaiService final {
       void HelloStream(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::HelloRequest,::service::HelloResponse>* reactor) override;
       void SpeechToText(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::STTRequest,::service::STTResponse>* reactor) override;
       void GetResponse(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::GetResponseRequest,::service::GetResponseResponse>* reactor) override;
+      void GetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle* request, ::grpc::ClientReadReactor< ::service::GetResponseResponse>* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -165,10 +187,14 @@ class ConvaiService final {
     ::grpc::ClientReaderWriter< ::service::GetResponseRequest, ::service::GetResponseResponse>* GetResponseRaw(::grpc::ClientContext* context) override;
     ::grpc::ClientAsyncReaderWriter< ::service::GetResponseRequest, ::service::GetResponseResponse>* AsyncGetResponseRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
     ::grpc::ClientAsyncReaderWriter< ::service::GetResponseRequest, ::service::GetResponseResponse>* PrepareAsyncGetResponseRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientReader< ::service::GetResponseResponse>* GetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request) override;
+    ::grpc::ClientAsyncReader< ::service::GetResponseResponse>* AsyncGetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq, void* tag) override;
+    ::grpc::ClientAsyncReader< ::service::GetResponseResponse>* PrepareAsyncGetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_Hello_;
     const ::grpc::internal::RpcMethod rpcmethod_HelloStream_;
     const ::grpc::internal::RpcMethod rpcmethod_SpeechToText_;
     const ::grpc::internal::RpcMethod rpcmethod_GetResponse_;
+    const ::grpc::internal::RpcMethod rpcmethod_GetResponseSingle_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -180,6 +206,7 @@ class ConvaiService final {
     virtual ::grpc::Status HelloStream(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::service::HelloResponse, ::service::HelloRequest>* stream);
     virtual ::grpc::Status SpeechToText(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::service::STTResponse, ::service::STTRequest>* stream);
     virtual ::grpc::Status GetResponse(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::service::GetResponseResponse, ::service::GetResponseRequest>* stream);
+    virtual ::grpc::Status GetResponseSingle(::grpc::ServerContext* context, const ::service::GetResponseRequestSingle* request, ::grpc::ServerWriter< ::service::GetResponseResponse>* writer);
   };
   template <class BaseClass>
   class WithAsyncMethod_Hello : public BaseClass {
@@ -261,7 +288,27 @@ class ConvaiService final {
       ::grpc::Service::RequestAsyncBidiStreaming(3, context, stream, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_Hello<WithAsyncMethod_HelloStream<WithAsyncMethod_SpeechToText<WithAsyncMethod_GetResponse<Service > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodAsync(4);
+    }
+    ~WithAsyncMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetResponseSingle(::grpc::ServerContext* context, ::service::GetResponseRequestSingle* request, ::grpc::ServerAsyncWriter< ::service::GetResponseResponse>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncServerStreaming(4, context, request, writer, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_Hello<WithAsyncMethod_HelloStream<WithAsyncMethod_SpeechToText<WithAsyncMethod_GetResponse<WithAsyncMethod_GetResponseSingle<Service > > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_Hello : public BaseClass {
    private:
@@ -358,7 +405,29 @@ class ConvaiService final {
       ::grpc::CallbackServerContext* /*context*/)
       { return nullptr; }
   };
-  typedef WithCallbackMethod_Hello<WithCallbackMethod_HelloStream<WithCallbackMethod_SpeechToText<WithCallbackMethod_GetResponse<Service > > > > CallbackService;
+  template <class BaseClass>
+  class WithCallbackMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodCallback(4,
+          new ::grpc::internal::CallbackServerStreamingHandler< ::service::GetResponseRequestSingle, ::service::GetResponseResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::service::GetResponseRequestSingle* request) { return this->GetResponseSingle(context, request); }));
+    }
+    ~WithCallbackMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerWriteReactor< ::service::GetResponseResponse>* GetResponseSingle(
+      ::grpc::CallbackServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_Hello<WithCallbackMethod_HelloStream<WithCallbackMethod_SpeechToText<WithCallbackMethod_GetResponse<WithCallbackMethod_GetResponseSingle<Service > > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Hello : public BaseClass {
@@ -424,6 +493,23 @@ class ConvaiService final {
     }
     // disable synchronous version of this method
     ::grpc::Status GetResponse(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::service::GetResponseResponse, ::service::GetResponseRequest>* /*stream*/)  override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodGeneric(4);
+    }
+    ~WithGenericMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -506,6 +592,26 @@ class ConvaiService final {
     }
     void RequestGetResponse(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncBidiStreaming(3, context, stream, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodRaw(4);
+    }
+    ~WithRawMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetResponseSingle(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncWriter< ::grpc::ByteBuffer>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncServerStreaming(4, context, request, writer, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -600,6 +706,28 @@ class ConvaiService final {
       { return nullptr; }
   };
   template <class BaseClass>
+  class WithRawCallbackMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodRawCallback(4,
+          new ::grpc::internal::CallbackServerStreamingHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const::grpc::ByteBuffer* request) { return this->GetResponseSingle(context, request); }));
+    }
+    ~WithRawCallbackMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerWriteReactor< ::grpc::ByteBuffer>* GetResponseSingle(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)  { return nullptr; }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_Hello : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -627,8 +755,35 @@ class ConvaiService final {
     virtual ::grpc::Status StreamedHello(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::service::HelloRequest,::service::HelloResponse>* server_unary_streamer) = 0;
   };
   typedef WithStreamedUnaryMethod_Hello<Service > StreamedUnaryService;
-  typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Hello<Service > StreamedService;
+  template <class BaseClass>
+  class WithSplitStreamingMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithSplitStreamingMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodStreamed(4,
+        new ::grpc::internal::SplitServerStreamingHandler<
+          ::service::GetResponseRequestSingle, ::service::GetResponseResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerSplitStreamer<
+                     ::service::GetResponseRequestSingle, ::service::GetResponseResponse>* streamer) {
+                       return this->StreamedGetResponseSingle(context,
+                         streamer);
+                  }));
+    }
+    ~WithSplitStreamingMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with split streamed
+    virtual ::grpc::Status StreamedGetResponseSingle(::grpc::ServerContext* context, ::grpc::ServerSplitStreamer< ::service::GetResponseRequestSingle,::service::GetResponseResponse>* server_split_streamer) = 0;
+  };
+  typedef WithSplitStreamingMethod_GetResponseSingle<Service > SplitStreamedService;
+  typedef WithStreamedUnaryMethod_Hello<WithSplitStreamingMethod_GetResponseSingle<Service > > StreamedService;
 };
 
 }  // namespace service
@@ -710,6 +865,15 @@ class ConvaiService final {
     std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::service::GetResponseRequest, ::service::GetResponseResponse>> PrepareAsyncGetResponse(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::service::GetResponseRequest, ::service::GetResponseResponse>>(PrepareAsyncGetResponseRaw(context, cq));
     }
+    std::unique_ptr< ::grpc::ClientReaderInterface< ::service::GetResponseResponse>> GetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request) {
+      return std::unique_ptr< ::grpc::ClientReaderInterface< ::service::GetResponseResponse>>(GetResponseSingleRaw(context, request));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>> AsyncGetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>>(AsyncGetResponseSingleRaw(context, request, cq, tag));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>> PrepareAsyncGetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>>(PrepareAsyncGetResponseSingleRaw(context, request, cq));
+    }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
@@ -734,6 +898,11 @@ class ConvaiService final {
       #else
       virtual void GetResponse(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::service::GetResponseRequest,::service::GetResponseResponse>* reactor) = 0;
       #endif
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      virtual void GetResponseSingle(::grpc::ClientContext* context, ::service::GetResponseRequestSingle* request, ::grpc::ClientReadReactor< ::service::GetResponseResponse>* reactor) = 0;
+      #else
+      virtual void GetResponseSingle(::grpc::ClientContext* context, ::service::GetResponseRequestSingle* request, ::grpc::experimental::ClientReadReactor< ::service::GetResponseResponse>* reactor) = 0;
+      #endif
     };
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     typedef class experimental_async_interface async_interface;
@@ -754,6 +923,9 @@ class ConvaiService final {
     virtual ::grpc::ClientReaderWriterInterface< ::service::GetResponseRequest, ::service::GetResponseResponse>* GetResponseRaw(::grpc::ClientContext* context) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::service::GetResponseRequest, ::service::GetResponseResponse>* AsyncGetResponseRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::service::GetResponseRequest, ::service::GetResponseResponse>* PrepareAsyncGetResponseRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientReaderInterface< ::service::GetResponseResponse>* GetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request) = 0;
+    virtual ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>* AsyncGetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq, void* tag) = 0;
+    virtual ::grpc::ClientAsyncReaderInterface< ::service::GetResponseResponse>* PrepareAsyncGetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -792,6 +964,15 @@ class ConvaiService final {
     std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::service::GetResponseRequest, ::service::GetResponseResponse>> PrepareAsyncGetResponse(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::service::GetResponseRequest, ::service::GetResponseResponse>>(PrepareAsyncGetResponseRaw(context, cq));
     }
+    std::unique_ptr< ::grpc::ClientReader< ::service::GetResponseResponse>> GetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request) {
+      return std::unique_ptr< ::grpc::ClientReader< ::service::GetResponseResponse>>(GetResponseSingleRaw(context, request));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReader< ::service::GetResponseResponse>> AsyncGetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReader< ::service::GetResponseResponse>>(AsyncGetResponseSingleRaw(context, request, cq, tag));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReader< ::service::GetResponseResponse>> PrepareAsyncGetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReader< ::service::GetResponseResponse>>(PrepareAsyncGetResponseSingleRaw(context, request, cq));
+    }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
@@ -816,6 +997,11 @@ class ConvaiService final {
       #else
       void GetResponse(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::service::GetResponseRequest,::service::GetResponseResponse>* reactor) override;
       #endif
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      void GetResponseSingle(::grpc::ClientContext* context, ::service::GetResponseRequestSingle* request, ::grpc::ClientReadReactor< ::service::GetResponseResponse>* reactor) override;
+      #else
+      void GetResponseSingle(::grpc::ClientContext* context, ::service::GetResponseRequestSingle* request, ::grpc::experimental::ClientReadReactor< ::service::GetResponseResponse>* reactor) override;
+      #endif
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -838,10 +1024,14 @@ class ConvaiService final {
     ::grpc::ClientReaderWriter< ::service::GetResponseRequest, ::service::GetResponseResponse>* GetResponseRaw(::grpc::ClientContext* context) override;
     ::grpc::ClientAsyncReaderWriter< ::service::GetResponseRequest, ::service::GetResponseResponse>* AsyncGetResponseRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
     ::grpc::ClientAsyncReaderWriter< ::service::GetResponseRequest, ::service::GetResponseResponse>* PrepareAsyncGetResponseRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientReader< ::service::GetResponseResponse>* GetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request) override;
+    ::grpc::ClientAsyncReader< ::service::GetResponseResponse>* AsyncGetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq, void* tag) override;
+    ::grpc::ClientAsyncReader< ::service::GetResponseResponse>* PrepareAsyncGetResponseSingleRaw(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_Hello_;
     const ::grpc::internal::RpcMethod rpcmethod_HelloStream_;
     const ::grpc::internal::RpcMethod rpcmethod_SpeechToText_;
     const ::grpc::internal::RpcMethod rpcmethod_GetResponse_;
+    const ::grpc::internal::RpcMethod rpcmethod_GetResponseSingle_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -853,6 +1043,7 @@ class ConvaiService final {
     virtual ::grpc::Status HelloStream(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::service::HelloResponse, ::service::HelloRequest>* stream);
     virtual ::grpc::Status SpeechToText(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::service::STTResponse, ::service::STTRequest>* stream);
     virtual ::grpc::Status GetResponse(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::service::GetResponseResponse, ::service::GetResponseRequest>* stream);
+    virtual ::grpc::Status GetResponseSingle(::grpc::ServerContext* context, const ::service::GetResponseRequestSingle* request, ::grpc::ServerWriter< ::service::GetResponseResponse>* writer);
   };
   template <class BaseClass>
   class WithAsyncMethod_Hello : public BaseClass {
@@ -934,7 +1125,27 @@ class ConvaiService final {
       ::grpc::Service::RequestAsyncBidiStreaming(3, context, stream, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_Hello<WithAsyncMethod_HelloStream<WithAsyncMethod_SpeechToText<WithAsyncMethod_GetResponse<Service > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodAsync(4);
+    }
+    ~WithAsyncMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetResponseSingle(::grpc::ServerContext* context, ::service::GetResponseRequestSingle* request, ::grpc::ServerAsyncWriter< ::service::GetResponseResponse>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncServerStreaming(4, context, request, writer, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_Hello<WithAsyncMethod_HelloStream<WithAsyncMethod_SpeechToText<WithAsyncMethod_GetResponse<WithAsyncMethod_GetResponseSingle<Service > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_Hello : public BaseClass {
    private:
@@ -1096,11 +1307,49 @@ class ConvaiService final {
     #endif
       { return nullptr; }
   };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    ExperimentalWithCallbackMethod_GetResponseSingle() {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::Service::
+    #else
+      ::grpc::Service::experimental().
+    #endif
+        MarkMethodCallback(4,
+          new ::grpc::internal::CallbackServerStreamingHandler< ::service::GetResponseRequestSingle, ::service::GetResponseResponse>(
+            [this](
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+                   ::grpc::CallbackServerContext*
+    #else
+                   ::grpc::experimental::CallbackServerContext*
+    #endif
+                     context, const ::service::GetResponseRequestSingle* request) { return this->GetResponseSingle(context, request); }));
+    }
+    ~ExperimentalWithCallbackMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+    virtual ::grpc::ServerWriteReactor< ::service::GetResponseResponse>* GetResponseSingle(
+      ::grpc::CallbackServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/)
+    #else
+    virtual ::grpc::experimental::ServerWriteReactor< ::service::GetResponseResponse>* GetResponseSingle(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/)
+    #endif
+      { return nullptr; }
+  };
   #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-  typedef ExperimentalWithCallbackMethod_Hello<ExperimentalWithCallbackMethod_HelloStream<ExperimentalWithCallbackMethod_SpeechToText<ExperimentalWithCallbackMethod_GetResponse<Service > > > > CallbackService;
+  typedef ExperimentalWithCallbackMethod_Hello<ExperimentalWithCallbackMethod_HelloStream<ExperimentalWithCallbackMethod_SpeechToText<ExperimentalWithCallbackMethod_GetResponse<ExperimentalWithCallbackMethod_GetResponseSingle<Service > > > > > CallbackService;
   #endif
 
-  typedef ExperimentalWithCallbackMethod_Hello<ExperimentalWithCallbackMethod_HelloStream<ExperimentalWithCallbackMethod_SpeechToText<ExperimentalWithCallbackMethod_GetResponse<Service > > > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_Hello<ExperimentalWithCallbackMethod_HelloStream<ExperimentalWithCallbackMethod_SpeechToText<ExperimentalWithCallbackMethod_GetResponse<ExperimentalWithCallbackMethod_GetResponseSingle<Service > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Hello : public BaseClass {
    private:
@@ -1165,6 +1414,23 @@ class ConvaiService final {
     }
     // disable synchronous version of this method
     ::grpc::Status GetResponse(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::service::GetResponseResponse, ::service::GetResponseRequest>* /*stream*/)  override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodGeneric(4);
+    }
+    ~WithGenericMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1247,6 +1513,26 @@ class ConvaiService final {
     }
     void RequestGetResponse(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncBidiStreaming(3, context, stream, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodRaw(4);
+    }
+    ~WithRawMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetResponseSingle(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncWriter< ::grpc::ByteBuffer>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncServerStreaming(4, context, request, writer, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1402,6 +1688,44 @@ class ConvaiService final {
       { return nullptr; }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetResponseSingle() {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::Service::
+    #else
+      ::grpc::Service::experimental().
+    #endif
+        MarkMethodRawCallback(4,
+          new ::grpc::internal::CallbackServerStreamingHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+                   ::grpc::CallbackServerContext*
+    #else
+                   ::grpc::experimental::CallbackServerContext*
+    #endif
+                     context, const::grpc::ByteBuffer* request) { return this->GetResponseSingle(context, request); }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+    virtual ::grpc::ServerWriteReactor< ::grpc::ByteBuffer>* GetResponseSingle(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
+    #else
+    virtual ::grpc::experimental::ServerWriteReactor< ::grpc::ByteBuffer>* GetResponseSingle(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
+    #endif
+      { return nullptr; }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_Hello : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -1429,13 +1753,39 @@ class ConvaiService final {
     virtual ::grpc::Status StreamedHello(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::service::HelloRequest,::service::HelloResponse>* server_unary_streamer) = 0;
   };
   typedef WithStreamedUnaryMethod_Hello<Service > StreamedUnaryService;
-  typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Hello<Service > StreamedService;
+  template <class BaseClass>
+  class WithSplitStreamingMethod_GetResponseSingle : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithSplitStreamingMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodStreamed(4,
+        new ::grpc::internal::SplitServerStreamingHandler<
+          ::service::GetResponseRequestSingle, ::service::GetResponseResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerSplitStreamer<
+                     ::service::GetResponseRequestSingle, ::service::GetResponseResponse>* streamer) {
+                       return this->StreamedGetResponseSingle(context,
+                         streamer);
+                  }));
+    }
+    ~WithSplitStreamingMethod_GetResponseSingle() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status GetResponseSingle(::grpc::ServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/, ::grpc::ServerWriter< ::service::GetResponseResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with split streamed
+    virtual ::grpc::Status StreamedGetResponseSingle(::grpc::ServerContext* context, ::grpc::ServerSplitStreamer< ::service::GetResponseRequestSingle,::service::GetResponseResponse>* server_split_streamer) = 0;
+  };
+  typedef WithSplitStreamingMethod_GetResponseSingle<Service > SplitStreamedService;
+  typedef WithStreamedUnaryMethod_Hello<WithSplitStreamingMethod_GetResponseSingle<Service > > StreamedService;
 };
 
 }  // namespace service
 
 
 #endif  // GRPC_service_2eproto__INCLUDED
-
 #endif
