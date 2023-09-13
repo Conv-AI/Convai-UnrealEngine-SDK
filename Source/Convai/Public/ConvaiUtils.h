@@ -13,6 +13,7 @@ class USoundWave;
 class APlayerController;
 class UObject;
 class UConvaiSubsystem;
+struct FAnimationFrame;
 
 /**
  *
@@ -62,6 +63,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Convai")
 	static void GetPlatformInfo(FString& EngineVersion, FString& PlatformName);
 
+	UFUNCTION(BlueprintPure, Category = "Convai")
+	static TMap<FName, float> MapBlendshapes(const TMap<FName,float>& InputBlendshapes, const TMap<FName, FConvaiBlendshapeParameters>& BlendshapeMap, float GlobalMultiplier, float GlobalOffset);
+
 	static TArray<uint8> ExtractPCMDataFromSoundWave(USoundWave* SoundWave, int32& OutSampleRate);
 
 	static void PCMDataToWav(TArray<uint8> InPCMBytes, TArray<uint8>& OutWaveFileData, int NumChannels, int SampleRate);
@@ -77,6 +81,8 @@ public:
 	static FString FUTF8ToFString(const char* StringToConvert);
 
 	static int LevenshteinDistance(const FString& s, const FString& t);
+
+	static TArray<FAnimationFrame> ParseJsonToAnimationData(const FString& JsonString);
 
 };
 

@@ -5,6 +5,7 @@
 #include "Misc/FileHelper.h"
 #include "Http.h"
 #include "Containers/UnrealString.h"
+#include "Containers/Map.h"
 #include "Sound/SoundWave.h"
 #include "AudioDevice.h"
 #include "Interfaces/IAudioFormat.h"
@@ -387,10 +388,10 @@ namespace
 	// This struct contains information about the sound buffer.
 	struct SongBufferInfo
 	{
+		int32 RawPCMDataSize;
 		int32 NumChannels;
 		float Duration;
 		int32 SampleRate;
-		int32 RawPCMDataSize;
 
 		SongBufferInfo() : RawPCMDataSize(0), NumChannels(0), Duration(0), SampleRate(0) {}
 
@@ -686,4 +687,113 @@ int UConvaiUtils::LevenshteinDistance(const FString& s, const FString& t)
 	}
 
 	return v1[t.Len()];
+}
+
+TArray<FAnimationFrame> UConvaiUtils::ParseJsonToAnimationData(const FString& JsonString)
+{
+	TArray<FAnimationFrame> AnimationFrames;
+
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+	TSharedPtr<FJsonValue> JsonParsed;
+	if (FJsonSerializer::Deserialize(Reader, JsonParsed) && JsonParsed.IsValid() && JsonParsed->Type == EJson::Array)
+	{
+		TArray<TSharedPtr<FJsonValue>> FrameArray = JsonParsed->AsArray();
+		for (auto FrameVal : FrameArray)
+		{
+			TSharedPtr<FJsonObject> FrameObj = FrameVal->AsObject();
+			FAnimationFrame NewFrame;
+
+			NewFrame.FrameIndex = FrameObj->GetIntegerField("FrameIndex");
+
+			TArray<TSharedPtr<FJsonValue>> BlendShapeArray = FrameObj->GetArrayField("BlendShapes");
+			for (auto BlendShapeVal : BlendShapeArray)
+			{
+				TSharedPtr<FJsonObject> BlendShapeObj = BlendShapeVal->AsObject();
+				FName name = FName(BlendShapeObj->GetStringField("name"));
+				float score = BlendShapeObj->GetNumberField("score");
+
+				NewFrame.BlendShapes.Add(name, score);
+			}
+
+			AnimationFrames.Add(NewFrame);
+		}
+	}
+
+	return AnimationFrames;
+}
+
+TMap<FName, float> UConvaiUtils::MapBlendshapes(const TMap<FName, float>& InputBlendshapes, const TMap<FName, FConvaiBlendshapeParameters>& BlendshapeMap, float GlobalMultiplier, float GlobalOffset)
+{
+	TMap<FName, float> OutputMap;
+
+	// Generate arrays for original blendshape names and values
+	TArray<FName> OriginalNames;
+	TArray<float> OriginalValues;
+	InputBlendshapes.GenerateKeyArray(OriginalNames);
+	InputBlendshapes.GenerateValueArray(OriginalValues);
+
+	// Loop through each original blendshape
+	for (int i = 0; i < OriginalNames.Num(); i++)
+	{
+		FName OriginalName = OriginalNames[i];
+		float OriginalValue = OriginalValues[i];
+
+		// Check if the original name has a mapped parameter
+		const FConvaiBlendshapeParameters* MappedParameter = BlendshapeMap.Find(OriginalName);
+
+		if (MappedParameter)
+		{
+			float Multiplier = MappedParameter->Multiplyer;
+			float Offset = MappedParameter->Offset;
+			bool UseOverrideValue = MappedParameter->UseOverrideValue;
+			float OverrideValue = MappedParameter->OverrideValue;
+			float ClampMinValue = MappedParameter->ClampMinValue;
+			float ClampMaxValue = MappedParameter->ClampMaxValue;
+			bool IgnoreGlobalModifiers = MappedParameter->IgnoreGlobalModifiers;
+
+			// Loop through each target name specified in the mapped parameter
+			for (FName TargetName : MappedParameter->TargetNames)
+			{
+				if (UseOverrideValue)
+				{
+					// Use the override value if specified
+					OutputMap.Add(TargetName, OverrideValue);
+				}
+				else
+				{
+					// Calculate the final blendshape value using the multiplier and offset
+					float CalculatedValue;
+					if (IgnoreGlobalModifiers)
+					{
+						CalculatedValue = Multiplier * OriginalValue + Offset;
+					}
+					else
+					{
+						CalculatedValue = Multiplier * OriginalValue * GlobalMultiplier + Offset + GlobalOffset;
+					}
+
+					CalculatedValue = CalculatedValue > ClampMaxValue ? ClampMaxValue : CalculatedValue;
+					CalculatedValue = CalculatedValue < ClampMinValue ? ClampMinValue : CalculatedValue;
+
+					// If this curve appeared before then choose the higher value
+					if (float* PreviousValue = OutputMap.Find(TargetName))
+					{
+						if (CalculatedValue <= *PreviousValue)
+						{
+							continue;
+						}
+					}
+
+					OutputMap.Add(TargetName, CalculatedValue);
+				}
+			}
+		}
+		else
+		{
+			// If no mapped parameter exists for the original name, keep the original value
+			OutputMap.Add(OriginalName, OriginalValue);
+		}
+	}
+
+	return OutputMap;
 }
