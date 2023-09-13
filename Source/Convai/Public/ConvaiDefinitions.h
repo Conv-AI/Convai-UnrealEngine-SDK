@@ -97,7 +97,7 @@ struct FConvaiResultAction
 
 	/** The object or character whom the action is to be made on*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
-		FConvaiObjectEntry RelatedObjectOrCharacter;
+	FConvaiObjectEntry RelatedObjectOrCharacter;
 
 	/** The actual string of the action without any preprocessing*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
@@ -105,7 +105,61 @@ struct FConvaiResultAction
 
 	/** Has extra parameters*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
-		FConvaiExtraParams ConvaiExtraParams;
+	FConvaiExtraParams ConvaiExtraParams;
+};
+
+USTRUCT(BlueprintType)
+struct FConvaiBlendshapeParameters
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
+	TArray<FName> TargetNames;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
+	float Multiplyer = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
+	float Offset = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
+	bool UseOverrideValue = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
+	bool IgnoreGlobalModifiers = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
+	float OverrideValue = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
+	float ClampMinValue = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
+	float ClampMaxValue = 1;
+};
+
+USTRUCT()
+struct FAnimationFrame
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 FrameIndex;
+
+	UPROPERTY()
+	TMap<FName, float> BlendShapes;
+};
+
+USTRUCT()
+struct FAnimationSequence
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+	TArray<FAnimationFrame> AnimationFrames;
+
+	UPROPERTY()
+	float Duration;
 };
 
 UCLASS(Blueprintable)
