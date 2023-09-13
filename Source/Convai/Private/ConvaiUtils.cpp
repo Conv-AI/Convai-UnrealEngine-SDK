@@ -535,7 +535,6 @@ TArray<uint8> UConvaiUtils::ExtractPCMDataFromSoundWave(USoundWave* SoundWave, i
 			OutSampleRate = SongBuffer->BufferInfo.SampleRate;
 		}
 	}
-
 	return PCMData;
 }
 

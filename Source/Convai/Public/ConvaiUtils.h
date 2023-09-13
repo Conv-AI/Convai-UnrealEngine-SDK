@@ -86,7 +86,6 @@ public:
 
 };
 
-
 UCLASS()
 class UConvaiFormValidation : public UBlueprintFunctionLibrary
 {
