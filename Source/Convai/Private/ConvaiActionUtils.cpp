@@ -143,8 +143,8 @@ FString UConvaiActions::RemoveDesc(FString str)
 
 FString UConvaiActions::FindAction(FString ActionToBeParsed, TArray<FString> Actions)
 {
-	FString ClosestAction;
-	int32 MinDistance = MAX_int32;
+	FString ClosestAction = "None";
+	int32 MinDistance = 4;
 	for (auto a : Actions)
 	{
 		a = RemoveDesc(a);
