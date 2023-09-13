@@ -437,12 +437,14 @@ void UConvaiPlayerComponent::StopVoiceChunkCapture()
 	//UE_LOG(ConvaiPlayerLog, Log, TEXT("Int16Buffer.GetNumSamples() %i, NumChannels %f,  SampleRate %f"), Int16Buffer.GetNumSamples(), NumChannels, SampleRate);
 	//UE_LOG(ConvaiPlayerLog, Log, TEXT("OutConverted.Num() %i"), OutConverted.Num());
 
+	if (IsRecording)
+	{
+		VoiceCaptureBuffer.Append((uint8*)OutConverted.GetData(), OutConverted.Num() * sizeof(int16));
+		return;
+	}
 
 	if (!ReplicateVoiceToNetwork)
 	{
-		if (IsRecording)
-			VoiceCaptureBuffer.Append((uint8*)OutConverted.GetData(), OutConverted.Num()*sizeof(int16));
-
 		if (IsStreaming)
 			VoiceCaptureRingBuffer.Enqueue((uint8*)OutConverted.GetData(), OutConverted.Num() * sizeof(int16));
 
