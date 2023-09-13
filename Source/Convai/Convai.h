@@ -16,6 +16,7 @@ public:
 		: Super(ObjectInitializer)
 	{
 		API_Key = "";
+		EnableNewActionSystem = false;
 	}
 	/* API Key Issued from the website */
 	UPROPERTY(Config, EditAnywhere, Category = "Convai API")
