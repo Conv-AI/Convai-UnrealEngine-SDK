@@ -13,13 +13,15 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiGRPCLog, Log, All);
 
+class USoundWave;
+struct FAnimationFrame;
+
 DECLARE_DELEGATE_ThreeParams(FConvaiGRPCOnTranscriptionSignature, const FString /*Transcription*/, bool /*IsTranscriptionReady*/, bool /*IsFinal*/);
-DECLARE_DELEGATE_FourParams(FConvaiGRPCOnDataSignature, const FString /*ReceivedText*/, const TArray<uint8>& /*ReceivedAudio*/, uint32 /*SampleRate*/, bool /*IsFinal*/);
+DECLARE_DELEGATE_FiveParams(FConvaiGRPCOnDataSignature, const FString /*ReceivedText*/, const TArray<uint8>& /*ReceivedAudio*/, TArray<FAnimationFrame> /*FaceData*/, uint32 /*SampleRate*/, bool /*IsFinal*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnActionsSignature, const TArray<FConvaiResultAction>& /*ActionSequence*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnSessiondIDSignature, FString /*SessionID*/);
 DECLARE_DELEGATE(FConvaiGRPCOnEventSignature);
 
-class USoundWave;
 
 /**
  *
@@ -48,7 +50,7 @@ public:
 	FConvaiGRPCOnEventSignature OnFailure;
 
 	//UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai GRPC Test", WorldContext = "WorldContextObject"), Category = "Convai|gRPC")
-	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key);
+	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key);
 
 	void Activate();
 
@@ -116,6 +118,7 @@ private:
 	FString API_Key;
 	FString UserQuery;
 	bool VoiceResponse;
+	bool RequireFaceData;
 	FString CharID;
 	FString SessionID;
 	bool GenerateActions;
