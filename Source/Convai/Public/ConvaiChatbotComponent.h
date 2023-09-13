@@ -291,7 +291,7 @@ private:
 	void Broadcast_onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
 
 	void OnTranscriptionReceived(FString Transcription, bool IsTranscriptionReady, bool IsFinal);
-	void onResponseDataReceived(FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal);
+	void onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, TArray<FAnimationFrame> FaceData, uint32 SampleRate, bool IsFinal);
 	void onSessionIDReceived(FString ReceivedSessionID);
 	void onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
 	void onFinishedReceivingData();

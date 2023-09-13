@@ -61,7 +61,7 @@ namespace {
 }
 
 
-UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
+UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
 {
 	UConvaiGRPCGetResponseProxy* Proxy = NewObject<UConvaiGRPCGetResponseProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
@@ -71,6 +71,7 @@ UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetRes
 	Proxy->VoiceResponse = VoiceResponse;
 	Proxy->Environment = Environment;
 	Proxy->GenerateActions = GenerateActions;
+	Proxy->RequireFaceData = RequireFaceData;
 	Proxy->API_Key = API_Key;
 
 	return Proxy;
@@ -290,7 +291,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 		action_config->set_classification("multistep");
 		for (FString action : Environment->Actions) // Add Actions
 		{
-			action_config->add_actions(TCHAR_TO_ANSI(*action));
+			action_config->add_actions(TCHAR_TO_UTF8(*action));
 		}
 
 		for (FConvaiObjectEntry object : Environment->Objects) // Add Objects
@@ -303,8 +304,8 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 				FinalName = FinalName.Append(*object.Description);
 				FinalName = FinalName.Append(">");
 			}
-			action_config_object->set_name(TCHAR_TO_ANSI(*FinalName));
-			action_config_object->set_description(TCHAR_TO_ANSI(*object.Description));
+			action_config_object->set_name(TCHAR_TO_UTF8(*FinalName));
+			action_config_object->set_description(TCHAR_TO_UTF8(*object.Description));
 		}
 
 		for (FConvaiObjectEntry character : Environment->Characters) // Add Characters
@@ -318,8 +319,8 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 				FinalName = FinalName.Append(">");
 			}
 
-			action_config_character->set_name(TCHAR_TO_ANSI(*FinalName));
-			action_config_character->set_bio(TCHAR_TO_ANSI(*character.Description));
+			action_config_character->set_name(TCHAR_TO_UTF8(*FinalName));
+			action_config_character->set_bio(TCHAR_TO_UTF8(*character.Description));
 		}
 
 		// Get the speaker/main character name
@@ -329,17 +330,20 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	// Create Audio Configuration
 	AudioConfig* audio_config = new AudioConfig();
-	audio_config->set_sample_rate_hertz(ConvaiConstants::VoiceCaptureSampleRate);
+	audio_config->set_sample_rate_hertz((int32)ConvaiConstants::VoiceCaptureSampleRate);
+	audio_config->set_enable_facial_data(RequireFaceData);
+	//audio_config->set_disable_audio(false);
 
 	// Create the config object that holds Audio and Action configs
 	GetResponseRequest_GetResponseConfig* getResponseConfig = new GetResponseRequest_GetResponseConfig();
-	getResponseConfig->set_api_key(TCHAR_TO_ANSI(*API_Key));
-	getResponseConfig->set_session_id(TCHAR_TO_ANSI(*SessionID));
-	getResponseConfig->set_character_id(TCHAR_TO_ANSI(*CharID));
+	getResponseConfig->set_api_key(TCHAR_TO_UTF8(*API_Key));
+	getResponseConfig->set_session_id(TCHAR_TO_UTF8(*SessionID));
+	getResponseConfig->set_character_id(TCHAR_TO_UTF8(*CharID));
+
 	if (GenerateActions)
 	{
 		getResponseConfig->set_allocated_action_config(action_config);
-		getResponseConfig->set_speaker(TCHAR_TO_ANSI(*MainCharacter));
+		getResponseConfig->set_speaker(TCHAR_TO_UTF8(*MainCharacter));
 	}
 	getResponseConfig->set_allocated_audio_config(audio_config);
 
@@ -529,10 +533,28 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		{
 			VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 44), audio_data.length() - 44);
 		}
+
+		TArray<FAnimationFrame> FaceDataAnimation;
+		//std::string FaceData;
+		//FaceData = reply->audio_response().face_data();
+		//FString FaceData_string = UConvaiUtils::FUTF8ToFString(FaceData.c_str());
+		//UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s"), *FaceData_string);
+
+		if (RequireFaceData)
+		{
+			TSharedPtr<FJsonObject> FaceData_json;
+
+			std::string FaceData;
+			FaceData = reply->audio_response().face_data();
+			FString FaceData_string = UConvaiUtils::FUTF8ToFString(FaceData.c_str());
+
+			FaceDataAnimation = UConvaiUtils::ParseJsonToAnimationData(FaceData_string);
+		}
+
 		bool IsFinalResponse = reply->audio_response().end_of_response();
 
 		// Broadcast the audio and text
-		OnDataReceived.ExecuteIfBound(text_string, VoiceData, reply->audio_response().audio_config().sample_rate_hertz(), IsFinalResponse);
+		OnDataReceived.ExecuteIfBound(text_string, VoiceData, FaceDataAnimation, reply->audio_response().audio_config().sample_rate_hertz(), IsFinalResponse);
 	}
 	else if (reply->has_action_response()) // Is there an action response
 	{

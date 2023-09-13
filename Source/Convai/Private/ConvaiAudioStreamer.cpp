@@ -107,6 +107,11 @@ bool UConvaiAudioStreamer::ShouldMuteGlobal()
 
 void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
 {
+	PlayVoiceData(VoiceData, VoiceDataSize, ContainsHeaderData, FAnimationSequence(), SampleRate, NumChannels);
+}
+
+void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, FAnimationSequence FaceSequence, uint32 SampleRate, uint32 NumChannels)
+{
 	if (IsVoiceCurrentlyFading())
 		StopVoice();
 	ResetVoiceFade();
@@ -191,16 +196,12 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
 	if (ContainsHeaderData)
 	{
 		// Play only the PCM data which start after 44 bytes
-		SoundWaveProcedural->QueueAudio(VoiceData + 44, VoiceDataSize - 44);
-        PlayLipSync(VoiceData + 44, VoiceDataSize - 44, SampleRate,
-                            NumChannels);
-		ResetVoiceFade();
+		VoiceData += 44;
+		VoiceDataSize -= 44;
 	}
-	else
-	{
-		SoundWaveProcedural->QueueAudio(VoiceData, VoiceDataSize);
-        PlayLipSync(VoiceData, VoiceDataSize, SampleRate, NumChannels);
-	}
+
+	SoundWaveProcedural->QueueAudio(VoiceData, VoiceDataSize);
+    PlayLipSync(VoiceData, VoiceDataSize, FaceSequence, SampleRate, NumChannels);
 }
 
 void UConvaiAudioStreamer::ForcePlayVoice(USoundWave* VoiceToPlay)
@@ -308,14 +309,26 @@ IConvaiLipSyncInterface* UConvaiAudioStreamer::FindFirstLipSyncComponent()
 	auto LipSyncComponents = (GetOwner()->GetComponentsByInterface(UConvaiLipSyncInterface::StaticClass()));
 	if (LipSyncComponents.Num())
 	{
-		ConvaiLipSync = Cast<IConvaiLipSyncInterface>(LipSyncComponents[0]);
+		SetLipSyncComponent(LipSyncComponents[0]);
+	}
+	return ConvaiLipSync;
+}
+
+bool UConvaiAudioStreamer::SetLipSyncComponent(UActorComponent* LipSyncComponent)
+{
+	// Find the LipSync component
+	if (LipSyncComponent && LipSyncComponent->GetClass()->ImplementsInterface(UConvaiLipSyncInterface::StaticClass()))
+	{
+		ConvaiLipSync = Cast<IConvaiLipSyncInterface>(LipSyncComponent);
+		ConvaiLipSyncExtended = Cast<IConvaiLipSyncExtendedInterface>(LipSyncComponent);
+		return true;
 	}
 	else
 	{
 		ConvaiLipSync = nullptr;
+		ConvaiLipSyncExtended = nullptr;
+		return false;
 	}
-
-	return ConvaiLipSync;
 }
 
 bool UConvaiAudioStreamer::SupportsLipSync()
@@ -324,7 +337,6 @@ bool UConvaiAudioStreamer::SupportsLipSync()
 	{
 		FindFirstLipSyncComponent();
 	}
-
 	return ConvaiLipSync != nullptr;
 }
 
@@ -335,7 +347,8 @@ void UConvaiAudioStreamer::BeginPlay()
 	bAutoActivate = true;
 	bAlwaysPlay = true;
 
-	FindFirstLipSyncComponent();
+	if (ConvaiLipSync == nullptr)
+		FindFirstLipSyncComponent();
 }
 
 void UConvaiAudioStreamer::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -382,13 +395,24 @@ void UConvaiAudioStreamer::DestroyOpus()
 
 }
 
-void UConvaiAudioStreamer::PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize,
-                                       uint32 InSampleRate,
-                                       uint32 InNumChannels) 
+void UConvaiAudioStreamer::PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels) 
+{
+	PlayLipSync(InPCMData, InPCMDataSize, FAnimationSequence(), InSampleRate, InNumChannels);
+}
+
+void UConvaiAudioStreamer::PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, FAnimationSequence FaceSequence, uint32 InSampleRate, uint32 InNumChannels)
 {
 	if (ConvaiLipSync)
 	{
-        ConvaiLipSync->ConvaiProcessLipSync(InPCMData, InPCMDataSize, InSampleRate, InNumChannels);
+		if (ConvaiLipSyncExtended && ConvaiLipSyncExtended->RequiresPreGeneratedFaceData())
+		{
+			ConvaiLipSyncExtended->ConvaiProcessLipSyncAdvanced(InPCMData, InPCMDataSize, InSampleRate, InNumChannels, FaceSequence);
+		}
+		else
+		{
+			ConvaiLipSync->ConvaiProcessLipSync(InPCMData, InPCMDataSize, InSampleRate, InNumChannels);
+		}
+
 		ConvaiLipSync->OnVisemesDataReady.BindUObject(this, &UConvaiAudioStreamer::OnVisemesReadyCallback);
 	}
 }
@@ -425,7 +449,38 @@ const TArray<FString> UConvaiAudioStreamer::GetVisemeNames() const
 	return TArray<FString>();
 }
 
+const TMap<FName, float> UConvaiAudioStreamer::ConvaiGetFaceBlendshapes() const
+{
+	if (ConvaiLipSyncExtended)
+	{
+		return ConvaiLipSyncExtended->ConvaiGetFaceBlendshapes();
+	}
+	return TMap<FName, float>();
+}
+
+bool UConvaiAudioStreamer::GeneratesVisemesAsBlendshapes()
+{
+	if (ConvaiLipSyncExtended)
+	{
+		return ConvaiLipSyncExtended->GeneratesVisemesAsBlendshapes();
+	}
+	return false;
+}
+
 void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
+	bool ContainsHeaderData,
+	uint32 InSampleRate,
+	uint32 InNumChannels) 
+{
+	AddPCMDataToSend(PCMDataToAdd,
+		FAnimationSequence(),
+		ContainsHeaderData,
+		InSampleRate,
+		InNumChannels);
+}
+
+void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
+											FAnimationSequence FaceSequence,
                                             bool ContainsHeaderData,
                                             uint32 InSampleRate,
                                             uint32 InNumChannels) {
@@ -480,7 +535,7 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 	else if (!ShouldMuteLocal())
 	{
 		// Just play it locally
-		PlayVoiceData((uint8*)OutConverted.GetData(), OutConverted.Num()*2, false, InSampleRate, InNumChannels);
+		PlayVoiceData((uint8*)OutConverted.GetData(), OutConverted.Num()*2, false, FaceSequence, InSampleRate, InNumChannels);
 	}
 }
 
