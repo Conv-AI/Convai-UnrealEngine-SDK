@@ -110,7 +110,6 @@ void UConvaiTextToSpeechProxy::Activate()
 	if (!Request->ProcessRequest()) failed();
 }
 
-
 void UConvaiTextToSpeechProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful)
 {
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
@@ -132,21 +131,17 @@ void UConvaiTextToSpeechProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 	success();
 }
 
-
-
 void UConvaiTextToSpeechProxy::failed()
 {
 	OnFailure.Broadcast(SoundWave);
 	finish();
 }
 
-
 void UConvaiTextToSpeechProxy::success()
 {
 	OnSuccess.Broadcast(SoundWave);
 	finish();
 }
-
 
 void UConvaiTextToSpeechProxy::finish()
 {
