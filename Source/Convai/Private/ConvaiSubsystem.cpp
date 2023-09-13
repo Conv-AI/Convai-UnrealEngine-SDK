@@ -2,6 +2,7 @@
 
 #include "ConvaiSubsystem.h"
 #include "ConvaiAndroid.h"
+#include "Engine/Engine.h"
 
 THIRD_PARTY_INCLUDES_START
 // grpc includes
@@ -96,7 +97,13 @@ uint32 FgRPCClient::Run()
 		if (got_tag)
 		{
 			FgRPC_Delegate* gRPC_Delegate = static_cast<FgRPC_Delegate*>(got_tag);
-			AsyncTask(ENamedThreads::GameThread, [gRPC_Delegate, ok] {gRPC_Delegate->ExecuteIfBound(ok); });
+			AsyncTask(ENamedThreads::GameThread, [&gRPC_Delegate, &ok, this]
+			{
+				if (bIsRunning)
+				{
+					gRPC_Delegate->ExecuteIfBound(ok);
+				}
+			});
 		}
 		else
 		{
