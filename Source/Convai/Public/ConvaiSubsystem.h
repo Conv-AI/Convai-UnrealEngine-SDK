@@ -87,7 +87,7 @@ public:
 
 private: 
     mutable FCriticalSection CriticalSection;
-    FThreadSafeBool bIsRunning;
+    bool bIsRunning;
 
     TUniquePtr<FRunnableThread> Thread;
 

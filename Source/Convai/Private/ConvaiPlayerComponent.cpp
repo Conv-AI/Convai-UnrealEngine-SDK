@@ -37,7 +37,13 @@ static Audio::FMixerDevice* GetAudioMixerDeviceFromWorldContext(const UObject* W
 {
 	if (FAudioDevice* AudioDevice = GetAudioDeviceFromWorldContext(WorldContextObject))
 	{
-		if (!AudioDevice->IsAudioMixerEnabled())
+		#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 3
+		bool Found = AudioDevice != nullptr;
+		#else
+		bool Found = AudioDevice !=nullptr && AudioDevice->IsAudioMixerEnabled();
+		#endif
+
+		if (!Found)
 		{
 			return nullptr;
 		}
