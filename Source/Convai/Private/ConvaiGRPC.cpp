@@ -23,6 +23,7 @@ THIRD_PARTY_INCLUDES_END
 DEFINE_LOG_CATEGORY(ConvaiGRPCLog);
 
 using ::service::GetResponseRequest_GetResponseConfig;
+using ::service::TriggerConfig;
 using ::service::ActionConfig;
 using ::service::AudioConfig;
 using ::service::ActionConfig_Object;
@@ -60,12 +61,12 @@ namespace {
 	"DO_NOT_USE" };
 }
 
-
-UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
+UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString Trigger, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
 {
 	UConvaiGRPCGetResponseProxy* Proxy = NewObject<UConvaiGRPCGetResponseProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	Proxy->UserQuery = UserQuery;
+	Proxy->Trigger = Trigger;
 	Proxy->CharID = CharID;
 	Proxy->SessionID = SessionID;
 	Proxy->VoiceResponse = VoiceResponse;
@@ -75,6 +76,11 @@ UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetRes
 	Proxy->API_Key = API_Key;
 
 	return Proxy;
+}
+
+UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
+{
+	return CreateConvaiGRPCGetResponseProxy(WorldContextObject, UserQuery, FString(""), CharID, VoiceResponse, RequireFaceData, SessionID, Environment, GenerateActions, API_Key);
 }
 
 void UConvaiGRPCGetResponseProxy::Activate()
@@ -396,7 +402,15 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 		get_response_data->set_text_data(TCHAR_TO_UTF8(*UserQuery));
 		IsThisTheFinalWrite = true;
 	}
-	else
+	else if (Trigger.Len()) // If there is a trigger message
+	{
+		// Add in the trigger data
+		TriggerConfig* triggerConfig = new TriggerConfig();
+		triggerConfig->set_trigger_message(TCHAR_TO_UTF8(*Trigger));
+		get_response_data->set_allocated_trigger_data(triggerConfig);
+		IsThisTheFinalWrite = true;
+	}
+	else // Normal voice data
 	{
 		// Try to consume the next chunk of mic data
 		uint8* Buffer = nullptr;
