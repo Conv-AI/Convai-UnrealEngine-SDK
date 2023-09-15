@@ -207,12 +207,34 @@ public:
 		Actions.Empty();
 	}
 
+	bool FindObject(FString ObjectName, FConvaiObjectEntry& OutObject)
+	{
+		for (FConvaiObjectEntry& o : Objects)
+		{
+			if (ObjectName == o.Name)
+			{
+				OutObject = o;
+				return true;
+			}
+		}
+		return false;
+	}
+
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
-		void AddObject(FConvaiObjectEntry Object)
+	void AddObject(FConvaiObjectEntry Object)
 	{
 		// Replace old object that has the same name with the new object
-		RemoveObject(Object.Name);
-		Objects.AddUnique(Object);
+		FConvaiObjectEntry ExistingObject;
+		if (FindObject(Object.Name, ExistingObject))
+		{
+			ExistingObject.Description = Object.Description;
+			ExistingObject.OptionalPositionVector = Object.OptionalPositionVector;
+			ExistingObject.Ref = Object.Ref;
+		}
+		else
+		{
+			Objects.AddUnique(Object);
+		}
 	}
 
 	/**
@@ -247,13 +269,36 @@ public:
 		Objects.Empty();
 	}
 
+	bool FindCharacter(FString CharacterName, FConvaiObjectEntry& OutCharacter)
+	{
+		for (FConvaiObjectEntry& c : Characters)
+		{
+			if (CharacterName == c.Name)
+			{
+				OutCharacter = c;
+				return true;
+			}
+		}
+		return false;
+	}
+
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
 		void AddCharacter(FConvaiObjectEntry Character)
 	{
 		// Replace old character that has the same name with the new character
-		RemoveCharacter(Character.Name);
-		Characters.AddUnique(Character);
+		FConvaiObjectEntry ExistingCharacter;
+		if (FindCharacter(Character.Name, ExistingCharacter))
+		{
+			ExistingCharacter.Description = Character.Description;
+			ExistingCharacter.OptionalPositionVector = Character.OptionalPositionVector;
+			ExistingCharacter.Ref = Character.Ref;
+		}
+		else
+		{
+			Characters.AddUnique(Character);
+		}
 	}
+
 
 	/**
 		*    Adds a list of characters to the Environment object

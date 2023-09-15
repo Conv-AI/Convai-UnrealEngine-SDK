@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "ConvaiDefinitions.h"
 #include "ConvaiUtils.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiUtilsLog, Log, All);
@@ -13,7 +14,6 @@ class USoundWave;
 class APlayerController;
 class UObject;
 class UConvaiSubsystem;
-struct FAnimationFrame;
 
 /**
  *
