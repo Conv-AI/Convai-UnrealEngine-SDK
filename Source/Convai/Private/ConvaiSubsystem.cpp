@@ -103,6 +103,10 @@ uint32 FgRPCClient::Run()
 				{
 					gRPC_Delegate->ExecuteIfBound(ok);
 				}
+				else
+				{
+					UE_LOG(ConvaiSubsystemLog, Log, TEXT("Could not run gRPC delegate due to thread closing down"));
+				}
 			});
 		}
 		else
