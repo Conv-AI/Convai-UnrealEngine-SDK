@@ -6,6 +6,7 @@
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "HAL/Runnable.h"
+#include "HAL/ThreadSafeBool.h"
 
 THIRD_PARTY_INCLUDES_START
 #include "Proto/service.grpc.pb.h"
@@ -87,7 +88,7 @@ public:
 
 private: 
     mutable FCriticalSection CriticalSection;
-    bool bIsRunning;
+    FThreadSafeBool bIsRunning;
 
     TUniquePtr<FRunnableThread> Thread;
 
