@@ -1,5 +1,22 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+# Release 2.8.0
+**Added**
+- New Action System. (Tutorial Coming Soon!)
+- Functions: `Get All Convai Player Components` and `Get All Convai Chatbot Components`.
+
+**Updated**
+- Improved MetaHuman body Animations and Facial expressions.
+- Better OVR Lipsync for MetaHuman.
+- Better capturing of text input as an extra parameter in Actions.
+
+**Fixed**
+- Rare crash caused by UE grabage collection during lipsync.
+- Rare crash (Editor only) caused by exiting play mode before the AI character has finished its response.
+- Random Freeze that happens when talking to an AI character for the first time.
+- Crash when using `Convai Speech to Text` function with an imported audio.
+- MetaHuman rotating 90 degrees when in play mode.
+
 # Release 2.7.0
 **Added**
 - Full multiplayer support with real-time AI avatar conversations and voice chat.
