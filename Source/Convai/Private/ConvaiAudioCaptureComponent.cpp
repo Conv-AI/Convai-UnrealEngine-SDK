@@ -39,10 +39,9 @@ namespace Audio
 		AudioCapture.GetCaptureDevicesAvailable(CaptureDevicesInfo);
 		uint32 NumDevices = CaptureDevicesInfo.Num();
 
-		for (uint32 DeviceIndex = 0; DeviceIndex < NumDevices+1; DeviceIndex++)
+		Audio::FCaptureDeviceInfo DeviceInfo;
+		for (uint32 DeviceIndex = 0; AudioCapture.GetCaptureDeviceInfo(DeviceInfo, DeviceIndex); DeviceIndex++)
 		{
-			Audio::FCaptureDeviceInfo DeviceInfo;
-			AudioCapture.GetCaptureDeviceInfo(DeviceInfo, DeviceIndex);
 			//UE_LOG(ConvaiAudioLog, Log, TEXT("DeviceIndex: %d, InputDeviceID: %d - name: %s - channels:%d - NumDevices:%d"), DeviceIndex, InputDeviceID, *DeviceInfo.DeviceName, DeviceInfo.InputChannels, NumDevices);
 			bool IsInput = DeviceInfo.InputChannels > 0;
 			if (!IsInput)
