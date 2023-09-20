@@ -147,9 +147,10 @@ FString UConvaiActions::FindAction(FString ActionToBeParsed, TArray<FString> Act
 	int32 MinDistance = 4;
 	for (auto a : Actions)
 	{
+		FString TrimmedAction = ActionToBeParsed;
 		a = RemoveDesc(a);
-		ActionToBeParsed = KeepNWords(ActionToBeParsed, a);
-		int32 Distance = UConvaiUtils::LevenshteinDistance(ActionToBeParsed, a);
+		TrimmedAction = KeepNWords(ActionToBeParsed, a);
+		int32 Distance = UConvaiUtils::LevenshteinDistance(TrimmedAction, a);
 		if (Distance < MinDistance)
 		{
 			MinDistance = Distance;
