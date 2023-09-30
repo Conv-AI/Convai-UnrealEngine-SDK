@@ -1,5 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+# Release 2.9.0
+**Added**
+- Unreal Engine 5.3 Support.
+
+**Fixed**
+- Actions with more than 1 word was sometimes ignored.
+
 # Release 2.8.0
 **Added**
 - New Action System. (Tutorial Coming Soon!)
