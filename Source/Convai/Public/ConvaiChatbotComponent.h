@@ -23,6 +23,8 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(FOnActionReceivedSignature
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnCharacterDataLoadSignature_Deprecated, UConvaiChatbotComponent, OnCharacterDataLoadEvent, bool, Success);
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnCharacterDataLoadSignature_V2, UConvaiChatbotComponent, OnCharacterDataLoadEvent_V2, UConvaiChatbotComponent*, ChatbotComponent, bool, Success);
 
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnNarrativeSectionReceivedSignature, UConvaiChatbotComponent, OnNarrativeSectionReceivedEvent, UConvaiChatbotComponent*, ChatbotComponent, FString, NarrativeSectionID);
+
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(FOnFailureSignature, UConvaiChatbotComponent, OnFailureEvent);
 // TODO (Mohamed): Manage onDestroy/onEndPlay - should end any on-going streams
 
@@ -220,13 +222,19 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Character Data Loaded"))
 	FOnCharacterDataLoadSignature_V2 OnCharacterDataLoadEvent_V2;
 
+	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Narrative Section Received"))
+	FOnNarrativeSectionReceivedSignature OnNarrativeSectionReceivedEvent;
+
 	/** Called there is an error */
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Failure"))
 	FOnFailureSignature OnFailureEvent;
 
 public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
-	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAPI_Key, FString OverrideAPI_Key, uint32 InToken);
+	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool ReplicateVoiceToNetwork, bool UseOverrideAPI_Key, FString OverrideAPI_Key, uint32 InToken);
+	
+	UFUNCTION(BlueprintCallable)
+	void ExecuteNarrativeTrigger(FString TriggerName, FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer);
 
 	// Interrupts the current speech with a provided fade-out duration. 
 	// The fade-out duration is controlled by the parameter 'InVoiceFadeOutDuration'.
@@ -272,7 +280,7 @@ private:
 	void ClearTimeOutTimer();
 
 private:
-	void Start_GRPC_Request(bool UseOverrideAPI_Key, FString OverrideAPI_Key);
+	void Start_GRPC_Request(bool UseOverrideAPI_Key, FString OverrideAPI_Key, FString TriggerName = "", FString TriggerMessage = "");
 
 	void Bind_GRPC_Request_Delegates();
 
@@ -288,13 +296,16 @@ private:
 	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
 	void Broadcast_onSessionIDReceived(const FString& ReceivedSessionID);
 	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
-	void Broadcast_onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
+	void Broadcast_onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);	
+	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
+	void Broadcast_OnNarrativeSectionReceived(const FString& BT_Code, const FString& BT_Constants, const FString& ReceivedNarrativeSectionID);
 
 	void OnTranscriptionReceived(FString Transcription, bool IsTranscriptionReady, bool IsFinal);
 	void onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, TArray<FAnimationFrame> FaceData, uint32 SampleRate, bool IsFinal);
 	void onSessionIDReceived(FString ReceivedSessionID);
 	void onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
 	void onFinishedReceivingData();
+	void OnNarrativeSectionReceived(FString BT_Code, FString BT_Constants, FString ReceivedNarrativeSectionID);
 	void onFailure();
 
 private:
@@ -316,4 +327,5 @@ private:
 	FString LastTranscription;
 	bool ReceivedFinalTranscription;
 	bool ReceivedFinalData;
+	FString LastPlayerName;
 };

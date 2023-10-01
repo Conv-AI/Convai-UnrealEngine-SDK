@@ -16,6 +16,7 @@ DECLARE_LOG_CATEGORY_EXTERN(ConvaiGRPCLog, Log, All);
 class USoundWave;
 struct FAnimationFrame;
 
+DECLARE_DELEGATE_ThreeParams(FConvaiGRPCOnNarrativeDataSignature, const FString /*BT_Code*/, const FString /*BT_Constants*/, const FString /*NarrativeSectionID*/);
 DECLARE_DELEGATE_ThreeParams(FConvaiGRPCOnTranscriptionSignature, const FString /*Transcription*/, bool /*IsTranscriptionReady*/, bool /*IsFinal*/);
 DECLARE_DELEGATE_FiveParams(FConvaiGRPCOnDataSignature, const FString /*ReceivedText*/, const TArray<uint8>& /*ReceivedAudio*/, TArray<FAnimationFrame> /*FaceData*/, uint32 /*SampleRate*/, bool /*IsFinal*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnActionsSignature, const TArray<FConvaiResultAction>& /*ActionSequence*/);
@@ -43,6 +44,8 @@ public:
 	// Called when new SessionID is received
 	FConvaiGRPCOnSessiondIDSignature OnSessionIDReceived;
 
+	FConvaiGRPCOnNarrativeDataSignature OnNarrativeDataReceived;
+
 	// Called when the response stream is done
 	FConvaiGRPCOnEventSignature OnFinish;
 
@@ -50,7 +53,7 @@ public:
 	FConvaiGRPCOnEventSignature OnFailure;
 
 	//UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai GRPC Test", WorldContext = "WorldContextObject"), Category = "Convai|gRPC")
-	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString Trigger, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key);
+	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString TriggerName, FString TriggerMessage, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key);
 	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key);
 
 	void Activate();
@@ -118,7 +121,8 @@ private:
 	FString URL;
 	FString API_Key;
 	FString UserQuery;
-	FString Trigger;
+	FString TriggerName;
+	FString TriggerMessage;
 	bool VoiceResponse;
 	bool RequireFaceData;
 	FString CharID;

@@ -61,12 +61,13 @@ namespace {
 	"DO_NOT_USE" };
 }
 
-UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString Trigger, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
+UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString TriggerName, FString TriggerMessage, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
 {
 	UConvaiGRPCGetResponseProxy* Proxy = NewObject<UConvaiGRPCGetResponseProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	Proxy->UserQuery = UserQuery;
-	Proxy->Trigger = Trigger;
+	Proxy->TriggerName = TriggerName;
+	Proxy->TriggerMessage = TriggerMessage;
 	Proxy->CharID = CharID;
 	Proxy->SessionID = SessionID;
 	Proxy->VoiceResponse = VoiceResponse;
@@ -80,7 +81,7 @@ UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetRes
 
 UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
 {
-	return CreateConvaiGRPCGetResponseProxy(WorldContextObject, UserQuery, FString(""), CharID, VoiceResponse, RequireFaceData, SessionID, Environment, GenerateActions, API_Key);
+	return CreateConvaiGRPCGetResponseProxy(WorldContextObject, UserQuery, FString(""), FString(""), CharID, VoiceResponse, RequireFaceData, SessionID, Environment, GenerateActions, API_Key);
 }
 
 void UConvaiGRPCGetResponseProxy::Activate()
@@ -402,11 +403,12 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 		get_response_data->set_text_data(TCHAR_TO_UTF8(*UserQuery));
 		IsThisTheFinalWrite = true;
 	}
-	else if (Trigger.Len()) // If there is a trigger message
+	else if (TriggerName.Len()) // If there is a trigger message
 	{
 		// Add in the trigger data
 		TriggerConfig* triggerConfig = new TriggerConfig();
-		triggerConfig->set_trigger_message(TCHAR_TO_UTF8(*Trigger));
+		triggerConfig->set_trigger_name(TCHAR_TO_UTF8(*TriggerName));
+		triggerConfig->set_trigger_message(TCHAR_TO_UTF8(*TriggerMessage));
 		get_response_data->set_allocated_trigger_data(triggerConfig);
 		IsThisTheFinalWrite = true;
 	}
@@ -595,6 +597,13 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		}
 		// Broadcast the actions
 		OnActionsReceived.ExecuteIfBound(SequenceOfActions);
+	}
+	else if (reply->has_bt_response())
+	{
+		FString BT_Code = UConvaiUtils::FUTF8ToFString(reply->bt_response().bt_code().c_str());
+		FString BT_Constants = UConvaiUtils::FUTF8ToFString(reply->bt_response().bt_constants().c_str());
+		FString NarrativeSectionID = UConvaiUtils::FUTF8ToFString(reply->bt_response().narrative_section_id().c_str());
+		OnNarrativeDataReceived.ExecuteIfBound(BT_Code, BT_Constants, NarrativeSectionID);
 	}
 	else // This is a debug message response
 	{
