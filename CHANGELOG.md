@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 **Fixed**
 - Actions with more than 1 word was sometimes ignored.
+- Player name would show as Unknown in multiplayer at some cases.
 
 # Release 2.8.0
 **Added**
