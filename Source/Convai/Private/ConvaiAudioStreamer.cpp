@@ -208,8 +208,9 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
 void UConvaiAudioStreamer::ForcePlayVoice(USoundWave* VoiceToPlay)
 {
 	int32 SampleRate;
-	TArray<uint8> PCMData = UConvaiUtils::ExtractPCMDataFromSoundWave(VoiceToPlay, SampleRate);
-	PlayVoiceData(PCMData.GetData(), PCMData.Num(), false, SampleRate, 1);
+	int32 NumChannels;
+	TArray<uint8> PCMData = UConvaiUtils::ExtractPCMDataFromSoundWave(VoiceToPlay, SampleRate, NumChannels);
+	PlayVoiceData(PCMData.GetData(), PCMData.Num(), false, SampleRate, NumChannels);
 }
 
 void UConvaiAudioStreamer::StopVoice()
