@@ -60,11 +60,12 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromSoundWa
 	uint8* PCMData = nullptr;
 	TArray<uint8> RawPCMData;
 	int32 OutSampleRate = -1;
+	int32 outNumChannels = -1;
 	//int32 numBytes = SoundWave->GeneratePCMData(PCMData, SoundWave->TotalSamples);
 
 	if (SoundWave->RawPCMData == nullptr || SoundWave->RawPCMDataSize <= 0) {
 		UE_LOG(LogTemp, Display, TEXT("SoundWave PCM Data is compressed. Starting Decompressing....."));
-		RawPCMData = UConvaiUtils::ExtractPCMDataFromSoundWave(SoundWave, OutSampleRate);
+		RawPCMData = UConvaiUtils::ExtractPCMDataFromSoundWave(SoundWave, OutSampleRate, outNumChannels);
 
 		if (RawPCMData.Num() > 0) {
 			UE_LOG(LogTemp, Display, TEXT("SoundWave PCM Data decompression successfully done....."));

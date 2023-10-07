@@ -511,7 +511,7 @@ namespace
 	}
 };
 
-TArray<uint8> UConvaiUtils::ExtractPCMDataFromSoundWave(USoundWave* SoundWave, int32& OutSampleRate)
+TArray<uint8> UConvaiUtils::ExtractPCMDataFromSoundWave(USoundWave* SoundWave, int32& OutSampleRate, int32& OutNumChannels)
 {
 	TArray<uint8> PCMData;
 
@@ -525,6 +525,7 @@ TArray<uint8> UConvaiUtils::ExtractPCMDataFromSoundWave(USoundWave* SoundWave, i
 	{
 		PCMData.Append(SoundWave->RawPCMData, SoundWave->RawPCMDataSize);
 		OutSampleRate = SoundWave->GetSampleRateForCurrentPlatform();
+		OutNumChannels = SoundWave->NumChannels;
 	}
 	else
 	{
@@ -533,6 +534,7 @@ TArray<uint8> UConvaiUtils::ExtractPCMDataFromSoundWave(USoundWave* SoundWave, i
 		{
 			PCMData = SongBuffer->RawPCMData;
 			OutSampleRate = SongBuffer->BufferInfo.SampleRate;
+			OutNumChannels = SongBuffer->BufferInfo.NumChannels;
 		}
 	}
 	return PCMData;
