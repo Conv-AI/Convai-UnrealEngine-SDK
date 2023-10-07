@@ -410,7 +410,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 		get_response_data->set_text_data(TCHAR_TO_UTF8(*UserQuery));
 		IsThisTheFinalWrite = true;
 	}
-	else if (TriggerName.Len()) // If there is a trigger message
+	else if (TriggerName.Len() || TriggerMessage.Len()) // If there is a trigger message
 	{
 		// Add in the trigger data
 		TriggerConfig* triggerConfig = new TriggerConfig();

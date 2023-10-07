@@ -289,9 +289,9 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 
 void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerName, FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateVoiceToNetwork)
 {
-	if (TriggerName.IsEmpty())
+	if (TriggerName.IsEmpty() && TriggerMessage.IsEmpty())
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendNarrativeTrigger: Trigger Name is missing"));
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendNarrativeTrigger: Trigger Name and TriggerMessage are missing - Please supply one of them"));
 	}
 
 	if (GenerateActions && IsValid(InEnvironment))
