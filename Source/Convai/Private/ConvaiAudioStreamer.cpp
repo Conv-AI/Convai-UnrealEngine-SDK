@@ -107,11 +107,6 @@ bool UConvaiAudioStreamer::ShouldMuteGlobal()
 
 void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
 {
-	PlayVoiceData(VoiceData, VoiceDataSize, ContainsHeaderData, FAnimationSequence(), SampleRate, NumChannels);
-}
-
-void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, FAnimationSequence FaceSequence, uint32 SampleRate, uint32 NumChannels)
-{
 	if (IsVoiceCurrentlyFading())
 		StopVoice();
 	ResetVoiceFade();
@@ -201,7 +196,13 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
 	}
 
 	SoundWaveProcedural->QueueAudio(VoiceData, VoiceDataSize);
-    PlayLipSync(VoiceData, VoiceDataSize, FaceSequence, SampleRate, NumChannels);
+
+	// Does the lipsync component require the blendshapes/Visemes to be sent to it
+	if (ConvaiLipSyncExtended && ConvaiLipSyncExtended->RequiresPreGeneratedFaceData())
+		return;
+	else
+		// Lipsync component process the audio data to generate the lipsync
+		PlayLipSync(VoiceData, VoiceDataSize, SampleRate, NumChannels);
 }
 
 void UConvaiAudioStreamer::ForcePlayVoice(USoundWave* VoiceToPlay)
@@ -321,6 +322,7 @@ bool UConvaiAudioStreamer::SetLipSyncComponent(UActorComponent* LipSyncComponent
 	{
 		ConvaiLipSync = Cast<IConvaiLipSyncInterface>(LipSyncComponent);
 		ConvaiLipSyncExtended = Cast<IConvaiLipSyncExtendedInterface>(LipSyncComponent);
+		ConvaiLipSync->OnVisemesDataReady.BindUObject(this, &UConvaiAudioStreamer::OnVisemesReadyCallback);
 		return true;
 	}
 	else
@@ -395,25 +397,22 @@ void UConvaiAudioStreamer::DestroyOpus()
 
 }
 
-void UConvaiAudioStreamer::PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels) 
-{
-	PlayLipSync(InPCMData, InPCMDataSize, FAnimationSequence(), InSampleRate, InNumChannels);
-}
-
-void UConvaiAudioStreamer::PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, FAnimationSequence FaceSequence, uint32 InSampleRate, uint32 InNumChannels)
+void UConvaiAudioStreamer::PlayLipSyncWithPreGeneratedData(FAnimationSequence FaceSequence)
 {
 	if (ConvaiLipSync)
 	{
 		if (ConvaiLipSyncExtended && ConvaiLipSyncExtended->RequiresPreGeneratedFaceData())
 		{
-			ConvaiLipSyncExtended->ConvaiProcessLipSyncAdvanced(InPCMData, InPCMDataSize, InSampleRate, InNumChannels, FaceSequence);
+			ConvaiLipSyncExtended->ConvaiProcessLipSyncAdvanced(nullptr, 0, 0, 0, FaceSequence);
 		}
-		else
-		{
-			ConvaiLipSync->ConvaiProcessLipSync(InPCMData, InPCMDataSize, InSampleRate, InNumChannels);
-		}
+	}
+}
 
-		ConvaiLipSync->OnVisemesDataReady.BindUObject(this, &UConvaiAudioStreamer::OnVisemesReadyCallback);
+void UConvaiAudioStreamer::PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels)
+{
+	if (ConvaiLipSync)
+	{
+			ConvaiLipSync->ConvaiProcessLipSync(InPCMData, InPCMDataSize, InSampleRate, InNumChannels);
 	}
 }
 
@@ -467,21 +466,13 @@ bool UConvaiAudioStreamer::GeneratesVisemesAsBlendshapes()
 	return false;
 }
 
-void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
-	bool ContainsHeaderData,
-	uint32 InSampleRate,
-	uint32 InNumChannels) 
+void UConvaiAudioStreamer::AddFaceDataToSend(FAnimationSequence FaceSequence)
 {
-	AddPCMDataToSend(PCMDataToAdd,
-		FAnimationSequence(),
-		ContainsHeaderData,
-		InSampleRate,
-		InNumChannels);
+	PlayLipSyncWithPreGeneratedData(FaceSequence);
 }
 
 void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
-											FAnimationSequence FaceSequence,
-                                            bool ContainsHeaderData,
+											bool ContainsHeaderData,
                                             uint32 InSampleRate,
                                             uint32 InNumChannels) {
 	if (ContainsHeaderData)
@@ -535,18 +526,23 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 	else if (!ShouldMuteLocal())
 	{
 		// Just play it locally
-		PlayVoiceData((uint8*)OutConverted.GetData(), OutConverted.Num()*2, false, FaceSequence, InSampleRate, InNumChannels);
+		PlayVoiceData((uint8*)OutConverted.GetData(), OutConverted.Num()*2, false, InSampleRate, InNumChannels);
 	}
 }
 
 void UConvaiAudioStreamer::onAudioStarted()
 {
-	OnStartedTalking.Broadcast();
+	AsyncTask(ENamedThreads::GameThread, [this] {
+		OnStartedTalking.Broadcast();
+		});
+	
 }
 
 void UConvaiAudioStreamer::onAudioFinished()
 {
-	OnFinishedTalking.Broadcast();
+	AsyncTask(ENamedThreads::GameThread, [this] {
+		OnFinishedTalking.Broadcast();
+	});
 	IsTalking = false;
 }
 

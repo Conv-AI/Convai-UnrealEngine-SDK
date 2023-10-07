@@ -111,9 +111,9 @@ public:
 	IConvaiLipSyncInterface* ConvaiLipSync;
 	IConvaiLipSyncExtendedInterface* ConvaiLipSyncExtended;
 
-	void PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels);
+	void PlayLipSyncWithPreGeneratedData(FAnimationSequence FaceSequence);
 
-	void PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, FAnimationSequence FaceSequence, uint32 InSampleRate, uint32 InNumChannels);
+	void PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels);
 
 	void StopLipSync();
 
@@ -131,10 +131,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Convai|LipSync", Meta = (Tooltip = "True if the output visemes is in Blendshape format"))
 	bool GeneratesVisemesAsBlendshapes();
 
-	// Should be called in the game thread
-	void AddPCMDataToSend(TArray<uint8> PCMDataToAdd, bool ContainsHeaderData, uint32 InSampleRate, uint32 InNumChannels);
+	void AddFaceDataToSend(FAnimationSequence FaceSequence);
 
-	void AddPCMDataToSend(TArray<uint8> PCMDataToAdd, FAnimationSequence FaceSequence, bool ContainsHeaderData = true, uint32 SampleRate = 21000, uint32 NumChannels = 1);
+	// Should be called in the game thread
+	void AddPCMDataToSend(TArray<uint8> PCMDataToAdd, bool ContainsHeaderData = true, uint32 SampleRate = 21000, uint32 NumChannels = 1);
 
 	virtual void onAudioStarted();
 	virtual void onAudioFinished();
