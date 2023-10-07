@@ -301,11 +301,11 @@ private:
 	void Broadcast_OnNarrativeSectionReceived(const FString& BT_Code, const FString& BT_Constants, const FString& ReceivedNarrativeSectionID);
 
 	void OnTranscriptionReceived(FString Transcription, bool IsTranscriptionReady, bool IsFinal);
-	void onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, TArray<FAnimationFrame> FaceData, uint32 SampleRate, bool IsFinal);
+	void onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal);
+	void OnFaceDataReceived(FAnimationSequence FaceDataAnimation);
 	void onSessionIDReceived(FString ReceivedSessionID);
 	void onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
 	void onFinishedReceivingData();
-	void OnNarrativeSectionReceived(FString BT_Code, FString BT_Constants, FString ReceivedNarrativeSectionID);
 	void onFailure();
 
 private:

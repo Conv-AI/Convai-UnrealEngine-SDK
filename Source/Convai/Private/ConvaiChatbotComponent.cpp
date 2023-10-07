@@ -362,12 +362,17 @@ void UConvaiChatbotComponent::Broadcast_InterruptSpeech_Implementation(float InV
 void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAPI_Key, FString OverrideAPI_Key, FString TriggerName, FString TriggerMessage)
 {
 	FString API_Key = UseOverrideAPI_Key ? OverrideAPI_Key : UConvaiUtils::GetAPI_Key();
-
-	bool RequireFaceData = ConvaiLipSyncExtended == nullptr? false : ConvaiLipSyncExtended->RequiresPreGeneratedFaceData();
+	bool RequireFaceData = false;
+	bool GeneratesVisemesAsBlendshapes = false;
+	if (ConvaiLipSyncExtended)
+	{
+		RequireFaceData = ConvaiLipSyncExtended->RequiresPreGeneratedFaceData();
+		GeneratesVisemesAsBlendshapes = ConvaiLipSyncExtended->GeneratesVisemesAsBlendshapes();
+	}
 	RequireFaceData = RequireFaceData && VoiceResponse;
 
 	// Create the request proxy
-	ConvaiGRPCGetResponseProxy = UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(this, UserText, TriggerName, TriggerMessage, CharacterID, VoiceResponse, RequireFaceData, SessionID, Environment, GenerateActions, API_Key);
+	ConvaiGRPCGetResponseProxy = UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(this, UserText, TriggerName, TriggerMessage, CharacterID, VoiceResponse, RequireFaceData, GeneratesVisemesAsBlendshapes, SessionID, Environment, GenerateActions, API_Key);
 
 	// Bind the needed delegates
 	Bind_GRPC_Request_Delegates();
@@ -386,6 +391,7 @@ void UConvaiChatbotComponent::Bind_GRPC_Request_Delegates()
 
 	ConvaiGRPCGetResponseProxy->OnTranscriptionReceived.BindUObject(this, &UConvaiChatbotComponent::OnTranscriptionReceived);
 	ConvaiGRPCGetResponseProxy->OnDataReceived.BindUObject(this, &UConvaiChatbotComponent::onResponseDataReceived);
+	ConvaiGRPCGetResponseProxy->OnFaceDataReceived.BindUObject(this, &UConvaiChatbotComponent::OnFaceDataReceived);
 	ConvaiGRPCGetResponseProxy->OnSessionIDReceived.BindUObject(this, &UConvaiChatbotComponent::onSessionIDReceived);
 	ConvaiGRPCGetResponseProxy->OnActionsReceived.BindUObject(this, &UConvaiChatbotComponent::onActionSequenceReceived);
 	ConvaiGRPCGetResponseProxy->OnNarrativeDataReceived.BindUObject(this, &UConvaiChatbotComponent::OnNarrativeSectionReceived);
@@ -402,6 +408,7 @@ void UConvaiChatbotComponent::Unbind_GRPC_Request_Delegates()
 
 	ConvaiGRPCGetResponseProxy->OnTranscriptionReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnDataReceived.Unbind();
+	ConvaiGRPCGetResponseProxy->OnFaceDataReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnSessionIDReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnActionsReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnFinish.Unbind();
@@ -455,7 +462,7 @@ void UConvaiChatbotComponent::Broadcast_onResponseDataReceived_Implementation(co
 {
 	if (!UKismetSystemLibrary::IsServer(this))
 	{
-		onResponseDataReceived(ReceivedText, TArray<uint8>(), TArray<FAnimationFrame>(), 0, IsFinal);
+		onResponseDataReceived(ReceivedText, TArray<uint8>(), 0, IsFinal);
 	}
 }
 
@@ -503,7 +510,7 @@ void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, boo
 	ReceivedFinalTranscription = IsFinal;
 }
 
-void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, TArray<FAnimationFrame> FaceData, uint32 SampleRate, bool IsFinal)
+void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal)
 {
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
@@ -511,17 +518,13 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 		Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
 	}
 
-	AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, FaceData, SampleRate, IsFinal]
+	AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal]
 		{
 			float AudioDuration = 0;
 			if (VoiceResponse && ReceivedAudio.Num() > 0)
 			{
 				AudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
-				FAnimationSequence FaceSequence;
-				FaceSequence.AnimationFrames = FaceData;
-				FaceSequence.Duration = AudioDuration;
-
-				AddPCMDataToSend(ReceivedAudio, FaceSequence, false, SampleRate, 1); // Should be called in the game thread
+				AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1); // Should be called in the game thread
 			}
 
 			// Send text and audio duration to blueprint event
@@ -531,6 +534,11 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 			OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, AudioDuration, IsFinal);
 		});
 	ReceivedFinalData = IsFinal;
+}
+
+void UConvaiChatbotComponent::OnFaceDataReceived(FAnimationSequence FaceDataAnimation)
+{
+	AddFaceDataToSend(FaceDataAnimation);
 }
 
 void UConvaiChatbotComponent::onSessionIDReceived(const FString ReceivedSessionID)
