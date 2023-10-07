@@ -688,7 +688,7 @@ int UConvaiUtils::LevenshteinDistance(const FString& s, const FString& t)
 	return v1[t.Len()];
 }
 
-TArray<FAnimationFrame> UConvaiUtils::ParseJsonToAnimationData(const FString& JsonString)
+TArray<FAnimationFrame> UConvaiUtils::ParseJsonToBlendShapeData(const FString& JsonString)
 {
 	TArray<FAnimationFrame> AnimationFrames;
 
@@ -709,7 +709,10 @@ TArray<FAnimationFrame> UConvaiUtils::ParseJsonToAnimationData(const FString& Js
 			{
 				TSharedPtr<FJsonObject> BlendShapeObj = BlendShapeVal->AsObject();
 				FName name = FName(BlendShapeObj->GetStringField("name"));
-				float score = BlendShapeObj->GetNumberField("score");
+				double score;
+				bool Success = BlendShapeObj->TryGetNumberField("score", score);
+				if (!Success)
+					score = 0;
 
 				NewFrame.BlendShapes.Add(name, score);
 			}
@@ -719,6 +722,58 @@ TArray<FAnimationFrame> UConvaiUtils::ParseJsonToAnimationData(const FString& Js
 	}
 
 	return AnimationFrames;
+}
+
+bool UConvaiUtils::ParseVisemeValuesToAnimationFrame(const FString& VisemeValuesString, FAnimationFrame& AnimationFrame)
+{
+	// Split the input string by ','
+	TArray<FString> StringValues;
+	VisemeValuesString.ParseIntoArray(StringValues, TEXT(","));
+
+	// Ensure that the number of parsed values is the same as the number of viseme names
+	if (StringValues.Num() != ConvaiConstants::VisemeNames.Num())
+	{
+		// Log an error message and return the uninitialized FAnimationFrame object
+		//UE_LOG(LogTemp, Error, TEXT("Number of values does not match the number of viseme names."));
+		return false;
+	}
+
+	float ValuesSum = 0.0f; // Used to check if all blendshapes are zeros
+
+	bool ignore = true;
+	// Loop over the parsed string values and the viseme names simultaneously
+	for (int32 Index = 0; Index < StringValues.Num(); ++Index)
+	{
+		// Convert each string value to a float and add it to the TMap in AnimationFrame
+		float Value;
+		if (StringValues[Index].TrimStartAndEnd().IsNumeric())
+		{
+			Value = FCString::Atof(*StringValues[Index]);
+			AnimationFrame.BlendShapes.Add(*ConvaiConstants::VisemeNames[Index], Value);
+			if (Value > 0.03)
+				ignore = false;
+			ValuesSum += Value; // Add the value to the sum
+		}
+		else
+		{
+			// Log a warning message if a string value is not numeric
+			//UE_LOG(LogTemp, Warning, TEXT("Invalid numeric value: %s"), *StringValues[Index])
+			Value = 0;
+			AnimationFrame.BlendShapes.Add(*ConvaiConstants::VisemeNames[Index], Value);
+		}
+	}
+
+	// If the sum of all parsed values is close to zero, set the first blendshape to 1
+	if (ValuesSum < 0.1 || ignore)
+	{
+		if (ConvaiConstants::VisemeNames.Num() > 0)
+		{
+			AnimationFrame.BlendShapes[*ConvaiConstants::VisemeNames[0]] = 1.0f;
+			return false;
+		}
+	}
+
+	return true;
 }
 
 TMap<FName, float> UConvaiUtils::MapBlendshapes(const TMap<FName, float>& InputBlendshapes, const TMap<FName, FConvaiBlendshapeParameters>& BlendshapeMap, float GlobalMultiplier, float GlobalOffset)

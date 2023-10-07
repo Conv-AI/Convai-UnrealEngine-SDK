@@ -14,12 +14,13 @@ class USoundWave;
 class APlayerController;
 class UObject;
 class UConvaiSubsystem;
+struct FAnimationFrame;
 
 /**
  *
  */
 UCLASS()
-class UConvaiUtils : public UBlueprintFunctionLibrary
+class CONVAI_API UConvaiUtils : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
@@ -39,10 +40,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Convai|Utils")
 	static FString ByteArrayToString(TArray<uint8> Bytes);
 
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (WorldContext = "WorldContextObject", AutoCreateRefTerm = "IncludedCharacters, ExcludedCharacters"))
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|Utils", meta = (WorldContext = "WorldContextObject", AutoCreateRefTerm = "IncludedCharacters, ExcludedCharacters"))
 	static void ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlayerController* PlayerController, float Radius, bool PlaneView, TArray<UObject*> IncludedCharacters, TArray<UObject*> ExcludedCharacters, UConvaiChatbotComponent*& ConvaiCharacter, bool& Found);
 	
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (WorldContext = "WorldContextObject"))
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|Utils", meta = (WorldContext = "WorldContextObject"))
 	static void ConvaiGetAllPlayerComponents(UObject* WorldContextObject, TArray<class UConvaiPlayerComponent*>& ConvaiPlayerComponents);
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (WorldContext = "WorldContextObject"))
@@ -82,7 +83,10 @@ public:
 
 	static int LevenshteinDistance(const FString& s, const FString& t);
 
-	static TArray<FAnimationFrame> ParseJsonToAnimationData(const FString& JsonString);
+	static TArray<FAnimationFrame> ParseJsonToBlendShapeData(const FString& JsonString);
+
+	static bool ParseVisemeValuesToAnimationFrame(const FString& VisemeValuesString, FAnimationFrame& AnimationFrame);
+
 
 };
 
