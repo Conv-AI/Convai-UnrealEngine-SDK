@@ -144,7 +144,7 @@ struct FAnimationFrame
 	GENERATED_BODY()
 
 	UPROPERTY()
-	int32 FrameIndex;
+	int32 FrameIndex = 0;
 
 	UPROPERTY()
 	TMap<FName, float> BlendShapes;
@@ -159,7 +159,7 @@ public:
 	TArray<FAnimationFrame> AnimationFrames;
 
 	UPROPERTY()
-	float Duration;
+	float Duration = 0;
 };
 
 UCLASS(Blueprintable)
@@ -374,12 +374,16 @@ namespace ConvaiConstants
 		// Buffer sizes
 		VoiceCaptureRingBufferCapacity = 1024 * 1024,
 		VoiceCaptureBufferSize = 1024 * 1024,
+		LipSyncBufferSize = 1024 * 100, // aproximately 1024 seconds for OVR
 		VoiceCaptureSampleRate = 16000,
 		VoiceCaptureChunk = 2084,
 		VoiceStreamMaxChunk = 4096,
 		PlayerTimeOut = 2500 /* 2500 ms*/,
 		ChatbotTimeOut = 6000 /* 6000 ms*/
 	};
+
+	const TArray<FString> BlendShapesNames = { "EyeBlinkLeft", "EyeLookDownLeft", "EyeLookInLeft", "EyeLookOutLeft", "EyeLookUpLeft", "EyeSquintLeft", "EyeWideLeft", "EyeBlinkRight", "EyeLookDownRight", "EyeLookInRight", "EyeLookOutRight", "EyeLookUpRight", "EyeSquintRight", "EyeWideRight", "JawForward", "JawLeft", "JawRight", "JawOpen", "MouthClose", "MouthFunnel", "MouthPucker", "MouthLeft", "MouthRight", "MouthSmileLeft", "MouthSmileRight", "MouthFrownLeft", "MouthFrownRight", "MouthDimpleLeft", "MouthDimpleRight", "MouthStretchLeft", "MouthStretchRight", "MouthRollLower", "MouthRollUpper", "MouthShrugLower", "MouthShrugUpper", "MouthPressLeft", "MouthPressRight", "MouthLowerDownLeft", "MouthLowerDownRight", "MouthUpperUpLeft", "MouthUpperUpRight", "BrowDownLeft", "BrowDownRight", "BrowInnerUp", "BrowOuterUpLeft", "BrowOuterUpRight", "CheekPuff", "CheekSquintLeft", "CheekSquintRight", "NoseSneerLeft", "NoseSneerRight", "TongueOut", "HeadRoll", "HeadPitch", "HeadYaw" };
+	const TArray<FString> VisemeNames = { "sil", "PP", "FF", "TH", "DD", "kk", "CH", "SS", "nn", "RR", "aa", "E", "ih", "oh", "ou" };
 
 	//char* AvatarDefaultImage2 = "https://convai.com/_next/static/images/placeholder-3d-cab6463359f6ccedb4cda311c4056788.jpg";
 };
