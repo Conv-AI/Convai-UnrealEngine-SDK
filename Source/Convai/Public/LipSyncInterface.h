@@ -10,7 +10,7 @@
 DECLARE_DELEGATE(FOnVisemesDataReadySignature);
 
 UINTERFACE()
-class UConvaiLipSyncInterface : public UInterface
+class CONVAI_API UConvaiLipSyncInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -29,7 +29,7 @@ public:
 };
 
 UINTERFACE()
-class UConvaiLipSyncExtendedInterface : public UConvaiLipSyncInterface
+class CONVAI_API UConvaiLipSyncExtendedInterface : public UConvaiLipSyncInterface
 {
 	GENERATED_BODY()
 };
@@ -40,6 +40,7 @@ class IConvaiLipSyncExtendedInterface : public IConvaiLipSyncInterface
 
 public:
 	virtual void ConvaiProcessLipSyncAdvanced(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels, FAnimationSequence FaceSequence) = 0;
+	virtual void ConvaiProcessLipSyncSingleFrame(FAnimationFrame FaceFrame, float Duration) = 0;
 	virtual bool RequiresPreGeneratedFaceData() = 0;
 	virtual bool GeneratesVisemesAsBlendshapes() = 0;
 	virtual TMap<FName, float> ConvaiGetFaceBlendshapes() = 0;
