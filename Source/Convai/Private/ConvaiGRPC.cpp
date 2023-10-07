@@ -29,6 +29,7 @@ using ::service::AudioConfig;
 using ::service::ActionConfig_Object;
 using ::service::ActionConfig_Character;
 using ::service::GetResponseRequest_GetResponseData;
+using ::service::FaceModel;
 
 using grpc::Channel;
 using grpc::ClientAsyncResponseReader;
@@ -61,7 +62,7 @@ namespace {
 	"DO_NOT_USE" };
 }
 
-UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString TriggerName, FString TriggerMessage, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
+UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString TriggerName, FString TriggerMessage, FString CharID, bool VoiceResponse, bool RequireFaceData, bool GeneratesVisemesAsBlendshapes, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
 {
 	UConvaiGRPCGetResponseProxy* Proxy = NewObject<UConvaiGRPCGetResponseProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
@@ -74,14 +75,15 @@ UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetRes
 	Proxy->Environment = Environment;
 	Proxy->GenerateActions = GenerateActions;
 	Proxy->RequireFaceData = RequireFaceData;
+	Proxy->GeneratesVisemesAsBlendshapes = GeneratesVisemesAsBlendshapes;
 	Proxy->API_Key = API_Key;
 
 	return Proxy;
 }
 
-UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, bool RequireFaceData, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
+UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, bool RequireFaceData, bool GeneratesVisemesAsBlendshapes, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
 {
-	return CreateConvaiGRPCGetResponseProxy(WorldContextObject, UserQuery, FString(""), FString(""), CharID, VoiceResponse, RequireFaceData, SessionID, Environment, GenerateActions, API_Key);
+	return CreateConvaiGRPCGetResponseProxy(WorldContextObject, UserQuery, FString(""), FString(""), CharID, VoiceResponse, RequireFaceData, GeneratesVisemesAsBlendshapes, SessionID, Environment, GenerateActions, API_Key);
 }
 
 void UConvaiGRPCGetResponseProxy::Activate()
@@ -210,7 +212,7 @@ void UConvaiGRPCGetResponseProxy::BeginDestroy()
 	client_context.TryCancel();
 	stub_.reset();
 	Super::BeginDestroy();
-	//UE_LOG(ConvaiGRPCLog, Log, TEXT("Destroying..."));
+	//UE_LOG(ConvaiGRPCLog, Log, TEXT("Destroying UConvaiGRPCGetResponseProxy..."));
 }
 
 TArray<uint8> UConvaiGRPCGetResponseProxy::ConsumeFromAudioBuffer(bool& IsThisTheFinalWrite)
@@ -339,6 +341,11 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 	AudioConfig* audio_config = new AudioConfig();
 	audio_config->set_sample_rate_hertz((int32)ConvaiConstants::VoiceCaptureSampleRate);
 	audio_config->set_enable_facial_data(RequireFaceData);
+	if (RequireFaceData)
+	{
+		FaceModel faceModel = GeneratesVisemesAsBlendshapes ? FaceModel::FACE_MODEL_A_2F_MODEL_NAME : FaceModel::FACE_MODEL_OVR_MODEL_NAME;
+		audio_config->set_face_model(faceModel);
+	}
 	//audio_config->set_disable_audio(false);
 
 	// Create the config object that holds Audio and Action configs
@@ -490,7 +497,10 @@ void UConvaiGRPCGetResponseProxy::OnStreamWriteDone(bool ok)
 
 	// Tell the server early on that we are ready to finish the stream any time it wishes
 	UE_LOG(ConvaiGRPCLog, Log, TEXT("stream_handler->Finish"));
-	stream_handler->Finish(&status, (void*)&OnStreamFinishDelegate);
+	if (stream_handler)
+		stream_handler->Finish(&status, (void*)&OnStreamFinishDelegate);
+	else
+		OnFinish.ExecuteIfBound();
 }
 
 void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
@@ -545,16 +555,14 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		// Grab bot audio
 		::std::string audio_data = reply->audio_response().audio_data();
 		TArray<uint8> VoiceData;
+		float SampleRate = 0;
 		if (reply->audio_response().audio_data().length() > 44)
 		{
 			VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 44), audio_data.length() - 44);
+			SampleRate = reply->audio_response().audio_config().sample_rate_hertz();
 		}
 
-		TArray<FAnimationFrame> FaceDataAnimation;
-		//std::string FaceData;
-		//FaceData = reply->audio_response().face_data();
-		//FString FaceData_string = UConvaiUtils::FUTF8ToFString(FaceData.c_str());
-		//UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s"), *FaceData_string);
+		FAnimationSequence FaceDataAnimation;
 
 		if (RequireFaceData)
 		{
@@ -564,13 +572,35 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 			FaceData = reply->audio_response().face_data();
 			FString FaceData_string = UConvaiUtils::FUTF8ToFString(FaceData.c_str());
 
-			FaceDataAnimation = UConvaiUtils::ParseJsonToAnimationData(FaceData_string);
+			if (GeneratesVisemesAsBlendshapes)
+			{
+				FaceDataAnimation.AnimationFrames = UConvaiUtils::ParseJsonToBlendShapeData(FaceData_string);
+			}
+			else
+			{
+				FAnimationFrame AnimationFrame;
+				if(UConvaiUtils::ParseVisemeValuesToAnimationFrame(FaceData_string, AnimationFrame))
+					FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
+			}
+
+			float FaceDataDuration;
+			//if (VoiceData.Num() > 0)
+			//	FaceDataDuration = float(VoiceData.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
+			//else
+			//	FaceDataDuration = FaceDataAnimation.AnimationFrames.Num() * 0.01; // Assume each frame is 0.01 seconds
+			FaceDataDuration = FaceDataAnimation.AnimationFrames.Num() * 0.01; // Assume each frame is 0.01 seconds
+
+			FaceDataAnimation.Duration = FaceDataDuration;
+			if (FaceDataAnimation.AnimationFrames.Num() > 0 && FaceDataAnimation.Duration > 0)
+				OnFaceDataReceived.ExecuteIfBound(FaceDataAnimation);
+
+			UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s"), *FaceData_string);
 		}
 
 		bool IsFinalResponse = reply->audio_response().end_of_response();
 
 		// Broadcast the audio and text
-		OnDataReceived.ExecuteIfBound(text_string, VoiceData, FaceDataAnimation, reply->audio_response().audio_config().sample_rate_hertz(), IsFinalResponse);
+		OnDataReceived.ExecuteIfBound(text_string, VoiceData, SampleRate, IsFinalResponse);
 	}
 	else if (reply->has_action_response()) // Is there an action response
 	{
