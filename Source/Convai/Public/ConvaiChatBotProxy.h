@@ -253,12 +253,12 @@ class UConvaiChatBotUpdateProxy : public UOnlineBlueprintCallProxyBase
 	 *	  @param NewCharName			The new character name, leave empty if you do not want to update
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai Update Character", WorldContext = "WorldContextObject"), Category = "Convai|REST API")
-		static UConvaiChatBotUpdateProxy* CreateCharacterUpdateProxy(UObject* WorldContextObject, FString CharID, FString NewVoice, FString NewBackstory, FString NewCharName);
+		static UConvaiChatBotUpdateProxy* CreateCharacterUpdateProxy(UObject* WorldContextObject, FString CharID, FString NewVoice, FString NewBackstory, FString NewCharName, FString NewLanguage);
 
 	UFUNCTION(BlueprintCallable, meta = (DeprecatedFunction, DeprecationMessage = "Use \"Convai Update Character\" instead", BlueprintInternalUseOnly = "true", DisplayName = "Convai Update Chatbot", WorldContext = "WorldContextObject"), Category = "Convai|REST API")
-		static UConvaiChatBotUpdateProxy* CreateChatBotUpdateProxy(UObject* WorldContextObject, FString CharID, FString NewVoice, FString NewBackstory, FString NewCharName)
+		static UConvaiChatBotUpdateProxy* CreateChatBotUpdateProxy(UObject* WorldContextObject, FString CharID, FString NewVoice, FString NewBackstory, FString NewCharName, FString NewLanguage)
 	{
-		return CreateCharacterUpdateProxy(WorldContextObject, CharID, NewVoice, NewBackstory, NewCharName);
+		return CreateCharacterUpdateProxy(WorldContextObject, CharID, NewVoice, NewBackstory, NewCharName, NewLanguage);
 	}
 
 	virtual void Activate() override;
@@ -275,7 +275,7 @@ class UConvaiChatBotUpdateProxy : public UOnlineBlueprintCallProxyBase
 	FString NewCharName;
 	FString NewVoice;
 	FString NewBackstory;
-
+	FString NewLanguage;
 
 	// Pointer to the world
 	TWeakObjectPtr<UWorld> WorldPtr;

@@ -695,7 +695,7 @@ void UConvaiChatBotCreateProxy::finish()
 
 
 
-UConvaiChatBotUpdateProxy* UConvaiChatBotUpdateProxy::CreateCharacterUpdateProxy(UObject* WorldContextObject, FString CharID, FString NewVoice, FString NewBackstory, FString NewCharName)
+UConvaiChatBotUpdateProxy* UConvaiChatBotUpdateProxy::CreateCharacterUpdateProxy(UObject* WorldContextObject, FString CharID, FString NewVoice, FString NewBackstory, FString NewCharName, FString NewLanguage)
 {
 	UConvaiChatBotUpdateProxy* Proxy = NewObject<UConvaiChatBotUpdateProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
@@ -768,6 +768,8 @@ void UConvaiChatBotUpdateProxy::Activate()
 		JsonWriter->WriteValue("backstory", NewBackstory);
 	if (NewCharName.Len())
 		JsonWriter->WriteValue("charName", NewCharName);
+	if (NewLanguage.Len())
+		JsonWriter->WriteValue("languageCode", NewLanguage);
 
 
 	JsonWriter->WriteObjectEnd();
