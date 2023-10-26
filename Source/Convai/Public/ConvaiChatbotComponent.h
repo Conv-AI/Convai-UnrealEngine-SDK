@@ -233,7 +233,7 @@ public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
 	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool ReplicateVoiceToNetwork, bool UseOverrideAPI_Key, FString OverrideAPI_Key, uint32 InToken);
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Convai")
 	void ExecuteNarrativeTrigger(FString TriggerName, FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer);
 
 	// Interrupts the current speech with a provided fade-out duration. 
@@ -306,6 +306,7 @@ private:
 	void onSessionIDReceived(FString ReceivedSessionID);
 	void onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
 	void onFinishedReceivingData();
+	void OnNarrativeSectionReceived(FString BT_Code, FString BT_Constants, FString ReceivedNarrativeSectionID);
 	void onFailure();
 
 private:

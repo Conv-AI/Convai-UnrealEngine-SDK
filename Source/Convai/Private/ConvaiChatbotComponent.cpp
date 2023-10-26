@@ -346,7 +346,7 @@ void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 			OnTranscriptionReceived(LastTranscription, true, true);
 
 		if (ReceivedFinalData == false)
-			onResponseDataReceived(FString(""), TArray<uint8>(), TArray<FAnimationFrame>(), 0, true);
+			onResponseDataReceived(FString(""), TArray<uint8>(), 0, true);
 	}
 }
 
