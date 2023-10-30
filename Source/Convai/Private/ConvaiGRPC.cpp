@@ -290,8 +290,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	UE_LOG(ConvaiGRPCLog, Log, TEXT("GRPC GetResponse stream initialized"));
 
-
-
 	// Create Action Configuration
 	ActionConfig* action_config = new ActionConfig();
 	FString MainCharacter;
@@ -529,7 +527,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 
 	}
 
-
 	if (reply->has_user_query()) // Is there transcription ready
 	{
 		std::string UserQuery_std = reply->user_query().text_data();
@@ -556,11 +553,17 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		::std::string audio_data = reply->audio_response().audio_data();
 		TArray<uint8> VoiceData;
 		float SampleRate = 0;
-		if (reply->audio_response().audio_data().length() > 44)
+		if (reply->audio_response().audio_data().length() > 46)
 		{
 			VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 44), audio_data.length() - 44);
 			SampleRate = reply->audio_response().audio_config().sample_rate_hertz();
 		}
+		//else
+		//{
+
+		//	FString AudioResponseDebug = UConvaiUtils::FUTF8ToFString(reply->audio_response().DebugString().c_str());
+		//	UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s"), *AudioResponseDebug);
+		//}
 
 		FAnimationSequence FaceDataAnimation;
 
@@ -568,33 +571,50 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		{
 			TSharedPtr<FJsonObject> FaceData_json;
 
-			std::string FaceData;
-			FaceData = reply->audio_response().face_data();
-			FString FaceData_string = UConvaiUtils::FUTF8ToFString(FaceData.c_str());
+			bool HasVisemes = reply->audio_response().has_visemes_data();
+			bool HasBlendshapes = reply->audio_response().has_blendshapes_data();
 
-			if (GeneratesVisemesAsBlendshapes)
+			if (HasBlendshapes && GeneratesVisemesAsBlendshapes)
 			{
-				FaceDataAnimation.AnimationFrames = UConvaiUtils::ParseJsonToBlendShapeData(FaceData_string);
+				std::string FaceBlendshapeData = reply->audio_response().blendshapes_data().blendshape_data();
+				if (FaceBlendshapeData.size() > 0)
+				{
+					FString FaceData_string = UConvaiUtils::FUTF8ToFString(FaceBlendshapeData.c_str());
+					FaceDataAnimation.AnimationFrames = UConvaiUtils::ParseJsonToBlendShapeData(FaceData_string);
+				}
 			}
-			else
+			else if (HasVisemes && !GeneratesVisemesAsBlendshapes)
 			{
+				auto Visemes = reply->audio_response().visemes_data().visemes();
 				FAnimationFrame AnimationFrame;
-				if(UConvaiUtils::ParseVisemeValuesToAnimationFrame(FaceData_string, AnimationFrame))
-					FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
+				AnimationFrame.BlendShapes.Add("sil", Visemes.sil());
+				AnimationFrame.BlendShapes.Add("PP", Visemes.pp());
+				AnimationFrame.BlendShapes.Add("FF", Visemes.ff());
+				AnimationFrame.BlendShapes.Add("TH", Visemes.th());
+				AnimationFrame.BlendShapes.Add("DD", Visemes.dd());
+				AnimationFrame.BlendShapes.Add("kk", Visemes.kk());
+				AnimationFrame.BlendShapes.Add("CH", Visemes.ch());
+				AnimationFrame.BlendShapes.Add("SS", Visemes.ss());
+				AnimationFrame.BlendShapes.Add("nn", Visemes.nn());
+				AnimationFrame.BlendShapes.Add("RR", Visemes.rr());
+				AnimationFrame.BlendShapes.Add("aa", Visemes.aa());
+				AnimationFrame.BlendShapes.Add("E", Visemes.e());
+				AnimationFrame.BlendShapes.Add("ih", Visemes.ih());
+				AnimationFrame.BlendShapes.Add("oh", Visemes.oh());
+				AnimationFrame.BlendShapes.Add("ou", Visemes.ou());
+				FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
+				FaceDataAnimation.Duration += 0.01;
+				//UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s"), *AnimationFrame.ToString());
 			}
 
-			float FaceDataDuration;
-			//if (VoiceData.Num() > 0)
-			//	FaceDataDuration = float(VoiceData.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
-			//else
-			//	FaceDataDuration = FaceDataAnimation.AnimationFrames.Num() * 0.01; // Assume each frame is 0.01 seconds
-			FaceDataDuration = FaceDataAnimation.AnimationFrames.Num() * 0.01; // Assume each frame is 0.01 seconds
+			if (VoiceData.Num() > 0 && FaceDataAnimation.Duration == 0)
+			{
+				float FaceDataDuration = float(VoiceData.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
+				FaceDataAnimation.Duration = FaceDataDuration;
+			}
 
-			FaceDataAnimation.Duration = FaceDataDuration;
 			if (FaceDataAnimation.AnimationFrames.Num() > 0 && FaceDataAnimation.Duration > 0)
 				OnFaceDataReceived.ExecuteIfBound(FaceDataAnimation);
-
-			UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s"), *FaceData_string);
 		}
 
 		bool IsFinalResponse = reply->audio_response().end_of_response();
@@ -634,6 +654,13 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		FString BT_Constants = UConvaiUtils::FUTF8ToFString(reply->bt_response().bt_constants().c_str());
 		FString NarrativeSectionID = UConvaiUtils::FUTF8ToFString(reply->bt_response().narrative_section_id().c_str());
 		OnNarrativeDataReceived.ExecuteIfBound(BT_Code, BT_Constants, NarrativeSectionID);
+	}
+	else if (!reply->emotion_response().empty())
+	{
+		FString EmotionResponseDebug = UConvaiUtils::FUTF8ToFString(reply->DebugString().c_str());
+		UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse EmotionResponseDebug: %s"), *EmotionResponseDebug);
+		FString EmotionResponse = UConvaiUtils::FUTF8ToFString(reply->emotion_response().c_str());
+		OnEmotionReceived.ExecuteIfBound(EmotionResponse);
 	}
 	else // This is a debug message response
 	{
