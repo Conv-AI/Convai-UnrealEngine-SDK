@@ -69,10 +69,10 @@ public:
 	const static TMap<FName, float> ZeroBlendshapeFrame;
 	const static TMap<FName, float> ZeroVisemeFrame;
 
-	UPROPERTY(EditAnywhere, Category = "Convai|LipSync")
+	//UPROPERTY(EditAnywhere, Category = "Convai|LipSync")
 	float AnchorValue = 0.5;
 
-	UPROPERTY(EditAnywhere, Category = "Convai|LipSync")
+	//UPROPERTY(EditAnywhere, Category = "Convai|LipSync")
 	bool ToggleBlendshapeOrViseme = false;
 
 protected:
