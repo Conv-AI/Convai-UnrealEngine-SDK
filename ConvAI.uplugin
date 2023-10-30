@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "2.9.0",
+	"VersionName": "3.0.0-beta",
 	"FriendlyName": "Convai",
 	"Description": "Adds new blueprint functions and components to integrate Convai API.",
 	"Category": "Runtime",
@@ -19,12 +19,10 @@
 			"LoadingPhase": "PreDefault",
 			"PlatformAllowList": [
 				"Win64",
-				"Android",
 				"Mac"
 			],
 			"WhitelistPlatforms": [
 				"Win64",
-				"Android",
 				"Mac"
 			]
 		}
