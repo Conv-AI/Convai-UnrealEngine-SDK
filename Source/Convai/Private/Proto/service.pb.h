@@ -47,7 +47,7 @@ struct TableStruct_service_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[18]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[21]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -67,6 +67,9 @@ extern ActionConfig_ObjectDefaultTypeInternal _ActionConfig_Object_default_insta
 class AudioConfig;
 class AudioConfigDefaultTypeInternal;
 extern AudioConfigDefaultTypeInternal _AudioConfig_default_instance_;
+class BlendShapesData;
+class BlendShapesDataDefaultTypeInternal;
+extern BlendShapesDataDefaultTypeInternal _BlendShapesData_default_instance_;
 class GetResponseRequest;
 class GetResponseRequestDefaultTypeInternal;
 extern GetResponseRequestDefaultTypeInternal _GetResponseRequest_default_instance_;
@@ -109,12 +112,19 @@ extern STTResponseDefaultTypeInternal _STTResponse_default_instance_;
 class TriggerConfig;
 class TriggerConfigDefaultTypeInternal;
 extern TriggerConfigDefaultTypeInternal _TriggerConfig_default_instance_;
+class Viseme;
+class VisemeDefaultTypeInternal;
+extern VisemeDefaultTypeInternal _Viseme_default_instance_;
+class VisemesData;
+class VisemesDataDefaultTypeInternal;
+extern VisemesDataDefaultTypeInternal _VisemesData_default_instance_;
 }  // namespace service
 PROTOBUF_NAMESPACE_OPEN
 template<> ::service::ActionConfig* Arena::CreateMaybeMessage<::service::ActionConfig>(Arena*);
 template<> ::service::ActionConfig_Character* Arena::CreateMaybeMessage<::service::ActionConfig_Character>(Arena*);
 template<> ::service::ActionConfig_Object* Arena::CreateMaybeMessage<::service::ActionConfig_Object>(Arena*);
 template<> ::service::AudioConfig* Arena::CreateMaybeMessage<::service::AudioConfig>(Arena*);
+template<> ::service::BlendShapesData* Arena::CreateMaybeMessage<::service::BlendShapesData>(Arena*);
 template<> ::service::GetResponseRequest* Arena::CreateMaybeMessage<::service::GetResponseRequest>(Arena*);
 template<> ::service::GetResponseRequestSingle* Arena::CreateMaybeMessage<::service::GetResponseRequestSingle>(Arena*);
 template<> ::service::GetResponseRequest_GetResponseConfig* Arena::CreateMaybeMessage<::service::GetResponseRequest_GetResponseConfig>(Arena*);
@@ -129,6 +139,8 @@ template<> ::service::HelloResponse* Arena::CreateMaybeMessage<::service::HelloR
 template<> ::service::STTRequest* Arena::CreateMaybeMessage<::service::STTRequest>(Arena*);
 template<> ::service::STTResponse* Arena::CreateMaybeMessage<::service::STTResponse>(Arena*);
 template<> ::service::TriggerConfig* Arena::CreateMaybeMessage<::service::TriggerConfig>(Arena*);
+template<> ::service::Viseme* Arena::CreateMaybeMessage<::service::Viseme>(Arena*);
+template<> ::service::VisemesData* Arena::CreateMaybeMessage<::service::VisemesData>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace service {
 
@@ -2230,6 +2242,12 @@ class GetResponseResponse_AudioResponse PROTOBUF_FINAL :
   }
   static const GetResponseResponse_AudioResponse& default_instance();
 
+  enum FaceDataTypeCase {
+    kVisemesData = 6,
+    kBlendshapesData = 7,
+    FACE_DATA_TYPE_NOT_SET = 0,
+  };
+
   static inline const GetResponseResponse_AudioResponse* internal_default_instance() {
     return reinterpret_cast<const GetResponseResponse_AudioResponse*>(
                &_GetResponseResponse_AudioResponse_default_instance_);
@@ -2311,6 +2329,8 @@ class GetResponseResponse_AudioResponse PROTOBUF_FINAL :
     kFaceDataFieldNumber = 5,
     kAudioConfigFieldNumber = 2,
     kEndOfResponseFieldNumber = 4,
+    kVisemesDataFieldNumber = 6,
+    kBlendshapesDataFieldNumber = 7,
   };
   // bytes audio_data = 1;
   void clear_audio_data();
@@ -2387,9 +2407,52 @@ class GetResponseResponse_AudioResponse PROTOBUF_FINAL :
   void _internal_set_end_of_response(bool value);
   public:
 
+  // .service.VisemesData visemes_data = 6;
+  bool has_visemes_data() const;
+  private:
+  bool _internal_has_visemes_data() const;
+  public:
+  void clear_visemes_data();
+  const ::service::VisemesData& visemes_data() const;
+  ::service::VisemesData* release_visemes_data();
+  ::service::VisemesData* mutable_visemes_data();
+  void set_allocated_visemes_data(::service::VisemesData* visemes_data);
+  private:
+  const ::service::VisemesData& _internal_visemes_data() const;
+  ::service::VisemesData* _internal_mutable_visemes_data();
+  public:
+  void unsafe_arena_set_allocated_visemes_data(
+      ::service::VisemesData* visemes_data);
+  ::service::VisemesData* unsafe_arena_release_visemes_data();
+
+  // .service.BlendShapesData blendshapes_data = 7;
+  bool has_blendshapes_data() const;
+  private:
+  bool _internal_has_blendshapes_data() const;
+  public:
+  void clear_blendshapes_data();
+  const ::service::BlendShapesData& blendshapes_data() const;
+  ::service::BlendShapesData* release_blendshapes_data();
+  ::service::BlendShapesData* mutable_blendshapes_data();
+  void set_allocated_blendshapes_data(::service::BlendShapesData* blendshapes_data);
+  private:
+  const ::service::BlendShapesData& _internal_blendshapes_data() const;
+  ::service::BlendShapesData* _internal_mutable_blendshapes_data();
+  public:
+  void unsafe_arena_set_allocated_blendshapes_data(
+      ::service::BlendShapesData* blendshapes_data);
+  ::service::BlendShapesData* unsafe_arena_release_blendshapes_data();
+
+  void clear_face_data_type();
+  FaceDataTypeCase face_data_type_case() const;
   // @@protoc_insertion_point(class_scope:service.GetResponseResponse.AudioResponse)
  private:
   class _Internal;
+  void set_has_visemes_data();
+  void set_has_blendshapes_data();
+
+  inline bool has_face_data_type() const;
+  inline void clear_has_face_data_type();
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
@@ -2399,7 +2462,14 @@ class GetResponseResponse_AudioResponse PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr face_data_;
   ::service::AudioConfig* audio_config_;
   bool end_of_response_;
+  union FaceDataTypeUnion {
+    FaceDataTypeUnion() {}
+    ::service::VisemesData* visemes_data_;
+    ::service::BlendShapesData* blendshapes_data_;
+  } face_data_type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
+
   friend struct ::TableStruct_service_2eproto;
 };
 // -------------------------------------------------------------------
@@ -2933,6 +3003,7 @@ class GetResponseResponse PROTOBUF_FINAL :
     kDebugLog = 4,
     kUserQuery = 5,
     kBtResponse = 6,
+    kEmotionResponse = 7,
     RESPONSE_TYPE_NOT_SET = 0,
   };
 
@@ -3023,6 +3094,7 @@ class GetResponseResponse PROTOBUF_FINAL :
     kDebugLogFieldNumber = 4,
     kUserQueryFieldNumber = 5,
     kBtResponseFieldNumber = 6,
+    kEmotionResponseFieldNumber = 7,
   };
   // string session_id = 1;
   void clear_session_id();
@@ -3131,6 +3203,25 @@ class GetResponseResponse PROTOBUF_FINAL :
       ::service::GetResponseResponse_BehaviorTreeResponse* bt_response);
   ::service::GetResponseResponse_BehaviorTreeResponse* unsafe_arena_release_bt_response();
 
+  // string emotion_response = 7;
+  private:
+  bool _internal_has_emotion_response() const;
+  public:
+  void clear_emotion_response();
+  const std::string& emotion_response() const;
+  void set_emotion_response(const std::string& value);
+  void set_emotion_response(std::string&& value);
+  void set_emotion_response(const char* value);
+  void set_emotion_response(const char* value, size_t size);
+  std::string* mutable_emotion_response();
+  std::string* release_emotion_response();
+  void set_allocated_emotion_response(std::string* emotion_response);
+  private:
+  const std::string& _internal_emotion_response() const;
+  void _internal_set_emotion_response(const std::string& value);
+  std::string* _internal_mutable_emotion_response();
+  public:
+
   void clear_response_type();
   ResponseTypeCase response_type_case() const;
   // @@protoc_insertion_point(class_scope:service.GetResponseResponse)
@@ -3141,6 +3232,7 @@ class GetResponseResponse PROTOBUF_FINAL :
   void set_has_debug_log();
   void set_has_user_query();
   void set_has_bt_response();
+  void set_has_emotion_response();
 
   inline bool has_response_type() const;
   inline void clear_has_response_type();
@@ -3156,10 +3248,589 @@ class GetResponseResponse PROTOBUF_FINAL :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr debug_log_;
     ::service::GetResponseResponse_UserTranscript* user_query_;
     ::service::GetResponseResponse_BehaviorTreeResponse* bt_response_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr emotion_response_;
   } response_type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
 
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class VisemesData PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.VisemesData) */ {
+ public:
+  inline VisemesData() : VisemesData(nullptr) {}
+  virtual ~VisemesData();
+
+  VisemesData(const VisemesData& from);
+  VisemesData(VisemesData&& from) noexcept
+    : VisemesData() {
+    *this = ::std::move(from);
+  }
+
+  inline VisemesData& operator=(const VisemesData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline VisemesData& operator=(VisemesData&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const VisemesData& default_instance();
+
+  static inline const VisemesData* internal_default_instance() {
+    return reinterpret_cast<const VisemesData*>(
+               &_VisemesData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    16;
+
+  friend void swap(VisemesData& a, VisemesData& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(VisemesData* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(VisemesData* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline VisemesData* New() const final {
+    return CreateMaybeMessage<VisemesData>(nullptr);
+  }
+
+  VisemesData* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<VisemesData>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const VisemesData& from);
+  void MergeFrom(const VisemesData& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(VisemesData* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.VisemesData";
+  }
+  protected:
+  explicit VisemesData(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
+    return ::descriptor_table_service_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kVisemesFieldNumber = 1,
+  };
+  // .service.Viseme visemes = 1;
+  bool has_visemes() const;
+  private:
+  bool _internal_has_visemes() const;
+  public:
+  void clear_visemes();
+  const ::service::Viseme& visemes() const;
+  ::service::Viseme* release_visemes();
+  ::service::Viseme* mutable_visemes();
+  void set_allocated_visemes(::service::Viseme* visemes);
+  private:
+  const ::service::Viseme& _internal_visemes() const;
+  ::service::Viseme* _internal_mutable_visemes();
+  public:
+  void unsafe_arena_set_allocated_visemes(
+      ::service::Viseme* visemes);
+  ::service::Viseme* unsafe_arena_release_visemes();
+
+  // @@protoc_insertion_point(class_scope:service.VisemesData)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::service::Viseme* visemes_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Viseme PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.Viseme) */ {
+ public:
+  inline Viseme() : Viseme(nullptr) {}
+  virtual ~Viseme();
+
+  Viseme(const Viseme& from);
+  Viseme(Viseme&& from) noexcept
+    : Viseme() {
+    *this = ::std::move(from);
+  }
+
+  inline Viseme& operator=(const Viseme& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Viseme& operator=(Viseme&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Viseme& default_instance();
+
+  static inline const Viseme* internal_default_instance() {
+    return reinterpret_cast<const Viseme*>(
+               &_Viseme_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    17;
+
+  friend void swap(Viseme& a, Viseme& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Viseme* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Viseme* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Viseme* New() const final {
+    return CreateMaybeMessage<Viseme>(nullptr);
+  }
+
+  Viseme* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Viseme>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Viseme& from);
+  void MergeFrom(const Viseme& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Viseme* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.Viseme";
+  }
+  protected:
+  explicit Viseme(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
+    return ::descriptor_table_service_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSilFieldNumber = 1,
+    kPpFieldNumber = 2,
+    kFfFieldNumber = 3,
+    kThFieldNumber = 4,
+    kDdFieldNumber = 5,
+    kKkFieldNumber = 6,
+    kChFieldNumber = 7,
+    kSsFieldNumber = 8,
+    kNnFieldNumber = 9,
+    kRrFieldNumber = 10,
+    kAaFieldNumber = 11,
+    kEFieldNumber = 12,
+    kIhFieldNumber = 13,
+    kOhFieldNumber = 14,
+    kOuFieldNumber = 15,
+  };
+  // float sil = 1;
+  void clear_sil();
+  float sil() const;
+  void set_sil(float value);
+  private:
+  float _internal_sil() const;
+  void _internal_set_sil(float value);
+  public:
+
+  // float pp = 2;
+  void clear_pp();
+  float pp() const;
+  void set_pp(float value);
+  private:
+  float _internal_pp() const;
+  void _internal_set_pp(float value);
+  public:
+
+  // float ff = 3;
+  void clear_ff();
+  float ff() const;
+  void set_ff(float value);
+  private:
+  float _internal_ff() const;
+  void _internal_set_ff(float value);
+  public:
+
+  // float th = 4;
+  void clear_th();
+  float th() const;
+  void set_th(float value);
+  private:
+  float _internal_th() const;
+  void _internal_set_th(float value);
+  public:
+
+  // float dd = 5;
+  void clear_dd();
+  float dd() const;
+  void set_dd(float value);
+  private:
+  float _internal_dd() const;
+  void _internal_set_dd(float value);
+  public:
+
+  // float kk = 6;
+  void clear_kk();
+  float kk() const;
+  void set_kk(float value);
+  private:
+  float _internal_kk() const;
+  void _internal_set_kk(float value);
+  public:
+
+  // float ch = 7;
+  void clear_ch();
+  float ch() const;
+  void set_ch(float value);
+  private:
+  float _internal_ch() const;
+  void _internal_set_ch(float value);
+  public:
+
+  // float ss = 8;
+  void clear_ss();
+  float ss() const;
+  void set_ss(float value);
+  private:
+  float _internal_ss() const;
+  void _internal_set_ss(float value);
+  public:
+
+  // float nn = 9;
+  void clear_nn();
+  float nn() const;
+  void set_nn(float value);
+  private:
+  float _internal_nn() const;
+  void _internal_set_nn(float value);
+  public:
+
+  // float rr = 10;
+  void clear_rr();
+  float rr() const;
+  void set_rr(float value);
+  private:
+  float _internal_rr() const;
+  void _internal_set_rr(float value);
+  public:
+
+  // float aa = 11;
+  void clear_aa();
+  float aa() const;
+  void set_aa(float value);
+  private:
+  float _internal_aa() const;
+  void _internal_set_aa(float value);
+  public:
+
+  // float e = 12;
+  void clear_e();
+  float e() const;
+  void set_e(float value);
+  private:
+  float _internal_e() const;
+  void _internal_set_e(float value);
+  public:
+
+  // float ih = 13;
+  void clear_ih();
+  float ih() const;
+  void set_ih(float value);
+  private:
+  float _internal_ih() const;
+  void _internal_set_ih(float value);
+  public:
+
+  // float oh = 14;
+  void clear_oh();
+  float oh() const;
+  void set_oh(float value);
+  private:
+  float _internal_oh() const;
+  void _internal_set_oh(float value);
+  public:
+
+  // float ou = 15;
+  void clear_ou();
+  float ou() const;
+  void set_ou(float value);
+  private:
+  float _internal_ou() const;
+  void _internal_set_ou(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.Viseme)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  float sil_;
+  float pp_;
+  float ff_;
+  float th_;
+  float dd_;
+  float kk_;
+  float ch_;
+  float ss_;
+  float nn_;
+  float rr_;
+  float aa_;
+  float e_;
+  float ih_;
+  float oh_;
+  float ou_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class BlendShapesData PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.BlendShapesData) */ {
+ public:
+  inline BlendShapesData() : BlendShapesData(nullptr) {}
+  virtual ~BlendShapesData();
+
+  BlendShapesData(const BlendShapesData& from);
+  BlendShapesData(BlendShapesData&& from) noexcept
+    : BlendShapesData() {
+    *this = ::std::move(from);
+  }
+
+  inline BlendShapesData& operator=(const BlendShapesData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline BlendShapesData& operator=(BlendShapesData&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const BlendShapesData& default_instance();
+
+  static inline const BlendShapesData* internal_default_instance() {
+    return reinterpret_cast<const BlendShapesData*>(
+               &_BlendShapesData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    18;
+
+  friend void swap(BlendShapesData& a, BlendShapesData& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(BlendShapesData* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(BlendShapesData* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline BlendShapesData* New() const final {
+    return CreateMaybeMessage<BlendShapesData>(nullptr);
+  }
+
+  BlendShapesData* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<BlendShapesData>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const BlendShapesData& from);
+  void MergeFrom(const BlendShapesData& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(BlendShapesData* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.BlendShapesData";
+  }
+  protected:
+  explicit BlendShapesData(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
+    return ::descriptor_table_service_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kBlendshapeDataFieldNumber = 1,
+  };
+  // string blendshape_data = 1;
+  void clear_blendshape_data();
+  const std::string& blendshape_data() const;
+  void set_blendshape_data(const std::string& value);
+  void set_blendshape_data(std::string&& value);
+  void set_blendshape_data(const char* value);
+  void set_blendshape_data(const char* value, size_t size);
+  std::string* mutable_blendshape_data();
+  std::string* release_blendshape_data();
+  void set_allocated_blendshape_data(std::string* blendshape_data);
+  private:
+  const std::string& _internal_blendshape_data() const;
+  void _internal_set_blendshape_data(const std::string& value);
+  std::string* _internal_mutable_blendshape_data();
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.BlendShapesData)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr blendshape_data_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_service_2eproto;
 };
 // -------------------------------------------------------------------
@@ -3205,7 +3876,7 @@ class HelloRequest PROTOBUF_FINAL :
                &_HelloRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    19;
 
   friend void swap(HelloRequest& a, HelloRequest& b) {
     a.Swap(&b);
@@ -3348,7 +4019,7 @@ class HelloResponse PROTOBUF_FINAL :
                &_HelloResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    20;
 
   friend void swap(HelloResponse& a, HelloResponse& b) {
     a.Swap(&b);
@@ -5867,6 +6538,161 @@ inline void GetResponseResponse_AudioResponse::set_allocated_face_data(std::stri
   // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.AudioResponse.face_data)
 }
 
+// .service.VisemesData visemes_data = 6;
+inline bool GetResponseResponse_AudioResponse::_internal_has_visemes_data() const {
+  return face_data_type_case() == kVisemesData;
+}
+inline bool GetResponseResponse_AudioResponse::has_visemes_data() const {
+  return _internal_has_visemes_data();
+}
+inline void GetResponseResponse_AudioResponse::set_has_visemes_data() {
+  _oneof_case_[0] = kVisemesData;
+}
+inline void GetResponseResponse_AudioResponse::clear_visemes_data() {
+  if (_internal_has_visemes_data()) {
+    if (GetArena() == nullptr) {
+      delete face_data_type_.visemes_data_;
+    }
+    clear_has_face_data_type();
+  }
+}
+inline ::service::VisemesData* GetResponseResponse_AudioResponse::release_visemes_data() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.AudioResponse.visemes_data)
+  if (_internal_has_visemes_data()) {
+    clear_has_face_data_type();
+      ::service::VisemesData* temp = face_data_type_.visemes_data_;
+    if (GetArena() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    face_data_type_.visemes_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::service::VisemesData& GetResponseResponse_AudioResponse::_internal_visemes_data() const {
+  return _internal_has_visemes_data()
+      ? *face_data_type_.visemes_data_
+      : reinterpret_cast< ::service::VisemesData&>(::service::_VisemesData_default_instance_);
+}
+inline const ::service::VisemesData& GetResponseResponse_AudioResponse::visemes_data() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.AudioResponse.visemes_data)
+  return _internal_visemes_data();
+}
+inline ::service::VisemesData* GetResponseResponse_AudioResponse::unsafe_arena_release_visemes_data() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:service.GetResponseResponse.AudioResponse.visemes_data)
+  if (_internal_has_visemes_data()) {
+    clear_has_face_data_type();
+    ::service::VisemesData* temp = face_data_type_.visemes_data_;
+    face_data_type_.visemes_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void GetResponseResponse_AudioResponse::unsafe_arena_set_allocated_visemes_data(::service::VisemesData* visemes_data) {
+  clear_face_data_type();
+  if (visemes_data) {
+    set_has_visemes_data();
+    face_data_type_.visemes_data_ = visemes_data;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseResponse.AudioResponse.visemes_data)
+}
+inline ::service::VisemesData* GetResponseResponse_AudioResponse::_internal_mutable_visemes_data() {
+  if (!_internal_has_visemes_data()) {
+    clear_face_data_type();
+    set_has_visemes_data();
+    face_data_type_.visemes_data_ = CreateMaybeMessage< ::service::VisemesData >(GetArena());
+  }
+  return face_data_type_.visemes_data_;
+}
+inline ::service::VisemesData* GetResponseResponse_AudioResponse::mutable_visemes_data() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.AudioResponse.visemes_data)
+  return _internal_mutable_visemes_data();
+}
+
+// .service.BlendShapesData blendshapes_data = 7;
+inline bool GetResponseResponse_AudioResponse::_internal_has_blendshapes_data() const {
+  return face_data_type_case() == kBlendshapesData;
+}
+inline bool GetResponseResponse_AudioResponse::has_blendshapes_data() const {
+  return _internal_has_blendshapes_data();
+}
+inline void GetResponseResponse_AudioResponse::set_has_blendshapes_data() {
+  _oneof_case_[0] = kBlendshapesData;
+}
+inline void GetResponseResponse_AudioResponse::clear_blendshapes_data() {
+  if (_internal_has_blendshapes_data()) {
+    if (GetArena() == nullptr) {
+      delete face_data_type_.blendshapes_data_;
+    }
+    clear_has_face_data_type();
+  }
+}
+inline ::service::BlendShapesData* GetResponseResponse_AudioResponse::release_blendshapes_data() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.AudioResponse.blendshapes_data)
+  if (_internal_has_blendshapes_data()) {
+    clear_has_face_data_type();
+      ::service::BlendShapesData* temp = face_data_type_.blendshapes_data_;
+    if (GetArena() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    face_data_type_.blendshapes_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::service::BlendShapesData& GetResponseResponse_AudioResponse::_internal_blendshapes_data() const {
+  return _internal_has_blendshapes_data()
+      ? *face_data_type_.blendshapes_data_
+      : reinterpret_cast< ::service::BlendShapesData&>(::service::_BlendShapesData_default_instance_);
+}
+inline const ::service::BlendShapesData& GetResponseResponse_AudioResponse::blendshapes_data() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.AudioResponse.blendshapes_data)
+  return _internal_blendshapes_data();
+}
+inline ::service::BlendShapesData* GetResponseResponse_AudioResponse::unsafe_arena_release_blendshapes_data() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:service.GetResponseResponse.AudioResponse.blendshapes_data)
+  if (_internal_has_blendshapes_data()) {
+    clear_has_face_data_type();
+    ::service::BlendShapesData* temp = face_data_type_.blendshapes_data_;
+    face_data_type_.blendshapes_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void GetResponseResponse_AudioResponse::unsafe_arena_set_allocated_blendshapes_data(::service::BlendShapesData* blendshapes_data) {
+  clear_face_data_type();
+  if (blendshapes_data) {
+    set_has_blendshapes_data();
+    face_data_type_.blendshapes_data_ = blendshapes_data;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseResponse.AudioResponse.blendshapes_data)
+}
+inline ::service::BlendShapesData* GetResponseResponse_AudioResponse::_internal_mutable_blendshapes_data() {
+  if (!_internal_has_blendshapes_data()) {
+    clear_face_data_type();
+    set_has_blendshapes_data();
+    face_data_type_.blendshapes_data_ = CreateMaybeMessage< ::service::BlendShapesData >(GetArena());
+  }
+  return face_data_type_.blendshapes_data_;
+}
+inline ::service::BlendShapesData* GetResponseResponse_AudioResponse::mutable_blendshapes_data() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.AudioResponse.blendshapes_data)
+  return _internal_mutable_blendshapes_data();
+}
+
+inline bool GetResponseResponse_AudioResponse::has_face_data_type() const {
+  return face_data_type_case() != FACE_DATA_TYPE_NOT_SET;
+}
+inline void GetResponseResponse_AudioResponse::clear_has_face_data_type() {
+  _oneof_case_[0] = FACE_DATA_TYPE_NOT_SET;
+}
+inline GetResponseResponse_AudioResponse::FaceDataTypeCase GetResponseResponse_AudioResponse::face_data_type_case() const {
+  return GetResponseResponse_AudioResponse::FaceDataTypeCase(_oneof_case_[0]);
+}
 // -------------------------------------------------------------------
 
 // GetResponseResponse_ActionResponse
@@ -6688,6 +7514,113 @@ inline ::service::GetResponseResponse_BehaviorTreeResponse* GetResponseResponse:
   return _internal_mutable_bt_response();
 }
 
+// string emotion_response = 7;
+inline bool GetResponseResponse::_internal_has_emotion_response() const {
+  return response_type_case() == kEmotionResponse;
+}
+inline void GetResponseResponse::set_has_emotion_response() {
+  _oneof_case_[0] = kEmotionResponse;
+}
+inline void GetResponseResponse::clear_emotion_response() {
+  if (_internal_has_emotion_response()) {
+    response_type_.emotion_response_.Destroy(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+    clear_has_response_type();
+  }
+}
+inline const std::string& GetResponseResponse::emotion_response() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseResponse.emotion_response)
+  return _internal_emotion_response();
+}
+inline void GetResponseResponse::set_emotion_response(const std::string& value) {
+  _internal_set_emotion_response(value);
+  // @@protoc_insertion_point(field_set:service.GetResponseResponse.emotion_response)
+}
+inline std::string* GetResponseResponse::mutable_emotion_response() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseResponse.emotion_response)
+  return _internal_mutable_emotion_response();
+}
+inline const std::string& GetResponseResponse::_internal_emotion_response() const {
+  if (_internal_has_emotion_response()) {
+    return response_type_.emotion_response_.Get();
+  }
+  return ::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited();
+}
+inline void GetResponseResponse::_internal_set_emotion_response(const std::string& value) {
+  if (!_internal_has_emotion_response()) {
+    clear_response_type();
+    set_has_emotion_response();
+    response_type_.emotion_response_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  response_type_.emotion_response_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void GetResponseResponse::set_emotion_response(std::string&& value) {
+  // @@protoc_insertion_point(field_set:service.GetResponseResponse.emotion_response)
+  if (!_internal_has_emotion_response()) {
+    clear_response_type();
+    set_has_emotion_response();
+    response_type_.emotion_response_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  response_type_.emotion_response_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.GetResponseResponse.emotion_response)
+}
+inline void GetResponseResponse::set_emotion_response(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  if (!_internal_has_emotion_response()) {
+    clear_response_type();
+    set_has_emotion_response();
+    response_type_.emotion_response_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  response_type_.emotion_response_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{},
+      ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.GetResponseResponse.emotion_response)
+}
+inline void GetResponseResponse::set_emotion_response(const char* value,
+                             size_t size) {
+  if (!_internal_has_emotion_response()) {
+    clear_response_type();
+    set_has_emotion_response();
+    response_type_.emotion_response_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  response_type_.emotion_response_.Set(
+      ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size),
+      GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.GetResponseResponse.emotion_response)
+}
+inline std::string* GetResponseResponse::_internal_mutable_emotion_response() {
+  if (!_internal_has_emotion_response()) {
+    clear_response_type();
+    set_has_emotion_response();
+    response_type_.emotion_response_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  return response_type_.emotion_response_.Mutable(
+      ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* GetResponseResponse::release_emotion_response() {
+  // @@protoc_insertion_point(field_release:service.GetResponseResponse.emotion_response)
+  if (_internal_has_emotion_response()) {
+    clear_has_response_type();
+    return response_type_.emotion_response_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  } else {
+    return nullptr;
+  }
+}
+inline void GetResponseResponse::set_allocated_emotion_response(std::string* emotion_response) {
+  if (has_response_type()) {
+    clear_response_type();
+  }
+  if (emotion_response != nullptr) {
+    set_has_emotion_response();
+    response_type_.emotion_response_.UnsafeSetDefault(emotion_response);
+    ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena();
+    if (arena != nullptr) {
+      arena->Own(emotion_response);
+    }
+  }
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.emotion_response)
+}
+
 inline bool GetResponseResponse::has_response_type() const {
   return response_type_case() != RESPONSE_TYPE_NOT_SET;
 }
@@ -6697,6 +7630,462 @@ inline void GetResponseResponse::clear_has_response_type() {
 inline GetResponseResponse::ResponseTypeCase GetResponseResponse::response_type_case() const {
   return GetResponseResponse::ResponseTypeCase(_oneof_case_[0]);
 }
+// -------------------------------------------------------------------
+
+// VisemesData
+
+// .service.Viseme visemes = 1;
+inline bool VisemesData::_internal_has_visemes() const {
+  return this != internal_default_instance() && visemes_ != nullptr;
+}
+inline bool VisemesData::has_visemes() const {
+  return _internal_has_visemes();
+}
+inline void VisemesData::clear_visemes() {
+  if (GetArena() == nullptr && visemes_ != nullptr) {
+    delete visemes_;
+  }
+  visemes_ = nullptr;
+}
+inline const ::service::Viseme& VisemesData::_internal_visemes() const {
+  const ::service::Viseme* p = visemes_;
+  return p != nullptr ? *p : reinterpret_cast<const ::service::Viseme&>(
+      ::service::_Viseme_default_instance_);
+}
+inline const ::service::Viseme& VisemesData::visemes() const {
+  // @@protoc_insertion_point(field_get:service.VisemesData.visemes)
+  return _internal_visemes();
+}
+inline void VisemesData::unsafe_arena_set_allocated_visemes(
+    ::service::Viseme* visemes) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(visemes_);
+  }
+  visemes_ = visemes;
+  if (visemes) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.VisemesData.visemes)
+}
+inline ::service::Viseme* VisemesData::release_visemes() {
+  
+  ::service::Viseme* temp = visemes_;
+  visemes_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::service::Viseme* VisemesData::unsafe_arena_release_visemes() {
+  // @@protoc_insertion_point(field_release:service.VisemesData.visemes)
+  
+  ::service::Viseme* temp = visemes_;
+  visemes_ = nullptr;
+  return temp;
+}
+inline ::service::Viseme* VisemesData::_internal_mutable_visemes() {
+  
+  if (visemes_ == nullptr) {
+    auto* p = CreateMaybeMessage<::service::Viseme>(GetArena());
+    visemes_ = p;
+  }
+  return visemes_;
+}
+inline ::service::Viseme* VisemesData::mutable_visemes() {
+  // @@protoc_insertion_point(field_mutable:service.VisemesData.visemes)
+  return _internal_mutable_visemes();
+}
+inline void VisemesData::set_allocated_visemes(::service::Viseme* visemes) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete visemes_;
+  }
+  if (visemes) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(visemes);
+    if (message_arena != submessage_arena) {
+      visemes = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, visemes, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  visemes_ = visemes;
+  // @@protoc_insertion_point(field_set_allocated:service.VisemesData.visemes)
+}
+
+// -------------------------------------------------------------------
+
+// Viseme
+
+// float sil = 1;
+inline void Viseme::clear_sil() {
+  sil_ = 0;
+}
+inline float Viseme::_internal_sil() const {
+  return sil_;
+}
+inline float Viseme::sil() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.sil)
+  return _internal_sil();
+}
+inline void Viseme::_internal_set_sil(float value) {
+  
+  sil_ = value;
+}
+inline void Viseme::set_sil(float value) {
+  _internal_set_sil(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.sil)
+}
+
+// float pp = 2;
+inline void Viseme::clear_pp() {
+  pp_ = 0;
+}
+inline float Viseme::_internal_pp() const {
+  return pp_;
+}
+inline float Viseme::pp() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.pp)
+  return _internal_pp();
+}
+inline void Viseme::_internal_set_pp(float value) {
+  
+  pp_ = value;
+}
+inline void Viseme::set_pp(float value) {
+  _internal_set_pp(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.pp)
+}
+
+// float ff = 3;
+inline void Viseme::clear_ff() {
+  ff_ = 0;
+}
+inline float Viseme::_internal_ff() const {
+  return ff_;
+}
+inline float Viseme::ff() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.ff)
+  return _internal_ff();
+}
+inline void Viseme::_internal_set_ff(float value) {
+  
+  ff_ = value;
+}
+inline void Viseme::set_ff(float value) {
+  _internal_set_ff(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.ff)
+}
+
+// float th = 4;
+inline void Viseme::clear_th() {
+  th_ = 0;
+}
+inline float Viseme::_internal_th() const {
+  return th_;
+}
+inline float Viseme::th() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.th)
+  return _internal_th();
+}
+inline void Viseme::_internal_set_th(float value) {
+  
+  th_ = value;
+}
+inline void Viseme::set_th(float value) {
+  _internal_set_th(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.th)
+}
+
+// float dd = 5;
+inline void Viseme::clear_dd() {
+  dd_ = 0;
+}
+inline float Viseme::_internal_dd() const {
+  return dd_;
+}
+inline float Viseme::dd() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.dd)
+  return _internal_dd();
+}
+inline void Viseme::_internal_set_dd(float value) {
+  
+  dd_ = value;
+}
+inline void Viseme::set_dd(float value) {
+  _internal_set_dd(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.dd)
+}
+
+// float kk = 6;
+inline void Viseme::clear_kk() {
+  kk_ = 0;
+}
+inline float Viseme::_internal_kk() const {
+  return kk_;
+}
+inline float Viseme::kk() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.kk)
+  return _internal_kk();
+}
+inline void Viseme::_internal_set_kk(float value) {
+  
+  kk_ = value;
+}
+inline void Viseme::set_kk(float value) {
+  _internal_set_kk(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.kk)
+}
+
+// float ch = 7;
+inline void Viseme::clear_ch() {
+  ch_ = 0;
+}
+inline float Viseme::_internal_ch() const {
+  return ch_;
+}
+inline float Viseme::ch() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.ch)
+  return _internal_ch();
+}
+inline void Viseme::_internal_set_ch(float value) {
+  
+  ch_ = value;
+}
+inline void Viseme::set_ch(float value) {
+  _internal_set_ch(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.ch)
+}
+
+// float ss = 8;
+inline void Viseme::clear_ss() {
+  ss_ = 0;
+}
+inline float Viseme::_internal_ss() const {
+  return ss_;
+}
+inline float Viseme::ss() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.ss)
+  return _internal_ss();
+}
+inline void Viseme::_internal_set_ss(float value) {
+  
+  ss_ = value;
+}
+inline void Viseme::set_ss(float value) {
+  _internal_set_ss(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.ss)
+}
+
+// float nn = 9;
+inline void Viseme::clear_nn() {
+  nn_ = 0;
+}
+inline float Viseme::_internal_nn() const {
+  return nn_;
+}
+inline float Viseme::nn() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.nn)
+  return _internal_nn();
+}
+inline void Viseme::_internal_set_nn(float value) {
+  
+  nn_ = value;
+}
+inline void Viseme::set_nn(float value) {
+  _internal_set_nn(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.nn)
+}
+
+// float rr = 10;
+inline void Viseme::clear_rr() {
+  rr_ = 0;
+}
+inline float Viseme::_internal_rr() const {
+  return rr_;
+}
+inline float Viseme::rr() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.rr)
+  return _internal_rr();
+}
+inline void Viseme::_internal_set_rr(float value) {
+  
+  rr_ = value;
+}
+inline void Viseme::set_rr(float value) {
+  _internal_set_rr(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.rr)
+}
+
+// float aa = 11;
+inline void Viseme::clear_aa() {
+  aa_ = 0;
+}
+inline float Viseme::_internal_aa() const {
+  return aa_;
+}
+inline float Viseme::aa() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.aa)
+  return _internal_aa();
+}
+inline void Viseme::_internal_set_aa(float value) {
+  
+  aa_ = value;
+}
+inline void Viseme::set_aa(float value) {
+  _internal_set_aa(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.aa)
+}
+
+// float e = 12;
+inline void Viseme::clear_e() {
+  e_ = 0;
+}
+inline float Viseme::_internal_e() const {
+  return e_;
+}
+inline float Viseme::e() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.e)
+  return _internal_e();
+}
+inline void Viseme::_internal_set_e(float value) {
+  
+  e_ = value;
+}
+inline void Viseme::set_e(float value) {
+  _internal_set_e(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.e)
+}
+
+// float ih = 13;
+inline void Viseme::clear_ih() {
+  ih_ = 0;
+}
+inline float Viseme::_internal_ih() const {
+  return ih_;
+}
+inline float Viseme::ih() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.ih)
+  return _internal_ih();
+}
+inline void Viseme::_internal_set_ih(float value) {
+  
+  ih_ = value;
+}
+inline void Viseme::set_ih(float value) {
+  _internal_set_ih(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.ih)
+}
+
+// float oh = 14;
+inline void Viseme::clear_oh() {
+  oh_ = 0;
+}
+inline float Viseme::_internal_oh() const {
+  return oh_;
+}
+inline float Viseme::oh() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.oh)
+  return _internal_oh();
+}
+inline void Viseme::_internal_set_oh(float value) {
+  
+  oh_ = value;
+}
+inline void Viseme::set_oh(float value) {
+  _internal_set_oh(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.oh)
+}
+
+// float ou = 15;
+inline void Viseme::clear_ou() {
+  ou_ = 0;
+}
+inline float Viseme::_internal_ou() const {
+  return ou_;
+}
+inline float Viseme::ou() const {
+  // @@protoc_insertion_point(field_get:service.Viseme.ou)
+  return _internal_ou();
+}
+inline void Viseme::_internal_set_ou(float value) {
+  
+  ou_ = value;
+}
+inline void Viseme::set_ou(float value) {
+  _internal_set_ou(value);
+  // @@protoc_insertion_point(field_set:service.Viseme.ou)
+}
+
+// -------------------------------------------------------------------
+
+// BlendShapesData
+
+// string blendshape_data = 1;
+inline void BlendShapesData::clear_blendshape_data() {
+  blendshape_data_.ClearToEmpty();
+}
+inline const std::string& BlendShapesData::blendshape_data() const {
+  // @@protoc_insertion_point(field_get:service.BlendShapesData.blendshape_data)
+  return _internal_blendshape_data();
+}
+inline void BlendShapesData::set_blendshape_data(const std::string& value) {
+  _internal_set_blendshape_data(value);
+  // @@protoc_insertion_point(field_set:service.BlendShapesData.blendshape_data)
+}
+inline std::string* BlendShapesData::mutable_blendshape_data() {
+  // @@protoc_insertion_point(field_mutable:service.BlendShapesData.blendshape_data)
+  return _internal_mutable_blendshape_data();
+}
+inline const std::string& BlendShapesData::_internal_blendshape_data() const {
+  return blendshape_data_.Get();
+}
+inline void BlendShapesData::_internal_set_blendshape_data(const std::string& value) {
+  
+  blendshape_data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void BlendShapesData::set_blendshape_data(std::string&& value) {
+  
+  blendshape_data_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.BlendShapesData.blendshape_data)
+}
+inline void BlendShapesData::set_blendshape_data(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  blendshape_data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.BlendShapesData.blendshape_data)
+}
+inline void BlendShapesData::set_blendshape_data(const char* value,
+    size_t size) {
+  
+  blendshape_data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.BlendShapesData.blendshape_data)
+}
+inline std::string* BlendShapesData::_internal_mutable_blendshape_data() {
+  
+  return blendshape_data_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* BlendShapesData::release_blendshape_data() {
+  // @@protoc_insertion_point(field_release:service.BlendShapesData.blendshape_data)
+  return blendshape_data_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void BlendShapesData::set_allocated_blendshape_data(std::string* blendshape_data) {
+  if (blendshape_data != nullptr) {
+    
+  } else {
+    
+  }
+  blendshape_data_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), blendshape_data,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.BlendShapesData.blendshape_data)
+}
+
 // -------------------------------------------------------------------
 
 // HelloRequest
@@ -6830,6 +8219,12 @@ inline void HelloResponse::set_allocated_message(std::string* message) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

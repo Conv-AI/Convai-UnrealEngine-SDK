@@ -35,14 +35,17 @@ extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::interna
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ActionConfig_Character_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ActionConfig_Object_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_AudioConfig_service_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_BlendShapesData_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_GetResponseRequest_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_GetResponseRequest_GetResponseConfig_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GetResponseRequest_GetResponseData_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GetResponseResponse_ActionResponse_service_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GetResponseResponse_AudioResponse_service_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_GetResponseResponse_AudioResponse_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GetResponseResponse_BehaviorTreeResponse_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GetResponseResponse_UserTranscript_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_TriggerConfig_service_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Viseme_service_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_VisemesData_service_2eproto;
 namespace service {
 class AudioConfigDefaultTypeInternal {
  public:
@@ -108,6 +111,18 @@ class GetResponseResponseDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GetResponseResponse> _instance;
 } _GetResponseResponse_default_instance_;
+class VisemesDataDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<VisemesData> _instance;
+} _VisemesData_default_instance_;
+class VisemeDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Viseme> _instance;
+} _Viseme_default_instance_;
+class BlendShapesDataDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<BlendShapesData> _instance;
+} _BlendShapesData_default_instance_;
 class HelloRequestDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<HelloRequest> _instance;
@@ -170,6 +185,19 @@ static void InitDefaultsscc_info_AudioConfig_service_2eproto() {
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_AudioConfig_service_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_AudioConfig_service_2eproto}, {}};
+
+static void InitDefaultsscc_info_BlendShapesData_service_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::service::_BlendShapesData_default_instance_;
+    new (ptr) ::service::BlendShapesData();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_BlendShapesData_service_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_BlendShapesData_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_GetResponseRequest_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -269,9 +297,11 @@ static void InitDefaultsscc_info_GetResponseResponse_AudioResponse_service_2epro
   }
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GetResponseResponse_AudioResponse_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_GetResponseResponse_AudioResponse_service_2eproto}, {
-      &scc_info_AudioConfig_service_2eproto.base,}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_GetResponseResponse_AudioResponse_service_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 3, 0, InitDefaultsscc_info_GetResponseResponse_AudioResponse_service_2eproto}, {
+      &scc_info_AudioConfig_service_2eproto.base,
+      &scc_info_VisemesData_service_2eproto.base,
+      &scc_info_BlendShapesData_service_2eproto.base,}};
 
 static void InitDefaultsscc_info_GetResponseResponse_BehaviorTreeResponse_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -365,7 +395,34 @@ static void InitDefaultsscc_info_TriggerConfig_service_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_TriggerConfig_service_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_TriggerConfig_service_2eproto}, {}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_service_2eproto[18];
+static void InitDefaultsscc_info_Viseme_service_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::service::_Viseme_default_instance_;
+    new (ptr) ::service::Viseme();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Viseme_service_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Viseme_service_2eproto}, {}};
+
+static void InitDefaultsscc_info_VisemesData_service_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::service::_VisemesData_default_instance_;
+    new (ptr) ::service::VisemesData();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_VisemesData_service_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_VisemesData_service_2eproto}, {
+      &scc_info_Viseme_service_2eproto.base,}};
+
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_service_2eproto[21];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_service_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_service_2eproto = nullptr;
 
@@ -464,13 +521,16 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_service_2eproto::offsets[] PRO
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::service::GetResponseResponse_AudioResponse, _internal_metadata_),
   ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
+  PROTOBUF_FIELD_OFFSET(::service::GetResponseResponse_AudioResponse, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::service::GetResponseResponse_AudioResponse, audio_data_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseResponse_AudioResponse, audio_config_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseResponse_AudioResponse, text_data_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseResponse_AudioResponse, end_of_response_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseResponse_AudioResponse, face_data_),
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  PROTOBUF_FIELD_OFFSET(::service::GetResponseResponse_AudioResponse, face_data_type_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::service::GetResponseResponse_ActionResponse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -504,7 +564,40 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_service_2eproto::offsets[] PRO
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   PROTOBUF_FIELD_OFFSET(::service::GetResponseResponse, response_type_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::VisemesData, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::service::VisemesData, visemes_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, sil_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, pp_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, ff_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, th_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, dd_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, kk_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, ch_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, ss_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, nn_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, rr_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, aa_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, e_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, ih_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, oh_),
+  PROTOBUF_FIELD_OFFSET(::service::Viseme, ou_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::BlendShapesData, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::service::BlendShapesData, blendshape_data_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::service::HelloRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -531,12 +624,15 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 76, -1, sizeof(::service::GetResponseRequest)},
   { 84, -1, sizeof(::service::GetResponseRequestSingle)},
   { 91, -1, sizeof(::service::GetResponseResponse_AudioResponse)},
-  { 101, -1, sizeof(::service::GetResponseResponse_ActionResponse)},
-  { 107, -1, sizeof(::service::GetResponseResponse_BehaviorTreeResponse)},
-  { 115, -1, sizeof(::service::GetResponseResponse_UserTranscript)},
-  { 123, -1, sizeof(::service::GetResponseResponse)},
-  { 135, -1, sizeof(::service::HelloRequest)},
-  { 141, -1, sizeof(::service::HelloResponse)},
+  { 104, -1, sizeof(::service::GetResponseResponse_ActionResponse)},
+  { 110, -1, sizeof(::service::GetResponseResponse_BehaviorTreeResponse)},
+  { 118, -1, sizeof(::service::GetResponseResponse_UserTranscript)},
+  { 126, -1, sizeof(::service::GetResponseResponse)},
+  { 139, -1, sizeof(::service::VisemesData)},
+  { 145, -1, sizeof(::service::Viseme)},
+  { 165, -1, sizeof(::service::BlendShapesData)},
+  { 171, -1, sizeof(::service::HelloRequest)},
+  { 177, -1, sizeof(::service::HelloResponse)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -556,6 +652,9 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_GetResponseResponse_BehaviorTreeResponse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_GetResponseResponse_UserTranscript_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_GetResponseResponse_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_VisemesData_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_Viseme_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_BlendShapesData_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_HelloRequest_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_HelloResponse_default_instance_),
 };
@@ -593,7 +692,7 @@ const char descriptor_table_protodef_service_2eproto[] PROTOBUF_SECTION_VARIABLE
   "B\016\n\014request_type\"\204\001\n\030GetResponseRequestS"
   "ingle\0224\n\017response_config\030\001 \001(\0132\033.service"
   ".GetResponseRequest\0222\n\rresponse_data\030\002 \001"
-  "(\0132\033.service.GetResponseRequest\"\312\005\n\023GetR"
+  "(\0132\033.service.GetResponseRequest\"\334\006\n\023GetR"
   "esponseResponse\022\022\n\nsession_id\030\001 \001(\t\022F\n\017a"
   "ction_response\030\002 \001(\0132+.service.GetRespon"
   "seResponse.ActionResponseH\000\022D\n\016audio_res"
@@ -602,39 +701,51 @@ const char descriptor_table_protodef_service_2eproto[] PROTOBUF_SECTION_VARIABLE
   "\n\nuser_query\030\005 \001(\0132+.service.GetResponse"
   "Response.UserTranscriptH\000\022H\n\013bt_response"
   "\030\006 \001(\01321.service.GetResponseResponse.Beh"
-  "aviorTreeResponseH\000\032\216\001\n\rAudioResponse\022\022\n"
-  "\naudio_data\030\001 \001(\014\022*\n\014audio_config\030\002 \001(\0132"
-  "\024.service.AudioConfig\022\021\n\ttext_data\030\003 \001(\t"
-  "\022\027\n\017end_of_response\030\004 \001(\010\022\021\n\tface_data\030\005"
-  " \001(\t\032 \n\016ActionResponse\022\016\n\006action\030\001 \001(\t\032["
-  "\n\024BehaviorTreeResponse\022\017\n\007bt_code\030\001 \001(\t\022"
-  "\024\n\014bt_constants\030\002 \001(\t\022\034\n\024narrative_secti"
-  "on_id\030\003 \001(\t\032N\n\016UserTranscript\022\021\n\ttext_da"
-  "ta\030\001 \001(\t\022\020\n\010is_final\030\002 \001(\010\022\027\n\017end_of_res"
-  "ponse\030\003 \001(\010B\017\n\rresponse_type\"\034\n\014HelloReq"
-  "uest\022\014\n\004name\030\001 \001(\t\" \n\rHelloResponse\022\017\n\007m"
-  "essage\030\001 \001(\t*\212\001\n\tFaceModel\022\032\n\026FACE_MODEL"
-  "_UNSPECIFIED\020\000\022\036\n\032FACE_MODEL_A_2F_MODEL_"
-  "NAME\020\001\022\"\n\036FACE_MODEL_PHONEMES_MODEL_NAME"
-  "\020\002\022\035\n\031FACE_MODEL_OVR_MODEL_NAME\020\0032\370\002\n\rCo"
-  "nvaiService\0228\n\005Hello\022\025.service.HelloRequ"
-  "est\032\026.service.HelloResponse\"\000\022B\n\013HelloSt"
-  "ream\022\025.service.HelloRequest\032\026.service.He"
-  "lloResponse\"\000(\0010\001\022\?\n\014SpeechToText\022\023.serv"
-  "ice.STTRequest\032\024.service.STTResponse\"\000(\001"
-  "0\001\022N\n\013GetResponse\022\033.service.GetResponseR"
-  "equest\032\034.service.GetResponseResponse\"\000(\001"
-  "0\001\022X\n\021GetResponseSingle\022!.service.GetRes"
-  "ponseRequestSingle\032\034.service.GetResponse"
-  "Response\"\0000\001b\006proto3"
+  "aviorTreeResponseH\000\022\032\n\020emotion_response\030"
+  "\007 \001(\tH\000\032\204\002\n\rAudioResponse\022\022\n\naudio_data\030"
+  "\001 \001(\014\022*\n\014audio_config\030\002 \001(\0132\024.service.Au"
+  "dioConfig\022\021\n\ttext_data\030\003 \001(\t\022\027\n\017end_of_r"
+  "esponse\030\004 \001(\010\022\021\n\tface_data\030\005 \001(\t\022,\n\014vise"
+  "mes_data\030\006 \001(\0132\024.service.VisemesDataH\000\0224"
+  "\n\020blendshapes_data\030\007 \001(\0132\030.service.Blend"
+  "ShapesDataH\000B\020\n\016face_data_type\032 \n\016Action"
+  "Response\022\016\n\006action\030\001 \001(\t\032[\n\024BehaviorTree"
+  "Response\022\017\n\007bt_code\030\001 \001(\t\022\024\n\014bt_constant"
+  "s\030\002 \001(\t\022\034\n\024narrative_section_id\030\003 \001(\t\032N\n"
+  "\016UserTranscript\022\021\n\ttext_data\030\001 \001(\t\022\020\n\010is"
+  "_final\030\002 \001(\010\022\027\n\017end_of_response\030\003 \001(\010B\017\n"
+  "\rresponse_type\"/\n\013VisemesData\022 \n\007visemes"
+  "\030\001 \001(\0132\017.service.Viseme\"\274\001\n\006Viseme\022\013\n\003si"
+  "l\030\001 \001(\002\022\n\n\002pp\030\002 \001(\002\022\n\n\002ff\030\003 \001(\002\022\n\n\002th\030\004 "
+  "\001(\002\022\n\n\002dd\030\005 \001(\002\022\n\n\002kk\030\006 \001(\002\022\n\n\002ch\030\007 \001(\002\022"
+  "\n\n\002ss\030\010 \001(\002\022\n\n\002nn\030\t \001(\002\022\n\n\002rr\030\n \001(\002\022\n\n\002a"
+  "a\030\013 \001(\002\022\t\n\001e\030\014 \001(\002\022\n\n\002ih\030\r \001(\002\022\n\n\002oh\030\016 \001"
+  "(\002\022\n\n\002ou\030\017 \001(\002\"*\n\017BlendShapesData\022\027\n\017ble"
+  "ndshape_data\030\001 \001(\t\"\034\n\014HelloRequest\022\014\n\004na"
+  "me\030\001 \001(\t\" \n\rHelloResponse\022\017\n\007message\030\001 \001"
+  "(\t*\212\001\n\tFaceModel\022\032\n\026FACE_MODEL_UNSPECIFI"
+  "ED\020\000\022\036\n\032FACE_MODEL_A_2F_MODEL_NAME\020\001\022\"\n\036"
+  "FACE_MODEL_PHONEMES_MODEL_NAME\020\002\022\035\n\031FACE"
+  "_MODEL_OVR_MODEL_NAME\020\0032\370\002\n\rConvaiServic"
+  "e\0228\n\005Hello\022\025.service.HelloRequest\032\026.serv"
+  "ice.HelloResponse\"\000\022B\n\013HelloStream\022\025.ser"
+  "vice.HelloRequest\032\026.service.HelloRespons"
+  "e\"\000(\0010\001\022\?\n\014SpeechToText\022\023.service.STTReq"
+  "uest\032\024.service.STTResponse\"\000(\0010\001\022N\n\013GetR"
+  "esponse\022\033.service.GetResponseRequest\032\034.s"
+  "ervice.GetResponseResponse\"\000(\0010\001\022X\n\021GetR"
+  "esponseSingle\022!.service.GetResponseReque"
+  "stSingle\032\034.service.GetResponseResponse\"\000"
+  "0\001b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_service_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_service_2eproto_sccs[18] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_service_2eproto_sccs[21] = {
   &scc_info_ActionConfig_service_2eproto.base,
   &scc_info_ActionConfig_Character_service_2eproto.base,
   &scc_info_ActionConfig_Object_service_2eproto.base,
   &scc_info_AudioConfig_service_2eproto.base,
+  &scc_info_BlendShapesData_service_2eproto.base,
   &scc_info_GetResponseRequest_service_2eproto.base,
   &scc_info_GetResponseRequest_GetResponseConfig_service_2eproto.base,
   &scc_info_GetResponseRequest_GetResponseData_service_2eproto.base,
@@ -649,13 +760,15 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ser
   &scc_info_STTRequest_service_2eproto.base,
   &scc_info_STTResponse_service_2eproto.base,
   &scc_info_TriggerConfig_service_2eproto.base,
+  &scc_info_Viseme_service_2eproto.base,
+  &scc_info_VisemesData_service_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_service_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_service_2eproto = {
-  false, false, descriptor_table_protodef_service_2eproto, "service.proto", 2620,
-  &descriptor_table_service_2eproto_once, descriptor_table_service_2eproto_sccs, descriptor_table_service_2eproto_deps, 18, 0,
+  false, false, descriptor_table_protodef_service_2eproto, "service.proto", 3050,
+  &descriptor_table_service_2eproto_once, descriptor_table_service_2eproto_sccs, descriptor_table_service_2eproto_deps, 21, 0,
   schemas, file_default_instances, TableStruct_service_2eproto::offsets,
-  file_level_metadata_service_2eproto, 18, file_level_enum_descriptors_service_2eproto, file_level_service_descriptors_service_2eproto,
+  file_level_metadata_service_2eproto, 21, file_level_enum_descriptors_service_2eproto, file_level_service_descriptors_service_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -3905,11 +4018,51 @@ void GetResponseRequestSingle::InternalSwap(GetResponseRequestSingle* other) {
 class GetResponseResponse_AudioResponse::_Internal {
  public:
   static const ::service::AudioConfig& audio_config(const GetResponseResponse_AudioResponse* msg);
+  static const ::service::VisemesData& visemes_data(const GetResponseResponse_AudioResponse* msg);
+  static const ::service::BlendShapesData& blendshapes_data(const GetResponseResponse_AudioResponse* msg);
 };
 
 const ::service::AudioConfig&
 GetResponseResponse_AudioResponse::_Internal::audio_config(const GetResponseResponse_AudioResponse* msg) {
   return *msg->audio_config_;
+}
+const ::service::VisemesData&
+GetResponseResponse_AudioResponse::_Internal::visemes_data(const GetResponseResponse_AudioResponse* msg) {
+  return *msg->face_data_type_.visemes_data_;
+}
+const ::service::BlendShapesData&
+GetResponseResponse_AudioResponse::_Internal::blendshapes_data(const GetResponseResponse_AudioResponse* msg) {
+  return *msg->face_data_type_.blendshapes_data_;
+}
+void GetResponseResponse_AudioResponse::set_allocated_visemes_data(::service::VisemesData* visemes_data) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_face_data_type();
+  if (visemes_data) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(visemes_data);
+    if (message_arena != submessage_arena) {
+      visemes_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, visemes_data, submessage_arena);
+    }
+    set_has_visemes_data();
+    face_data_type_.visemes_data_ = visemes_data;
+  }
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.AudioResponse.visemes_data)
+}
+void GetResponseResponse_AudioResponse::set_allocated_blendshapes_data(::service::BlendShapesData* blendshapes_data) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_face_data_type();
+  if (blendshapes_data) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(blendshapes_data);
+    if (message_arena != submessage_arena) {
+      blendshapes_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, blendshapes_data, submessage_arena);
+    }
+    set_has_blendshapes_data();
+    face_data_type_.blendshapes_data_ = blendshapes_data;
+  }
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseResponse.AudioResponse.blendshapes_data)
 }
 GetResponseResponse_AudioResponse::GetResponseResponse_AudioResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
@@ -3941,6 +4094,20 @@ GetResponseResponse_AudioResponse::GetResponseResponse_AudioResponse(const GetRe
     audio_config_ = nullptr;
   }
   end_of_response_ = from.end_of_response_;
+  clear_has_face_data_type();
+  switch (from.face_data_type_case()) {
+    case kVisemesData: {
+      _internal_mutable_visemes_data()->::service::VisemesData::MergeFrom(from._internal_visemes_data());
+      break;
+    }
+    case kBlendshapesData: {
+      _internal_mutable_blendshapes_data()->::service::BlendShapesData::MergeFrom(from._internal_blendshapes_data());
+      break;
+    }
+    case FACE_DATA_TYPE_NOT_SET: {
+      break;
+    }
+  }
   // @@protoc_insertion_point(copy_constructor:service.GetResponseResponse.AudioResponse)
 }
 
@@ -3953,6 +4120,7 @@ void GetResponseResponse_AudioResponse::SharedCtor() {
       reinterpret_cast<char*>(&audio_config_) - reinterpret_cast<char*>(this)),
       0, static_cast<size_t>(reinterpret_cast<char*>(&end_of_response_) -
       reinterpret_cast<char*>(&audio_config_)) + sizeof(end_of_response_));
+  clear_has_face_data_type();
 }
 
 GetResponseResponse_AudioResponse::~GetResponseResponse_AudioResponse() {
@@ -3967,6 +4135,9 @@ void GetResponseResponse_AudioResponse::SharedDtor() {
   text_data_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   face_data_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete audio_config_;
+  if (has_face_data_type()) {
+    clear_face_data_type();
+  }
 }
 
 void GetResponseResponse_AudioResponse::ArenaDtor(void* object) {
@@ -3984,6 +4155,29 @@ const GetResponseResponse_AudioResponse& GetResponseResponse_AudioResponse::defa
 }
 
 
+void GetResponseResponse_AudioResponse::clear_face_data_type() {
+// @@protoc_insertion_point(one_of_clear_start:service.GetResponseResponse.AudioResponse)
+  switch (face_data_type_case()) {
+    case kVisemesData: {
+      if (GetArena() == nullptr) {
+        delete face_data_type_.visemes_data_;
+      }
+      break;
+    }
+    case kBlendshapesData: {
+      if (GetArena() == nullptr) {
+        delete face_data_type_.blendshapes_data_;
+      }
+      break;
+    }
+    case FACE_DATA_TYPE_NOT_SET: {
+      break;
+    }
+  }
+  _oneof_case_[0] = FACE_DATA_TYPE_NOT_SET;
+}
+
+
 void GetResponseResponse_AudioResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:service.GetResponseResponse.AudioResponse)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -3998,6 +4192,7 @@ void GetResponseResponse_AudioResponse::Clear() {
   }
   audio_config_ = nullptr;
   end_of_response_ = false;
+  clear_face_data_type();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -4045,6 +4240,20 @@ const char* GetResponseResponse_AudioResponse::_InternalParse(const char* ptr, :
           auto str = _internal_mutable_face_data();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "service.GetResponseResponse.AudioResponse.face_data"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .service.VisemesData visemes_data = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+          ptr = ctx->ParseMessage(_internal_mutable_visemes_data(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .service.BlendShapesData blendshapes_data = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+          ptr = ctx->ParseMessage(_internal_mutable_blendshapes_data(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -4116,6 +4325,22 @@ failure:
         5, this->_internal_face_data(), target);
   }
 
+  // .service.VisemesData visemes_data = 6;
+  if (_internal_has_visemes_data()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        6, _Internal::visemes_data(this), target, stream);
+  }
+
+  // .service.BlendShapesData blendshapes_data = 7;
+  if (_internal_has_blendshapes_data()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        7, _Internal::blendshapes_data(this), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -4165,6 +4390,25 @@ size_t GetResponseResponse_AudioResponse::ByteSizeLong() const {
     total_size += 1 + 1;
   }
 
+  switch (face_data_type_case()) {
+    // .service.VisemesData visemes_data = 6;
+    case kVisemesData: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *face_data_type_.visemes_data_);
+      break;
+    }
+    // .service.BlendShapesData blendshapes_data = 7;
+    case kBlendshapesData: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *face_data_type_.blendshapes_data_);
+      break;
+    }
+    case FACE_DATA_TYPE_NOT_SET: {
+      break;
+    }
+  }
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -4211,6 +4455,19 @@ void GetResponseResponse_AudioResponse::MergeFrom(const GetResponseResponse_Audi
   if (from.end_of_response() != 0) {
     _internal_set_end_of_response(from._internal_end_of_response());
   }
+  switch (from.face_data_type_case()) {
+    case kVisemesData: {
+      _internal_mutable_visemes_data()->::service::VisemesData::MergeFrom(from._internal_visemes_data());
+      break;
+    }
+    case kBlendshapesData: {
+      _internal_mutable_blendshapes_data()->::service::BlendShapesData::MergeFrom(from._internal_blendshapes_data());
+      break;
+    }
+    case FACE_DATA_TYPE_NOT_SET: {
+      break;
+    }
+  }
 }
 
 void GetResponseResponse_AudioResponse::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -4243,6 +4500,8 @@ void GetResponseResponse_AudioResponse::InternalSwap(GetResponseResponse_AudioRe
       - PROTOBUF_FIELD_OFFSET(GetResponseResponse_AudioResponse, audio_config_)>(
           reinterpret_cast<char*>(&audio_config_),
           reinterpret_cast<char*>(&other->audio_config_));
+  swap(face_data_type_, other->face_data_type_);
+  swap(_oneof_case_[0], other->_oneof_case_[0]);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseResponse_AudioResponse::GetMetadata() const {
@@ -5124,6 +5383,10 @@ GetResponseResponse::GetResponseResponse(const GetResponseResponse& from)
       _internal_mutable_bt_response()->::service::GetResponseResponse_BehaviorTreeResponse::MergeFrom(from._internal_bt_response());
       break;
     }
+    case kEmotionResponse: {
+      _internal_set_emotion_response(from._internal_emotion_response());
+      break;
+    }
     case RESPONSE_TYPE_NOT_SET: {
       break;
     }
@@ -5197,6 +5460,10 @@ void GetResponseResponse::clear_response_type() {
       }
       break;
     }
+    case kEmotionResponse: {
+      response_type_.emotion_response_.Destroy(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+      break;
+    }
     case RESPONSE_TYPE_NOT_SET: {
       break;
     }
@@ -5266,6 +5533,15 @@ const char* GetResponseResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAME
       case 6:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
           ptr = ctx->ParseMessage(_internal_mutable_bt_response(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string emotion_response = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+          auto str = _internal_mutable_emotion_response();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "service.GetResponseResponse.emotion_response"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -5349,6 +5625,16 @@ failure:
         6, _Internal::bt_response(this), target, stream);
   }
 
+  // string emotion_response = 7;
+  if (_internal_has_emotion_response()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_emotion_response().data(), static_cast<int>(this->_internal_emotion_response().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "service.GetResponseResponse.emotion_response");
+    target = stream->WriteStringMaybeAliased(
+        7, this->_internal_emotion_response(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -5406,6 +5692,13 @@ size_t GetResponseResponse::ByteSizeLong() const {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
           *response_type_.bt_response_);
+      break;
+    }
+    // string emotion_response = 7;
+    case kEmotionResponse: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_emotion_response());
       break;
     }
     case RESPONSE_TYPE_NOT_SET: {
@@ -5467,6 +5760,10 @@ void GetResponseResponse::MergeFrom(const GetResponseResponse& from) {
       _internal_mutable_bt_response()->::service::GetResponseResponse_BehaviorTreeResponse::MergeFrom(from._internal_bt_response());
       break;
     }
+    case kEmotionResponse: {
+      _internal_set_emotion_response(from._internal_emotion_response());
+      break;
+    }
     case RESPONSE_TYPE_NOT_SET: {
       break;
     }
@@ -5500,6 +5797,920 @@ void GetResponseResponse::InternalSwap(GetResponseResponse* other) {
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseResponse::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+class VisemesData::_Internal {
+ public:
+  static const ::service::Viseme& visemes(const VisemesData* msg);
+};
+
+const ::service::Viseme&
+VisemesData::_Internal::visemes(const VisemesData* msg) {
+  return *msg->visemes_;
+}
+VisemesData::VisemesData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:service.VisemesData)
+}
+VisemesData::VisemesData(const VisemesData& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  if (from._internal_has_visemes()) {
+    visemes_ = new ::service::Viseme(*from.visemes_);
+  } else {
+    visemes_ = nullptr;
+  }
+  // @@protoc_insertion_point(copy_constructor:service.VisemesData)
+}
+
+void VisemesData::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_VisemesData_service_2eproto.base);
+  visemes_ = nullptr;
+}
+
+VisemesData::~VisemesData() {
+  // @@protoc_insertion_point(destructor:service.VisemesData)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void VisemesData::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  if (this != internal_default_instance()) delete visemes_;
+}
+
+void VisemesData::ArenaDtor(void* object) {
+  VisemesData* _this = reinterpret_cast< VisemesData* >(object);
+  (void)_this;
+}
+void VisemesData::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void VisemesData::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const VisemesData& VisemesData::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_VisemesData_service_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void VisemesData::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.VisemesData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (GetArena() == nullptr && visemes_ != nullptr) {
+    delete visemes_;
+  }
+  visemes_ = nullptr;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* VisemesData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // .service.Viseme visemes = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ctx->ParseMessage(_internal_mutable_visemes(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* VisemesData::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.VisemesData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .service.Viseme visemes = 1;
+  if (this->has_visemes()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        1, _Internal::visemes(this), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.VisemesData)
+  return target;
+}
+
+size_t VisemesData::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.VisemesData)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // .service.Viseme visemes = 1;
+  if (this->has_visemes()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *visemes_);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void VisemesData::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:service.VisemesData)
+  GOOGLE_DCHECK_NE(&from, this);
+  const VisemesData* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<VisemesData>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:service.VisemesData)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:service.VisemesData)
+    MergeFrom(*source);
+  }
+}
+
+void VisemesData::MergeFrom(const VisemesData& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:service.VisemesData)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.has_visemes()) {
+    _internal_mutable_visemes()->::service::Viseme::MergeFrom(from._internal_visemes());
+  }
+}
+
+void VisemesData::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:service.VisemesData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void VisemesData::CopyFrom(const VisemesData& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.VisemesData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool VisemesData::IsInitialized() const {
+  return true;
+}
+
+void VisemesData::InternalSwap(VisemesData* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  swap(visemes_, other->visemes_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata VisemesData::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+class Viseme::_Internal {
+ public:
+};
+
+Viseme::Viseme(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:service.Viseme)
+}
+Viseme::Viseme(const Viseme& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&sil_, &from.sil_,
+    static_cast<size_t>(reinterpret_cast<char*>(&ou_) -
+    reinterpret_cast<char*>(&sil_)) + sizeof(ou_));
+  // @@protoc_insertion_point(copy_constructor:service.Viseme)
+}
+
+void Viseme::SharedCtor() {
+  ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+      reinterpret_cast<char*>(&sil_) - reinterpret_cast<char*>(this)),
+      0, static_cast<size_t>(reinterpret_cast<char*>(&ou_) -
+      reinterpret_cast<char*>(&sil_)) + sizeof(ou_));
+}
+
+Viseme::~Viseme() {
+  // @@protoc_insertion_point(destructor:service.Viseme)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Viseme::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void Viseme::ArenaDtor(void* object) {
+  Viseme* _this = reinterpret_cast< Viseme* >(object);
+  (void)_this;
+}
+void Viseme::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Viseme::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Viseme& Viseme::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Viseme_service_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Viseme::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.Viseme)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&sil_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&ou_) -
+      reinterpret_cast<char*>(&sil_)) + sizeof(ou_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Viseme::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // float sil = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13)) {
+          sil_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float pp = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 21)) {
+          pp_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float ff = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29)) {
+          ff_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float th = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37)) {
+          th_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float dd = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 45)) {
+          dd_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float kk = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 53)) {
+          kk_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float ch = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 61)) {
+          ch_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float ss = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 69)) {
+          ss_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float nn = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 77)) {
+          nn_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float rr = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 85)) {
+          rr_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float aa = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 93)) {
+          aa_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float e = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 101)) {
+          e_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float ih = 13;
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 109)) {
+          ih_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float oh = 14;
+      case 14:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 117)) {
+          oh_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float ou = 15;
+      case 15:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 125)) {
+          ou_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Viseme::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.Viseme)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // float sil = 1;
+  if (!(this->sil() <= 0 && this->sil() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_sil(), target);
+  }
+
+  // float pp = 2;
+  if (!(this->pp() <= 0 && this->pp() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(2, this->_internal_pp(), target);
+  }
+
+  // float ff = 3;
+  if (!(this->ff() <= 0 && this->ff() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(3, this->_internal_ff(), target);
+  }
+
+  // float th = 4;
+  if (!(this->th() <= 0 && this->th() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(4, this->_internal_th(), target);
+  }
+
+  // float dd = 5;
+  if (!(this->dd() <= 0 && this->dd() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(5, this->_internal_dd(), target);
+  }
+
+  // float kk = 6;
+  if (!(this->kk() <= 0 && this->kk() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(6, this->_internal_kk(), target);
+  }
+
+  // float ch = 7;
+  if (!(this->ch() <= 0 && this->ch() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(7, this->_internal_ch(), target);
+  }
+
+  // float ss = 8;
+  if (!(this->ss() <= 0 && this->ss() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(8, this->_internal_ss(), target);
+  }
+
+  // float nn = 9;
+  if (!(this->nn() <= 0 && this->nn() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(9, this->_internal_nn(), target);
+  }
+
+  // float rr = 10;
+  if (!(this->rr() <= 0 && this->rr() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(10, this->_internal_rr(), target);
+  }
+
+  // float aa = 11;
+  if (!(this->aa() <= 0 && this->aa() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(11, this->_internal_aa(), target);
+  }
+
+  // float e = 12;
+  if (!(this->e() <= 0 && this->e() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(12, this->_internal_e(), target);
+  }
+
+  // float ih = 13;
+  if (!(this->ih() <= 0 && this->ih() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(13, this->_internal_ih(), target);
+  }
+
+  // float oh = 14;
+  if (!(this->oh() <= 0 && this->oh() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(14, this->_internal_oh(), target);
+  }
+
+  // float ou = 15;
+  if (!(this->ou() <= 0 && this->ou() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(15, this->_internal_ou(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.Viseme)
+  return target;
+}
+
+size_t Viseme::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.Viseme)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // float sil = 1;
+  if (!(this->sil() <= 0 && this->sil() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float pp = 2;
+  if (!(this->pp() <= 0 && this->pp() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float ff = 3;
+  if (!(this->ff() <= 0 && this->ff() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float th = 4;
+  if (!(this->th() <= 0 && this->th() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float dd = 5;
+  if (!(this->dd() <= 0 && this->dd() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float kk = 6;
+  if (!(this->kk() <= 0 && this->kk() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float ch = 7;
+  if (!(this->ch() <= 0 && this->ch() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float ss = 8;
+  if (!(this->ss() <= 0 && this->ss() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float nn = 9;
+  if (!(this->nn() <= 0 && this->nn() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float rr = 10;
+  if (!(this->rr() <= 0 && this->rr() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float aa = 11;
+  if (!(this->aa() <= 0 && this->aa() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float e = 12;
+  if (!(this->e() <= 0 && this->e() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float ih = 13;
+  if (!(this->ih() <= 0 && this->ih() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float oh = 14;
+  if (!(this->oh() <= 0 && this->oh() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float ou = 15;
+  if (!(this->ou() <= 0 && this->ou() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Viseme::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:service.Viseme)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Viseme* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Viseme>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:service.Viseme)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:service.Viseme)
+    MergeFrom(*source);
+  }
+}
+
+void Viseme::MergeFrom(const Viseme& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:service.Viseme)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!(from.sil() <= 0 && from.sil() >= 0)) {
+    _internal_set_sil(from._internal_sil());
+  }
+  if (!(from.pp() <= 0 && from.pp() >= 0)) {
+    _internal_set_pp(from._internal_pp());
+  }
+  if (!(from.ff() <= 0 && from.ff() >= 0)) {
+    _internal_set_ff(from._internal_ff());
+  }
+  if (!(from.th() <= 0 && from.th() >= 0)) {
+    _internal_set_th(from._internal_th());
+  }
+  if (!(from.dd() <= 0 && from.dd() >= 0)) {
+    _internal_set_dd(from._internal_dd());
+  }
+  if (!(from.kk() <= 0 && from.kk() >= 0)) {
+    _internal_set_kk(from._internal_kk());
+  }
+  if (!(from.ch() <= 0 && from.ch() >= 0)) {
+    _internal_set_ch(from._internal_ch());
+  }
+  if (!(from.ss() <= 0 && from.ss() >= 0)) {
+    _internal_set_ss(from._internal_ss());
+  }
+  if (!(from.nn() <= 0 && from.nn() >= 0)) {
+    _internal_set_nn(from._internal_nn());
+  }
+  if (!(from.rr() <= 0 && from.rr() >= 0)) {
+    _internal_set_rr(from._internal_rr());
+  }
+  if (!(from.aa() <= 0 && from.aa() >= 0)) {
+    _internal_set_aa(from._internal_aa());
+  }
+  if (!(from.e() <= 0 && from.e() >= 0)) {
+    _internal_set_e(from._internal_e());
+  }
+  if (!(from.ih() <= 0 && from.ih() >= 0)) {
+    _internal_set_ih(from._internal_ih());
+  }
+  if (!(from.oh() <= 0 && from.oh() >= 0)) {
+    _internal_set_oh(from._internal_oh());
+  }
+  if (!(from.ou() <= 0 && from.ou() >= 0)) {
+    _internal_set_ou(from._internal_ou());
+  }
+}
+
+void Viseme::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:service.Viseme)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Viseme::CopyFrom(const Viseme& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.Viseme)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Viseme::IsInitialized() const {
+  return true;
+}
+
+void Viseme::InternalSwap(Viseme* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Viseme, ou_)
+      + sizeof(Viseme::ou_)
+      - PROTOBUF_FIELD_OFFSET(Viseme, sil_)>(
+          reinterpret_cast<char*>(&sil_),
+          reinterpret_cast<char*>(&other->sil_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Viseme::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+class BlendShapesData::_Internal {
+ public:
+};
+
+BlendShapesData::BlendShapesData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:service.BlendShapesData)
+}
+BlendShapesData::BlendShapesData(const BlendShapesData& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  blendshape_data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_blendshape_data().empty()) {
+    blendshape_data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_blendshape_data(), 
+      GetArena());
+  }
+  // @@protoc_insertion_point(copy_constructor:service.BlendShapesData)
+}
+
+void BlendShapesData::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_BlendShapesData_service_2eproto.base);
+  blendshape_data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+BlendShapesData::~BlendShapesData() {
+  // @@protoc_insertion_point(destructor:service.BlendShapesData)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void BlendShapesData::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  blendshape_data_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void BlendShapesData::ArenaDtor(void* object) {
+  BlendShapesData* _this = reinterpret_cast< BlendShapesData* >(object);
+  (void)_this;
+}
+void BlendShapesData::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void BlendShapesData::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const BlendShapesData& BlendShapesData::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_BlendShapesData_service_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void BlendShapesData::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.BlendShapesData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  blendshape_data_.ClearToEmpty();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* BlendShapesData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // string blendshape_data = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_blendshape_data();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "service.BlendShapesData.blendshape_data"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* BlendShapesData::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.BlendShapesData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string blendshape_data = 1;
+  if (this->blendshape_data().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_blendshape_data().data(), static_cast<int>(this->_internal_blendshape_data().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "service.BlendShapesData.blendshape_data");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_blendshape_data(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.BlendShapesData)
+  return target;
+}
+
+size_t BlendShapesData::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.BlendShapesData)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string blendshape_data = 1;
+  if (this->blendshape_data().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_blendshape_data());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void BlendShapesData::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:service.BlendShapesData)
+  GOOGLE_DCHECK_NE(&from, this);
+  const BlendShapesData* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<BlendShapesData>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:service.BlendShapesData)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:service.BlendShapesData)
+    MergeFrom(*source);
+  }
+}
+
+void BlendShapesData::MergeFrom(const BlendShapesData& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:service.BlendShapesData)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.blendshape_data().size() > 0) {
+    _internal_set_blendshape_data(from._internal_blendshape_data());
+  }
+}
+
+void BlendShapesData::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:service.BlendShapesData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void BlendShapesData::CopyFrom(const BlendShapesData& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.BlendShapesData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool BlendShapesData::IsInitialized() const {
+  return true;
+}
+
+void BlendShapesData::InternalSwap(BlendShapesData* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  blendshape_data_.Swap(&other->blendshape_data_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata BlendShapesData::GetMetadata() const {
   return GetMetadataStatic();
 }
 
@@ -5966,6 +7177,15 @@ template<> PROTOBUF_NOINLINE ::service::GetResponseResponse_UserTranscript* Aren
 }
 template<> PROTOBUF_NOINLINE ::service::GetResponseResponse* Arena::CreateMaybeMessage< ::service::GetResponseResponse >(Arena* arena) {
   return Arena::CreateMessageInternal< ::service::GetResponseResponse >(arena);
+}
+template<> PROTOBUF_NOINLINE ::service::VisemesData* Arena::CreateMaybeMessage< ::service::VisemesData >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::VisemesData >(arena);
+}
+template<> PROTOBUF_NOINLINE ::service::Viseme* Arena::CreateMaybeMessage< ::service::Viseme >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::Viseme >(arena);
+}
+template<> PROTOBUF_NOINLINE ::service::BlendShapesData* Arena::CreateMaybeMessage< ::service::BlendShapesData >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::BlendShapesData >(arena);
 }
 template<> PROTOBUF_NOINLINE ::service::HelloRequest* Arena::CreateMaybeMessage< ::service::HelloRequest >(Arena* arena) {
   return Arena::CreateMessageInternal< ::service::HelloRequest >(arena);
