@@ -261,9 +261,19 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 
 		DirCameraToCharacter.Normalize();
 		float CurrentFocuseDot = FVector::DotProduct(DirCameraToCharacter, CameraForward);
+		float mxnScore = -1;
+		float score = 0;
 
-		if (CurrentFocuseDot > FocuseDotThresshold)
+		if (PlaneView) {
+			score = CurrentFocuseDot / DistSquared2D;
+		}
+		else {
+			score = CurrentFocuseDot / DistSquared;
+		}
+
+		if (score > mxnScore && CurrentFocuseDot >= FocuseDotThresshold)
 		{
+			mxnScore = score;
 			FocuseDotThresshold = CurrentFocuseDot;
 			ConvaiCharacter = CurrentConvaiCharacter;
 			Found = true;
