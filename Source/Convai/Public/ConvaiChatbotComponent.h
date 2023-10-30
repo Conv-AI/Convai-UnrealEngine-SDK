@@ -20,6 +20,8 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_SixParams(FOnTextReceivedSignature_V2,
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnActionReceivedSignature_Deprecated, UConvaiChatbotComponent, OnActionReceivedEvent, const TArray<FConvaiResultAction>&, SequenceOfActions);
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(FOnActionReceivedSignature_V2, UConvaiChatbotComponent, OnActionReceivedEvent_V2, UConvaiChatbotComponent*, ChatbotComponent, UConvaiPlayerComponent*, InteractingPlayerComponent, const TArray<FConvaiResultAction>&, SequenceOfActions);
 
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnEmotionReceivedSignature, UConvaiChatbotComponent, OnEmotionStateChangedEvent, UConvaiChatbotComponent*, ChatbotComponent, UConvaiPlayerComponent*, InteractingPlayerComponent);
+
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnCharacterDataLoadSignature_Deprecated, UConvaiChatbotComponent, OnCharacterDataLoadEvent, bool, Success);
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnCharacterDataLoadSignature_V2, UConvaiChatbotComponent, OnCharacterDataLoadEvent_V2, UConvaiChatbotComponent*, ChatbotComponent, bool, Success);
 
@@ -93,6 +95,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Convai|Actions", Replicated)
 	TArray<FConvaiResultAction> ActionsQueue;
+
+	UPROPERTY(Replicated)
+	FConvaiEmotionState EmotionState;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai|Emotion", Replicated)
+	bool LockEmotionState = false;
 
 	/**
 	 *    Used to track memory of a previous conversation, set to -1 means no previous conversation,
@@ -197,6 +205,14 @@ public:
 	 */
 	bool TriggerNamedBlueprintAction(const FString& ActionName, FConvaiResultAction ConvaiActionStruct);
 
+	UFUNCTION(BlueprintCallable, Category = "Convai|Emotion")
+	void ForceSetEmotion(EBasicEmotions BasicEmotion, EEmotionIntensity Intensity, bool ResetOtherEmotions = false);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Convai|Emotion")
+	float GetEmotionScore(EBasicEmotions Emotion);
+
+	UFUNCTION(BlueprintCallable, Category = "Convai|Emotion")
+	void ResetEmotionState();
 
 public:
 	/** Called when a new action is received from the API */
@@ -204,6 +220,9 @@ public:
 	FOnActionReceivedSignature_Deprecated OnActionReceivedEvent;
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Actions Received"))
 	FOnActionReceivedSignature_V2 OnActionReceivedEvent_V2;
+	
+	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Emotion State Changed"))
+	FOnEmotionReceivedSignature OnEmotionStateChangedEvent;
 
 	/** Called when new text is received from the API, AudioDuration = 0 if no audio was received */
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "_DEPRECATED On Text Received"))
@@ -299,12 +318,15 @@ private:
 	void Broadcast_onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);	
 	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
 	void Broadcast_OnNarrativeSectionReceived(const FString& BT_Code, const FString& BT_Constants, const FString& ReceivedNarrativeSectionID);
+	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
+	void Broadcast_onEmotionReceived(const FString& ReceivedEmotionResponse);
 
 	void OnTranscriptionReceived(FString Transcription, bool IsTranscriptionReady, bool IsFinal);
 	void onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal);
 	void OnFaceDataReceived(FAnimationSequence FaceDataAnimation);
 	void onSessionIDReceived(FString ReceivedSessionID);
 	void onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
+	void onEmotionReceived(FString ReceivedEmotionResponse);
 	void onFinishedReceivingData();
 	void OnNarrativeSectionReceived(FString BT_Code, FString BT_Constants, FString ReceivedNarrativeSectionID);
 	void onFailure();

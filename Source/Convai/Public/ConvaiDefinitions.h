@@ -29,6 +29,29 @@ enum class ETTS_Voice_Type : uint8
 	Applejack,
 };
 
+UENUM(BlueprintType)
+enum class EEmotionIntensity : uint8
+{
+	Basic        UMETA(DisplayName = "Basic"),
+	LessIntense  UMETA(DisplayName = "Less Intense"),
+	MoreIntense  UMETA(DisplayName = "More Intense"),
+	None         UMETA(DisplayName = "None", BlueprintHidden) // To handle cases when the emotion is not found
+};
+
+UENUM(BlueprintType)
+enum class EBasicEmotions : uint8
+{
+	Joy          UMETA(DisplayName = "Joy"),
+	Trust        UMETA(DisplayName = "Trust"),
+	Fear         UMETA(DisplayName = "Fear"),
+	Surprise     UMETA(DisplayName = "Surprise"),
+	Sadness      UMETA(DisplayName = "Sadness"),
+	Disgust      UMETA(DisplayName = "Disgust"),
+	Anger        UMETA(DisplayName = "Anger"),
+	Anticipation UMETA(DisplayName = "Anticipation"),
+	None         UMETA(DisplayName = "None", BlueprintHidden) // To handle cases when the emotion is not found
+};
+
 USTRUCT(BlueprintType)
 struct FConvaiObjectEntry
 {
@@ -148,6 +171,26 @@ struct FAnimationFrame
 
 	UPROPERTY()
 	TMap<FName, float> BlendShapes;
+
+	FString ToString()
+	{
+		FString Result;
+
+		// iterate over all elements in the TMap
+		for (const auto& Elem : BlendShapes)
+		{
+			// Append the key-value pair to the result string
+			Result += Elem.Key.ToString() + TEXT(": ") + FString::SanitizeFloat(Elem.Value) + TEXT(", ");
+		}
+
+		// Remove the trailing comma and space for cleanliness, if present
+		if (Result.Len() > 0)
+		{
+			Result.RemoveAt(Result.Len() - 2);
+		}
+
+		return Result;
+	}
 };
 
 USTRUCT()
@@ -160,6 +203,154 @@ public:
 
 	UPROPERTY()
 	float Duration = 0;
+};
+
+USTRUCT()
+struct FConvaiEmotionState
+{
+	GENERATED_BODY()
+
+public:
+	void GetEmotionDetails(const FString& Emotion, EEmotionIntensity& Intensity, EBasicEmotions& BasicEmotion)
+	{
+		// Static dictionaries of emotions
+		static const TMap<FString, EBasicEmotions> BasicEmotions = {
+			{"Joy", EBasicEmotions::Joy},
+			{"Trust", EBasicEmotions::Trust},
+			{"Fear", EBasicEmotions::Fear},
+			{"Surprise", EBasicEmotions::Surprise},
+			{"Sadness", EBasicEmotions::Sadness},
+			{"Disgust", EBasicEmotions::Disgust},
+			{"Anger", EBasicEmotions::Anger},
+			{"Anticipation", EBasicEmotions::Anticipation}
+		};
+
+		static const TMap<FString, EBasicEmotions> LessIntenseEmotions = {
+			{"Serenity", EBasicEmotions::Joy},
+			{"Acceptance", EBasicEmotions::Trust},
+			{"Apprehension", EBasicEmotions::Fear},
+			{"Distraction", EBasicEmotions::Surprise},
+			{"Pensiveness", EBasicEmotions::Sadness},
+			{"Boredom", EBasicEmotions::Disgust},
+			{"Annoyance", EBasicEmotions::Anger},
+			{"Interest", EBasicEmotions::Anticipation}
+		};
+
+		static const TMap<FString, EBasicEmotions> MoreIntenseEmotions = {
+			{"Ecstasy", EBasicEmotions::Joy},
+			{"Admiration", EBasicEmotions::Trust},
+			{"Terror", EBasicEmotions::Fear},
+			{"Amazement", EBasicEmotions::Surprise},
+			{"Grief", EBasicEmotions::Sadness},
+			{"Loathing", EBasicEmotions::Disgust},
+			{"Rage", EBasicEmotions::Anger},
+			{"Vigilance", EBasicEmotions::Anticipation}
+		};
+
+		// Initialize the output parameters
+		Intensity = EEmotionIntensity::None;
+		BasicEmotion = EBasicEmotions::None;
+
+		// Look up the emotion
+		if (BasicEmotions.Contains(Emotion))
+		{
+			Intensity = EEmotionIntensity::Basic;
+			BasicEmotion = BasicEmotions[Emotion];
+		}
+		else if (LessIntenseEmotions.Contains(Emotion))
+		{
+			Intensity = EEmotionIntensity::LessIntense;
+			BasicEmotion = LessIntenseEmotions[Emotion];
+		}
+		else if (MoreIntenseEmotions.Contains(Emotion))
+		{
+			Intensity = EEmotionIntensity::MoreIntense;
+			BasicEmotion = MoreIntenseEmotions[Emotion];
+		}
+	}
+
+	void ForceSetEmotion(const EBasicEmotions& BasicEmotion, const EEmotionIntensity& Intensity, const bool& ResetOtherEmotions)
+	{
+		if (ResetOtherEmotions)
+		{
+			ResetEmotionScores();
+		}
+
+		float Score = 0;
+		if (const float* ScoreMultiplier = ScoreMultipliers.Find(Intensity))
+		{
+			Score = *ScoreMultiplier;
+		}
+		else
+		{
+			Score = 0;
+		}
+
+		EmotionsScore.Add(BasicEmotion, Score);
+	}
+
+	void SetEmotionData(const FString& EmotionRespponse)
+	{
+		TArray<FString> OutputEmotionsArray;
+		// Separate the string into an array based on the space delimiter
+		EmotionRespponse.ParseIntoArray(OutputEmotionsArray, TEXT(" "), true);
+		SetEmotionData(OutputEmotionsArray);
+	}
+
+	void SetEmotionData(const TArray<FString>& EmotionArray)
+	{
+		ResetEmotionScores();
+		EEmotionIntensity Intensity = EEmotionIntensity::None;
+		EBasicEmotions BasicEmotion = EBasicEmotions::None;
+		float Score = 0;
+
+		int i = 0;
+		for (FString Emotion : EmotionArray)
+		{
+			GetEmotionDetails(Emotion, Intensity, BasicEmotion);
+			if (Intensity == EEmotionIntensity::None || BasicEmotion == EBasicEmotions::None)
+				continue;
+
+			if (const float* ScoreMultiplier = ScoreMultipliers.Find(Intensity))
+			{
+				Score = *ScoreMultiplier  * FMath::Exp(float(-i) / float(EmotionArray.Num()));
+			}
+			else
+			{
+				Score = 0;
+			}
+
+			EmotionsScore.Add(BasicEmotion, Score);
+			i++;
+		}
+
+	}
+
+	float GetEmotionScore(const EBasicEmotions& Emotion)
+	{
+		float Score = 0;
+		if (const float* ScorePointer = EmotionsScore.Find(Emotion))
+		{
+			Score = *ScorePointer;
+		}
+		return Score;
+	}
+
+	void ResetEmotionScores()
+	{
+		EmotionsScore.Empty();
+		
+		for (int32 i = 0; i <= static_cast<int32>(EBasicEmotions::Anticipation); ++i)
+		{
+			EBasicEmotions EnumValue = static_cast<EBasicEmotions>(i);
+			EmotionsScore.Add(EnumValue, 0);
+		}
+	}
+
+private:
+	TMap<EBasicEmotions, float> EmotionsScore;
+
+	static const TMap<EEmotionIntensity, float> ScoreMultipliers;
 };
 
 UCLASS(Blueprintable)

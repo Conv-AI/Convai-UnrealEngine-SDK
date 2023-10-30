@@ -35,6 +35,8 @@ void UConvaiChatbotComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	DOREPLIFETIME(UConvaiChatbotComponent, ReadyPlayerMeLink);
 	DOREPLIFETIME(UConvaiChatbotComponent, CurrentConvaiPlayerComponent);
 	DOREPLIFETIME(UConvaiChatbotComponent, ActionsQueue);
+	DOREPLIFETIME(UConvaiChatbotComponent, EmotionState);
+	DOREPLIFETIME(UConvaiChatbotComponent, LockEmotionState);
 }
 
 bool UConvaiChatbotComponent::IsInConversation()
@@ -225,6 +227,23 @@ bool UConvaiChatbotComponent::TriggerNamedBlueprintAction(const FString& ActionN
 	return false;
 }
 
+void UConvaiChatbotComponent::ForceSetEmotion(EBasicEmotions BasicEmotion, EEmotionIntensity Intensity, bool ResetOtherEmotions)
+{
+	EmotionState.ForceSetEmotion(BasicEmotion, Intensity, ResetOtherEmotions);
+	OnEmotionStateChangedEvent.Broadcast(this, CurrentConvaiPlayerComponent);
+}
+
+float UConvaiChatbotComponent::GetEmotionScore(EBasicEmotions Emotion)
+{
+	return EmotionState.GetEmotionScore(Emotion);
+}
+
+void UConvaiChatbotComponent::ResetEmotionState()
+{
+	EmotionState.ResetEmotionScores();
+	OnEmotionStateChangedEvent.Broadcast(this, CurrentConvaiPlayerComponent);
+}
+
 void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAPI_Key, FString OverrideAPI_Key, uint32 InToken)
 {
 	if (!IsValid(InConvaiPlayerComponent))
@@ -395,6 +414,7 @@ void UConvaiChatbotComponent::Bind_GRPC_Request_Delegates()
 	ConvaiGRPCGetResponseProxy->OnSessionIDReceived.BindUObject(this, &UConvaiChatbotComponent::onSessionIDReceived);
 	ConvaiGRPCGetResponseProxy->OnActionsReceived.BindUObject(this, &UConvaiChatbotComponent::onActionSequenceReceived);
 	ConvaiGRPCGetResponseProxy->OnNarrativeDataReceived.BindUObject(this, &UConvaiChatbotComponent::OnNarrativeSectionReceived);
+	ConvaiGRPCGetResponseProxy->OnEmotionReceived.BindUObject(this, &UConvaiChatbotComponent::onEmotionReceived);
 	ConvaiGRPCGetResponseProxy->OnFinish.BindUObject(this, &UConvaiChatbotComponent::onFinishedReceivingData);
 	ConvaiGRPCGetResponseProxy->OnFailure.BindUObject(this, &UConvaiChatbotComponent::onFailure);
 }
@@ -411,6 +431,7 @@ void UConvaiChatbotComponent::Unbind_GRPC_Request_Delegates()
 	ConvaiGRPCGetResponseProxy->OnFaceDataReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnSessionIDReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnActionsReceived.Unbind();
+	ConvaiGRPCGetResponseProxy->OnEmotionReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnFinish.Unbind();
 	ConvaiGRPCGetResponseProxy->OnFailure.Unbind();
 }
@@ -487,6 +508,14 @@ void UConvaiChatbotComponent::Broadcast_OnNarrativeSectionReceived_Implementatio
 	if (!UKismetSystemLibrary::IsServer(this))
 	{
 		OnNarrativeSectionReceived(BT_Code, BT_Constants, ReceivedNarrativeSectionID);
+	}
+}
+
+void UConvaiChatbotComponent::Broadcast_onEmotionReceived_Implementation(const FString& ReceivedEmotionResponse)
+{
+	if (!UKismetSystemLibrary::IsServer(this))
+	{
+		onEmotionReceived(ReceivedEmotionResponse);
 	}
 }
 
@@ -577,6 +606,26 @@ void UConvaiChatbotComponent::onActionSequenceReceived(const TArray<FConvaiResul
 
 		// Run the deprecated event
 		OnActionReceivedEvent.Broadcast(ReceivedSequenceOfActions); 
+		});
+}
+
+void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse)
+{
+	if (LockEmotionState)
+		return;
+
+	// Broadcast to clients
+	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
+	{
+		Broadcast_onEmotionReceived(ReceivedEmotionResponse);
+	}
+
+	// Update teh emotion state
+	EmotionState.SetEmotionData(ReceivedEmotionResponse);
+
+	// Broadcast the emotion state changed event
+	AsyncTask(ENamedThreads::GameThread, [this] {
+		OnEmotionStateChangedEvent.Broadcast(this, CurrentConvaiPlayerComponent);
 		});
 }
 
