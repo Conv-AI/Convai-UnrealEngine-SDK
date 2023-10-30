@@ -97,7 +97,7 @@ uint32 FgRPCClient::Run()
 		if (got_tag)
 		{
 			FgRPC_Delegate* gRPC_Delegate = static_cast<FgRPC_Delegate*>(got_tag);
-			AsyncTask(ENamedThreads::GameThread, [&gRPC_Delegate, &ok, this]
+			AsyncTask(ENamedThreads::GameThread, [gRPC_Delegate, ok, this]
 			{
 				if (bIsRunning)
 				{
@@ -202,6 +202,7 @@ FgRPCClient::FgRPCClient(std::string InTarget,
 
 std::unique_ptr<ConvaiService::Stub> FgRPCClient::GetNewStub()
 {
+	FScopeLock Lock(&CriticalSection);
 	grpc_connectivity_state state = Channel->GetState(false);
 
 	if (state != grpc_connectivity_state::GRPC_CHANNEL_READY)
