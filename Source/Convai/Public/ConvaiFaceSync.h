@@ -80,4 +80,5 @@ protected:
 	TMap<FName, float> CurrentBlendShapesMap;
 	FAnimationSequence MainSequenceBuffer;
 	FCriticalSection SequenceCriticalSection;
+	bool Stopping;
 };

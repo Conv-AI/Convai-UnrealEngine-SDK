@@ -62,24 +62,35 @@ UConvaiFaceSyncComponent::~UConvaiFaceSyncComponent() // Implement destructor
 
 void UConvaiFaceSyncComponent::BeginPlay()
 {
+	Super::BeginPlay();
 	CurrentBlendShapesMap = GenerateZeroFrame();
 }
 
 void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
 	// Interpolate blendshapes and advance animation sequence
 	if (IsValidSequence(MainSequenceBuffer))
 	{
+		SequenceCriticalSection.Lock();
 		CurrentSequenceTimePassed += DeltaTime;
 
-		if (CurrentSequenceTimePassed > MainSequenceBuffer.Duration)
+		if (CurrentSequenceTimePassed > MainSequenceBuffer.Duration && Stopping)
 		{
 			CurrentSequenceTimePassed = 0;
 			ClearMainSequence();
 			SetCurrentFrametoZero();
 			OnVisemesDataReady.ExecuteIfBound();
+			Stopping = false;
+			SequenceCriticalSection.Unlock();
 			return;
+		}
+		else if (CurrentSequenceTimePassed > MainSequenceBuffer.Duration && !Stopping)
+		{
+			Stopping = true;
+			ConvaiStopLipSync();
 		}
 
 		// Calculate frame duration and offsets
@@ -115,14 +126,15 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 			Alpha = (CurrentSequenceTimePassed - FrameOffset - (CurrentFrameIndex * FrameDuration)) / FrameDuration;
 		}
 
-		AnchorValue = FMath::Clamp(AnchorValue, 0, 1);
-		Alpha = Calculate1DBezierCurve(Alpha, AnchorValue,0, 1-AnchorValue, 1);
+		//AnchorValue = FMath::Clamp(AnchorValue, 0, 1);
+		//Alpha = Calculate1DBezierCurve(Alpha, AnchorValue,0, 1-AnchorValue, 1);
 
 		CurrentBlendShapesMap = InterpolateFrames(StartFrame, EndFrame, Alpha);
 
 		// Trigger the blueprint event
 		OnVisemesDataReady.ExecuteIfBound();
-	}
+		SequenceCriticalSection.Unlock();
+	}	
 }
 
 void UConvaiFaceSyncComponent::ConvaiProcessLipSyncAdvanced(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels, FAnimationSequence FaceSequence)
@@ -136,6 +148,13 @@ void UConvaiFaceSyncComponent::ConvaiProcessLipSyncAdvanced(uint8* InPCMData, ui
 void UConvaiFaceSyncComponent::ConvaiProcessLipSyncSingleFrame(FAnimationFrame FaceFrame, float Duration)
 {
 	SequenceCriticalSection.Lock();
+	if (Stopping)
+	{
+		CurrentSequenceTimePassed = 0;
+		ClearMainSequence();
+		Stopping = false;
+	}
+
 	MainSequenceBuffer.AnimationFrames.Add(FaceFrame);
 	MainSequenceBuffer.Duration += Duration;
 	SequenceCriticalSection.Unlock();
