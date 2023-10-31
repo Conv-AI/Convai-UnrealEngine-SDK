@@ -149,10 +149,6 @@ void UConvaiGRPCGetResponseProxy::Activate()
 	// Add metadata
 	client_context.AddMetadata("engine", "Unreal Engine");
 	client_context.AddMetadata("engine_version", TCHAR_TO_UTF8(*EngineVersion));
-	client_context.AddMetadata("engine", "Unreal Engine");
-
-	client_context.AddMetadata("engine", "Unreal Engine");
-	client_context.AddMetadata("engine_version", TCHAR_TO_UTF8(*EngineVersion));
 	client_context.AddMetadata("platform_name", TCHAR_TO_UTF8(*PlatformName));
 
 	if (Found)
