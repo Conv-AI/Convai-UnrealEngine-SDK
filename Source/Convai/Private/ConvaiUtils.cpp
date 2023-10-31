@@ -241,16 +241,18 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 		{
 			continue;
 		}
-
+		float DistSquared, DistSquared2D;
 		FVector CurrentCharacterLocation = CurrentConvaiCharacter->GetComponentLocation();
 		if (PlaneView)
 		{
-			if (Radius > 0 && FVector::DistSquared2D(CurrentCharacterLocation, CameraLocation) > Radius * Radius)
+			DistSquared2D = FVector::DistSquared2D(CurrentCharacterLocation, CameraLocation);
+			if (Radius > 0 && DistSquared2D > Radius * Radius)
 				continue;
 		}
 		else
 		{
-			if (Radius > 0 && FVector::DistSquared(CurrentCharacterLocation, CameraLocation) > Radius * Radius)
+			DistSquared = FVector::DistSquared(CurrentCharacterLocation, CameraLocation);
+			if (Radius > 0 && DistSquared > Radius * Radius)
 				continue;
 		}
 
