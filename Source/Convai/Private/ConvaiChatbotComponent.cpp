@@ -21,6 +21,7 @@ UConvaiChatbotComponent::UConvaiChatbotComponent()
 	//SetIsReplicated(true);
 	InterruptVoiceFadeOutDuration = 1.0;
 	LastPlayerName = FString("Unknown");
+	//Environment = CreateDefaultSubobject<UConvaiEnvironment>(TEXT("Environment"));
 }
 
 void UConvaiChatbotComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -37,6 +38,7 @@ void UConvaiChatbotComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	DOREPLIFETIME(UConvaiChatbotComponent, ActionsQueue);
 	DOREPLIFETIME(UConvaiChatbotComponent, EmotionState);
 	DOREPLIFETIME(UConvaiChatbotComponent, LockEmotionState);
+	DOREPLIFETIME(UConvaiChatbotComponent, ConvaiEnvironmentDetails);
 }
 
 bool UConvaiChatbotComponent::IsInConversation()
@@ -57,6 +59,28 @@ bool UConvaiChatbotComponent::IsListening()
 bool UConvaiChatbotComponent::GetIsTalking()
 {
 	return IsTalking;
+}
+
+float UConvaiChatbotComponent::GetTalkingTimeElapsed()
+{
+	float TimeElapsed = 0;
+	if (IsValid(GetWorld()))
+	{
+		TimeElapsed = GetWorld()->GetTimerManager().GetTimerElapsed(AudioFinishedTimerHandle);
+	}
+
+	return TimeElapsed;
+}
+
+float UConvaiChatbotComponent::GetTalkingTimeRemaining()
+{
+	float TimeRemaing= 0;
+	if (IsValid(GetWorld()))
+	{
+		TimeRemaing = GetWorld()->GetTimerManager().GetTimerRemaining(AudioFinishedTimerHandle);
+	}
+
+	return TimeRemaing;
 }
 
 void UConvaiChatbotComponent::ResetConversation()
@@ -258,8 +282,14 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 		return;
 	}
 
-	if (GenerateActions && IsValid(InEnvironment))
-		Environment = InEnvironment;
+	if (IsValid(Environment))
+	{
+		Environment->SetFromEnvironment(InEnvironment);
+	}
+	else
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartGetResponseStream: Environment is not valid"));
+	}
 
 	FString Error;
 	bool ValidEnvironment = UConvaiActions::ValidateEnvironment(Environment, Error);
@@ -313,8 +343,14 @@ void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerName, FStri
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendNarrativeTrigger: Trigger Name and TriggerMessage are missing - Please supply one of them"));
 	}
 
-	if (GenerateActions && IsValid(InEnvironment))
-		Environment = InEnvironment;
+	if (IsValid(Environment))
+	{
+		Environment->SetFromEnvironment(InEnvironment);
+	}
+	else
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendNarrativeTrigger: Environment is not valid"));
+	}
 
 	FString Error;
 	bool ValidEnvironment = UConvaiActions::ValidateEnvironment(Environment, Error);
@@ -366,7 +402,29 @@ void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 
 		if (ReceivedFinalData == false)
 			onResponseDataReceived(FString(""), TArray<uint8>(), 0, true);
+
+		//AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this)]
+		//	{
+		//		if (!WeakThis.IsValid() || WeakThis->IsPendingKill())
+		//		{
+		//			// The object is no longer valid or is being destroyed.
+		//			return;
+		//		}
+		//		WeakThis->OnInterruptedEvent.Broadcast(WeakThis.Get(), WeakThis->CurrentConvaiPlayerComponent);
+		//	});
 	}
+}
+
+void UConvaiChatbotComponent::TryClearInteractingPlayer(bool& Success, bool Interrupt)
+{
+	if (IsListening())
+	{
+		Success = false;
+		return;
+	}
+	if (Interrupt)
+		InterruptSpeech(0.5);
+	CurrentConvaiPlayerComponent = nullptr;
 }
 
 void UConvaiChatbotComponent::Broadcast_InterruptSpeech_Implementation(float InVoiceFadeOutDuration)
@@ -663,6 +721,42 @@ void UConvaiChatbotComponent::onFailure()
 	onFinishedReceivingData();
 }
 
+void UConvaiChatbotComponent::OnRep_EnvironmentData()
+{
+	if (IsValid(Environment))
+	{
+		Environment->SetFromEnvironment(ConvaiEnvironmentDetails);
+	}
+	else
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("OnRep_EnvironmentData: Environment is not valid"));
+	}
+}
+
+void UConvaiChatbotComponent::UpdateEnvironmentData()
+{
+	if (IsValid(Environment))
+	{
+		ConvaiEnvironmentDetails = Environment->ToEnvironmentStruct();
+	}
+	else
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("UpdateEnvironmentData: Environment is not valid"));
+	}
+}
+
+void UConvaiChatbotComponent::LoadEnvironment(UConvaiEnvironment* NewConvaiEnvironment)
+{
+	if (IsValid(Environment))
+	{
+		Environment->SetFromEnvironment(NewConvaiEnvironment);
+	}
+	else
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("LoadEnvironment: Environment is not valid"));
+	}
+}
+
 bool UConvaiChatbotComponent::CheckTokenValidity()
 {
 	if (!IsValid(CurrentConvaiPlayerComponent) || !CurrentConvaiPlayerComponent->CheckTokenValidty(Token))
@@ -692,13 +786,24 @@ void UConvaiChatbotComponent::ClearTimeOutTimer()
 
 void UConvaiChatbotComponent::BeginPlay()
 {
+	Super::BeginPlay();
+	
 	Environment = NewObject<UConvaiEnvironment>();
+
+	if (IsValid(Environment))
+	{
+		Environment->OnEnvironmentChanged.BindUObject(this, &UConvaiChatbotComponent::UpdateEnvironmentData);
+
+	}
+	else
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("BeginPlay: Environment is not valid"));
+	}
 
 	// Get character details
 	if (CharacterID != "")
 		ConvaiGetDetails();
 
-	Super::BeginPlay();
 }
 
 void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -756,7 +861,13 @@ void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType
 
 void UConvaiChatbotComponent::BeginDestroy()
 {
+	//InterruptSpeech(0);
+	if (IsValid(Environment))
+	{
+		Environment->OnEnvironmentChanged.Unbind();
+	}
 	Unbind_GRPC_Request_Delegates();
+	Cleanup(true);
 	Super::BeginDestroy();
 }
 

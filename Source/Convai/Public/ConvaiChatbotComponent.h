@@ -28,6 +28,8 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnCharacterDataLoadSignatur
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnNarrativeSectionReceivedSignature, UConvaiChatbotComponent, OnNarrativeSectionReceivedEvent, UConvaiChatbotComponent*, ChatbotComponent, FString, NarrativeSectionID);
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(FOnFailureSignature, UConvaiChatbotComponent, OnFailureEvent);
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnInterruptedSignature, UConvaiChatbotComponent, OnEmotionStateChangedEvent, UConvaiChatbotComponent*, ChatbotComponent, UConvaiPlayerComponent*, InteractingPlayerComponent);
+
 // TODO (Mohamed): Manage onDestroy/onEndPlay - should end any on-going streams
 
 class UConvaiPlayerComponent;
@@ -68,6 +70,14 @@ public:
 	*/
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (DisplayName = "Is Talking"))
 	bool GetIsTalking();
+
+	/** Returns time elapsed since the character started talking */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|Voice")
+	float GetTalkingTimeElapsed();
+
+	/** Returns time remaining audio time for the character to speak */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|Voice")
+	float GetTalkingTimeRemaining();
 
 	UPROPERTY(EditAnywhere, Category = "Convai", Replicated, BlueprintSetter = LoadCharacter)
 	FString CharacterID;
@@ -113,7 +123,7 @@ public:
 	/**
 	 *    Contains all relevant objects and characters in the scene including the (Player), and also all the actions doable by the character
 	 */
-	UPROPERTY(BlueprintReadWrite, Category = "Convai")
+	UPROPERTY(BlueprintReadWrite, Category = "Convai", BlueprintSetter = LoadEnvironment)
 	UConvaiEnvironment* Environment;
 
 	/**
@@ -133,6 +143,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Convai")
 	void LoadCharacter(FString NewCharacterID);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Convai")
+	void LoadEnvironment(UConvaiEnvironment* NewConvaiEnvironment);
 
 	/**
 	 * Appends a TArray of FConvaiResultAction items to the existing ActionsQueue.
@@ -244,9 +257,13 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Narrative Section Received"))
 	FOnNarrativeSectionReceivedSignature OnNarrativeSectionReceivedEvent;
 
-	/** Called there is an error */
+	/** Called when the character is interrupted */
+	// UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Interrupted"))
+	// FOnInterruptedSignature OnInterruptedEvent;
+
+	/** Called when there is an error */
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Failure"))
-	FOnFailureSignature OnFailureEvent;
+	FOnFailureSignature OnFailureEvent;	
 
 public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
@@ -259,6 +276,11 @@ public:
 	// The fade-out duration is controlled by the parameter 'InVoiceFadeOutDuration'.
 	UFUNCTION(BlueprintCallable, Category = "Convai")
 	void InterruptSpeech(float InVoiceFadeOutDuration);
+
+	// Trys to clear the Interacting player variable if there were no conversation going
+	// If Force clear was true, it will interrupt the conversation and clear the interacting player
+	UFUNCTION(BlueprintCallable, Category = "Convai")
+	void TryClearInteractingPlayer(bool& Success, bool Interrupt);
 
 	// Broadcasts an interruption of the current speech across a network, with a provided fade-out duration.
 	// This function ensures that the interruption is communicated reliably to all connected clients.
@@ -330,6 +352,15 @@ private:
 	void onFinishedReceivingData();
 	void OnNarrativeSectionReceived(FString BT_Code, FString BT_Constants, FString ReceivedNarrativeSectionID);
 	void onFailure();
+
+private:
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_EnvironmentData)
+	FConvaiEnvironmentDetails ConvaiEnvironmentDetails;
+
+	UFUNCTION()
+	void OnRep_EnvironmentData();
+
+	void UpdateEnvironmentData();
 
 private:
 	UPROPERTY()

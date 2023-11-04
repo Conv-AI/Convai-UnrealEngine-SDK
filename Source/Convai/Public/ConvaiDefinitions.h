@@ -353,17 +353,75 @@ private:
 	static const TMap<EEmotionIntensity, float> ScoreMultipliers;
 };
 
+USTRUCT()
+struct FConvaiEnvironmentDetails
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY()
+	TArray<FString> Actions;
+
+	UPROPERTY()
+	TArray<FConvaiObjectEntry> Objects;
+
+	UPROPERTY()
+	TArray<FConvaiObjectEntry> Characters;
+
+	UPROPERTY()
+	FConvaiObjectEntry MainCharacter;
+};
+
+// TODO: OnEnvironmentChanged event should be called in an optimizied way for any change in the environment
+
 UCLASS(Blueprintable)
 class UConvaiEnvironment : public UObject
 {
 	GENERATED_BODY()
 public:
+
+	DECLARE_DELEGATE(FEnvironmentChangedEventSignature);
+
+	FEnvironmentChangedEventSignature OnEnvironmentChanged;
+
 	// Creates a Convai Environment object.
 	UFUNCTION(BlueprintCallable, Category = "Convai|Action API")
 	static UConvaiEnvironment* CreateConvaiEnvironment()
 	{
 		UConvaiEnvironment* ContextObject = NewObject<UConvaiEnvironment>();
 		return ContextObject;
+	}
+
+	void SetFromEnvironment(UConvaiEnvironment* InEnvironment)
+	{
+		if (IsValid(InEnvironment))
+		{
+			Objects = InEnvironment->Objects;
+			Characters = InEnvironment->Characters;
+			Actions = InEnvironment->Actions;
+			MainCharacter = InEnvironment->MainCharacter;
+			OnEnvironmentChanged.ExecuteIfBound();
+		}
+	}
+
+	void SetFromEnvironment(FConvaiEnvironmentDetails InEnvironment)
+	{
+		Objects = InEnvironment.Objects;
+		Characters = InEnvironment.Characters;
+		Actions = InEnvironment.Actions;
+		MainCharacter = InEnvironment.MainCharacter;
+		OnEnvironmentChanged.ExecuteIfBound();
+	}
+
+	FConvaiEnvironmentDetails ToEnvironmentStruct()
+	{
+		FConvaiEnvironmentDetails OutStruct;
+		OutStruct.Objects = Objects;
+		OutStruct.Characters = Characters;
+		OutStruct.Actions = Actions;
+		OutStruct.MainCharacter = MainCharacter;
+		return OutStruct;
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
@@ -377,6 +435,7 @@ public:
 	{
 		for (auto a : ActionsToAdd)
 			Actions.AddUnique(a);
+		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
@@ -390,12 +449,14 @@ public:
 	{
 		for (auto a : ActionsToRemove)
 			Actions.Remove(a);
+		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
 		void ClearAllActions()
 	{
 		Actions.Empty();
+		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
 	bool FindObject(FString ObjectName, FConvaiObjectEntry& OutObject)
@@ -437,6 +498,7 @@ public:
 	{
 		for (auto o : ObjectsToAdd)
 			AddObject(o);
+		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
@@ -452,12 +514,14 @@ public:
 	{
 		for (auto n : ObjectNamesToRemove)
 			RemoveObject(n);
+		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
 		void ClearObjects()
 	{
 		Objects.Empty();
+		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
 	bool FindCharacter(FString CharacterName, FConvaiObjectEntry& OutCharacter)
@@ -500,6 +564,7 @@ public:
 	{
 		for (auto c : CharactersToAdd)
 			AddCharacter(c);
+		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
@@ -521,14 +586,22 @@ public:
 		void ClearCharacters()
 	{
 		Characters.Empty();
+		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
 	// Assigns the main character initiating the conversation, typically the player character, unless the dialogue involves non-player characters talking to each other.
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
-		void SetMainCharacter(FConvaiObjectEntry InMainCharacter)
+	void SetMainCharacter(FConvaiObjectEntry InMainCharacter)
 	{
 		MainCharacter = InMainCharacter;
 		AddCharacter(MainCharacter);
+		OnEnvironmentChanged.ExecuteIfBound();
+	}
+
+	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
+	void ClearMainCharacter()
+	{
+		MainCharacter = FConvaiObjectEntry();
 	}
 
 
