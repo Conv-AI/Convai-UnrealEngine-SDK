@@ -327,11 +327,13 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 			action_config_character->set_name(TCHAR_TO_UTF8(*FinalName));
 			action_config_character->set_bio(TCHAR_TO_UTF8(*character.Description));
 		}
+	}
 
+	if (IsValid(Environment))
+	{
 		// Get the speaker/main character name
 		MainCharacter = Environment->MainCharacter.Name;
 	}
-
 
 	// Create Audio Configuration
 	AudioConfig* audio_config = new AudioConfig();
@@ -342,7 +344,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 		FaceModel faceModel = GeneratesVisemesAsBlendshapes ? FaceModel::FACE_MODEL_A_2F_MODEL_NAME : FaceModel::FACE_MODEL_OVR_MODEL_NAME;
 		audio_config->set_face_model(faceModel);
 	}
-	//audio_config->set_disable_audio(false);
 
 	// Create the config object that holds Audio and Action configs
 	GetResponseRequest_GetResponseConfig* getResponseConfig = new GetResponseRequest_GetResponseConfig();
