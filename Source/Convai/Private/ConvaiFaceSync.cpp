@@ -155,6 +155,16 @@ void UConvaiFaceSyncComponent::ConvaiProcessLipSyncSingleFrame(FAnimationFrame F
 		Stopping = false;
 	}
 
+	if (!GeneratesVisemesAsBlendshapes())
+	{
+		float* sil = FaceFrame.BlendShapes.Find("sil");
+		if (sil != nullptr && *sil < 0)
+		{
+			ClearMainSequence();
+			return;
+		}
+	}
+
 	MainSequenceBuffer.AnimationFrames.Add(FaceFrame);
 	MainSequenceBuffer.Duration += Duration;
 	SequenceCriticalSection.Unlock();
@@ -174,7 +184,6 @@ void UConvaiFaceSyncComponent::ClearMainSequence()
 	MainSequenceBuffer.AnimationFrames.Empty();
 	MainSequenceBuffer.Duration = 0;
 	SequenceCriticalSection.Unlock();
-
 }
 
 TMap<FName, float> UConvaiFaceSyncComponent::InterpolateFrames(const TMap<FName, float>& StartFrame, const TMap<FName, float>& EndFrame, float Alpha)
