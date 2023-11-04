@@ -242,13 +242,15 @@ TArray<uint8> UConvaiGRPCGetResponseProxy::ConsumeFromAudioBuffer(bool& IsThisTh
 void UConvaiGRPCGetResponseProxy::LogAndEcecuteFailure(FString FuncName)
 {
 	UE_LOG(ConvaiGRPCLog, Warning,
-	TEXT("%s: Status:%s | Debug Log:%s | Error message:%s | Error Details:%s | Error Code:%i"),
+	TEXT("%s: Status:%s | Debug Log:%s | Error message:%s | Error Details:%s | Error Code:%i | Character ID:%s | Session ID:%s"),
 	*FString(FuncName), 
 	*FString(status.ok()? "Ok" : "Not Ok"),
 	*FString(reply->DebugString().c_str()), 
 	*FString(status.error_message().c_str()), 
 	*FString(status.error_details().c_str()), 
-	status.error_code());
+	status.error_code(),
+	*CharID,
+	*SessionID);
 
 	if (!FailAlreadyExecuted)
 	{
@@ -551,7 +553,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		float SampleRate = 0;
 		if (reply->audio_response().audio_data().length() > 46)
 		{
-			VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 44), audio_data.length() - 44);
+			VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 46), audio_data.length() - 46);
 			SampleRate = reply->audio_response().audio_config().sample_rate_hertz();
 		}
 		//else
