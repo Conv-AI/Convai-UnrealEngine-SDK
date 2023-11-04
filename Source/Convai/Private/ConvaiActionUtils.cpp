@@ -56,6 +56,42 @@ namespace
 
 		return ClosestString;
 	}
+
+	// Helper function to check if a substring is found outside of quotes.
+	bool FindSubstringOutsideQuotes(const FString& SearchString, const FString& SubstringToFind)
+	{
+		bool bInsideQuotes = false;
+		int32 SubstringLength = SubstringToFind.Len();
+		int32 SearchStringLength = SearchString.Len();
+
+		if (SubstringLength > SearchStringLength || SubstringLength == 0)
+		{
+			return false;
+		}
+
+		for (int32 i = 0; i <= SearchStringLength - SubstringLength; ++i)
+		{
+			// Toggle the inside quotes flag if a quote is found
+			if (SearchString[i] == '"')
+			{
+				bInsideQuotes = !bInsideQuotes;
+				continue;
+			}
+
+			// If we are not inside quotes, perform the search
+			if (!bInsideQuotes && SearchString.Mid(i, SubstringLength).Equals(SubstringToFind, ESearchCase::IgnoreCase))
+			{
+				// Make sure the match is not part of a larger string
+				if ((i == 0 || !FChar::IsAlnum(SearchString[i - 1])) &&
+					(i + SubstringLength == SearchStringLength || !FChar::IsAlnum(SearchString[i + SubstringLength])))
+				{
+					return true; // Substring found outside of quotes
+				}
+			}
+		}
+
+		return false; // Substring not found or is within quotes
+	}
 };
 
 TArray<FString> UConvaiActions::SmartSplit(const FString& SequenceString)
@@ -173,17 +209,18 @@ bool UConvaiActions::ParseAction(UConvaiEnvironment* Environment, FString Action
 	for (auto c : Environment->Characters)
 	{
 		FString charName = RemoveDesc(c.Name);
-		if (ActionToBeParsed.Find(charName) >= 0)
+		if (FindSubstringOutsideQuotes(ActionToBeParsed, charName))
 		{
 			RelatedObjOrChar = c;
 		}
 	}
 
+	
 	// find objects
 	for (auto o : Environment->Objects)
 	{
 		FString objName = RemoveDesc(o.Name);
-		if (ActionToBeParsed.Find(objName) >= 0)
+		if (FindSubstringOutsideQuotes(ActionToBeParsed, objName))
 		{
 			RelatedObjOrChar = o;
 		}
