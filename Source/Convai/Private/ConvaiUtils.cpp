@@ -241,7 +241,8 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 		{
 			continue;
 		}
-		float DistSquared, DistSquared2D;
+		float DistSquared = 0;
+		float DistSquared2D = 0;
 		FVector CurrentCharacterLocation = CurrentConvaiCharacter->GetComponentLocation();
 		if (PlaneView)
 		{
