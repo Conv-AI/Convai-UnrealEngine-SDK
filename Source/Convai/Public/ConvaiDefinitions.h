@@ -468,7 +468,7 @@ public:
 				return &o;
 			}
 		}
-		return false;
+		return nullptr;
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
@@ -531,7 +531,7 @@ public:
 				return &c;
 			}
 		}
-		return false;
+		return nullptr;
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
