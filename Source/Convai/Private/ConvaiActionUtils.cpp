@@ -92,6 +92,103 @@ namespace
 
 		return false; // Substring not found or is within quotes
 	}
+
+	bool FindClosePhraseOutsideQuotes(const FString& SearchString, const FString& PhraseToFind, int& OutBestDistance, int NumWordsToSkip = 0)
+	{
+		if (PhraseToFind.IsEmpty())
+		{
+			return false; // Can't find an empty phrase.
+		}
+
+		int32 MaxLevenshteinDistance = FMath::Clamp(PhraseToFind.Len() / 2, 2, 4);
+		TArray<FString> Words;
+		FString CurrentWord;
+		bool bInsideQuotes = false;
+		OutBestDistance = MaxLevenshteinDistance + 1; // Initialize with a value above the limit
+
+		// Collect words outside quotes
+		for (TCHAR Char : SearchString)
+		{
+			if (Char == '"')
+			{
+				bInsideQuotes = !bInsideQuotes;
+				if (!CurrentWord.IsEmpty())
+				{
+					Words.Add(CurrentWord);
+					CurrentWord.Empty();
+				}
+				continue;
+			}
+
+			if (!bInsideQuotes && (Char == ' ' || Char == '\t'))
+			{
+				if (!CurrentWord.IsEmpty())
+				{
+					Words.Add(CurrentWord);
+					CurrentWord.Empty();
+				}
+			}
+			else if (!bInsideQuotes)
+			{
+				CurrentWord.AppendChar(Char);
+			}
+		}
+
+		// Add the last word if there is one
+		if (!CurrentWord.IsEmpty())
+		{
+			Words.Add(CurrentWord);
+		}
+
+		// Number of words in the phrase to find
+		TArray<FString> PhraseWords;
+		PhraseToFind.ParseIntoArray(PhraseWords, TEXT(" "), true);
+		int32 NumWordsInPhrase = PhraseWords.Num();
+
+		// Sliding window of words to check for the phrase
+		for (int32 i = NumWordsToSkip; i <= Words.Num() - NumWordsInPhrase; ++i)
+		{
+			FString WindowString;
+			for (int32 j = 0; j < NumWordsInPhrase; ++j)
+			{
+				WindowString += (j > 0 ? TEXT(" ") : TEXT("")) + Words[i + j];
+			}
+
+			if (WindowString.Len() - PhraseToFind.Len() >= MaxLevenshteinDistance || PhraseToFind.Len() - WindowString.Len() >= MaxLevenshteinDistance)
+			{
+				continue;
+			}
+
+			int32 Distance = UConvaiUtils::LevenshteinDistance(WindowString, PhraseToFind);
+			if (Distance <= MaxLevenshteinDistance && Distance < OutBestDistance)
+			{
+				OutBestDistance = Distance;
+			}
+		}
+
+		// The function returns true if we found a match within the acceptable Levenshtein distance
+		return OutBestDistance <= MaxLevenshteinDistance;
+	}
+
+	static bool FindNearestObjectByName(FString SearchString, TArray<FConvaiObjectEntry> Objects, FConvaiObjectEntry& ObjectMatch)
+	{
+		bool Found = false;
+		int BestDistance = 100;
+		for (auto o : Objects)
+		{
+			int Distance = 0;
+			if (FindClosePhraseOutsideQuotes(SearchString, o.Name, Distance))
+			{
+				if (Distance < BestDistance)
+				{
+					ObjectMatch = o;
+					BestDistance = Distance;
+					Found = true;
+				}
+			}
+		}
+		return Found;
+	}
 };
 
 TArray<FString> UConvaiActions::SmartSplit(const FString& SequenceString)
@@ -206,25 +303,10 @@ bool UConvaiActions::ParseAction(UConvaiEnvironment* Environment, FString Action
 	ActionToAdd = FindAction(ActionToBeParsed, Environment->Actions);
 
 	// find characters
-	for (auto c : Environment->Characters)
-	{
-		FString charName = RemoveDesc(c.Name);
-		if (FindSubstringOutsideQuotes(ActionToBeParsed, charName))
-		{
-			RelatedObjOrChar = c;
-		}
-	}
-
+	FindNearestObjectByName(ActionToBeParsed, Environment->Characters, RelatedObjOrChar);
 	
 	// find objects
-	for (auto o : Environment->Objects)
-	{
-		FString objName = RemoveDesc(o.Name);
-		if (FindSubstringOutsideQuotes(ActionToBeParsed, objName))
-		{
-			RelatedObjOrChar = o;
-		}
-	}
+	FindNearestObjectByName(ActionToBeParsed, Environment->Characters, RelatedObjOrChar);
 
 	// Find extra numeric param
 	float ExtraNumber = ExtractNumber(ActionToBeParsed);
