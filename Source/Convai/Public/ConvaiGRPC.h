@@ -14,7 +14,10 @@
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiGRPCLog, Log, All);
 
 class USoundWave;
+class UConvaiEnvironment;
 struct FAnimationFrame;
+struct FAnimationSequence;
+struct FConvaiResultAction;
 
 DECLARE_DELEGATE_ThreeParams(FConvaiGRPCOnNarrativeDataSignature, const FString /*BT_Code*/, const FString /*BT_Constants*/, const FString /*NarrativeSectionID*/);
 DECLARE_DELEGATE_ThreeParams(FConvaiGRPCOnTranscriptionSignature, const FString /*Transcription*/, bool /*IsTranscriptionReady*/, bool /*IsFinal*/);

@@ -12,6 +12,8 @@
 #include "Net/UnrealNetwork.h"
 #include "ConvaiChatBotProxy.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "TimerManager.h"
+#include "Async/Async.h"
 
 DEFINE_LOG_CATEGORY(ConvaiChatbotComponentLog);
 
@@ -74,7 +76,7 @@ float UConvaiChatbotComponent::GetTalkingTimeElapsed()
 
 float UConvaiChatbotComponent::GetTalkingTimeRemaining()
 {
-	float TimeRemaing= 0;
+	float TimeRemaing = 0;
 	if (IsValid(GetWorld()))
 	{
 		TimeRemaing = GetWorld()->GetTimerManager().GetTimerRemaining(AudioFinishedTimerHandle);

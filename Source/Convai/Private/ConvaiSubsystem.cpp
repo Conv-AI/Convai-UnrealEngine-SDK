@@ -3,6 +3,7 @@
 #include "ConvaiSubsystem.h"
 #include "ConvaiAndroid.h"
 #include "Engine/Engine.h"
+#include "Async/Async.h"
 
 THIRD_PARTY_INCLUDES_START
 // grpc includes

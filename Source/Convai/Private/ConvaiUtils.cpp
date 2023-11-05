@@ -19,6 +19,7 @@
 
 #include "../Convai.h"
 #include "ConvaiChatbotComponent.h"
+#include "ConvaiPlayerComponent.h"
 
 #include "Interfaces/IPluginManager.h"
 #include "Engine/EngineTypes.h"
@@ -37,7 +38,7 @@ UConvaiSubsystem* UConvaiUtils::GetConvaiSubsystem(const UObject* WorldContextOb
 
 	if (!WorldContextObject)
 	{
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("WorldContextObject ptr is invalid!"));
+		UE_LOG(ConvaiUtilsLog, Warning, TEXT("WorldContextObject ptr is invalid!"));
 		return nullptr;
 	}
 
