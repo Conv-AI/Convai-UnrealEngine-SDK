@@ -459,14 +459,13 @@ public:
 		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
-	bool FindObject(FString ObjectName, FConvaiObjectEntry& OutObject)
+	FConvaiObjectEntry* FindObject(FString ObjectName)
 	{
 		for (FConvaiObjectEntry& o : Objects)
 		{
 			if (ObjectName == o.Name)
 			{
-				OutObject = o;
-				return true;
+				return &o;
 			}
 		}
 		return false;
@@ -476,12 +475,11 @@ public:
 	void AddObject(FConvaiObjectEntry Object)
 	{
 		// Replace old object that has the same name with the new object
-		FConvaiObjectEntry ExistingObject;
-		if (FindObject(Object.Name, ExistingObject))
+		if (FConvaiObjectEntry* ExistingObject = FindObject(Object.Name))
 		{
-			ExistingObject.Description = Object.Description;
-			ExistingObject.OptionalPositionVector = Object.OptionalPositionVector;
-			ExistingObject.Ref = Object.Ref;
+			ExistingObject->Description = Object.Description;
+			ExistingObject->OptionalPositionVector = Object.OptionalPositionVector;
+			ExistingObject->Ref = Object.Ref;
 		}
 		else
 		{
@@ -524,14 +522,13 @@ public:
 		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
-	bool FindCharacter(FString CharacterName, FConvaiObjectEntry& OutCharacter)
+	FConvaiObjectEntry* FindCharacter(FString CharacterName)
 	{
 		for (FConvaiObjectEntry& c : Characters)
 		{
 			if (CharacterName == c.Name)
 			{
-				OutCharacter = c;
-				return true;
+				return &c;
 			}
 		}
 		return false;
@@ -541,19 +538,17 @@ public:
 		void AddCharacter(FConvaiObjectEntry Character)
 	{
 		// Replace old character that has the same name with the new character
-		FConvaiObjectEntry ExistingCharacter;
-		if (FindCharacter(Character.Name, ExistingCharacter))
+		if (FConvaiObjectEntry* ExistingCharacter = FindCharacter(Character.Name))
 		{
-			ExistingCharacter.Description = Character.Description;
-			ExistingCharacter.OptionalPositionVector = Character.OptionalPositionVector;
-			ExistingCharacter.Ref = Character.Ref;
+			ExistingCharacter->Description = Character.Description;
+			ExistingCharacter->OptionalPositionVector = Character.OptionalPositionVector;
+			ExistingCharacter->Ref = Character.Ref;
 		}
 		else
 		{
 			Characters.AddUnique(Character);
 		}
 	}
-
 
 	/**
 		*    Adds a list of characters to the Environment object
