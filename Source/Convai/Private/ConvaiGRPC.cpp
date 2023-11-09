@@ -213,18 +213,19 @@ void UConvaiGRPCGetResponseProxy::BeginDestroy()
 
 TArray<uint8> UConvaiGRPCGetResponseProxy::ConsumeFromAudioBuffer(bool& IsThisTheFinalWrite)
 {
-	// TODO: (Mohamed) optimize this to reduce number of copying operations to not spend much time in CS, also reserve memory for "output" array before entering
+	// TODO: (Mohamed) optimize and clean this to reduce number of copying operations to not spend much time in CS, also reserve memory for "output" array before entering
 
 	TArray<uint8> output;
 
 	m_mutex.Lock();
-	uint32 Length = FMath::Min(AudioBuffer.Num(), (int32)ConvaiConstants::VoiceStreamMaxChunk);
+	//uint32 Length = FMath::Min(AudioBuffer.Num(), (int32)ConvaiConstants::VoiceStreamMaxChunk);
+	uint32 Length = AudioBuffer.Num();
 	if (Length)
 	{
 		output.Append(AudioBuffer.GetData(), Length);
 
 		if (Length == AudioBuffer.Num())
-			AudioBuffer.SetNumUnsafeInternal(0);
+			AudioBuffer.Empty(AudioBuffer.Max());
 		else
 			AudioBuffer.RemoveAt(0, Length);
 	}

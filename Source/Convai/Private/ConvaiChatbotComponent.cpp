@@ -36,6 +36,7 @@ void UConvaiChatbotComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	DOREPLIFETIME(UConvaiChatbotComponent, VoiceType);
 	DOREPLIFETIME(UConvaiChatbotComponent, Backstory);
 	DOREPLIFETIME(UConvaiChatbotComponent, ReadyPlayerMeLink);
+	DOREPLIFETIME(UConvaiChatbotComponent, LanguageCode);
 	DOREPLIFETIME(UConvaiChatbotComponent, CurrentConvaiPlayerComponent);
 	DOREPLIFETIME(UConvaiChatbotComponent, ActionsQueue);
 	DOREPLIFETIME(UConvaiChatbotComponent, EmotionState);
@@ -789,8 +790,10 @@ void UConvaiChatbotComponent::ClearTimeOutTimer()
 void UConvaiChatbotComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	Environment = NewObject<UConvaiEnvironment>();
+
+	PlayerInpuAudioBuffer.SetNumUninitialized(ConvaiConstants::VoiceCaptureSampleRate * 10); // Buffer allocated 10 seconds of audio into memory
 
 	if (IsValid(Environment))
 	{
@@ -824,12 +827,12 @@ void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		ThisIsTheLastWrite = true;
 	}
 
-	bool Successfull = false;
-	uint8 Buffer[ConvaiConstants::VoiceCaptureChunk];
+	bool Successful = false;
 	if (IsValid(CurrentConvaiPlayerComponent))
 	{
 		// Consume the mic stream into our buffer
-		Successfull = CurrentConvaiPlayerComponent->ConsumeStreamingBuffer(Buffer, ConvaiConstants::VoiceCaptureChunk);
+		PlayerInpuAudioBuffer.Empty(PlayerInpuAudioBuffer.Max()); // Empty the buffer but keep its memory allocation intact
+		Successful = CurrentConvaiPlayerComponent->ConsumeStreamingBuffer(PlayerInpuAudioBuffer);
 	}
 	else
 	{
@@ -838,9 +841,9 @@ void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		ThisIsTheLastWrite = true;
 	}
 
-	if (Successfull) // If there is mic data to send
+	if (Successful) // If there is mic data to send
 	{
-		ConvaiGRPCGetResponseProxy->WriteAudioDataToSend(Buffer, ConvaiConstants::VoiceCaptureChunk, ThisIsTheLastWrite);
+		ConvaiGRPCGetResponseProxy->WriteAudioDataToSend(PlayerInpuAudioBuffer.GetData(), PlayerInpuAudioBuffer.Num(), ThisIsTheLastWrite);
 	}
 	else if (ThisIsTheLastWrite) // If there is no data to send, and we do not expect more mic data to send  
 	{
@@ -857,7 +860,7 @@ void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	}
 
 	// Make sure the time out timer is cleared on a successful read or that we have finished reading from the mic
-	if (Successfull || !StreamInProgress)
+	if (Successful || !StreamInProgress)
 		ClearTimeOutTimer();
 }
 

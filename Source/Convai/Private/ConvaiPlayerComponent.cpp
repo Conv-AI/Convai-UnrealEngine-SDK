@@ -372,10 +372,11 @@ void UConvaiPlayerComponent::UpdateVoiceCapture(float DeltaTime)
 		RemainingTimeUntilNextUpdate -= DeltaTime;
 		if (RemainingTimeUntilNextUpdate <= 0)
 		{
-			FAudioThread::RunCommandOnAudioThread([this]()
+			float ExpectedRecordingTime = DeltaTime > TIME_BETWEEN_VOICE_UPDATES_SECS ? DeltaTime : TIME_BETWEEN_VOICE_UPDATES_SECS;
+			FAudioThread::RunCommandOnAudioThread([this, ExpectedRecordingTime]()
 				{
 					StopVoiceChunkCapture();
-					StartVoiceChunkCapture();
+					StartVoiceChunkCapture(ExpectedRecordingTime);
 				});
 			RemainingTimeUntilNextUpdate = TIME_BETWEEN_VOICE_UPDATES_SECS;
 		}
@@ -386,11 +387,11 @@ void UConvaiPlayerComponent::UpdateVoiceCapture(float DeltaTime)
 	}
 }
 
-void UConvaiPlayerComponent::StartVoiceChunkCapture()
+void UConvaiPlayerComponent::StartVoiceChunkCapture(float ExpectedRecordingTime)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("StartVoiceChunkCapture() in VoiceCaptureComp.cpp")));
 	//UE_LOG(LogTemp, Warning, TEXT("StartVoiceChunkCapture() in VoiceCaptureComp.cpp"));
-	UAudioMixerBlueprintLibrary::StartRecordingOutput(this, TIME_BETWEEN_VOICE_UPDATES_SECS*1, Cast<USoundSubmix>(AudioCaptureComponent->SoundSubmix));
+	UAudioMixerBlueprintLibrary::StartRecordingOutput(this, ExpectedRecordingTime, Cast<USoundSubmix>(AudioCaptureComponent->SoundSubmix));
 }
 
 void UConvaiPlayerComponent::ReadRecordedBuffer(Audio::AlignedFloatBuffer& RecordedBuffer, float& OutNumChannels, float& OutSampleRate)
@@ -512,7 +513,7 @@ USoundWave* UConvaiPlayerComponent::FinishRecording()
 	USoundWave* OutSoundWave = UConvaiUtils::PCMDataToSoundWav(VoiceCaptureBuffer, 1, ConvaiConstants::VoiceCaptureSampleRate);
 	AudioCaptureComponent->Stop();  //stop the AudioCaptureComponent
 	if (IsValid(OutSoundWave))
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("OutSoundWave->GetDuration(): %d seconds "), OutSoundWave->GetDuration());
+		UE_LOG(ConvaiPlayerLog, Log, TEXT("OutSoundWave->GetDuration(): %f seconds "), OutSoundWave->GetDuration());
 	IsRecording = false;
 	return OutSoundWave;
 }
@@ -785,12 +786,15 @@ void UConvaiPlayerComponent::BeginPlay()
 	}
 }
 
-bool UConvaiPlayerComponent::ConsumeStreamingBuffer(uint8* Buffer, uint32 length)
+bool UConvaiPlayerComponent::ConsumeStreamingBuffer(TArray<uint8>& Buffer)
 {
-	if (VoiceCaptureRingBuffer.RingDataUsage() < length)
+	int Datalength = VoiceCaptureRingBuffer.RingDataUsage();
+	if (Datalength <= 0)
 		return false;
-	// TODO (Mohamed): add functionality to consume data <= Length
-	VoiceCaptureRingBuffer.Dequeue(Buffer, length);
+
+	Buffer.SetNumUninitialized(Datalength, false);
+	VoiceCaptureRingBuffer.Dequeue(Buffer.GetData(), Datalength);
+
 	return true;
 }
 
