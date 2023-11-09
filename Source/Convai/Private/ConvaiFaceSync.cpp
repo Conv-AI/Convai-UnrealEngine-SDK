@@ -161,6 +161,7 @@ void UConvaiFaceSyncComponent::ConvaiProcessLipSyncSingleFrame(FAnimationFrame F
 		if (sil != nullptr && *sil < 0)
 		{
 			ClearMainSequence();
+			Stopping = true;
 			return;
 		}
 	}
