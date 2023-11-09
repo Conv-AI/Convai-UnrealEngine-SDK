@@ -306,7 +306,7 @@ bool UConvaiActions::ParseAction(UConvaiEnvironment* Environment, FString Action
 	FindNearestObjectByName(ActionToBeParsed, Environment->Characters, RelatedObjOrChar);
 	
 	// find objects
-	FindNearestObjectByName(ActionToBeParsed, Environment->Characters, RelatedObjOrChar);
+	FindNearestObjectByName(ActionToBeParsed, Environment->Objects, RelatedObjOrChar);
 
 	// Find extra numeric param
 	float ExtraNumber = ExtractNumber(ActionToBeParsed);
