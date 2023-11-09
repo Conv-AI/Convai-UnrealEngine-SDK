@@ -10,7 +10,7 @@
 #include "DSP/BufferVectorOperations.h"
 #include "ConvaiPlayerComponent.generated.h"
 
-#define TIME_BETWEEN_VOICE_UPDATES_SECS 0.1
+#define TIME_BETWEEN_VOICE_UPDATES_SECS 0.01
 
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiPlayerLog, Log, All);
 
@@ -210,7 +210,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	bool ConsumeStreamingBuffer(uint8* Buffer, uint32 length);
+	bool ConsumeStreamingBuffer(TArray<uint8>& Buffer);
 
 	UFUNCTION(Server, Reliable, Category = "Convai|Network")
 	void SetIsStreamingServer(bool value);
@@ -262,7 +262,7 @@ private:
 	TWeakObjectPtr<UConvaiAudioCaptureComponent> AudioCaptureComponent;
 
 	void UpdateVoiceCapture(float DeltaTime);
-	void StartVoiceChunkCapture();
+	void StartVoiceChunkCapture(float ExpectedRecordingTime = 0.01);
 	void StopVoiceChunkCapture();
 	void ReadRecordedBuffer(Audio::AlignedFloatBuffer& RecordedBuffer, float& OutNumChannels, float& OutSampleRate);
 
