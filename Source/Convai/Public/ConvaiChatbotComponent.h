@@ -382,4 +382,5 @@ private:
 	bool ReceivedFinalTranscription;
 	bool ReceivedFinalData;
 	FString LastPlayerName;
+	TArray<uint8> PlayerInpuAudioBuffer;
 };
