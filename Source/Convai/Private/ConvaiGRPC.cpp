@@ -207,8 +207,8 @@ void UConvaiGRPCGetResponseProxy::BeginDestroy()
 {
 	client_context.TryCancel();
 	stub_.reset();
+	UE_LOG(ConvaiGRPCLog, Log, TEXT("Destroying UConvaiGRPCGetResponseProxy..."));
 	Super::BeginDestroy();
-	//UE_LOG(ConvaiGRPCLog, Log, TEXT("Destroying UConvaiGRPCGetResponseProxy..."));
 }
 
 TArray<uint8> UConvaiGRPCGetResponseProxy::ConsumeFromAudioBuffer(bool& IsThisTheFinalWrite)
