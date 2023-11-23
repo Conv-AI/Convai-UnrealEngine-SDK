@@ -65,18 +65,33 @@ UConvaiPlayerComponent::UConvaiPlayerComponent()
 	IsInit = false;
 	VoiceCaptureRingBuffer.Init(ConvaiConstants::VoiceCaptureRingBufferCapacity);
 	VoiceCaptureBuffer.Empty(ConvaiConstants::VoiceCaptureBufferSize);
-	AudioCaptureComponent = CreateDefaultSubobject<UConvaiAudioCaptureComponent>(TEXT("ConvaiAudioCapture"));
-	AudioCaptureComponent->SetupAttachment(this);
 
 	const FString FoundSubmixPath = "/ConvAI/Submixes/AudioInput.AudioInput";
-	auto _FoundSubmix = ConstructorHelpers::FObjectFinder<USoundSubmixBase>(*FoundSubmixPath).Object;
+	static ConstructorHelpers::FObjectFinder<USoundSubmixBase> SoundSubmixFinder(*FoundSubmixPath);
+	if (SoundSubmixFinder.Succeeded())
+	{
+		_FoundSubmix = SoundSubmixFinder.Object;
+	}
+}
+
+void UConvaiPlayerComponent::OnComponentCreated()
+{
+	Super::OnComponentCreated();
+
+	AudioCaptureComponent = NewObject<UConvaiAudioCaptureComponent>(this, UConvaiAudioCaptureComponent::StaticClass(), TEXT("ConvaiAudioCapture"));
+	if (AudioCaptureComponent)
+	{
+		AudioCaptureComponent->RegisterComponent();
+	}
+	//AudioCaptureComponent->SetupAttachment(this);
+
 	if (_FoundSubmix != nullptr) {
 		AudioCaptureComponent->SoundSubmix = _FoundSubmix;
-        UE_LOG(ConvaiPlayerLog, Log, TEXT("UConvaiPlayerComponent: Found submix \"AudioInput\""));
+		UE_LOG(ConvaiPlayerLog, Log, TEXT("UConvaiPlayerComponent: Found submix \"AudioInput\""));
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("UConvaiPlayerComponent: Audio Submix was not found, please ensure an audio submix exists at this directory: \"/ConvAI/Submixes/AudioInput\" then restart the Unreal Engine or "));
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("UConvaiPlayerComponent: Audio Submix was not found, please ensure an audio submix exists at this directory: \"/ConvAI/Submixes/AudioInput\" then restart Unreal Engine"));
 	}
 }
 
@@ -106,7 +121,7 @@ bool UConvaiPlayerComponent::Init()
 	}
 
 	AudioCaptureComponent = Cast<UConvaiAudioCaptureComponent>(GetOwner()->GetComponentByClass(UConvaiAudioCaptureComponent::StaticClass()));
-	if (!AudioCaptureComponent.IsValid())
+	if (!IsValid(AudioCaptureComponent))
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("Init: AudioCaptureComponent is not valid"));
 		return false;
@@ -134,7 +149,7 @@ void UConvaiPlayerComponent::SetPlayerNameServer_Implementation(const FString& N
 
 bool UConvaiPlayerComponent::GetDefaultCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo)
 {
-	if (!AudioCaptureComponent.IsValid())
+	if (!IsValid(AudioCaptureComponent))
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetDefaultCaptureDeviceInfo: AudioCaptureComponent is not valid"));
 		return false;
@@ -145,7 +160,7 @@ bool UConvaiPlayerComponent::GetDefaultCaptureDeviceInfo(FCaptureDeviceInfoBP& O
 
 bool UConvaiPlayerComponent::GetCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo, int DeviceIndex)
 {
-	if (!AudioCaptureComponent.IsValid())
+	if (!IsValid(AudioCaptureComponent))
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetCaptureDeviceInfo: AudioCaptureComponent is not valid"));
 		return false;
@@ -168,7 +183,7 @@ bool UConvaiPlayerComponent::GetCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo,
 TArray<FCaptureDeviceInfoBP> UConvaiPlayerComponent::GetAvailableCaptureDeviceDetails()
 {
 	TArray<FCaptureDeviceInfoBP> FCaptureDevicesInfoBP;
-	if (!AudioCaptureComponent.IsValid())
+	if (!IsValid(AudioCaptureComponent))
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetAvailableCaptureDeviceDetails: AudioCaptureComponent is not valid"));
 		return FCaptureDevicesInfoBP;
@@ -192,7 +207,7 @@ TArray<FCaptureDeviceInfoBP> UConvaiPlayerComponent::GetAvailableCaptureDeviceDe
 TArray<FString> UConvaiPlayerComponent::GetAvailableCaptureDeviceNames()
 {
 	TArray<FString> AvailableDeviceNames;
-	if (!AudioCaptureComponent.IsValid())
+	if (!IsValid(AudioCaptureComponent))
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetAvailableCaptureDeviceNames: AudioCaptureComponent is not valid"));
 		return AvailableDeviceNames;
@@ -208,7 +223,7 @@ TArray<FString> UConvaiPlayerComponent::GetAvailableCaptureDeviceNames()
 
 void UConvaiPlayerComponent::GetActiveCaptureDevice(FCaptureDeviceInfoBP& OutInfo)
 {
-	if (!AudioCaptureComponent.IsValid())
+	if (!IsValid(AudioCaptureComponent))
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetActiveCaptureDevice: AudioCaptureComponent is not valid"));
 		return;
@@ -225,7 +240,7 @@ void UConvaiPlayerComponent::GetActiveCaptureDevice(FCaptureDeviceInfoBP& OutInf
 
 bool UConvaiPlayerComponent::SetCaptureDeviceByIndex(int DeviceIndex)
 {
-	if (!AudioCaptureComponent.IsValid())
+	if (!IsValid(AudioCaptureComponent))
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByIndex: AudioCaptureComponent is not valid"));
 		return false;
@@ -242,7 +257,7 @@ bool UConvaiPlayerComponent::SetCaptureDeviceByIndex(int DeviceIndex)
 
 bool UConvaiPlayerComponent::SetCaptureDeviceByName(FString DeviceName)
 {
-	if (!AudioCaptureComponent.IsValid())
+	if (!IsValid(AudioCaptureComponent))
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: AudioCaptureComponent is not valid"));
 		return false;
@@ -280,7 +295,7 @@ bool UConvaiPlayerComponent::SetCaptureDeviceByName(FString DeviceName)
 void UConvaiPlayerComponent::SetMicrophoneVolumeMultiplier(float InVolumeMultiplier, bool& Success)
 {
 	Success = false;
-	if (!AudioCaptureComponent.IsValid())
+	if (!IsValid(AudioCaptureComponent))
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetMicrophoneVolumeMultiplier: AudioCaptureComponent is not valid"));
 		return;
@@ -292,7 +307,7 @@ void UConvaiPlayerComponent::SetMicrophoneVolumeMultiplier(float InVolumeMultipl
 void UConvaiPlayerComponent::GetMicrophoneVolumeMultiplier(float& OutVolumeMultiplier, bool& Success)
 {
 	Success = false;
-	if (!AudioCaptureComponent.IsValid())
+	if (!IsValid(AudioCaptureComponent))
 	{
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetMicrophoneVolumeMultiplier: AudioCaptureComponent is not valid"));
 		return;
@@ -309,7 +324,7 @@ void UConvaiPlayerComponent::GetMicrophoneVolumeMultiplier(float& OutVolumeMulti
 // void UConvaiPlayerComponent::GetIfHardwareFeatureIsSupported(EHardwareInputFeatureBP FeatureType, bool& Success)
 // {
 // 	Success = false;
-// 	if (!AudioCaptureComponent.IsValid())
+// 	if (!IsValid(AudioCaptureComponent))
 // 	{
 // 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetIfHardwareFeatureIsSupported: AudioCaptureComponent is not valid"));
 // 		return;
@@ -358,7 +373,7 @@ void UConvaiPlayerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!IsInit || !AudioCaptureComponent.IsValid())
+	if (!IsInit || !IsValid(AudioCaptureComponent))
 	{
 		return;
 	}
@@ -776,6 +791,16 @@ void UConvaiPlayerComponent::OnServerAudioReceived(uint8* VoiceData, uint32 Voic
 void UConvaiPlayerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (IsValid(AudioCaptureComponent))
+	{
+		AudioCaptureComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
+	}
+	else
+	{
+		UE_LOG(ConvaiPlayerLog, Error, TEXT("Could not attach AudioCaptureComponent"));
+	}
+
 	if (!IsInit)
 	{
 		if (!Init())

@@ -62,6 +62,8 @@ class UConvaiPlayerComponent : public UConvaiAudioStreamer
 
 	UConvaiPlayerComponent();
 
+	virtual void OnComponentCreated() override;
+
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	bool Init();
@@ -259,7 +261,8 @@ private:
 	// TODO (Mohamed): use TCircularAudioBuffer instead
 	TRingBuffer<uint8> VoiceCaptureRingBuffer;
 
-	TWeakObjectPtr<UConvaiAudioCaptureComponent> AudioCaptureComponent;
+	UPROPERTY()
+	UConvaiAudioCaptureComponent* AudioCaptureComponent;
 
 	void UpdateVoiceCapture(float DeltaTime);
 	void StartVoiceChunkCapture(float ExpectedRecordingTime = 0.01);
@@ -277,4 +280,6 @@ private:
 
 	// Used by a consumer (e.g. chatbot component) to validate if this player component is still streaming audio data to it
 	uint32 Token;
+
+	USoundSubmixBase* _FoundSubmix;
 };
