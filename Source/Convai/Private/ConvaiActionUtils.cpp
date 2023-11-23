@@ -311,10 +311,8 @@ bool UConvaiActions::ParseAction(UConvaiEnvironment* Environment, FString Action
 	// Find extra numeric param
 	float ExtraNumber = ExtractNumber(ActionToBeParsed);
 
-
 	// Find extra textual param
 	FString ExtraText = ExtractText(ActionToAdd, ActionToBeParsed);
-
 
 	// Add to result action sequence array
 	if (ActionToAdd != "")
