@@ -44,6 +44,9 @@ public:
 	static void ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlayerController* PlayerController, float Radius, bool PlaneView, TArray<UObject*> IncludedCharacters, TArray<UObject*> ExcludedCharacters, UConvaiChatbotComponent*& ConvaiCharacter, bool& Found);
 	
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|Utils", meta = (WorldContext = "WorldContextObject"))
+	static void ConvaiGetLookedAtObjectOrCharacter(UObject* WorldContextObject, APlayerController* PlayerController, float Radius, bool PlaneView, TArray<FConvaiObjectEntry> ListToSearchIn, FConvaiObjectEntry& FoundObjectOrCharacter, bool& Found);
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|Utils", meta = (WorldContext = "WorldContextObject"))
 	static void ConvaiGetAllPlayerComponents(UObject* WorldContextObject, TArray<class UConvaiPlayerComponent*>& ConvaiPlayerComponents);
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai", meta = (WorldContext = "WorldContextObject"))

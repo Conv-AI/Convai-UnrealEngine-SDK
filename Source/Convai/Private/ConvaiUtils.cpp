@@ -287,6 +287,109 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 	}
 }
 
+void UConvaiUtils::ConvaiGetLookedAtObjectOrCharacter(UObject* WorldContextObject, APlayerController* PlayerController, float Radius, bool PlaneView, TArray<FConvaiObjectEntry> ListToSearchIn, FConvaiObjectEntry& FoundObjectOrCharacter, bool& Found)
+{
+	Found = false;
+	float FocuseDotThresshold = 0.5;
+	FVector CameraLocation, CameraForward;
+
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	if (!World)
+	{
+		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
+		return;
+	}
+
+	if (!PlayerController)
+	{
+		PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
+	}
+
+	if (!PlayerController)
+	{
+		UE_LOG(ConvaiUtilsLog, Warning, TEXT("ConvaiGetLookedAtActor: Could not get a pointer to PlayerController"));
+		return;
+	}
+
+	if (PlayerController->PlayerCameraManager)
+	{
+		CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
+		CameraForward = PlayerController->PlayerCameraManager->GetTransformComponent()->GetForwardVector();
+	}
+	else if (PlayerController->GetPawn())
+	{
+		CameraLocation = PlayerController->GetPawn()->GetActorLocation();
+		CameraForward = PlayerController->GetPawn()->GetActorForwardVector();
+	}
+	else
+	{
+		UE_LOG(ConvaiUtilsLog, Warning, TEXT("ConvaiGetLookedAtActor: Could not get a camera location"));
+		return;
+	}
+
+
+	if (PlaneView)
+	{
+		CameraLocation.Z = 0;
+		CameraForward.Z = 0;
+		CameraForward.Normalize();
+	}
+
+
+	for (int32 ItemIndex = 0; ItemIndex < ListToSearchIn.Num(); ++ItemIndex)
+	{
+		FConvaiObjectEntry CurrentItem = ListToSearchIn[ItemIndex];
+
+		TWeakObjectPtr<AActor> CurrentItemRef = CurrentItem.Ref;
+
+		if (!CurrentItemRef.IsValid())
+			continue;
+
+		if (CurrentItemRef->GetWorld() != World)
+			continue;
+
+		float DistSquared = 0;
+		float DistSquared2D = 0;
+		FVector CurrentItemLocation = CurrentItemRef->GetActorLocation();
+		if (PlaneView)
+		{
+			DistSquared2D = FVector::DistSquared2D(CurrentItemLocation, CameraLocation);
+			if (Radius > 0 && DistSquared2D > Radius * Radius)
+				continue;
+		}
+		else
+		{
+			DistSquared = FVector::DistSquared(CurrentItemLocation, CameraLocation);
+			if (Radius > 0 && DistSquared > Radius * Radius)
+				continue;
+		}
+
+		FVector DirCameraToItem = CurrentItemLocation - CameraLocation;
+		if (PlaneView)
+			DirCameraToItem.Z = 0;
+
+		DirCameraToItem.Normalize();
+		float CurrentFocuseDot = FVector::DotProduct(DirCameraToItem, CameraForward);
+		float mxnScore = -1;
+		float score = 0;
+
+		if (PlaneView) {
+			score = CurrentFocuseDot / DistSquared2D;
+		}
+		else {
+			score = CurrentFocuseDot / DistSquared;
+		}
+
+		if (score > mxnScore && CurrentFocuseDot >= FocuseDotThresshold)
+		{
+			mxnScore = score;
+			FocuseDotThresshold = CurrentFocuseDot;
+			FoundObjectOrCharacter = CurrentItem;
+			Found = true;
+		}
+	}
+}
+
 void UConvaiUtils::ConvaiGetAllPlayerComponents(UObject* WorldContextObject, TArray<class UConvaiPlayerComponent*>& ConvaiPlayerComponents)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
