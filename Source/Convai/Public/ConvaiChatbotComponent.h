@@ -180,6 +180,13 @@ public:
 	bool IsActionsQueueEmpty();
 
 	/**
+	 * Clears the ActionsQueue managed by the Convai chatbot component.
+	 *
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Convai|Actions")
+	void ClearActionQueue();
+
+	/**
 	 * Fetches the first action from the ActionsQueue managed by the Convai chatbot component.
 	 *
 	 * @param ConvaiResultAction Reference to a struct that will be populated with the details of the first action in the queue.
@@ -269,8 +276,13 @@ public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
 	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool ReplicateVoiceToNetwork, bool UseOverrideAPI_Key, FString OverrideAPI_Key, uint32 InToken);
 	
-	UFUNCTION(BlueprintCallable, Category = "Convai")
-	void ExecuteNarrativeTrigger(FString TriggerName, FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer);
+	UFUNCTION(BlueprintCallable, Category = "Convai", meta = (DisplayName = "Invoke Speech"))
+	void ExecuteNarrativeTrigger(FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateOnNetwork);
+	
+	UFUNCTION(BlueprintCallable, Category = "Convai", meta = (DisplayName = "Invoke Narrative Design Trigger"))
+	void InvokeNarrativeDesignTrigger(FString TriggerName, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateOnNetwork);
+
+	void InvokeTrigger_Internal(FString TriggerName, FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateOnNetwork);
 
 	// Interrupts the current speech with a provided fade-out duration. 
 	// The fade-out duration is controlled by the parameter 'InVoiceFadeOutDuration'.

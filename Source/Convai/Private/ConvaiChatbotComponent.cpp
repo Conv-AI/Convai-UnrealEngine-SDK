@@ -158,6 +158,11 @@ bool UConvaiChatbotComponent::IsActionsQueueEmpty()
 	return ActionsQueue.Num() == 0;
 }
 
+void UConvaiChatbotComponent::ClearActionQueue()
+{
+	ActionsQueue.Empty();
+}
+
 bool UConvaiChatbotComponent::FetchFirstAction(FConvaiResultAction& ConvaiResultAction)
 {
 	if (!UConvaiUtils::IsNewActionSystemEnabled())
@@ -339,11 +344,33 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	Start_GRPC_Request(UseOverrideAPI_Key, OverrideAPI_Key);
 }
 
-void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerName, FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateVoiceToNetwork)
+void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateOnNetwork)
 {
-	if (TriggerName.IsEmpty() && TriggerMessage.IsEmpty())
+	if (TriggerMessage.IsEmpty())
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendNarrativeTrigger: Trigger Name and TriggerMessage are missing - Please supply one of them"));
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("Invoke Speech: TriggerMessage is missing"));
+		return;
+	}
+
+	InvokeTrigger_Internal("", TriggerMessage, InEnvironment, InGenerateActions, InVoiceResponse, InReplicateOnNetwork);
+}
+
+void UConvaiChatbotComponent::InvokeNarrativeDesignTrigger(FString TriggerName, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateOnNetwork)
+{
+	if (TriggerName.IsEmpty())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("Invoke Narrative Design Trigger: TriggerName is missing"));
+		return;
+	}
+	InvokeTrigger_Internal(TriggerName, "", InEnvironment, InGenerateActions, InVoiceResponse, InReplicateOnNetwork);
+}
+
+void UConvaiChatbotComponent::InvokeTrigger_Internal(FString TriggerName, FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateOnNetwork)
+{
+	if (TriggerMessage.IsEmpty() && TriggerName.IsEmpty())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("InvokeTrigger_Internal: TriggerName and TriggerMessage are missing - Please supply one of them"));
+		return;
 	}
 
 	if (IsValid(Environment))
@@ -352,15 +379,15 @@ void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerName, FStri
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendNarrativeTrigger: Environment is not valid"));
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("InvokeTrigger_Internal: Environment is not valid"));
 	}
 
 	FString Error;
 	bool ValidEnvironment = UConvaiActions::ValidateEnvironment(Environment, Error);
 	if (GenerateActions && !ValidEnvironment)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendNarrativeTrigger: %s"), *Error);
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("SendNarrativeTrigger: Environment object seems to have issues -> setting GenerateActions to false"));
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("InvokeTrigger_Internal: %s"), *Error);
+		UE_LOG(ConvaiPlayerLog, Log, TEXT("InvokeTrigger_Internal: Environment object seems to have issues -> setting GenerateActions to false"));
 		GenerateActions = false;
 	}
 
@@ -381,7 +408,7 @@ void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerName, FStri
 	UserText = "";
 	GenerateActions = InGenerateActions;
 	VoiceResponse = InVoiceResponse;
-	ReplicateVoiceToNetwork = InReplicateVoiceToNetwork;
+	ReplicateVoiceToNetwork = InReplicateOnNetwork;
 
 	Start_GRPC_Request(false, "", TriggerName, TriggerMessage);
 }
