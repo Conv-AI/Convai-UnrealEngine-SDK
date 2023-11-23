@@ -98,17 +98,27 @@ uint32 FgRPCClient::Run()
 		if (got_tag)
 		{
 			FgRPC_Delegate* gRPC_Delegate = static_cast<FgRPC_Delegate*>(got_tag);
-			AsyncTask(ENamedThreads::GameThread, [gRPC_Delegate, ok, this]
+
+			if (bIsRunning)
 			{
-				if (bIsRunning)
-				{
-					gRPC_Delegate->ExecuteIfBound(ok);
-				}
-				else
-				{
-					UE_LOG(ConvaiSubsystemLog, Log, TEXT("Could not run gRPC delegate due to thread closing down"));
-				}
-			});
+				gRPC_Delegate->ExecuteIfBound(ok);
+			}
+			else
+			{
+				UE_LOG(ConvaiSubsystemLog, Log, TEXT("Could not run gRPC delegate due to thread closing down"));
+			}
+
+			//AsyncTask(ENamedThreads::GameThread, [gRPC_Delegate, ok, this]
+			//{
+			//	if (bIsRunning)
+			//	{
+			//		gRPC_Delegate->ExecuteIfBound(ok);
+			//	}
+			//	else
+			//	{
+			//		UE_LOG(ConvaiSubsystemLog, Log, TEXT("Could not run gRPC delegate due to thread closing down"));
+			//	}
+			//});
 		}
 		else
 		{
