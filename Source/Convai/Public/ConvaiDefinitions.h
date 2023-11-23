@@ -371,6 +371,9 @@ public:
 
 	UPROPERTY()
 	FConvaiObjectEntry MainCharacter;
+
+	UPROPERTY()
+	FConvaiObjectEntry AttentionObject;
 };
 
 // TODO: OnEnvironmentChanged event should be called in an optimizied way for any change in the environment
@@ -401,6 +404,7 @@ public:
 			Characters = InEnvironment->Characters;
 			Actions = InEnvironment->Actions;
 			MainCharacter = InEnvironment->MainCharacter;
+			AttentionObject = InEnvironment->AttentionObject;
 			OnEnvironmentChanged.ExecuteIfBound();
 		}
 	}
@@ -411,6 +415,7 @@ public:
 		Characters = InEnvironment.Characters;
 		Actions = InEnvironment.Actions;
 		MainCharacter = InEnvironment.MainCharacter;
+		AttentionObject = InEnvironment.AttentionObject;
 		OnEnvironmentChanged.ExecuteIfBound();
 	}
 
@@ -421,6 +426,7 @@ public:
 		OutStruct.Characters = Characters;
 		OutStruct.Actions = Actions;
 		OutStruct.MainCharacter = MainCharacter;
+		OutStruct.AttentionObject = AttentionObject;
 		return OutStruct;
 	}
 
@@ -594,23 +600,39 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
+	void SetAttentionObject(FConvaiObjectEntry InAttentionObject)
+	{
+		AttentionObject = InAttentionObject;
+		AddObject(AttentionObject);
+		OnEnvironmentChanged.ExecuteIfBound();
+	}
+
+	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
 	void ClearMainCharacter()
 	{
 		MainCharacter = FConvaiObjectEntry();
 	}
 
+	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
+	void ClearAttentionObject()
+	{
+		AttentionObject = FConvaiObjectEntry();
+	}
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
-		TArray<FString> Actions;
+	TArray<FString> Actions;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
-		TArray<FConvaiObjectEntry> Objects;
+	TArray<FConvaiObjectEntry> Objects;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
-		TArray<FConvaiObjectEntry> Characters;
+	TArray<FConvaiObjectEntry> Characters;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
 	FConvaiObjectEntry MainCharacter;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
+	FConvaiObjectEntry AttentionObject;
 };
 
 UCLASS(Blueprintable)

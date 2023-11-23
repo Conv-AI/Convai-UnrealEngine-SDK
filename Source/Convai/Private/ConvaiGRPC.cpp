@@ -328,6 +328,20 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 			action_config_character->set_name(TCHAR_TO_UTF8(*FinalName));
 			action_config_character->set_bio(TCHAR_TO_UTF8(*character.Description));
 		}
+
+		// Check if we have an attention object set
+		FConvaiObjectEntry AttentionObject = Environment->AttentionObject;
+		if (AttentionObject.Name.Len() != 0)
+		{
+			FString FinalName = AttentionObject.Name;
+			if (AttentionObject.Description.Len())
+			{
+				FinalName = FinalName.Append(*FString(" <"));
+				FinalName = FinalName.Append(*AttentionObject.Description);
+				FinalName = FinalName.Append(">");
+			}
+			action_config->set_current_attention_object(TCHAR_TO_UTF8(*FinalName));
+		}
 	}
 
 	if (IsValid(Environment))
