@@ -392,7 +392,7 @@ private:
 
 	FString LastTranscription;
 	bool ReceivedFinalTranscription;
-	bool ReceivedFinalData;
+	bool ReceivedFinalData; // Did the character end his response
 	FString LastPlayerName;
 	TArray<uint8> PlayerInpuAudioBuffer;
 };
