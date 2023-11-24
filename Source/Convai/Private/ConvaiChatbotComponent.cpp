@@ -46,7 +46,7 @@ void UConvaiChatbotComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 
 bool UConvaiChatbotComponent::IsInConversation()
 {
-	return (IsValid(ConvaiGRPCGetResponseProxy) || IsTalking);
+	return ((IsValid(ConvaiGRPCGetResponseProxy) && !ReceivedFinalData) || IsTalking);
 }
 
 bool UConvaiChatbotComponent::IsProcessing()
@@ -471,6 +471,7 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAPI_Key, FStrin
 	FString API_Key = UseOverrideAPI_Key ? OverrideAPI_Key : UConvaiUtils::GetAPI_Key();
 	bool RequireFaceData = false;
 	bool GeneratesVisemesAsBlendshapes = false;
+	ReceivedFinalData = false;
 	if (ConvaiLipSyncExtended)
 	{
 		RequireFaceData = ConvaiLipSyncExtended->RequiresPreGeneratedFaceData();
