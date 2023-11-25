@@ -38,7 +38,7 @@ All notable changes to this project will be documented in this file.
 - Overall plugin stability and warnings.
 
 **Deprecated**
-- ConvaiOVRLipsync plugin and component - Please delete the plugin from your project and use the newFaceSync component instead.
+- ConvaiOVRLipsync plugin and component - Please delete the plugin from your project and use the new FaceSync component instead.
 
 # Release 2.9.0
 **Added**
