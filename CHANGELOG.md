@@ -1,5 +1,45 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+# Release 3.0.0
+**Added**
+- New lipsync component FaceSync which no longer requires ConvaiOVRLipsync plugin.
+- Mac Lipsync support.
+- Emotions.
+- Object in Attention.
+- New Convai Chatbot Component functions:
+    - Invoke Speech.
+    - Invoke Narrative Design Trigger.
+    - Force Set Emotion.
+    - Reset Emotion State.
+    - Get Emotion Score.
+    - Get Talking Time Elapsed.
+    - Get Talking Time Remaining.
+    - Set Lipsync Component.
+    - Clear Action Queue.
+- New Convai Chatbot Component Events:
+    - On Narrative Section Recevied.
+    - On Emotion State Changed.
+- ConvaiGetLookedAtObjectOrCharacter function
+- Actor loses focus with player after predefined time.
+- Move To and Follow Actions failures will trigger a character response.
+- Environment replication for multiplayer usecases.
+
+**Improved**
+- MetaHuman body Animations, Facial expressions and eye look at.
+- Realusion Animation blueprint, lipsync and eye look at.
+- Settings widget UI.
+- Actions accuracy.
+- Audio capture for low frame rate.
+
+**Fixed**
+- Packaging issue if Convai Player Component was in the scene prior to packaging.
+- Crash when many interactions were happening simultaneously.
+- ConvaiBasePlayerWithVoiceActivation Beta class was only working for the first interaction.
+- Overall plugin stability and warnings.
+
+**Deprecated**
+- ConvaiOVRLipsync plugin and component - Please delete the plugin from your project and use the newFaceSync component instead.
+
 # Release 2.9.0
 **Added**
 - Unreal Engine 5.3 Support.
