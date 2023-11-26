@@ -37,7 +37,7 @@ This guide provides detailed instructions on how to build and install the Convai
 Before starting, ensure you have the following installed:
 - Python: [Download Python](https://www.python.org/downloads/)
 - Git: [Download Git](https://git-scm.com/downloads)
-- Unreal Engine: Ensure you have Unreal Engine installed.
+- Unreal Engine 5.x: Ensure you have Unreal Engine 5.0 or later installed.
 - For Windows:
   - Visual Studio: Required for building the plugin. Refer to Unreal Engine's [Visual Studio Setup Guide](https://docs.unrealengine.com/en-US/Programming/Development/VisualStudioSetup) for detailed instructions.
   - For Android builds: Android Studio and the corresponding NDK. Refer to the [Setting Up Android SDK and NDK for Unreal](https://docs.unrealengine.com/4.27/en-US/SharingAndReleasing/Mobile/Android/Setup/) guide.
@@ -55,16 +55,16 @@ Before starting, ensure you have the following installed:
    cd Convai-UnrealEngine-SDK
    ```
 4. Run the build script with the Unreal Engine directory as the first argument:
-   - For Windows:
+
      ```
-     python Build.py "C:\Program Files\Epic Games\UE_5.x" [Additional Flags]
-     ```
-   - For macOS:
-     ```
-     python Build.py "/Users/your_user/UnrealEngine/UE_5.x" [Additional Flags]
+     python Build.py [Unreal Engine Directory] [Additional Flags]
      ```
 
    Add `-TargetPlatforms=Win64` to build specifically for Windows. For building on Windows with support for both Windows and Android, no extra flags are needed.
+     ```
+	 # Example: Build for Unreal Engine 5.3. Windows only 
+     python Build.py "C:\Program Files\Epic Games\UE_5.3" -TargetPlatforms=Win64 
+     ```
 
 ## Installing the Plugin
 1. After building the plugin, locate the output files in the `Output` folder within the repository directory.
