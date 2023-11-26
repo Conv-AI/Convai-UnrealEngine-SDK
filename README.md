@@ -1,7 +1,7 @@
-# ConvAI Unreal Engine SDK Plugin
+# Convai Unreal Engine SDK Plugin
 
 ## Overview
-ConvAI brings advanced AI-driven interaction to Unreal Engine, empowering NPCs to engage in realistic conversations with players and respond intelligently to verbal commands and environmental events. This plugin integrates seamlessly with various character assets and supports multiple languages, enhancing both single-player and multiplayer experiences.
+Convai brings advanced AI-driven interaction to Unreal Engine, empowering NPCs to engage in realistic conversations with players and respond intelligently to verbal commands and environmental events. Convai integrates seamlessly with various character assets and multiple language support.
 
 ### Key Highlights
 - **Intelligent Conversation**: Real-time, open-ended conversation capabilities that make interactions more natural and dynamic.
@@ -12,8 +12,8 @@ ConvAI brings advanced AI-driven interaction to Unreal Engine, empowering NPCs t
 - **Intelligent Animations**: Integration with lip-sync and comprehensive facial and body animations, synchronized with conversation flow.
 
 ### Resources for Ease of Use
-- [Marketplace Link](https://www.unrealengine.com/marketplace/en-US/product/convai)
-- [Extensive Documentation](https://docs.convai.com/api-docs-restructure/plugins-and-integrations/unreal-engine)
+- [Marketplace Link](https://www.unrealengine.com/marketplace/en-US/product/Convai)
+- [Extensive Documentation](https://docs.Convai.com/api-docs-restructure/plugins-and-integrations/unreal-engine)
 - [Quick Start Video](https://www.youtube.com/watch?v=HHJvY9dmwwg)
 - [Metahuman Demo Project](https://drive.google.com/drive/u/4/folders/1HNcghI9SG1NpCUaJWRX9Yh28HUF00-U0)
 
@@ -28,7 +28,7 @@ The plugin is compatible with a wide range of character and avatar assets, inclu
 - **Expansion to Other Platforms**: Including iOS and Linux.
 - **Long-term Memory for Characters**: Enabling NPCs to remember past interactions for more immersive gameplay.
 
-# ConvAI Unreal Engine SDK Plugin Installation and Build Guide
+# Convai Unreal Engine SDK Plugin Installation and Build Guide
 
 ## Overview
 This guide provides detailed instructions on how to build and install the Convai Unreal Engine plugin.
@@ -87,4 +87,4 @@ Before starting, ensure you have the following installed:
    ```
 
 ## Need Support or Have Questions?
-If you encounter any issues or have questions, feel free to reach out to us at support@convai.com or join the community on [Discord](https://discord.gg/UVvBgV3xQ5) Our team is dedicated to providing you with the support you need to make the most out of Convai.
+If you encounter any issues or have questions, feel free to reach out to us at support@Convai.com or join the community on [Discord](https://discord.gg/UVvBgV3xQ5) Our team is dedicated to providing you with the support you need to make the most out of Convai.
