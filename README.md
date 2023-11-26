@@ -62,7 +62,7 @@ Before starting, ensure you have the following installed:
 
    Add `-TargetPlatforms=Win64` to build specifically for Windows. For building on Windows with support for both Windows and Android, no extra flags are needed.
      ```
-	   // Example: Windows only Build for Unreal Engine 5.3.
+	 // Example: Windows only Build for Unreal Engine 5.3.
      python Build.py "C:\Program Files\Epic Games\UE_5.3" -TargetPlatforms=Win64 
      ```
 
