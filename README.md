@@ -87,4 +87,4 @@ Before starting, ensure you have the following installed:
    ```
 
 ## Need Support or Have Questions?
-If you encounter any issues or have questions, feel free to reach out to us at support@Convai.com or join the community on [Discord](https://discord.gg/UVvBgV3xQ5) Our team is dedicated to providing you with the support you need to make the most out of Convai.
+If you encounter any issues or have questions, feel free to reach out to us at support@convai.com or join the community on [Discord](https://discord.gg/UVvBgV3xQ5) Our team is dedicated to providing you with the support you need to make the most out of Convai.
