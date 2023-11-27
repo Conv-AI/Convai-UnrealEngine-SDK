@@ -159,4 +159,5 @@ private:
 	// Pointer to the world
 	TWeakObjectPtr<UWorld> WorldPtr;
 
+	bool ReceivedFinish;
 };
