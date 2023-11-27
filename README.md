@@ -28,7 +28,7 @@ The plugin is compatible with a wide range of character and avatar assets, inclu
 - **Expansion to Other Platforms**: Including iOS and Linux.
 - **Long-term Memory for Characters**: Enabling NPCs to remember past interactions for more immersive gameplay.
 
-# Convai Unreal Engine SDK Plugin Installation and Build Guide
+# Installation
 
 ## Overview
 This guide provides detailed instructions on how to build and install the Convai Unreal Engine plugin.
