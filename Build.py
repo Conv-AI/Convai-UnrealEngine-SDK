@@ -1,7 +1,6 @@
 import os
 import sys
 import subprocess
-import requests
 import zipfile
 import io
 import importlib.util
