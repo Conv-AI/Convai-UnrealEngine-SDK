@@ -433,15 +433,15 @@ void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 		if (ReceivedFinalData == false)
 			onResponseDataReceived(FString(""), TArray<uint8>(), 0, true);
 
-		//AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this)]
-		//	{
-		//		if (!WeakThis.IsValid() || WeakThis->IsPendingKill())
-		//		{
-		//			// The object is no longer valid or is being destroyed.
-		//			return;
-		//		}
-		//		WeakThis->OnInterruptedEvent.Broadcast(WeakThis.Get(), WeakThis->CurrentConvaiPlayerComponent);
-		//	});
+		AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this)]
+			{
+				if (!WeakThis.IsValid() || WeakThis->IsPendingKill())
+				{
+					// The object is no longer valid or is being destroyed.
+					return;
+				}
+				WeakThis->OnInterruptedEvent.Broadcast(WeakThis.Get(), WeakThis->CurrentConvaiPlayerComponent);
+			});
 	}
 }
 
