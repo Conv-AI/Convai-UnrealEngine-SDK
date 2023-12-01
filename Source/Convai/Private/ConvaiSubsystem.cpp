@@ -107,24 +107,11 @@ uint32 FgRPCClient::Run()
 			{
 				UE_LOG(ConvaiSubsystemLog, Log, TEXT("Could not run gRPC delegate due to thread closing down"));
 			}
-
-			//AsyncTask(ENamedThreads::GameThread, [gRPC_Delegate, ok, this]
-			//{
-			//	if (bIsRunning)
-			//	{
-			//		gRPC_Delegate->ExecuteIfBound(ok);
-			//	}
-			//	else
-			//	{
-			//		UE_LOG(ConvaiSubsystemLog, Log, TEXT("Could not run gRPC delegate due to thread closing down"));
-			//	}
-			//});
 		}
 		else
 		{
 			UE_LOG(ConvaiSubsystemLog, Log, TEXT("Bad got_tag"));
 		}
-		//FPlatformProcess::Sleep(.5);
     }
 	UE_LOG(ConvaiSubsystemLog, Log, TEXT("End Run"));
 
@@ -153,9 +140,6 @@ void FgRPCClient::CreateChannel()
 
 void FgRPCClient::OnStateChange(bool ok)
 {
-	//if (!bIsRunning)
-	//	return;
-
 	grpc_connectivity_state state;
 	
 	if (Channel)
@@ -186,9 +170,6 @@ void FgRPCClient::OnStateChange(bool ok)
 
 void FgRPCClient::Exit()
 {
-	//Channel.reset();
-	//Channel = nullptr;
-
 	if (!bIsRunning)
 	{
 		return;
@@ -199,8 +180,6 @@ void FgRPCClient::Exit()
 		FScopeLock Lock(&CriticalSection);
 		cq_.Shutdown();
 	}
-	//Thread->WaitForCompletion();
-	//Thread->Kill();
 }
 
 FgRPCClient::FgRPCClient(std::string InTarget,
@@ -219,7 +198,6 @@ std::unique_ptr<ConvaiService::Stub> FgRPCClient::GetNewStub()
 	if (state != grpc_connectivity_state::GRPC_CHANNEL_READY)
 	{
 		UE_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel not ready yet.. Current State: %s"), *FString(grpc_connectivity_state_str[state]));
-		//return nullptr;
 	}
 	return ConvaiService::NewStub(Channel);
 }
