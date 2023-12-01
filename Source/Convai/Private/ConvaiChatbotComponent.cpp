@@ -51,7 +51,7 @@ bool UConvaiChatbotComponent::IsInConversation()
 
 bool UConvaiChatbotComponent::IsProcessing()
 {
-	return (IsValid(ConvaiGRPCGetResponseProxy));
+	return (IsValid(ConvaiGRPCGetResponseProxy) && !ReceivedFinalData);
 }
 
 bool UConvaiChatbotComponent::IsListening()
@@ -851,12 +851,13 @@ void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	// CheckTokenValidity() checks if player has stopped sending audio
 	if ((!CheckTokenValidity() && StreamInProgress))
 	{
+		// UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("ConvaiChatbotComponentTick:: ThisIsTheLastWrite"));
 		StreamInProgress = false;
 		ThisIsTheLastWrite = true;
 	}
 
 	bool Successful = false;
-	if (IsValid(CurrentConvaiPlayerComponent))
+	if (IsValid(CurrentConvaiPlayerComponent) && !ThisIsTheLastWrite)
 	{
 		// Consume the mic stream into our buffer
 		PlayerInpuAudioBuffer.Empty(PlayerInpuAudioBuffer.Max()); // Empty the buffer but keep its memory allocation intact
@@ -867,17 +868,21 @@ void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		// Finish the stream
 		StreamInProgress = false;
 		ThisIsTheLastWrite = true;
+		// UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("ConvaiChatbotComponentTick:: Finish the stream"));
 	}
 
 	if (Successful) // If there is mic data to send
 	{
+		// UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("ConvaiChatbotComponentTick:: Succesful consumption of %d bytes"), PlayerInpuAudioBuffer.Num());
 		ConvaiGRPCGetResponseProxy->WriteAudioDataToSend(PlayerInpuAudioBuffer.GetData(), PlayerInpuAudioBuffer.Num(), ThisIsTheLastWrite);
 	}
-	else if (ThisIsTheLastWrite) // If there is no data to send, and we do not expect more mic data to send  
+	if (ThisIsTheLastWrite) // If there is no data to send, and we do not expect more mic data to send  
 	{
+		// UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("ConvaiChatbotComponentTick:: FinishWriting"));
 		ConvaiGRPCGetResponseProxy->FinishWriting();
 	}
-	else // If there is no data to send, but we expect the mic data to come in the near future
+
+	if (!Successful && !ThisIsTheLastWrite) // If there is no data to send, but we expect the mic data to come in the near future
 	{
 		// We did not receive audio from player although the player did not explicitly end sending the audio
 		// Start the time out timer if we did not start yet
@@ -889,7 +894,9 @@ void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType
 
 	// Make sure the time out timer is cleared on a successful read or that we have finished reading from the mic
 	if (Successful || !StreamInProgress)
+	{
 		ClearTimeOutTimer();
+	}
 }
 
 void UConvaiChatbotComponent::BeginDestroy()

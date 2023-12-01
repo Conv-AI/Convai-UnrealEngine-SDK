@@ -180,14 +180,14 @@ void UConvaiGRPCGetResponseProxy::WriteAudioDataToSend(uint8* Buffer, uint32 Len
 
 	m_mutex.Unlock();
 
-
+	// UE_LOG(ConvaiGRPCLog, Log, TEXT("WriteAudioDataToSend:: InformOnDataReceived = %s"), InformOnDataReceived ? *FString("True") : *FString("False"));
 	if (InformOnDataReceived)
 	{
-		// Inform of new data to send
-		OnStreamWrite(true);
-
 		// Reset
 		InformOnDataReceived = false;
+
+		// Inform of new data to send
+		OnStreamWrite(true);
 	}
 }
 
@@ -407,7 +407,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 		return;
 	}
 
-	//UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWrite"));
+	// UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWriteBegin"));
 
 	// Clear the request data to make it ready to hold the new data we are going to send
 	request.Clear();
@@ -682,12 +682,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 void UConvaiGRPCGetResponseProxy::OnStreamFinish(bool ok)
 {
 	ReceivedFinish = true;
-	//if (!IsValid(this))
-	//{
-	//	UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamFinish failed due to pending kill!"));
-	//	LogAndEcecuteFailure("OnStreamFinish");
-	//	return;
-	//}
 
 	if (!ok || !status.ok())
 	{

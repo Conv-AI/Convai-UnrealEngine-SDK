@@ -8,6 +8,7 @@
 #include "CoreMinimal.h"
 #include "Sound/SoundWave.h"
 #include "Net/OnlineBlueprintCallProxyBase.h"
+#include "HAL/ThreadSafeBool.h"
 #include "ConvaiGRPC.generated.h"
 
 
@@ -145,13 +146,13 @@ private:
 
 private:
 	// becomes true if we receive a non-ok header
-	bool InformOnDataReceived;
+	FThreadSafeBool InformOnDataReceived;
 
 	// Stores the audio data to be streamed to the API
 	TArray<uint8> AudioBuffer;
 
 	// True when we are informed that the "AudioBuffer" is complete and no more audio will be received
-	bool LastWriteReceived;
+	FThreadSafeBool LastWriteReceived;
 
 	// Used to regulate access to the AudioBuffer to prevent racing condition
 	FCriticalSection m_mutex;
@@ -159,5 +160,5 @@ private:
 	// Pointer to the world
 	TWeakObjectPtr<UWorld> WorldPtr;
 
-	bool ReceivedFinish;
+	FThreadSafeBool ReceivedFinish;
 };
