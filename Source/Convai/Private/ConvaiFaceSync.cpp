@@ -125,6 +125,7 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 			EndFrame = MainSequenceBuffer.AnimationFrames[NextFrameIndex].BlendShapes;
 			Alpha = (CurrentSequenceTimePassed - FrameOffset - (CurrentFrameIndex * FrameDuration)) / FrameDuration;
 		}
+		SequenceCriticalSection.Unlock();
 
 		//AnchorValue = FMath::Clamp(AnchorValue, 0, 1);
 		//Alpha = Calculate1DBezierCurve(Alpha, AnchorValue,0, 1-AnchorValue, 1);
@@ -133,7 +134,6 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 		// Trigger the blueprint event
 		OnVisemesDataReady.ExecuteIfBound();
-		SequenceCriticalSection.Unlock();
 	}	
 }
 
@@ -171,7 +171,7 @@ void UConvaiFaceSyncComponent::ConvaiProcessLipSyncSingleFrame(FAnimationFrame F
 	SequenceCriticalSection.Unlock();
 }
 
-bool UConvaiFaceSyncComponent::IsValidSequence(FAnimationSequence Sequence)
+bool UConvaiFaceSyncComponent::IsValidSequence(const FAnimationSequence &Sequence)
 {
 	if (Sequence.Duration > 0 && Sequence.AnimationFrames.Num() > 0 && Sequence.AnimationFrames[0].BlendShapes.Num() > 0)
 		return true;

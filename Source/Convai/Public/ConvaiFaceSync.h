@@ -48,7 +48,7 @@ public:
 	virtual TMap<FName, float> ConvaiGetFaceBlendshapes() override { return CurrentBlendShapesMap; }
 	// End IConvaiLipSyncExtendedInterface interface
 
-	bool IsValidSequence(FAnimationSequence Sequence);
+	bool IsValidSequence(const FAnimationSequence &Sequence);
 
 	void ClearMainSequence();
 
