@@ -269,6 +269,10 @@ private:
 	void StopVoiceChunkCapture();
 	void ReadRecordedBuffer(Audio::AlignedFloatBuffer& RecordedBuffer, float& OutNumChannels, float& OutSampleRate);
 
+	void StartAudioCaptureComponent();
+	void StopAudioCaptureComponent();
+
+
 	FonDataReceived_Delegate onDataReceived_Delegate;
 
 	bool IsRecording = false;

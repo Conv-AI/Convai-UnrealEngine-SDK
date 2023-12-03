@@ -8,6 +8,7 @@
 #include "ConvaiUtils.h"
 #include "ConvaiDefinitions.h"
 
+#include "Net/UnrealNetwork.h"
 #include "Misc/FileHelper.h"
 #include "Http.h"
 #include "ConvaiUtils.h"
@@ -427,6 +428,16 @@ void UConvaiPlayerComponent::ReadRecordedBuffer(Audio::AlignedFloatBuffer& Recor
 	}
 }
 
+void UConvaiPlayerComponent::StartAudioCaptureComponent()
+{
+		AudioCaptureComponent->Start();
+}
+
+void UConvaiPlayerComponent::StopAudioCaptureComponent()
+{
+	AudioCaptureComponent->Stop();
+}
+
 void UConvaiPlayerComponent::StopVoiceChunkCapture()
 {
 	//USoundWave* SoundWaveMic = UAudioMixerBlueprintLibrary::StopRecordingOutput(this, EAudioRecordingExportType::SoundWave, "Convsound", "ConvSound", Cast<USoundSubmix>(AudioCaptureComponent->SoundSubmix));
@@ -504,7 +515,7 @@ void UConvaiPlayerComponent::StartRecording()
 	}
 
 	UE_LOG(ConvaiPlayerLog, Log, TEXT("Started Recording "));
-	AudioCaptureComponent->Start();    //Start the AudioCaptureComponent
+	StartAudioCaptureComponent();    //Start the AudioCaptureComponent
 
 	// reset audio buffers
 	StartVoiceChunkCapture();
@@ -526,7 +537,7 @@ USoundWave* UConvaiPlayerComponent::FinishRecording()
 	StopVoiceChunkCapture();
 
 	USoundWave* OutSoundWave = UConvaiUtils::PCMDataToSoundWav(VoiceCaptureBuffer, 1, ConvaiConstants::VoiceCaptureSampleRate);
-	AudioCaptureComponent->Stop();  //stop the AudioCaptureComponent
+	StopAudioCaptureComponent();  //stop the AudioCaptureComponent
 	if (IsValid(OutSoundWave))
 		UE_LOG(ConvaiPlayerLog, Log, TEXT("OutSoundWave->GetDuration(): %f seconds "), OutSoundWave->GetDuration());
 	IsRecording = false;
@@ -579,7 +590,7 @@ void UConvaiPlayerComponent::StartTalking(
 
 	UE_LOG(ConvaiPlayerLog, Log, TEXT("Started Talking"));
 
-	AudioCaptureComponent->Start();    //Start the AudioCaptureComponent
+	StartAudioCaptureComponent();    //Start the AudioCaptureComponent
 
 	// reset audio buffers
 	StartVoiceChunkCapture();
@@ -615,7 +626,7 @@ void UConvaiPlayerComponent::FinishTalking()
 	}
 
 	StopVoiceChunkCapture();
-	AudioCaptureComponent->Stop();  //stop the AudioCaptureComponent
+	StopAudioCaptureComponent();  //stop the AudioCaptureComponent
 	IsStreaming = false;
 
 	if (ReplicateVoiceToNetwork)
