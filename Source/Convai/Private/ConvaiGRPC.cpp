@@ -213,6 +213,15 @@ void UConvaiGRPCGetResponseProxy::BeginDestroy()
 	Super::BeginDestroy();
 }
 
+void UConvaiGRPCGetResponseProxy::CallFinish()
+{
+	if (CalledFinish || !stream_handler)
+		return;
+
+	CalledFinish = true;
+	stream_handler->Finish(&status, (void*)&OnStreamFinishDelegate);
+}
+
 TArray<uint8> UConvaiGRPCGetResponseProxy::ConsumeFromAudioBuffer(bool& IsThisTheFinalWrite)
 {
 	// TODO: (Mohamed) optimize and clean this to reduce number of copying operations to not spend much time in CS, also reserve memory for "output" array before entering
@@ -403,9 +412,12 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 	if (!ok)
 	{
 		LogAndEcecuteFailure("OnStreamWrite");
-		stream_handler->Finish(&status, (void*)&OnStreamFinishDelegate);
+		CallFinish();
 		return;
 	}
+
+	if (CalledFinish)
+		return;
 
 	// UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWriteBegin"));
 
@@ -499,7 +511,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWriteDone(bool ok)
 	if (!ok)
 	{
 		LogAndEcecuteFailure("OnStreamWriteDone");
-		stream_handler->Finish(&status, (void*)&OnStreamFinishDelegate);
+		CallFinish();
 		return;
 	}
 
@@ -521,7 +533,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		// Tell the server that we are ready to finish the stream any time it wishes
 		UE_LOG(ConvaiGRPCLog, Log, TEXT("stream_handler->Finish"));
 		if (stream_handler)
-			stream_handler->Finish(&status, (void*)&OnStreamFinishDelegate);
+			CallFinish();
 		else
 			OnFinish.ExecuteIfBound();
 		if (!status.ok())

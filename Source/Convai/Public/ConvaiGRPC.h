@@ -80,10 +80,11 @@ public:
 
 private:
 
+	void CallFinish();
+
 	TArray<uint8> ConsumeFromAudioBuffer(bool& IsThisTheFinalWrite);
 
 	void LogAndEcecuteFailure(FString FuncName);
-
 
 	void ExtendDeadline();
 
@@ -161,4 +162,5 @@ private:
 	TWeakObjectPtr<UWorld> WorldPtr;
 
 	FThreadSafeBool ReceivedFinish;
+	FThreadSafeBool CalledFinish;
 };
