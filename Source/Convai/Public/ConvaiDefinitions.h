@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CoreGlobals.h"
 #include "ConvaiDefinitions.generated.h"
 
 
@@ -667,4 +668,54 @@ namespace ConvaiConstants
 	const TArray<FString> VisemeNames = { "sil", "PP", "FF", "TH", "DD", "kk", "CH", "SS", "nn", "RR", "aa", "E", "ih", "oh", "ou" };
 
 	//char* AvatarDefaultImage2 = "https://convai.com/_next/static/images/placeholder-3d-cab6463359f6ccedb4cda311c4056788.jpg";
+};
+
+
+template<typename DelegateType>
+class FThreadSafeDelegateWrapper
+{
+public:
+	// Bind a delegate
+	void Bind(const DelegateType& InDelegate)
+	{
+		FScopeLock Lock(&Mutex);
+		MyDelegate = InDelegate;
+	}
+
+	// Mirror of BindUObject function for non-const UserClass
+	template <typename UserClass, typename... VarTypes>
+	void BindUObject(UserClass* InUserObject, void(UserClass::* InFunc)(VarTypes...))
+	{
+		FScopeLock Lock(&Mutex);
+		MyDelegate.BindUObject(InUserObject, InFunc);
+	}
+
+	// Unbind the delegate
+	void Unbind()
+	{
+		FScopeLock Lock(&Mutex);
+		MyDelegate.Unbind();
+	}
+
+	// Check if the delegate is bound
+	bool IsBound() const
+	{
+		return MyDelegate.IsBound();
+	}
+
+	// Execute the delegate if it is bound
+	// Use perfect forwarding to forward arguments to the delegate
+	template<typename... ArgTypes>
+	void ExecuteIfBound(ArgTypes&&... Args) const
+	{
+		FScopeLock Lock(&Mutex);
+		if (MyDelegate.IsBound() && !IsEngineExitRequested())
+		{
+			MyDelegate.ExecuteIfBound(Forward<ArgTypes>(Args)...);
+		}
+	}
+
+private:
+	mutable FCriticalSection Mutex;
+	DelegateType MyDelegate;
 };

@@ -39,30 +39,30 @@ class UConvaiGRPCGetResponseProxy : public UObject
 	GENERATED_BODY()
 public:
 	// Called when user transcription is received
-	FConvaiGRPCOnTranscriptionSignature OnTranscriptionReceived;
+	FThreadSafeDelegateWrapper<FConvaiGRPCOnTranscriptionSignature> OnTranscriptionReceived;
 
 	// Called when new text and/or Audio data is received
-	FConvaiGRPCOnDataSignature OnDataReceived;
+	FThreadSafeDelegateWrapper<FConvaiGRPCOnDataSignature> OnDataReceived;
 
 	// Called when new face data is received
-	FConvaiGRPCOnFaceDataSignature OnFaceDataReceived;
+	FThreadSafeDelegateWrapper<FConvaiGRPCOnFaceDataSignature> OnFaceDataReceived;
 
 	// Called when actions are received
-	FConvaiGRPCOnActionsSignature OnActionsReceived;
+	FThreadSafeDelegateWrapper<FConvaiGRPCOnActionsSignature> OnActionsReceived;
 
 	// Called when new SessionID is received
-	FConvaiGRPCOnSessiondIDSignature OnSessionIDReceived;
+	FThreadSafeDelegateWrapper<FConvaiGRPCOnSessiondIDSignature> OnSessionIDReceived;
 
-	FConvaiGRPCOnNarrativeDataSignature OnNarrativeDataReceived;
-	
+	FThreadSafeDelegateWrapper<FConvaiGRPCOnNarrativeDataSignature> OnNarrativeDataReceived;
+
 	// Called when new Emotion is received
-	FConvaiGRPCOnEmotionSignature OnEmotionReceived;
+	FThreadSafeDelegateWrapper<FConvaiGRPCOnEmotionSignature> OnEmotionReceived;
 
 	// Called when the response stream is done
-	FConvaiGRPCOnEventSignature OnFinish;
+	FThreadSafeDelegateWrapper<FConvaiGRPCOnEventSignature> OnFinish;
 
 	// Called when there is an unsuccessful response
-	FConvaiGRPCOnEventSignature OnFailure;
+	FThreadSafeDelegateWrapper<FConvaiGRPCOnEventSignature> OnFailure;
 
 	//UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai GRPC Test", WorldContext = "WorldContextObject"), Category = "Convai|gRPC")
 	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString TriggerName, FString TriggerMessage, FString CharID, bool VoiceResponse, bool RequireFaceData, bool GeneratesVisemesAsBlendshapes, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key);
