@@ -705,6 +705,7 @@ UConvaiChatBotUpdateProxy* UConvaiChatBotUpdateProxy::CreateCharacterUpdateProxy
 	Proxy->NewVoice = NewVoice;
 	Proxy->NewBackstory = NewBackstory;
 	Proxy->NewCharName = NewCharName;
+	Proxy->NewLanguage = NewLanguage;
 	return Proxy;
 }
 
