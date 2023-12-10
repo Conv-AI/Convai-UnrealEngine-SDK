@@ -318,6 +318,9 @@ IConvaiLipSyncInterface* UConvaiAudioStreamer::FindFirstLipSyncComponent()
 
 bool UConvaiAudioStreamer::SetLipSyncComponent(UActorComponent* LipSyncComponent)
 {
+	if (!CanUseLipSync())
+		return false;
+
 	// Find the LipSync component
 	if (LipSyncComponent && LipSyncComponent->GetClass()->ImplementsInterface(UConvaiLipSyncInterface::StaticClass()))
 	{
@@ -424,6 +427,11 @@ void UConvaiAudioStreamer::StopLipSync()
 		ConvaiLipSync->ConvaiStopLipSync();
 		ConvaiLipSync->OnVisemesDataReady.ExecuteIfBound(); // TODO (Mohamed): This is redundant and should be removed once all users update their OVR lipsync plugin
 	}
+}
+
+bool UConvaiAudioStreamer::CanUseLipSync()
+{
+	return false;
 }
 
 void UConvaiAudioStreamer::OnVisemesReadyCallback()

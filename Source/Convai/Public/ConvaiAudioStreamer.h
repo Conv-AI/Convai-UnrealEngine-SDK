@@ -117,6 +117,8 @@ public:
 
 	void StopLipSync();
 
+	virtual bool CanUseLipSync();
+
 	void OnVisemesReadyCallback();
 
 	UFUNCTION(BlueprintPure, Category = "Convai|LipSync", Meta = (Tooltip = "Returns last predicted viseme scores"))

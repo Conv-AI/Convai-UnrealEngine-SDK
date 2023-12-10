@@ -911,6 +911,11 @@ void UConvaiChatbotComponent::BeginDestroy()
 	Super::BeginDestroy();
 }
 
+bool UConvaiChatbotComponent::CanUseLipSync()
+{
+	return true;
+}
+
 UConvaiChatBotGetDetailsProxy* UConvaiChatbotComponent::ConvaiGetDetails()
 {
 	ConvaiChatBotGetDetailsDelegate.BindUFunction(this, "OnConvaiGetDetailsCompleted");

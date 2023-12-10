@@ -300,7 +300,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable, Category = "VoiceNetworking")
 	void Broadcast_InterruptSpeech(float InVoiceFadeOutDuration);
 
-private:
+public:
 	// AActorComponent interface
 	virtual void BeginPlay() override;
 	//virtual void OnRegister() override;
@@ -311,6 +311,10 @@ private:
 	//~ Begin UObject Interface.
 	virtual void BeginDestroy() override;
 	//~ End UObject Interface.
+
+	//~ Begin UConvaiAudioStreamer Interface.
+	virtual bool CanUseLipSync() override;
+	//~ End UConvaiAudioStreamer Interface.
 
 private:
 	UConvaiChatBotGetDetailsProxy* ConvaiGetDetails();
