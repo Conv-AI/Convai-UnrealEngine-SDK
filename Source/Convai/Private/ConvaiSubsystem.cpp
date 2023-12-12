@@ -193,6 +193,13 @@ FgRPCClient::FgRPCClient(std::string InTarget,
 std::unique_ptr<ConvaiService::Stub> FgRPCClient::GetNewStub()
 {
 	FScopeLock Lock(&CriticalSection);
+
+	// # TODO (Mohamed): Handling Mic permissions requires refactoring and a unified pipeline for all platforms
+	// Delaying asking for permission for MacOS due to a crash
+	#ifdef __APPLE__
+    GetAppleMicPermission();
+	#endif
+
 	grpc_connectivity_state state = Channel->GetState(false);
 
 	if (state != grpc_connectivity_state::GRPC_CHANNEL_READY)
@@ -228,10 +235,6 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	#if PLATFORM_ANDROID
 	GetAndroidMicPermission();
-	#endif
-
-	#ifdef __APPLE__
-    GetAppleMicPermission();
 	#endif
 }
 
