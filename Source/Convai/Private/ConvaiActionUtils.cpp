@@ -10,6 +10,42 @@ DEFINE_LOG_CATEGORY(ConvaiActionUtilsLog);
 
 namespace
 {
+	bool FindCharAfterIndex(const FString& SearchString, const char Search, int32& OutIndex, const int32& AfterIndex)
+	{
+		SearchString.Left(AfterIndex).FindChar(Search, OutIndex);
+	}
+
+	FString RemoveQuotedWords(const FString& Input)
+	{
+
+		int32 QuoteStartIndex = -1;
+		if (!Input.FindChar('"', QuoteStartIndex))
+		{
+			return Input;
+		}
+
+		FString Result = Input;
+
+		while (Result.FindChar('"', QuoteStartIndex))
+		{
+			int32 QuoteEndIndex = -1;
+
+			// Start searching for the end quote after the start quote
+			if (Result.Left(QuoteStartIndex + 1).FindChar('"', QuoteEndIndex) && QuoteEndIndex > QuoteStartIndex)
+			{
+				// Remove the quoted string, including the quotes
+				Result.RemoveAt(QuoteStartIndex, QuoteEndIndex - QuoteStartIndex + 1);
+			}
+			else
+			{
+				// No closing quote found after this point, break the loop
+				break;
+			}
+		}
+
+		return Result;
+	}
+
 	int32 CountWords(const FString& str)
 	{
 		if (str.Len() == 0) return 0;
@@ -172,12 +208,14 @@ namespace
 
 	static bool FindNearestObjectByName(FString SearchString, TArray<FConvaiObjectEntry> Objects, FConvaiObjectEntry& ObjectMatch)
 	{
+		FString SearchStringLower = SearchString.ToLower();
 		bool Found = false;
 		int BestDistance = 100;
 		for (auto o : Objects)
 		{
+			FString ObjectNameLower = o.Name.ToLower();
 			int Distance = 0;
-			if (FindClosePhraseOutsideQuotes(SearchString, o.Name, Distance))
+			if (FindClosePhraseOutsideQuotes(SearchStringLower, ObjectNameLower, Distance))
 			{
 				if (Distance < BestDistance)
 				{
@@ -187,6 +225,36 @@ namespace
 				}
 			}
 		}
+
+		// Try to search in objects using each word in the SearchString
+		if (!Found)
+		{
+			TArray<FString> words;
+			FString SearchStringWithoutQuotes = RemoveQuotedWords(SearchStringLower);
+			SearchStringWithoutQuotes.ParseIntoArray(words, TEXT(" "), true);
+			for (auto o : Objects)
+			{
+				if (CountWords(o.Name) <= 1)
+					continue; // consider only names consisting of 1+ words
+
+				FString ObjectNameLower = o.Name.ToLower();
+				for (auto w : words)
+				{
+					if (w.Len() <= 3)
+						continue; // consider only words greater than 3 letters
+
+					int Distance = 0;
+					if (FindClosePhraseOutsideQuotes(ObjectNameLower, w, Distance))
+					{
+						ObjectMatch = o;
+						BestDistance = Distance;
+						Found = true;
+						break;
+					}
+				}
+			}
+		}
+
 		return Found;
 	}
 };
