@@ -335,7 +335,8 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	}
 	else
 	{
-		OnTranscriptionReceived(UserText, true, true);
+		if (InConvaiPlayerComponent->PlayerName.Len() > 0)
+			OnTranscriptionReceived(UserText, true, true);
 	}
 
 	CurrentConvaiPlayerComponent = InConvaiPlayerComponent;
