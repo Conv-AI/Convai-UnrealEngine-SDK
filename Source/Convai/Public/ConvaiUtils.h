@@ -90,7 +90,8 @@ public:
 
 	static bool ParseVisemeValuesToAnimationFrame(const FString& VisemeValuesString, FAnimationFrame& AnimationFrame);
 
-
+	// UFUNCTION(BlueprintCallable, Category = "ActorFuncions", meta = (WorldContext = WorldContextObject))
+	static AActor* ConvaiCloneActor(AActor* InputActor);
 };
 
 UCLASS()

@@ -895,6 +895,17 @@ bool UConvaiUtils::ParseVisemeValuesToAnimationFrame(const FString& VisemeValues
 	return true;
 }
 
+AActor* UConvaiUtils::ConvaiCloneActor(AActor* InputActor)
+{
+	UWorld* World = InputActor->GetWorld();
+	FActorSpawnParameters params;
+	params.Template = InputActor;
+
+	UClass* ItemClass = InputActor->GetClass();
+	AActor* const SpawnedActor = World->SpawnActor<AActor>(ItemClass, params);
+	return SpawnedActor;
+}
+
 TMap<FName, float> UConvaiUtils::MapBlendshapes(const TMap<FName, float>& InputBlendshapes, const TMap<FName, FConvaiBlendshapeParameters>& BlendshapeMap, float GlobalMultiplier, float GlobalOffset)
 {
 	TMap<FName, float> OutputMap;
