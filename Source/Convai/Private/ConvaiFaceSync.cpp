@@ -1,6 +1,7 @@
 // Copyright 2022 Convai Inc. All Rights Reserved.
 
 #include "ConvaiFaceSync.h"
+#include "Misc/ScopeLock.h"
 #include "ConvaiUtils.h"
 
 DEFINE_LOG_CATEGORY(ConvaiFaceSyncLog);
@@ -17,7 +18,7 @@ namespace
 		}
 		return ZeroBlendshapes;
 	}
-	
+
 	// Helper function: Creates a zero visemes map
 	TMap<FName, float> CreateZeroVisemes()
 	{
@@ -77,25 +78,18 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 		SequenceCriticalSection.Lock();
 		CurrentSequenceTimePassed += DeltaTime;
 
-		if (CurrentSequenceTimePassed > MainSequenceBuffer.Duration && Stopping)
+		if (CurrentSequenceTimePassed > MainSequenceBuffer.Duration)
 		{
-			CurrentSequenceTimePassed = 0;
-			ClearMainSequence();
-			SetCurrentFrametoZero();
-			OnVisemesDataReady.ExecuteIfBound();
-			Stopping = false;
+			ConvaiStopLipSync();
 			SequenceCriticalSection.Unlock();
 			return;
-		}
-		else if (CurrentSequenceTimePassed > MainSequenceBuffer.Duration && !Stopping)
-		{
-			Stopping = true;
-			ConvaiStopLipSync();
 		}
 
 		// Calculate frame duration and offsets
 		float FrameDuration = MainSequenceBuffer.Duration / MainSequenceBuffer.AnimationFrames.Num();
 		float FrameOffset = FrameDuration * 0.5f;
+		int32 FrameIndex;
+		int32 BufferIndex;
 
 		TMap<FName, float> StartFrame;
 		TMap<FName, float> EndFrame;
@@ -108,6 +102,8 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 			StartFrame = GetCurrentFrame();
 			EndFrame = MainSequenceBuffer.AnimationFrames[0].BlendShapes;
 			Alpha = CurrentSequenceTimePassed / FrameOffset + 0.5;
+			FrameIndex = MainSequenceBuffer.AnimationFrames[0].FrameIndex;
+			BufferIndex = 0;
 		}
 		else if (CurrentSequenceTimePassed >= MainSequenceBuffer.Duration - FrameOffset)
 		{
@@ -115,6 +111,8 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 			StartFrame = MainSequenceBuffer.AnimationFrames[LastFrameIdx].BlendShapes;
 			EndFrame = GenerateZeroFrame();
 			Alpha = (CurrentSequenceTimePassed - (MainSequenceBuffer.Duration - FrameOffset)) / FrameOffset;
+			FrameIndex = MainSequenceBuffer.AnimationFrames[LastFrameIdx].FrameIndex;
+			BufferIndex = LastFrameIdx;
 		}
 		else
 		{
@@ -124,17 +122,19 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 			StartFrame = MainSequenceBuffer.AnimationFrames[CurrentFrameIndex].BlendShapes;
 			EndFrame = MainSequenceBuffer.AnimationFrames[NextFrameIndex].BlendShapes;
 			Alpha = (CurrentSequenceTimePassed - FrameOffset - (CurrentFrameIndex * FrameDuration)) / FrameDuration;
+			FrameIndex = MainSequenceBuffer.AnimationFrames[CurrentFrameIndex].FrameIndex;
+			BufferIndex = CurrentFrameIndex;
 		}
 		SequenceCriticalSection.Unlock();
 
-		//AnchorValue = FMath::Clamp(AnchorValue, 0, 1);
-		//Alpha = Calculate1DBezierCurve(Alpha, AnchorValue,0, 1-AnchorValue, 1);
+		// UE_LOG(ConvaiFaceSyncLog, Log, TEXT("Evaluate: FrameIndex:%d Alpha: %f FramesLeft: %d"), FrameIndex, Alpha, MainSequenceBuffer.AnimationFrames.Num() - BufferIndex);
 
+		//CurrentBlendShapesMap = StartFrame;
 		CurrentBlendShapesMap = InterpolateFrames(StartFrame, EndFrame, Alpha);
 
 		// Trigger the blueprint event
 		OnVisemesDataReady.ExecuteIfBound();
-	}	
+	}
 }
 
 void UConvaiFaceSyncComponent::ConvaiProcessLipSyncAdvanced(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels, FAnimationSequence FaceSequence)
@@ -142,19 +142,21 @@ void UConvaiFaceSyncComponent::ConvaiProcessLipSyncAdvanced(uint8* InPCMData, ui
 	SequenceCriticalSection.Lock();
 	MainSequenceBuffer.AnimationFrames.Append(FaceSequence.AnimationFrames);
 	MainSequenceBuffer.Duration += FaceSequence.Duration;
+	MainSequenceBuffer.FrameRate = FaceSequence.FrameRate;
 	SequenceCriticalSection.Unlock();
+
+	if (IsRecordingLipSync)
+	{
+		FScopeLock ScopeLock(&RecordingCriticalSection);
+		RecordedSequenceBuffer.AnimationFrames.Append(FaceSequence.AnimationFrames);
+		RecordedSequenceBuffer.Duration += FaceSequence.Duration;
+		RecordedSequenceBuffer.FrameRate = FaceSequence.FrameRate;
+	}
 }
 
 void UConvaiFaceSyncComponent::ConvaiProcessLipSyncSingleFrame(FAnimationFrame FaceFrame, float Duration)
 {
 	SequenceCriticalSection.Lock();
-	if (Stopping)
-	{
-		CurrentSequenceTimePassed = 0;
-		ClearMainSequence();
-		Stopping = false;
-	}
-
 	if (!GeneratesVisemesAsBlendshapes())
 	{
 		float* sil = FaceFrame.BlendShapes.Find("sil");
@@ -168,10 +170,115 @@ void UConvaiFaceSyncComponent::ConvaiProcessLipSyncSingleFrame(FAnimationFrame F
 
 	MainSequenceBuffer.AnimationFrames.Add(FaceFrame);
 	MainSequenceBuffer.Duration += Duration;
+	MainSequenceBuffer.FrameRate = Duration==0? -1 : 1.0/Duration;
 	SequenceCriticalSection.Unlock();
+
+	if (IsRecordingLipSync)
+	{
+		FScopeLock ScopeLock(&RecordingCriticalSection);
+		RecordedSequenceBuffer.AnimationFrames.Add(FaceFrame);
+		RecordedSequenceBuffer.Duration += Duration;
+		RecordedSequenceBuffer.FrameRate = Duration == 0 ? -1 : 1.0 / Duration;
+	}
 }
 
-bool UConvaiFaceSyncComponent::IsValidSequence(const FAnimationSequence &Sequence)
+void UConvaiFaceSyncComponent::StartRecordingLipSync()
+{
+	if (IsRecordingLipSync)
+	{
+		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("Cannot start Recording LipSync while already recording LipSync"));
+		return;
+	}
+
+	UE_LOG(ConvaiFaceSyncLog, Log, TEXT("Started Recording LipSync"));
+	IsRecordingLipSync = true;
+}
+
+FAnimationSequenceBP UConvaiFaceSyncComponent::FinishRecordingLipSync()
+{
+	UE_LOG(ConvaiFaceSyncLog, Log, TEXT("Finished Recording LipSync - Total Frames: %d - Duration: %f"), RecordedSequenceBuffer.AnimationFrames.Num(), RecordedSequenceBuffer.Duration);
+
+	if (!IsRecordingLipSync)
+		return FAnimationSequenceBP();
+
+	FScopeLock ScopeLock(&RecordingCriticalSection);
+	IsRecordingLipSync = false;
+
+	FAnimationSequenceBP AnimationSequenceBP;
+	AnimationSequenceBP.AnimationSequence = RecordedSequenceBuffer;
+	RecordedSequenceBuffer.AnimationFrames.Empty();
+	RecordedSequenceBuffer.Duration = 0;
+	return AnimationSequenceBP;
+}
+
+bool UConvaiFaceSyncComponent::PlayRecordedLipSync(FAnimationSequenceBP RecordedLipSync, int StartFrame, int EndFrame, float OverwriteDuration)
+{
+	if (!IsValidSequence(RecordedLipSync.AnimationSequence))
+	{
+		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("Recorded LipSync is not valid - Total Frames: %d - Duration: %f"), RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
+		return false;
+	}
+
+	if (IsRecordingLipSync)
+	{
+		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("Cannot Play Recorded LipSync while Recording LipSync"));
+		return false;
+	}
+
+	if (IsValidSequence(MainSequenceBuffer))
+	{
+		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("Playing Recorded LipSync and stopping currently playing LipSync"));
+		ConvaiStopLipSync();
+	}
+
+	if (StartFrame > 0 && StartFrame > RecordedLipSync.AnimationSequence.AnimationFrames.Num() - 1)
+	{
+		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("StartFrame is greater than the recorded LipSync - StartFrame: %d Total Frames: %d - Duration: %f"), StartFrame, RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
+		return false;
+	}
+
+
+	if (EndFrame > 0 && EndFrame < StartFrame)
+	{
+		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("StartFrame cannot be greater than the EndFrame"));
+		return false;
+	}
+
+	//if (EndFrame > 0 && EndFrame > RecordedLipSync.AnimationSequence.AnimationFrames.Num() - 1)
+	//{
+	//	UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("EndFrame is greater than the recorded LipSync - EndFrame: %d Total Frames: %d - Duration: %f"), EndFrame, RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
+	//	return false;
+	//}
+	
+	if (EndFrame > 0 && EndFrame < RecordedLipSync.AnimationSequence.AnimationFrames.Num()-1)
+	{
+		float FrameDuration = RecordedLipSync.AnimationSequence.Duration / RecordedLipSync.AnimationSequence.AnimationFrames.Num();
+		int NumRemovedFrames = RecordedLipSync.AnimationSequence.AnimationFrames.Num() - EndFrame - 1;
+		RecordedLipSync.AnimationSequence.AnimationFrames.RemoveAt(EndFrame + 1, NumRemovedFrames);
+		float RemovedDuration = NumRemovedFrames * FrameDuration;
+		RecordedLipSync.AnimationSequence.Duration -= RemovedDuration;
+	}
+
+	if (StartFrame > 0)
+	{
+		float FrameDuration = RecordedLipSync.AnimationSequence.Duration / RecordedLipSync.AnimationSequence.AnimationFrames.Num();
+		int NumRemovedFrames = StartFrame;
+		RecordedLipSync.AnimationSequence.AnimationFrames.RemoveAt(0, NumRemovedFrames);
+		float RemovedDuration = NumRemovedFrames * FrameDuration;
+		RecordedLipSync.AnimationSequence.Duration -= RemovedDuration;
+	}
+
+	if (OverwriteDuration > 0)
+	{
+		RecordedLipSync.AnimationSequence.Duration = OverwriteDuration;
+	}
+
+	UE_LOG(ConvaiFaceSyncLog, Log, TEXT("Playing Recorded LipSync - Total Frames: %d - Duration: %f"), RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
+	ConvaiProcessLipSyncAdvanced(nullptr, 0, 0, 0, RecordedLipSync.AnimationSequence);
+	return true;
+}
+
+bool UConvaiFaceSyncComponent::IsValidSequence(const FAnimationSequence& Sequence)
 {
 	if (Sequence.Duration > 0 && Sequence.AnimationFrames.Num() > 0 && Sequence.AnimationFrames[0].BlendShapes.Num() > 0)
 		return true;
@@ -204,11 +311,7 @@ void UConvaiFaceSyncComponent::ConvaiStopLipSync()
 {
 	CurrentSequenceTimePassed = 0;
 	ClearMainSequence();
-
-	FAnimationFrame CurrentFrame = FAnimationFrame();
-	CurrentFrame.BlendShapes = CurrentBlendShapesMap;
-	FAnimationSequence StoppingSequence;
-	StoppingSequence.Duration = 0.2;
-	StoppingSequence.AnimationFrames.Add(CurrentFrame);
-	ConvaiProcessLipSyncAdvanced(nullptr, 0, 0, 0, StoppingSequence);
+	SetCurrentFrametoZero();
+	OnVisemesDataReady.ExecuteIfBound();
+	UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Stopping LipSync"));
 }

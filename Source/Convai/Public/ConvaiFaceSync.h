@@ -48,6 +48,15 @@ public:
 	virtual TMap<FName, float> ConvaiGetFaceBlendshapes() override { return CurrentBlendShapesMap; }
 	// End IConvaiLipSyncExtendedInterface interface
 
+	// UFUNCTION(BlueprintCallable, Category = "Convai|LipSync")
+	void StartRecordingLipSync();
+
+	// UFUNCTION(BlueprintCallable, Category = "Convai|LipSync")
+	FAnimationSequenceBP FinishRecordingLipSync();
+
+	// UFUNCTION(BlueprintCallable, Category = "Convai|LipSync")
+	bool PlayRecordedLipSync(FAnimationSequenceBP RecordedLipSync, int StartFrame, int EndFrame, float OverwriteDuration);
+
 	bool IsValidSequence(const FAnimationSequence &Sequence);
 
 	void ClearMainSequence();
@@ -72,13 +81,16 @@ public:
 	//UPROPERTY(EditAnywhere, Category = "Convai|LipSync")
 	float AnchorValue = 0.5;
 
-	//UPROPERTY(EditAnywhere, Category = "Convai|LipSync")
+	UPROPERTY(EditAnywhere, Category = "Convai|LipSync")
 	bool ToggleBlendshapeOrViseme = false;
 
 protected:
 	float CurrentSequenceTimePassed;
 	TMap<FName, float> CurrentBlendShapesMap;
 	FAnimationSequence MainSequenceBuffer;
+	FAnimationSequence RecordedSequenceBuffer;
 	FCriticalSection SequenceCriticalSection;
+	FCriticalSection RecordingCriticalSection;
 	bool Stopping;
+	bool IsRecordingLipSync;
 };
