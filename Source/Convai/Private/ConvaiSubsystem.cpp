@@ -4,6 +4,7 @@
 #include "ConvaiAndroid.h"
 #include "Engine/Engine.h"
 #include "Async/Async.h"
+#include "../Convai.h"
 
 THIRD_PARTY_INCLUDES_START
 // grpc includes
@@ -223,19 +224,42 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
+	//AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this)]
+	//	{
+			bool AllowInsecureConnection = Convai::Get().GetConvaiSettings()->AllowInsecureConnection;
+
+			std::shared_ptr<grpc::ChannelCredentials> channel_creds;
 #if PLATFORM_WINDOWS
-	auto channel_creds = grpc::SslCredentials(getSslOptions());
+			if (AllowInsecureConnection)
+				channel_creds = grpc::InsecureChannelCredentials();
+			else
+				channel_creds = grpc::SslCredentials(getSslOptions());
 #else
-	auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions());
+			if (AllowInsecureConnection)
+				channel_creds = grpc::InsecureChannelCredentials();
+			else
+				channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions());
 #endif
-	gRPC_Runnable = MakeShareable(new FgRPCClient(std::string("stream.convai.com"), channel_creds));
 
-	gRPC_Runnable->StartStub();
-	UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Started"));
 
-	#if PLATFORM_ANDROID
-	GetAndroidMicPermission();
-	#endif
+			FString URL = Convai::Get().GetConvaiSettings()->CustomURL;
+			URL.TrimEndInline();
+			URL.TrimStartInline();
+
+			if (URL.IsEmpty())
+				URL = "stream.convai.com";
+
+			gRPC_Runnable = MakeShareable(new FgRPCClient(TCHAR_TO_UTF8(*URL), channel_creds));
+
+			//gRPC_Runnable = MakeShareable(new FgRPCClient(std::string("0.tcp.us-cal-1.ngrok.io:13976"), channel_creds));
+
+			gRPC_Runnable->StartStub();
+			UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Started"));
+
+#if PLATFORM_ANDROID
+			GetAndroidMicPermission();
+#endif
+		//});
 }
 
 void UConvaiSubsystem::Deinitialize()
