@@ -25,6 +25,21 @@ public:
 	/* API Key Issued from the website */
 	UPROPERTY(Config, EditAnywhere, Category = "Convai API", meta = (DisplayName = "Enable New Action System (Experimental)"))
 	bool EnableNewActionSystem;
+
+	/* Custom Server URL (Used for debugging) */
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	FString CustomURL;
+
+	/* Test Character ID (Used for debugging) */
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	FString TestCharacterID;
+
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	bool AllowInsecureConnection;
+
+	/* Extra Parameters (Used for debugging) */
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	FString ExtraParams;
 };
 
 
