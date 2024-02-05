@@ -231,8 +231,21 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Convai|Emotion")
 	float GetEmotionScore(EBasicEmotions Emotion);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Convai|Emotion")
+	TMap<FName, float> GetEmotionBlendshapes();
+
 	UFUNCTION(BlueprintCallable, Category = "Convai|Emotion")
 	void ResetEmotionState();
+
+public:
+	// UFUNCTION(BlueprintCallable, Category = "Convai|Voice")
+	void StartRecordingVoice();
+
+	// UFUNCTION(BlueprintCallable, Category = "Convai|Voice")
+	USoundWave* FinishRecordingVoice();
+
+	// UFUNCTION(BlueprintCallable, Category = "Convai|Voice")
+	bool PlayRecordedVoice(USoundWave* RecordedVoice);
 
 public:
 	/** Called when a new action is received from the API */
@@ -364,7 +377,7 @@ private:
 	void OnFaceDataReceived(FAnimationSequence FaceDataAnimation);
 	void onSessionIDReceived(FString ReceivedSessionID);
 	void onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
-	void onEmotionReceived(FString ReceivedEmotionResponse);
+	void onEmotionReceived(FString ReceivedEmotionResponse, FAnimationFrame EmotionBlendshapesFrame);
 	void onFinishedReceivingData();
 	void OnNarrativeSectionReceived(FString BT_Code, FString BT_Constants, FString ReceivedNarrativeSectionID);
 	void onFailure();
@@ -399,4 +412,11 @@ private:
 	bool ReceivedFinalData; // Did the character end his response
 	FString LastPlayerName;
 	TArray<uint8> PlayerInpuAudioBuffer;
+
+	TMap<FName, float> EmotionBlendshapes;
+	float TotalReceivedAudioDuration = 0;
+
+	TArray<uint8> RecordedAudio;
+	uint32 RecordedAudioSampleRate;
+	bool IsRecordingAudio;
 };

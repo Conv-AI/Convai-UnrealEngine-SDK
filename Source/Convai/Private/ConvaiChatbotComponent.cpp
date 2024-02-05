@@ -51,7 +51,12 @@ bool UConvaiChatbotComponent::IsInConversation()
 
 bool UConvaiChatbotComponent::IsProcessing()
 {
-	return (IsValid(ConvaiGRPCGetResponseProxy) && !ReceivedFinalData);
+	if (IsValid(ConvaiGRPCGetResponseProxy) && !ReceivedFinalData)
+		return true;
+	else if (!GetIsTalking() && !DataBuffer.IsEmpty())
+		return true;
+	else
+		return false;
 }
 
 bool UConvaiChatbotComponent::IsListening()
@@ -69,7 +74,8 @@ float UConvaiChatbotComponent::GetTalkingTimeElapsed()
 	float TimeElapsed = 0;
 	if (IsValid(GetWorld()))
 	{
-		TimeElapsed = GetWorld()->GetTimerManager().GetTimerElapsed(AudioFinishedTimerHandle);
+		// TODO: Reset DataBuffer.TotalAudioDurationElapsed after response is complete
+		TimeElapsed = DataBuffer.TotalAudioDurationElapsed + GetWorld()->GetTimerManager().GetTimerElapsed(AudioFinishedTimerHandle);
 	}
 
 	return TimeElapsed;
@@ -81,8 +87,11 @@ float UConvaiChatbotComponent::GetTalkingTimeRemaining()
 	if (IsValid(GetWorld()))
 	{
 		TimeRemaing = GetWorld()->GetTimerManager().GetTimerRemaining(AudioFinishedTimerHandle);
+		TimeRemaing = TimeRemaing < 0 ? 0 : TimeRemaing;
+		float InSyncTimeRemaining = 0;
+		HasSufficentLipsyncFrames(InSyncTimeRemaining); // Takes into consideration the lipsync time
+		TimeRemaing += InSyncTimeRemaining;
 	}
-
 	return TimeRemaing;
 }
 
@@ -270,10 +279,64 @@ float UConvaiChatbotComponent::GetEmotionScore(EBasicEmotions Emotion)
 	return EmotionState.GetEmotionScore(Emotion);
 }
 
+TMap<FName, float> UConvaiChatbotComponent::GetEmotionBlendshapes()
+{
+	return EmotionBlendshapes;
+}
+
 void UConvaiChatbotComponent::ResetEmotionState()
 {
 	EmotionState.ResetEmotionScores();
 	OnEmotionStateChangedEvent.Broadcast(this, CurrentConvaiPlayerComponent);
+}
+
+void UConvaiChatbotComponent::StartRecordingVoice()
+{
+	if (IsRecordingAudio)
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Cannot start Recording voice while already recording voice"));
+		return;
+	}
+	IsRecordingAudio = true;
+}
+
+USoundWave* UConvaiChatbotComponent::FinishRecordingVoice()
+{
+	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Finished Recording Audio - Total bytes: %d - Duration: %f"), RecordedAudio.Num(), UConvaiUtils::CalculateAudioDuration(RecordedAudio.Num(), 1,RecordedAudioSampleRate, 2));
+
+	if (!IsRecordingAudio)
+		return nullptr;
+	USoundWave* SoundWave = UConvaiUtils::PCMDataToSoundWav(RecordedAudio, 1, RecordedAudioSampleRate);
+	IsRecordingAudio = false;
+	RecordedAudio.Empty();
+	return SoundWave;
+}
+
+bool UConvaiChatbotComponent::PlayRecordedVoice(USoundWave* RecordedVoice)
+{
+	if (!IsValid(RecordedVoice))
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Recorded voice is not valid"));
+		return false;
+	}
+
+	if (IsRecordingAudio)
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Cannot Play Recorded voice while Recording voice"));
+		return false;
+	}
+
+	if (GetIsTalking())
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Playing Recorded voice and stopping currently playing voice"));
+		InterruptSpeech(0);
+	}
+
+	//UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Play Recorded Audio - Duration: %f"), RecordedVoice->d);
+
+	ForcePlayVoice(RecordedVoice);
+
+	return true;
 }
 
 void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAPI_Key, FString OverrideAPI_Key, uint32 InToken)
@@ -317,10 +380,8 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	//	Environment->MainCharacter = MainCharacter;
 	//}
 
-	if (GetIsTalking() || IsProcessing())
-	{
-		InterruptSpeech(InterruptVoiceFadeOutDuration);
-	}
+
+	InterruptSpeech(InterruptVoiceFadeOutDuration);
 
 	UserText = InputText;
 	TextInput = UserText.Len() > 0;
@@ -335,8 +396,7 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	}
 	else
 	{
-		if (InConvaiPlayerComponent->PlayerName.Len() > 0)
-			OnTranscriptionReceived(UserText, true, true);
+		OnTranscriptionReceived(UserText, true, true);
 	}
 
 	CurrentConvaiPlayerComponent = InConvaiPlayerComponent;
@@ -401,10 +461,7 @@ void UConvaiChatbotComponent::InvokeTrigger_Internal(FString TriggerName, FStrin
 	//	Environment->MainCharacter = MainCharacter;
 	//}
 
-	if (GetIsTalking() || IsProcessing())
-	{
-		InterruptSpeech(InterruptVoiceFadeOutDuration);
-	}
+	InterruptSpeech(InterruptVoiceFadeOutDuration);
 
 	UserText = "";
 	GenerateActions = InGenerateActions;
@@ -443,6 +500,10 @@ void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 				}
 				WeakThis->OnInterruptedEvent.Broadcast(WeakThis.Get(), WeakThis->CurrentConvaiPlayerComponent);
 			});
+	}
+	else
+	{
+		StopVoice(); // Make sure to stop the voice either way
 	}
 }
 
@@ -605,7 +666,7 @@ void UConvaiChatbotComponent::Broadcast_onEmotionReceived_Implementation(const F
 {
 	if (!UKismetSystemLibrary::IsServer(this))
 	{
-		onEmotionReceived(ReceivedEmotionResponse);
+		onEmotionReceived(ReceivedEmotionResponse, FAnimationFrame());
 	}
 }
 
@@ -637,21 +698,37 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 		Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
 	}
 
-	AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal]
-		{
-			float AudioDuration = 0;
+	float ReceieivedAudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
+
 			if (VoiceResponse && ReceivedAudio.Num() > 0)
 			{
-				AudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
 				AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1); // Should be called in the game thread
+
+				if (IsRecordingAudio)
+				{
+					RecordedAudio.Append(ReceivedAudio);
+					RecordedAudioSampleRate = SampleRate;
+				}
 			}
 
+	AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal, ReceieivedAudioDuration]
+		{
 			// Send text and audio duration to blueprint event
-			OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, AudioDuration, IsFinal);
+			OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
 
 			// Run the deprecated event
-			OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, AudioDuration, IsFinal);
+			OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
 		});
+	if (ReceieivedAudioDuration > 0)
+	{
+		TotalReceivedAudioDuration += ReceieivedAudioDuration;
+	}
+	if (IsFinal)
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Chatbot Total Received Audio: %f seconds"), TotalReceivedAudioDuration);
+		TotalReceivedAudioDuration = 0;
+	}
+
 	ReceivedFinalData = IsFinal;
 }
 
@@ -699,7 +776,7 @@ void UConvaiChatbotComponent::onActionSequenceReceived(const TArray<FConvaiResul
 		});
 }
 
-void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse)
+void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse, FAnimationFrame EmotionBlendshapesFrame)
 {
 	if (LockEmotionState)
 		return;
@@ -710,8 +787,12 @@ void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse)
 		Broadcast_onEmotionReceived(ReceivedEmotionResponse);
 	}
 
-	// Update teh emotion state
-	EmotionState.SetEmotionData(ReceivedEmotionResponse);
+	// Update the emotion state
+	if (!ReceivedEmotionResponse.IsEmpty())
+	{
+		EmotionState.SetEmotionDataSingleEmotion(ReceivedEmotionResponse);
+		EmotionBlendshapes = EmotionBlendshapesFrame.BlendShapes;
+	}
 
 	// Broadcast the emotion state changed event
 	AsyncTask(ENamedThreads::GameThread, [this] {
