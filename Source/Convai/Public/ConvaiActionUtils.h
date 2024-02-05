@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "ConvaiDefinitions.h"
 #include "ConvaiActionUtils.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiActionUtilsLog, Log, All);
 
 class UConvaiEnvironment;
 struct FConvaiResultAction;
+struct FConvaiObjectEntry;
 
 
 UCLASS()

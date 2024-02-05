@@ -12,7 +12,7 @@ namespace
 {
 	bool FindCharAfterIndex(const FString& SearchString, const char Search, int32& OutIndex, const int32& AfterIndex)
 	{
-		SearchString.Left(AfterIndex).FindChar(Search, OutIndex);
+		return SearchString.Left(AfterIndex).FindChar(Search, OutIndex);
 	}
 
 	FString RemoveQuotedWords(const FString& Input)
@@ -232,8 +232,11 @@ namespace
 			TArray<FString> words;
 			FString SearchStringWithoutQuotes = RemoveQuotedWords(SearchStringLower);
 			SearchStringWithoutQuotes.ParseIntoArray(words, TEXT(" "), true);
+			bool breakFromLoop = false;
 			for (auto o : Objects)
 			{
+				if (breakFromLoop)
+					break;
 				if (CountWords(o.Name) <= 1)
 					continue; // consider only names consisting of 1+ words
 
@@ -249,6 +252,7 @@ namespace
 						ObjectMatch = o;
 						BestDistance = Distance;
 						Found = true;
+						breakFromLoop = true;
 						break;
 					}
 				}
@@ -256,6 +260,26 @@ namespace
 		}
 
 		return Found;
+	}
+
+	TArray<FConvaiObjectEntry> BubbleSortEntriesByNumberOfWords(TArray<FConvaiObjectEntry> Entries) 
+	{
+		bool swapped;
+		int n = Entries.Num();
+		for (int i = 0; i < n - 1; i++) {
+			swapped = false;
+			for (int j = 0; j < n - i - 1; j++) {
+				if (CountWords(Entries[j].Name) > CountWords(Entries[j+1].Name)) {
+					Entries.Swap(j, j + 1);
+					swapped = true;
+				}
+			}
+			// If no two elements were swapped by inner loop, then break
+			if (!swapped) {
+				break;
+			}
+		}
+		return Entries;
 	}
 };
 
