@@ -932,6 +932,9 @@ void UConvaiChatBotGetDetailsProxy::onHttpRequestComplete(FHttpRequestPtr Reques
 		return;
 	}
 
+	//FString ResponseContent = ResponsePtr->GetContentAsString();
+	//UE_LOG(LogTemp, Log, TEXT("HTTP Response Content: %s"), *ResponseContent);
+
 	FString Response = ResponsePtr->GetContentAsString();
 
 	TSharedPtr<FJsonValue> JsonValue;
