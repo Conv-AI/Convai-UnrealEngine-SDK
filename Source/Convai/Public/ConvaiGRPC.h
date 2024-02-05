@@ -9,6 +9,7 @@
 #include "Sound/SoundWave.h"
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "HAL/ThreadSafeBool.h"
+#include "ConvaiDefinitions.h"
 #include "ConvaiGRPC.generated.h"
 
 
@@ -25,7 +26,7 @@ DECLARE_DELEGATE_ThreeParams(FConvaiGRPCOnTranscriptionSignature, const FString 
 DECLARE_DELEGATE_FourParams(FConvaiGRPCOnDataSignature, const FString /*ReceivedText*/, const TArray<uint8>& /*ReceivedAudio*/, uint32 /*SampleRate*/, bool /*IsFinal*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnFaceDataSignature, FAnimationSequence /*FaceData*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnActionsSignature, const TArray<FConvaiResultAction>& /*ActionSequence*/);
-DECLARE_DELEGATE_OneParam(FConvaiGRPCOnEmotionSignature, FString /*EmotionResponse*/);
+DECLARE_DELEGATE_TwoParams(FConvaiGRPCOnEmotionSignature, FString /*EmotionResponse*/, FAnimationFrame /*EmotionBlendshapes*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnSessiondIDSignature, FString /*SessionID*/);
 DECLARE_DELEGATE(FConvaiGRPCOnEventSignature);
 
@@ -98,8 +99,8 @@ private:
 	FgRPC_Delegate OnStreamReadDelegate;
 	FgRPC_Delegate OnStreamWriteDelegate;
 	FgRPC_Delegate OnStreamWriteDoneDelegate; // called when a stream->writesdone is successful
-	
-    // called when a stream->finish is successful it means that the server decided
+
+	// called when a stream->finish is successful it means that the server decided
 	// to end the stream, we should check the status variable in that call
 	// https://groups.google.com/g/grpc-io/c/R0NTqKaHLdE 
 	FgRPC_Delegate OnStreamFinishDelegate;
@@ -163,4 +164,6 @@ private:
 
 	FThreadSafeBool ReceivedFinish;
 	FThreadSafeBool CalledFinish;
+
+	int TotalLipSyncResponsesReceived = 0;
 };

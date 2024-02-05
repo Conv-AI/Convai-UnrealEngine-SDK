@@ -39,6 +39,7 @@ using grpc::Status;
 using service::ConvaiService;
 
 
+
 namespace {
 	const char* StatusCodeStr[] =
 	{
@@ -93,7 +94,7 @@ void UConvaiGRPCGetResponseProxy::Activate()
 	OnStreamWriteDelegate = FgRPC_Delegate::CreateUObject(this, &ThisClass::OnStreamWrite);
 	OnStreamWriteDoneDelegate = FgRPC_Delegate::CreateUObject(this, &ThisClass::OnStreamWriteDone);
 	OnStreamFinishDelegate = FgRPC_Delegate::CreateUObject(this, &ThisClass::OnStreamFinish);
-	
+
 	reply = std::unique_ptr<service::GetResponseResponse>(new service::GetResponseResponse());
 
 	// Form Validation
@@ -216,9 +217,13 @@ void UConvaiGRPCGetResponseProxy::BeginDestroy()
 void UConvaiGRPCGetResponseProxy::CallFinish()
 {
 	if (CalledFinish || !stream_handler)
+	{
+		UE_LOG(ConvaiGRPCLog, Log, TEXT("stream_handler->Finish is already called"));
 		return;
+	}
 
 	CalledFinish = true;
+	UE_LOG(ConvaiGRPCLog, Log, TEXT("stream_handler->Finish"));
 	stream_handler->Finish(&status, (void*)&OnStreamFinishDelegate);
 }
 
@@ -254,15 +259,15 @@ TArray<uint8> UConvaiGRPCGetResponseProxy::ConsumeFromAudioBuffer(bool& IsThisTh
 void UConvaiGRPCGetResponseProxy::LogAndEcecuteFailure(FString FuncName)
 {
 	UE_LOG(ConvaiGRPCLog, Warning,
-	TEXT("%s: Status:%s | Debug Log:%s | Error message:%s | Error Details:%s | Error Code:%i | Character ID:%s | Session ID:%s"),
-	*FString(FuncName), 
-	*FString(status.ok()? "Ok" : "Not Ok"),
-	*FString(reply->DebugString().c_str()), 
-	*FString(status.error_message().c_str()), 
-	*FString(status.error_details().c_str()), 
-	status.error_code(),
-	*CharID,
-	*SessionID);
+		TEXT("%s: Status:%s | Debug Log:%s | Error message:%s | Error Details:%s | Error Code:%i | Character ID:%s | Session ID:%s"),
+		*FString(FuncName),
+		*FString(status.ok() ? "Ok" : "Not Ok"),
+		*FString(reply->DebugString().c_str()),
+		*FString(status.error_message().c_str()),
+		*FString(status.error_details().c_str()),
+		status.error_code(),
+		*CharID,
+		*SessionID);
 
 	if (!FailAlreadyExecuted)
 	{
@@ -365,7 +370,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 	audio_config->set_enable_facial_data(RequireFaceData);
 	if (RequireFaceData)
 	{
-		FaceModel faceModel = GeneratesVisemesAsBlendshapes ? FaceModel::FACE_MODEL_A_2F_MODEL_NAME : FaceModel::FACE_MODEL_OVR_MODEL_NAME;
+		FaceModel faceModel = GeneratesVisemesAsBlendshapes ? FaceModel::FACE_MODEL_A_2X_MODEL_NAME : FaceModel::FACE_MODEL_OVR_MODEL_NAME;
 		audio_config->set_face_model(faceModel);
 	}
 
@@ -393,11 +398,11 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	// Do a write task
 	stream_handler->Write(request, (void*)&OnStreamWriteDelegate);
-	//UE_LOG(ConvaiGRPCLog, Log, TEXT("stream_handler->Write"));
+	UE_LOG(ConvaiGRPCLog, Log, TEXT("Initial stream_handler->Write"));
 
 	// Do a read task
 	stream_handler->Read(reply.get(), (void*)&OnStreamReadDelegate);
-	//UE_LOG(ConvaiGRPCLog, Log, TEXT("stream_handler->Read"));
+	UE_LOG(ConvaiGRPCLog, Log, TEXT("Initial stream_handler->Read"));
 }
 
 void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
@@ -479,10 +484,10 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 
 
 
-	 //#if ConvaiDebugMode
-	 //    FString DebugString(request.DebugString().c_str());
-	 //    UE_LOG(ConvaiGRPCLog, Warning, TEXT("request: %s"), *DebugString);
-	 //#endif 
+	//#if ConvaiDebugMode
+	//    FString DebugString(request.DebugString().c_str());
+	//    UE_LOG(ConvaiGRPCLog, Warning, TEXT("request: %s"), *DebugString);
+	//#endif 
 
 	if (IsThisTheFinalWrite)
 	{
@@ -531,7 +536,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 	if (!ok)
 	{
 		// Tell the server that we are ready to finish the stream any time it wishes
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("stream_handler->Finish"));
 		if (stream_handler)
 			CallFinish();
 		else
@@ -540,6 +544,8 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 			LogAndEcecuteFailure("OnStreamRead");
 		return;
 	}
+
+	bool IsFinalResponse = reply->audio_response().end_of_response();
 
 	// Grab the session ID
 	std::string SessionID_std = reply->session_id();
@@ -579,17 +585,17 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		{
 			VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 46), audio_data.length() - 46);
 			SampleRate = reply->audio_response().audio_config().sample_rate_hertz();
+			UE_LOG(ConvaiGRPCLog, Log, TEXT("Received Audio Chunk: %f secs"), float(audio_data.length())/(SampleRate * 2.0));
 		}
 		FAnimationSequence FaceDataAnimation;
 
 		if (RequireFaceData)
 		{
-			TSharedPtr<FJsonObject> FaceData_json;
-
 			bool HasVisemes = reply->audio_response().has_visemes_data();
-			bool HasBlendshapes = reply->audio_response().has_blendshapes_data();
+			bool HasBlendshapesData = reply->audio_response().has_blendshapes_data();
+			bool HasBlendshapesFrame = reply->audio_response().has_blendshapes_frame();
 
-			if (HasBlendshapes && GeneratesVisemesAsBlendshapes)
+			if (HasBlendshapesData && GeneratesVisemesAsBlendshapes)
 			{
 				std::string FaceBlendshapeData = reply->audio_response().blendshapes_data().blendshape_data();
 				if (FaceBlendshapeData.size() > 0)
@@ -598,27 +604,103 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 					FaceDataAnimation.AnimationFrames = UConvaiUtils::ParseJsonToBlendShapeData(FaceData_string);
 				}
 			}
+			else if (HasBlendshapesFrame && GeneratesVisemesAsBlendshapes)
+			{
+				float FPS = reply->audio_response().blendshapes_frame().fps();
+				int FrameIndex = reply->audio_response().blendshapes_frame().frame_index();
+				float FrameTime = FPS == 0.0 ? 1.0 / 30.0 : 1.0 / FPS;
+				auto BlendshapesFrame = reply->audio_response().blendshapes_frame().blendshapes();
+				float multipier = 1.5;
+				FAnimationFrame AnimationFrame;
+				AnimationFrame.FrameIndex = FrameIndex;
+				AnimationFrame.BlendShapes.Add("browDownLeft", BlendshapesFrame.brow_down_left() * multipier);
+				AnimationFrame.BlendShapes.Add("browDownRight", BlendshapesFrame.brow_down_right() * multipier);
+				AnimationFrame.BlendShapes.Add("browInnerUp", BlendshapesFrame.brow_inner_up() * multipier);
+				AnimationFrame.BlendShapes.Add("browOuterUpLeft", BlendshapesFrame.brow_outer_up_left() * multipier);
+				AnimationFrame.BlendShapes.Add("browOuterUpRight", BlendshapesFrame.brow_outer_up_right() * multipier);
+				AnimationFrame.BlendShapes.Add("cheekPuff", BlendshapesFrame.cheek_puff() * multipier);
+				AnimationFrame.BlendShapes.Add("cheekSquintLeft", BlendshapesFrame.cheek_squint_left() * multipier);
+				AnimationFrame.BlendShapes.Add("cheekSquintRight", BlendshapesFrame.cheek_squint_right() * multipier);
+
+				AnimationFrame.BlendShapes.Add("eyeBlinkLeft", BlendshapesFrame.eye_blink_left());
+				AnimationFrame.BlendShapes.Add("eyeBlinkRight", BlendshapesFrame.eye_blink_right());
+
+				AnimationFrame.BlendShapes.Add("eyeLookDownLeft", BlendshapesFrame.eye_look_down_left() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeLookDownRight", BlendshapesFrame.eye_look_down_right() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeLookInLeft", BlendshapesFrame.eye_look_in_left() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeLookInRight", BlendshapesFrame.eye_look_in_right() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeLookOutLeft", BlendshapesFrame.eye_look_out_left() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeLookOutRight", BlendshapesFrame.eye_look_out_right() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeLookUpLeft", BlendshapesFrame.eye_look_up_left() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeLookUpRight", BlendshapesFrame.eye_look_up_right() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeSquintLeft", BlendshapesFrame.eye_squint_left() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeSquintRight", BlendshapesFrame.eye_squint_right() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeWideLeft", BlendshapesFrame.eye_wide_left() * multipier);
+				AnimationFrame.BlendShapes.Add("eyeWideRight", BlendshapesFrame.eye_wide_right() * multipier);
+				AnimationFrame.BlendShapes.Add("jawForward", BlendshapesFrame.jaw_forward() * multipier);
+				AnimationFrame.BlendShapes.Add("jawLeft", BlendshapesFrame.jaw_left() * multipier);
+				AnimationFrame.BlendShapes.Add("jawOpen", BlendshapesFrame.jaw_open() * multipier);
+				AnimationFrame.BlendShapes.Add("jawRight", BlendshapesFrame.jaw_right() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthClose", BlendshapesFrame.mouth_close() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthDimpleLeft", BlendshapesFrame.mouth_dimple_left() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthDimpleRight", BlendshapesFrame.mouth_dimple_right() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthFrownLeft", BlendshapesFrame.mouth_frown_left() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthFrownRight", BlendshapesFrame.mouth_frown_right() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthFunnel", BlendshapesFrame.mouth_funnel() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthLeft", BlendshapesFrame.mouth_left() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthLowerDownLeft", BlendshapesFrame.mouth_lower_down_left() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthLowerDownRight", BlendshapesFrame.mouth_lower_down_right() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthPressLeft", BlendshapesFrame.mouth_press_left() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthPressRight", BlendshapesFrame.mouth_press_right() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthPucker", BlendshapesFrame.mouth_pucker() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthRight", BlendshapesFrame.mouth_right() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthRollLower", BlendshapesFrame.mouth_roll_lower() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthRollUpper", BlendshapesFrame.mouth_roll_upper() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthShrugLower", BlendshapesFrame.mouth_shrug_lower() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthShrugUpper", BlendshapesFrame.mouth_shrug_upper() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthSmileLeft", BlendshapesFrame.mouth_smile_left() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthSmileRight", BlendshapesFrame.mouth_smile_right() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthStretchLeft", BlendshapesFrame.mouth_stretch_left() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthStretchRight", BlendshapesFrame.mouth_stretch_right() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthUpperUpLeft", BlendshapesFrame.mouth_upper_up_left() * multipier);
+				AnimationFrame.BlendShapes.Add("mouthUpperUpRight", BlendshapesFrame.mouth_upper_up_right() * multipier);
+				AnimationFrame.BlendShapes.Add("noseSneerLeft", BlendshapesFrame.nose_sneer_left() * multipier);
+				AnimationFrame.BlendShapes.Add("noseSneerRight", BlendshapesFrame.nose_sneer_right() * multipier);
+				AnimationFrame.BlendShapes.Add("tongueOut", BlendshapesFrame.tongue_out() * multipier);
+				//AnimationFrame.BlendShapes.Add("headRoll", BlendshapesFrame.head_roll() * (180.0/3.14));
+				//AnimationFrame.BlendShapes.Add("headPitch", BlendshapesFrame.head_pitch() * (180.0 / 3.14));
+				//AnimationFrame.BlendShapes.Add("headYaw", BlendshapesFrame.head_yaw() * (180.0 / 3.14));
+				FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
+				FaceDataAnimation.Duration = FrameTime;
+				FaceDataAnimation.FrameRate = FPS;
+				UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s - Frame Time: %f - Frame Index: %d"), *AnimationFrame.ToString(), FrameTime, FrameIndex);
+			}
 			else if (HasVisemes && !GeneratesVisemesAsBlendshapes)
 			{
 				auto Visemes = reply->audio_response().visemes_data().visemes();
-				FAnimationFrame AnimationFrame;
-				AnimationFrame.BlendShapes.Add("sil", Visemes.sil());
-				AnimationFrame.BlendShapes.Add("PP", Visemes.pp());
-				AnimationFrame.BlendShapes.Add("FF", Visemes.ff());
-				AnimationFrame.BlendShapes.Add("TH", Visemes.th());
-				AnimationFrame.BlendShapes.Add("DD", Visemes.dd());
-				AnimationFrame.BlendShapes.Add("kk", Visemes.kk());
-				AnimationFrame.BlendShapes.Add("CH", Visemes.ch());
-				AnimationFrame.BlendShapes.Add("SS", Visemes.ss());
-				AnimationFrame.BlendShapes.Add("nn", Visemes.nn());
-				AnimationFrame.BlendShapes.Add("RR", Visemes.rr());
-				AnimationFrame.BlendShapes.Add("aa", Visemes.aa());
-				AnimationFrame.BlendShapes.Add("E", Visemes.e());
-				AnimationFrame.BlendShapes.Add("ih", Visemes.ih());
-				AnimationFrame.BlendShapes.Add("oh", Visemes.oh());
-				AnimationFrame.BlendShapes.Add("ou", Visemes.ou());
-				FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
-				FaceDataAnimation.Duration += 0.01;
+
+				if (Visemes.sil() >= 0)
+				{
+					FAnimationFrame AnimationFrame;
+					AnimationFrame.BlendShapes.Add("sil", Visemes.sil());
+					AnimationFrame.BlendShapes.Add("PP", Visemes.pp());
+					AnimationFrame.BlendShapes.Add("FF", Visemes.ff());
+					AnimationFrame.BlendShapes.Add("TH", Visemes.th());
+					AnimationFrame.BlendShapes.Add("DD", Visemes.dd());
+					AnimationFrame.BlendShapes.Add("kk", Visemes.kk());
+					AnimationFrame.BlendShapes.Add("CH", Visemes.ch());
+					AnimationFrame.BlendShapes.Add("SS", Visemes.ss());
+					AnimationFrame.BlendShapes.Add("nn", Visemes.nn());
+					AnimationFrame.BlendShapes.Add("RR", Visemes.rr());
+					AnimationFrame.BlendShapes.Add("aa", Visemes.aa());
+					AnimationFrame.BlendShapes.Add("E", Visemes.e());
+					AnimationFrame.BlendShapes.Add("ih", Visemes.ih());
+					AnimationFrame.BlendShapes.Add("oh", Visemes.oh());
+					AnimationFrame.BlendShapes.Add("ou", Visemes.ou());
+					FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
+					FaceDataAnimation.Duration += 0.01;
+					FaceDataAnimation.FrameRate = 100;
+				}
 				//UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s"), *AnimationFrame.ToString());
 			}
 
@@ -629,10 +711,29 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 			}
 
 			if (FaceDataAnimation.AnimationFrames.Num() > 0 && FaceDataAnimation.Duration > 0)
+			{
 				OnFaceDataReceived.ExecuteIfBound(FaceDataAnimation);
+				TotalLipSyncResponsesReceived += 1;
+			}
+
+			if (IsFinalResponse)
+			{
+				UE_LOG(ConvaiGRPCLog, Log, TEXT("Chatbot Total Received Lipsync Responses: %d Responses"), TotalLipSyncResponsesReceived);
+				TotalLipSyncResponsesReceived = 0;
+			}
 		}
 
-		bool IsFinalResponse = reply->audio_response().end_of_response();
+		//if (reply->audio_response().has_face_emotion())
+		//{
+		//	FString EmotionResponse = UConvaiUtils::FUTF8ToFString(reply->audio_response().emotion_response().emotion().c_str());
+		//	UE_LOG(ConvaiGRPCLog, Log, TEXT("EmotionResponse: %s"), *EmotionResponse);
+		//	OnEmotionReceived.ExecuteIfBound(EmotionResponse, FAnimationFrame());
+		//}
+		if (reply->audio_response().has_blendshapes_data())
+		{
+			FString BlendshapesData = UConvaiUtils::FUTF8ToFString(reply->audio_response().blendshapes_data().blendshape_data().c_str());
+			UE_LOG(ConvaiGRPCLog, Log, TEXT("BlendshapesData: %s"), *BlendshapesData);
+		}
 
 		// Broadcast the audio and text
 		OnDataReceived.ExecuteIfBound(text_string, VoiceData, SampleRate, IsFinalResponse);
@@ -672,10 +773,8 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 	}
 	else if (!reply->emotion_response().empty())
 	{
-		FString EmotionResponseDebug = UConvaiUtils::FUTF8ToFString(reply->DebugString().c_str());
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse EmotionResponseDebug: %s"), *EmotionResponseDebug);
-		FString EmotionResponse = UConvaiUtils::FUTF8ToFString(reply->emotion_response().c_str());
-		OnEmotionReceived.ExecuteIfBound(EmotionResponse);
+		// Deprecated
+
 	}
 	else if (!reply->debug_log().empty()) // This is a debug message response
 	{
