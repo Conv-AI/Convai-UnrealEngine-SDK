@@ -16,6 +16,9 @@
 #include "UObject/UObjectHash.h"
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/DefaultValueHelper.h"
+#include "HAL/PlatformFilemanager.h"
+
 
 #include "../Convai.h"
 #include "ConvaiChatbotComponent.h"
@@ -137,6 +140,28 @@ FString UConvaiUtils::ByteArrayToString(TArray<uint8> Bytes)
 		Fixed.AppendChar(c);
 	}
 	return Fixed;
+}
+
+bool UConvaiUtils::WriteStringToFile(const FString& StringToWrite, const FString& FilePath)
+{
+	return FFileHelper::SaveStringToFile(StringToWrite, *FilePath);
+}
+
+bool UConvaiUtils::ReadStringFromFile(FString& OutString, const FString& FilePath)
+{
+	return FFileHelper::LoadFileToString(OutString, *FilePath);
+}
+
+float UConvaiUtils::CalculateAudioDuration(uint32 AudioSize, uint8 Channels, uint32 SampleRate, uint8 SampleSize)
+{
+	if (Channels == 0 || SampleRate == 0 || SampleSize == 0)
+	{
+		// Avoid division by zero
+		return 0;
+	}
+
+	// Calculate the duration in seconds
+	return float(AudioSize) / float(Channels * SampleRate * SampleSize);
 }
 
 void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlayerController* PlayerController, float Radius, bool PlaneView, TArray<UObject*> IncludedCharacters, TArray<UObject*> ExcludedCharacters, UConvaiChatbotComponent*& ConvaiCharacter, bool& Found)
@@ -458,6 +483,11 @@ void UConvaiUtils::SetAPI_Key(FString API_Key)
 FString UConvaiUtils::GetAPI_Key()
 {
 	return Convai::Get().GetConvaiSettings()->API_Key;
+}
+
+FString UConvaiUtils::GetTestCharacterID()
+{
+	return Convai::Get().GetConvaiSettings()->TestCharacterID;
 }
 
 bool UConvaiUtils::IsNewActionSystemEnabled()
@@ -906,6 +936,16 @@ AActor* UConvaiUtils::ConvaiCloneActor(AActor* InputActor)
 	return SpawnedActor;
 }
 
+FString UConvaiUtils::ConvaiAnimationSequenceToJson(const FAnimationSequenceBP& AnimationSequenceBP)
+{
+	return AnimationSequenceBP.AnimationSequence.ToJson();
+}
+
+void UConvaiUtils::ConvaiAnimationSequenceFromJson(const FString& JsonString, FAnimationSequenceBP& AnimationSequenceBP)
+{
+	AnimationSequenceBP.AnimationSequence.FromJson(JsonString);
+}
+
 TMap<FName, float> UConvaiUtils::MapBlendshapes(const TMap<FName, float>& InputBlendshapes, const TMap<FName, FConvaiBlendshapeParameters>& BlendshapeMap, float GlobalMultiplier, float GlobalOffset)
 {
 	TMap<FName, float> OutputMap;
@@ -980,4 +1020,69 @@ TMap<FName, float> UConvaiUtils::MapBlendshapes(const TMap<FName, float>& InputB
 	}
 
 	return OutputMap;
+}
+
+bool UConvaiSettingsUtils::GetParamValueAsString(const FString& paramName, FString& outValue) {
+	FString input = Convai::Get().GetConvaiSettings()->ExtraParams;
+	FString result;
+	FString trimmedInput = input.Replace(TEXT(" "), TEXT("")); // Remove all spaces
+	if (trimmedInput.Split(paramName + TEXT("="), nullptr, &result)) {
+		result.Split(TEXT(","), &result, nullptr);
+		outValue = result.TrimStartAndEnd().Replace(TEXT("\""), TEXT("")).TrimStartAndEnd();
+		return true;
+	}
+	outValue = FString();
+	return false;
+}
+
+bool UConvaiSettingsUtils::GetParamValueAsFloat(const FString& paramName, float& outValue) {
+	FString stringValue;
+	if (GetParamValueAsString(paramName, stringValue)) {
+		FDefaultValueHelper::ParseFloat(stringValue, outValue);
+		return true;
+	}
+	outValue = 0.0f;
+	return false;
+}
+
+bool UConvaiSettingsUtils::GetParamValueAsInt(const FString& paramName, int32& outValue) {
+	FString stringValue;
+	if (GetParamValueAsString(paramName, stringValue)) {
+		FDefaultValueHelper::ParseInt(stringValue, outValue);
+		return true;
+	}
+	outValue = 0;
+	return false;
+}
+
+bool UConvaiUtils::WriteSoundWaveToWavFile(USoundWave* SoundWave, const FString& FilePath)
+{
+	// Access the raw PCM data from the USoundWave
+	int32 OutSampleRate;
+	int32 OutNumChannels;
+	TArray<uint8> RawData = ExtractPCMDataFromSoundWave(SoundWave, OutSampleRate, OutNumChannels);
+
+	if (RawData.IsEmpty())
+		return false;
+
+	TArray<uint8> OutWaveFileData;
+
+	PCMDataToWav(RawData, OutWaveFileData, OutNumChannels, OutSampleRate);
+
+	// Use the helper function to save the raw PCM data as a .wav file
+	return SaveByteArrayAsFile(FilePath, OutWaveFileData);
+}
+
+USoundWave* UConvaiUtils::ReadWavFileAsSoundWave(const FString & FilePath)
+{
+	TArray<uint8> RawData;
+	if (!ReadFileAsByteArray(FilePath, RawData))
+	{
+		return nullptr;
+	}
+
+	// Create a new USoundWave object
+	USoundWave* NewSoundWave = WavDataToSoundWave(RawData);
+
+	return NewSoundWave;
 }
