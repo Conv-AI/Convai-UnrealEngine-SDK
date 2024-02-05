@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "CoreGlobals.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonReader.h"
 #include "ConvaiDefinitions.generated.h"
 
 
@@ -42,15 +45,15 @@ enum class EEmotionIntensity : uint8
 UENUM(BlueprintType)
 enum class EBasicEmotions : uint8
 {
-	Joy          UMETA(DisplayName = "Joy"),
-	Trust        UMETA(DisplayName = "Trust"),
-	Fear         UMETA(DisplayName = "Fear"),
+	Joy          UMETA(DisplayName = "Happy"),
+	Trust        UMETA(DisplayName = "Calm"),
+	Fear         UMETA(DisplayName = "Afraid"),
 	Surprise     UMETA(DisplayName = "Surprise"),
-	Sadness      UMETA(DisplayName = "Sadness"),
-	Disgust      UMETA(DisplayName = "Disgust"),
-	Anger        UMETA(DisplayName = "Anger"),
-	Anticipation UMETA(DisplayName = "Anticipation"),
-	None         UMETA(DisplayName = "None", BlueprintHidden) // To handle cases when the emotion is not found
+	Sadness      UMETA(DisplayName = "Sad"),
+	Disgust      UMETA(DisplayName = "Bored"),
+	Anger        UMETA(DisplayName = "Angry"),
+	Anticipation UMETA(DisplayName = "Anticipation", Hidden), // No longer used
+	None         UMETA(DisplayName = "None", Hidden) // To handle cases when the emotion is not found
 };
 
 USTRUCT(BlueprintType)
@@ -74,7 +77,7 @@ public:
 
 	/** The bio/description for the chracter/object*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
-	FString Description;
+		FString Description;
 
 	friend bool operator==(const FConvaiObjectEntry& lhs, const FConvaiObjectEntry& rhs)
 	{
@@ -115,21 +118,21 @@ struct FConvaiResultAction
 {
 	GENERATED_BODY()
 
-	/** The action to be made*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
-	FString Action;
+		/** The action to be made*/
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
+		FString Action;
 
 	/** The object or character whom the action is to be made on*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
-	FConvaiObjectEntry RelatedObjectOrCharacter;
+		FConvaiObjectEntry RelatedObjectOrCharacter;
 
 	/** The actual string of the action without any preprocessing*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
-	FString ActionString;
+		FString ActionString;
 
 	/** Has extra parameters*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|Action API")
-	FConvaiExtraParams ConvaiExtraParams;
+		FConvaiExtraParams ConvaiExtraParams;
 };
 
 USTRUCT(BlueprintType)
@@ -137,29 +140,29 @@ struct FConvaiBlendshapeParameters
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
-	TArray<FName> TargetNames;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
+		TArray<FName> TargetNames;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
-	float Multiplyer = 1;
+		float Multiplyer = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
-	float Offset = 0;
+		float Offset = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
-	bool UseOverrideValue = false;
+		bool UseOverrideValue = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
-	bool IgnoreGlobalModifiers = false;
+		bool IgnoreGlobalModifiers = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
-	float OverrideValue = 0;
+		float OverrideValue = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
-	float ClampMinValue = 0;
+		float ClampMinValue = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Convai|LipSync")
-	float ClampMaxValue = 1;
+		float ClampMaxValue = 1;
 };
 
 USTRUCT()
@@ -167,11 +170,11 @@ struct FAnimationFrame
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
-	int32 FrameIndex = 0;
+		UPROPERTY()
+		int32 FrameIndex = 0;
 
 	UPROPERTY()
-	TMap<FName, float> BlendShapes;
+		TMap<FName, float> BlendShapes;
 
 	FString ToString()
 	{
@@ -204,7 +207,96 @@ public:
 
 	UPROPERTY()
 	float Duration = 0;
+
+	UPROPERTY()
+	int32 FrameRate = 0;
+
+	// Serialize this struct to a JSON string
+	FString ToJson() const
+	{
+		TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+
+		// Convert AnimationFrames to a JSON array
+		TArray<TSharedPtr<FJsonValue>> JsonFrames;
+		for (const FAnimationFrame& Frame : AnimationFrames)
+		{
+			TSharedPtr<FJsonObject> JsonFrameObject = MakeShareable(new FJsonObject);
+			JsonFrameObject->SetNumberField(TEXT("FrameIndex"), Frame.FrameIndex);
+
+			// Convert BlendShapes to a JSON object
+			TSharedPtr<FJsonObject> JsonBlendShapes = MakeShareable(new FJsonObject);
+			for (const auto& Elem : Frame.BlendShapes)
+			{
+				JsonBlendShapes->SetNumberField(Elem.Key.ToString(), Elem.Value);
+			}
+			JsonFrameObject->SetObjectField(TEXT("BlendShapes"), JsonBlendShapes);
+
+			JsonFrames.Add(MakeShareable(new FJsonValueObject(JsonFrameObject)));
+		}
+		JsonObject->SetArrayField(TEXT("AnimationFrames"), JsonFrames);
+
+		// Set the rest of the properties
+		JsonObject->SetNumberField(TEXT("Duration"), Duration);
+		JsonObject->SetNumberField(TEXT("FrameRate"), FrameRate);
+
+		FString OutputString;
+		TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+		FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+		return OutputString;
+	}
+
+	// Deserialize this struct from a JSON string
+	bool FromJson(const FString& JsonString)
+	{
+		AnimationFrames.Empty();
+		Duration = 0;
+		FrameRate = 0;
+		TSharedPtr<FJsonObject> JsonObject;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+		{
+			const TArray<TSharedPtr<FJsonValue>>* JsonFrames;
+			if (JsonObject->TryGetArrayField(TEXT("AnimationFrames"), JsonFrames))
+			{
+				for (const TSharedPtr<FJsonValue>& JsonValue : *JsonFrames)
+				{
+					TSharedPtr<FJsonObject> JsonFrameObject = JsonValue->AsObject();
+					if (JsonFrameObject.IsValid())
+					{
+						FAnimationFrame Frame;
+						Frame.FrameIndex = JsonFrameObject->GetIntegerField(TEXT("FrameIndex"));
+
+						TSharedPtr<FJsonObject> JsonBlendShapes = JsonFrameObject->GetObjectField(TEXT("BlendShapes"));
+						for (const auto& Elem : JsonBlendShapes->Values)
+						{
+							Frame.BlendShapes.Add(FName(*Elem.Key), Elem.Value->AsNumber());
+						}
+
+						AnimationFrames.Add(Frame);
+					}
+				}
+			}
+
+			JsonObject->TryGetNumberField(TEXT("Duration"), Duration);
+			JsonObject->TryGetNumberField(TEXT("FrameRate"), FrameRate);
+
+			return true;
+		}
+		return false;
+	}
 };
+
+USTRUCT()
+struct FAnimationSequenceBP
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+	FAnimationSequence AnimationSequence = FAnimationSequence();
+};
+
+
 
 USTRUCT()
 struct FConvaiEmotionState
@@ -212,6 +304,8 @@ struct FConvaiEmotionState
 	GENERATED_BODY()
 
 public:
+	
+	// Deprecated
 	void GetEmotionDetails(const FString& Emotion, EEmotionIntensity& Intensity, EBasicEmotions& BasicEmotion)
 	{
 		// Static dictionaries of emotions
@@ -270,6 +364,46 @@ public:
 		}
 	}
 
+	// Deprecated
+	void SetEmotionData(const FString& EmotionRespponse)
+	{
+		TArray<FString> OutputEmotionsArray;
+		// Separate the string into an array based on the space delimiter
+		EmotionRespponse.ParseIntoArray(OutputEmotionsArray, TEXT(" "), true);
+		SetEmotionData(OutputEmotionsArray);
+	}
+
+	// Deprecated
+	void SetEmotionData(const TArray<FString>& EmotionArray)
+	{
+		ResetEmotionScores();
+		EEmotionIntensity Intensity = EEmotionIntensity::None;
+		EBasicEmotions BasicEmotion = EBasicEmotions::None;
+		float Score = 0;
+
+		int i = 0;
+		for (FString Emotion : EmotionArray)
+		{
+			GetEmotionDetails(Emotion, Intensity, BasicEmotion);
+			if (Intensity == EEmotionIntensity::None || BasicEmotion == EBasicEmotions::None)
+				continue;
+
+			if (const float* ScoreMultiplier = ScoreMultipliers.Find(Intensity))
+			{
+				Score = *ScoreMultiplier * FMath::Exp(float(-i) / float(EmotionArray.Num()));
+			}
+			else
+			{
+				Score = 0;
+			}
+
+			EmotionsScore.Add(BasicEmotion, Score);
+			i++;
+		}
+
+	}
+
+
 	void ForceSetEmotion(const EBasicEmotions& BasicEmotion, const EEmotionIntensity& Intensity, const bool& ResetOtherEmotions)
 	{
 		if (ResetOtherEmotions)
@@ -290,43 +424,43 @@ public:
 		EmotionsScore.Add(BasicEmotion, Score);
 	}
 
-	void SetEmotionData(const FString& EmotionRespponse)
+	void GetTTSEmotion(const FString& Emotion, EBasicEmotions& BasicEmotion)
 	{
-		TArray<FString> OutputEmotionsArray;
-		// Separate the string into an array based on the space delimiter
-		EmotionRespponse.ParseIntoArray(OutputEmotionsArray, TEXT(" "), true);
-		SetEmotionData(OutputEmotionsArray);
-	}
+		// Static dictionaries of emotions
+		static const TMap<FString, EBasicEmotions> BasicEmotions = {
+			{"Happy", EBasicEmotions::Joy},
+			{"Calm", EBasicEmotions::Trust},
+			{"Afraid", EBasicEmotions::Fear},
+			{"Surprise", EBasicEmotions::Surprise},
+			{"Sad", EBasicEmotions::Sadness},
+			{"Bored", EBasicEmotions::Disgust},
+			{"Angry", EBasicEmotions::Anger},
+			{"Neutral", EBasicEmotions::None}
+		};
 
-	void SetEmotionData(const TArray<FString>& EmotionArray)
-	{
-		ResetEmotionScores();
-		EEmotionIntensity Intensity = EEmotionIntensity::None;
-		EBasicEmotions BasicEmotion = EBasicEmotions::None;
-		float Score = 0;
+		// Initialize the output parameters
+		BasicEmotion = EBasicEmotions::None;
 
-		int i = 0;
-		for (FString Emotion : EmotionArray)
+		// Look up the emotion
+		if (BasicEmotions.Contains(Emotion))
 		{
-			GetEmotionDetails(Emotion, Intensity, BasicEmotion);
-			if (Intensity == EEmotionIntensity::None || BasicEmotion == EBasicEmotions::None)
-				continue;
-
-			if (const float* ScoreMultiplier = ScoreMultipliers.Find(Intensity))
-			{
-				Score = *ScoreMultiplier  * FMath::Exp(float(-i) / float(EmotionArray.Num()));
-			}
-			else
-			{
-				Score = 0;
-			}
-
-			EmotionsScore.Add(BasicEmotion, Score);
-			i++;
+			BasicEmotion = BasicEmotions[Emotion];
 		}
-
 	}
 
+
+	void SetEmotionDataSingleEmotion(const FString& EmotionRespponse)
+	{
+		FString EmotionString;
+		float Scale;
+		ParseStringToStringAndFloat(EmotionRespponse, EmotionString, Scale);
+
+		EBasicEmotions Emotion;
+		GetTTSEmotion(EmotionRespponse, Emotion);
+
+		ResetEmotionScores();
+		EmotionsScore.Add(Emotion, Scale);
+	}
 	float GetEmotionScore(const EBasicEmotions& Emotion)
 	{
 		float Score = 0;
@@ -340,7 +474,7 @@ public:
 	void ResetEmotionScores()
 	{
 		EmotionsScore.Empty();
-		
+
 		for (int32 i = 0; i <= static_cast<int32>(EBasicEmotions::Anticipation); ++i)
 		{
 			EBasicEmotions EnumValue = static_cast<EBasicEmotions>(i);
@@ -352,6 +486,31 @@ private:
 	TMap<EBasicEmotions, float> EmotionsScore;
 
 	static const TMap<EEmotionIntensity, float> ScoreMultipliers;
+
+	bool ParseStringToStringAndFloat(const FString& Input, FString& OutString, float& OutFloat)
+	{
+		// Split the input string into two parts based on the space character
+		TArray<FString> Parsed;
+		Input.ParseIntoArray(Parsed, TEXT(" "), true);
+
+		// Check if the parsing was successful
+		if (Parsed.Num() == 2)
+		{
+			// Assign the first part to OutString
+			OutString = Parsed[0];
+
+			// Convert the second part to a float and assign it to OutFloat
+			OutFloat = FCString::Atof(*Parsed[1]);
+			return true;
+		}
+		else
+		{
+			// Handle the error case
+			OutString = TEXT("");
+			OutFloat = 0.0f;
+			return false;
+		}
+	}
 };
 
 USTRUCT()
@@ -362,19 +521,19 @@ struct FConvaiEnvironmentDetails
 public:
 
 	UPROPERTY()
-	TArray<FString> Actions;
+		TArray<FString> Actions;
 
 	UPROPERTY()
-	TArray<FConvaiObjectEntry> Objects;
+		TArray<FConvaiObjectEntry> Objects;
 
 	UPROPERTY()
-	TArray<FConvaiObjectEntry> Characters;
+		TArray<FConvaiObjectEntry> Characters;
 
 	UPROPERTY()
-	FConvaiObjectEntry MainCharacter;
+		FConvaiObjectEntry MainCharacter;
 
 	UPROPERTY()
-	FConvaiObjectEntry AttentionObject;
+		FConvaiObjectEntry AttentionObject;
 };
 
 // TODO: OnEnvironmentChanged event should be called in an optimizied way for any change in the environment
@@ -391,7 +550,7 @@ public:
 
 	// Creates a Convai Environment object.
 	UFUNCTION(BlueprintCallable, Category = "Convai|Action API")
-	static UConvaiEnvironment* CreateConvaiEnvironment()
+		static UConvaiEnvironment* CreateConvaiEnvironment()
 	{
 		UConvaiEnvironment* ContextObject = NewObject<UConvaiEnvironment>();
 		return ContextObject;
@@ -479,7 +638,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
-	void AddObject(FConvaiObjectEntry Object)
+		void AddObject(FConvaiObjectEntry Object)
 	{
 		// Replace old object that has the same name with the new object
 		if (FConvaiObjectEntry* ExistingObject = FindObject(Object.Name))
@@ -593,7 +752,7 @@ public:
 
 	// Assigns the main character initiating the conversation, typically the player character, unless the dialogue involves non-player characters talking to each other.
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
-	void SetMainCharacter(FConvaiObjectEntry InMainCharacter)
+		void SetMainCharacter(FConvaiObjectEntry InMainCharacter)
 	{
 		MainCharacter = InMainCharacter;
 		AddCharacter(MainCharacter);
@@ -601,7 +760,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
-	void SetAttentionObject(FConvaiObjectEntry InAttentionObject)
+		void SetAttentionObject(FConvaiObjectEntry InAttentionObject)
 	{
 		AttentionObject = InAttentionObject;
 		AddObject(AttentionObject);
@@ -609,31 +768,31 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
-	void ClearMainCharacter()
+		void ClearMainCharacter()
 	{
 		MainCharacter = FConvaiObjectEntry();
 	}
 
 	UFUNCTION(BlueprintCallable, category = "Convai|Action API")
-	void ClearAttentionObject()
+		void ClearAttentionObject()
 	{
 		AttentionObject = FConvaiObjectEntry();
 	}
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
-	TArray<FString> Actions;
+		TArray<FString> Actions;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
-	TArray<FConvaiObjectEntry> Objects;
+		TArray<FConvaiObjectEntry> Objects;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
-	TArray<FConvaiObjectEntry> Characters;
+		TArray<FConvaiObjectEntry> Characters;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
-	FConvaiObjectEntry MainCharacter;
+		FConvaiObjectEntry MainCharacter;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Action API")
-	FConvaiObjectEntry AttentionObject;
+		FConvaiObjectEntry AttentionObject;
 };
 
 UCLASS(Blueprintable)
@@ -641,7 +800,7 @@ class UConvaiActionContext : public UConvaiEnvironment
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(Meta=(DeprecatedFunction, DeprecationMessage = "Use \"Create Convai Environment\" Instead"), BlueprintCallable, Category = "Convai|Action API|DEPRECATED")
+	UFUNCTION(Meta = (DeprecatedFunction, DeprecationMessage = "Use \"Create Convai Environment\" Instead"), BlueprintCallable, Category = "Convai|Action API|DEPRECATED")
 		static UConvaiActionContext* CreateConvaiActionContext()
 	{
 		UConvaiActionContext* ContextObject = NewObject<UConvaiActionContext>();
@@ -664,7 +823,7 @@ namespace ConvaiConstants
 		ChatbotTimeOut = 6000 /* 6000 ms*/
 	};
 
-	const TArray<FString> BlendShapesNames = { "EyeBlinkLeft", "EyeLookDownLeft", "EyeLookInLeft", "EyeLookOutLeft", "EyeLookUpLeft", "EyeSquintLeft", "EyeWideLeft", "EyeBlinkRight", "EyeLookDownRight", "EyeLookInRight", "EyeLookOutRight", "EyeLookUpRight", "EyeSquintRight", "EyeWideRight", "JawForward", "JawLeft", "JawRight", "JawOpen", "MouthClose", "MouthFunnel", "MouthPucker", "MouthLeft", "MouthRight", "MouthSmileLeft", "MouthSmileRight", "MouthFrownLeft", "MouthFrownRight", "MouthDimpleLeft", "MouthDimpleRight", "MouthStretchLeft", "MouthStretchRight", "MouthRollLower", "MouthRollUpper", "MouthShrugLower", "MouthShrugUpper", "MouthPressLeft", "MouthPressRight", "MouthLowerDownLeft", "MouthLowerDownRight", "MouthUpperUpLeft", "MouthUpperUpRight", "BrowDownLeft", "BrowDownRight", "BrowInnerUp", "BrowOuterUpLeft", "BrowOuterUpRight", "CheekPuff", "CheekSquintLeft", "CheekSquintRight", "NoseSneerLeft", "NoseSneerRight", "TongueOut", "HeadRoll", "HeadPitch", "HeadYaw" };
+	const TArray<FString> BlendShapesNames = { "browDownLeft", "browDownRight", "browInnerUp", "browOuterUpLeft", "browOuterUpRight", "cheekPuff", "cheekSquintLeft", "cheekSquintRight", "eyeBlinkLeft", "eyeBlinkRight", "eyeLookDownLeft", "eyeLookDownRight", "eyeLookInLeft", "eyeLookInRight", "eyeLookOutLeft", "eyeLookOutRight", "eyeLookUpLeft", "eyeLookUpRight", "eyeSquintLeft", "eyeSquintRight", "eyeWideLeft", "eyeWideRight", "jawForward", "jawLeft", "jawOpen", "jawRight", "mouthClose", "mouthDimpleLeft", "mouthDimpleRight", "mouthFrownLeft", "mouthFrownRight", "mouthFunnel", "mouthLeft", "mouthLowerDownLeft", "mouthLowerDownRight", "mouthPressLeft", "mouthPressRight", "mouthPucker", "mouthRight", "mouthRollLower", "mouthRollUpper", "mouthShrugLower", "mouthShrugUpper", "mouthSmileLeft", "mouthSmileRight", "mouthStretchLeft", "mouthStretchRight", "mouthUpperUpLeft", "mouthUpperUpRight", "noseSneerLeft", "noseSneerRight", "tongueOut", /*"headRoll", "headPitch", "headYaw"*/ };
 	const TArray<FString> VisemeNames = { "sil", "PP", "FF", "TH", "DD", "kk", "CH", "SS", "nn", "RR", "aa", "E", "ih", "oh", "ou" };
 
 	//char* AvatarDefaultImage2 = "https://convai.com/_next/static/images/placeholder-3d-cab6463359f6ccedb4cda311c4056788.jpg";
