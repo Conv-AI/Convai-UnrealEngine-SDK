@@ -30,19 +30,30 @@ The plugin is compatible with a wide range of character and avatar assets, inclu
 
 # Installation
 
-## Overview
-This guide provides detailed instructions on how to build and install the Convai Unreal Engine plugin.
-
 ## Prerequisites
 Before starting, ensure you have the following installed:
 - Python: [Download Python](https://www.python.org/downloads/)
 - Git: [Download Git](https://git-scm.com/downloads)
-- Unreal Engine 5.x: Ensure you have Unreal Engine 5.0 or later installed.
 - For Windows:
   - Visual Studio: Required for building the plugin. Refer to Unreal Engine's [Visual Studio Setup Guide](https://docs.unrealengine.com/en-US/Programming/Development/VisualStudioSetup) for detailed instructions.
   - For Android builds: Android Studio and the corresponding NDK. Refer to the [Setting Up Android SDK and NDK for Unreal](https://docs.unrealengine.com/4.27/en-US/SharingAndReleasing/Mobile/Android/Setup/) guide.
 - For macOS:
   - Xcode: Required for building the plugin. Refer to the official Unreal Engine documentation for specific macOS development setup instructions.
+
+## Overview
+There are multiple ways to install the plugin:
+- Install via the [marketplace](https://www.unrealengine.com/marketplace/en-US/product/convai)
+- Download one of our ready made [releases](https://github.com/Conv-AI/Convai-UnrealEngine-SDK/releases) and copy them to
+	```
+	C:\Program Files\Epic Games\UE_5.x\Engine\Plugins\Marketplace
+	```
+	or for macOS:
+	```
+	/Users/your_user/UnrealEngine/UE_5.x/Engine/Plugins/Marketplace
+	```
+ - Build the plugin manually to get the latest updates and support for Custom Unreal Engine Versions, which you can do by [following below steps](#Building-the-plugin-from-source)
+   
+# Building the plugin from source
 
 ## Cloning and Building the Plugin
 1. Open a command prompt or terminal.
@@ -71,11 +82,11 @@ Before starting, ensure you have the following installed:
 2. Copy the entire plugin folder to the Unreal Engine's plugins directory:
    - For a vanilla installation, this is typically located at:
      ```
-     C:\Program Files\Epic Games\UE_5.x\Engine\Plugins
+     C:\Program Files\Epic Games\UE_5.x\Engine\Plugins\Marketplace
      ```
      or for macOS:
      ```
-     /Users/your_user/UnrealEngine/UE_5.x/Engine/Plugins
+     /Users/your_user/UnrealEngine/UE_5.x/Engine/Plugins/Marketplace
      ```
 3. Ensure the folder hierarchy in the plugins directory mirrors the structure in the `Output` folder. It should look like this:
    ```
