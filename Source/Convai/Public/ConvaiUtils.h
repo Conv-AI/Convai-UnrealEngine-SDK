@@ -135,7 +135,7 @@ public:
 };
 
 UCLASS()
-class UConvaiFormValidation : public UBlueprintFunctionLibrary
+class CONVAI_API UConvaiFormValidation : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
