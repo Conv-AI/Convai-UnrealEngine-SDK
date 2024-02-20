@@ -9,6 +9,53 @@
 #include "Serialization/JsonReader.h"
 #include "ConvaiDefinitions.generated.h"
 
+USTRUCT(BlueprintType)
+struct CONVAI_API FNarrativeDecision
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString Criteria;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString NextSectionId;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	int32 Priority;
+};
+
+USTRUCT(BlueprintType)
+struct CONVAI_API FNarrativeSection
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString BehaviorTreeCode;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString BtConstants;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString CharacterId;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	TArray<FNarrativeDecision> Decisions;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString Objective;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString Parents;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString SectionId;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString SectionName;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	TMap<FString, FString> UpdatedCharacterData;
+};
 
 UENUM(BlueprintType)
 enum class ETTS_Voice_Type : uint8
