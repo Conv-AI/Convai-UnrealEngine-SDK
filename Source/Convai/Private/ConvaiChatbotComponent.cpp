@@ -332,7 +332,7 @@ bool UConvaiChatbotComponent::PlayRecordedVoice(USoundWave* RecordedVoice)
 		InterruptSpeech(0);
 	}
 
-	//UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Play Recorded Audio - Duration: %f"), RecordedVoice->d);
+	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Play Recorded Audio - Duration: %f"), RecordedVoice->Duration);
 
 	ForcePlayVoice(RecordedVoice);
 
@@ -412,7 +412,7 @@ void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerMessage, UC
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("Invoke Speech: TriggerMessage is missing"));
 		return;
 	}
-
+	UE_LOG(ConvaiPlayerLog, Warning, TEXT("Invoke Speech: Executed"));
 	InvokeTrigger_Internal("", TriggerMessage, InEnvironment, InGenerateActions, InVoiceResponse, InReplicateOnNetwork);
 }
 
@@ -423,6 +423,7 @@ void UConvaiChatbotComponent::InvokeNarrativeDesignTrigger(FString TriggerName, 
 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("Invoke Narrative Design Trigger: TriggerName is missing"));
 		return;
 	}
+	UE_LOG(ConvaiPlayerLog, Warning, TEXT("Invoke Narrative Design Trigger: Executed"));
 	InvokeTrigger_Internal(TriggerName, "", InEnvironment, InGenerateActions, InVoiceResponse, InReplicateOnNetwork);
 }
 
@@ -662,11 +663,11 @@ void UConvaiChatbotComponent::Broadcast_OnNarrativeSectionReceived_Implementatio
 	}
 }
 
-void UConvaiChatbotComponent::Broadcast_onEmotionReceived_Implementation(const FString& ReceivedEmotionResponse)
+void UConvaiChatbotComponent::Broadcast_onEmotionReceived_Implementation(const FString& ReceivedEmotionResponse, bool MultipleEmotions)
 {
 	if (!UKismetSystemLibrary::IsServer(this))
 	{
-		onEmotionReceived(ReceivedEmotionResponse, FAnimationFrame());
+		onEmotionReceived(ReceivedEmotionResponse, FAnimationFrame(), MultipleEmotions);
 	}
 }
 
@@ -776,7 +777,7 @@ void UConvaiChatbotComponent::onActionSequenceReceived(const TArray<FConvaiResul
 		});
 }
 
-void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse, FAnimationFrame EmotionBlendshapesFrame)
+void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse, FAnimationFrame EmotionBlendshapesFrame, bool MultipleEmotions)
 {
 	if (LockEmotionState)
 		return;
@@ -784,14 +785,21 @@ void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse,
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		Broadcast_onEmotionReceived(ReceivedEmotionResponse);
+		Broadcast_onEmotionReceived(ReceivedEmotionResponse, MultipleEmotions);
 	}
 
 	// Update the emotion state
 	if (!ReceivedEmotionResponse.IsEmpty())
 	{
-		EmotionState.SetEmotionDataSingleEmotion(ReceivedEmotionResponse);
-		EmotionBlendshapes = EmotionBlendshapesFrame.BlendShapes;
+		if (MultipleEmotions)
+		{
+			EmotionState.SetEmotionData(ReceivedEmotionResponse);
+		}
+		else
+		{
+			EmotionState.SetEmotionDataSingleEmotion(ReceivedEmotionResponse);
+			//EmotionBlendshapes = EmotionBlendshapesFrame.BlendShapes;
+		}
 	}
 
 	// Broadcast the emotion state changed event
