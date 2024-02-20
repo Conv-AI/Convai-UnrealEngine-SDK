@@ -720,6 +720,7 @@ void UConvaiAudioStreamer::onAudioFinished()
 			if (HasSufficentLipsyncFrames()) // returns true if the lipsync component is not available
 			{
 				UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("onAudioFinished: Resuming Voice and Lipsync"));
+				IsTalking = true; // put IsTalking to true to prevent triggering of the OnStartedTalking Trigger
 				PlayNextAudioInQueue();
 				PlayNextLipSyncInQueue();
 				ResumeVoice();
