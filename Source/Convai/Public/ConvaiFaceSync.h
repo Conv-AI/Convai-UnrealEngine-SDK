@@ -48,6 +48,9 @@ public:
 	virtual TMap<FName, float> ConvaiGetFaceBlendshapes() override { return CurrentBlendShapesMap; }
 	// End IConvaiLipSyncExtendedInterface interface
 
+	virtual void Apply_StartEndFrames_PostProcessing(const int& CurrentFrameIndex, const int& NextFrameIndex, float& Alpha, TMap<FName, float>& StartFrame, TMap<FName, float>& EndFrame){}
+	virtual void ApplyPostProcessing() {}
+
 	// UFUNCTION(BlueprintCallable, Category = "Convai|LipSync")
 	void StartRecordingLipSync();
 

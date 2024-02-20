@@ -122,6 +122,9 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 			StartFrame = MainSequenceBuffer.AnimationFrames[CurrentFrameIndex].BlendShapes;
 			EndFrame = MainSequenceBuffer.AnimationFrames[NextFrameIndex].BlendShapes;
 			Alpha = (CurrentSequenceTimePassed - FrameOffset - (CurrentFrameIndex * FrameDuration)) / FrameDuration;
+
+			Apply_StartEndFrames_PostProcessing(CurrentFrameIndex, NextFrameIndex, Alpha, StartFrame, EndFrame);
+
 			FrameIndex = MainSequenceBuffer.AnimationFrames[CurrentFrameIndex].FrameIndex;
 			BufferIndex = CurrentFrameIndex;
 		}
@@ -131,6 +134,8 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 		//CurrentBlendShapesMap = StartFrame;
 		CurrentBlendShapesMap = InterpolateFrames(StartFrame, EndFrame, Alpha);
+
+		ApplyPostProcessing();
 
 		// Trigger the blueprint event
 		OnVisemesDataReady.ExecuteIfBound();
