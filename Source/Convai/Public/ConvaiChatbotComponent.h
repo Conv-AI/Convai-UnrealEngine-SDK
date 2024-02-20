@@ -370,14 +370,14 @@ private:
 	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
 	void Broadcast_OnNarrativeSectionReceived(const FString& BT_Code, const FString& BT_Constants, const FString& ReceivedNarrativeSectionID);
 	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
-	void Broadcast_onEmotionReceived(const FString& ReceivedEmotionResponse);
+	void Broadcast_onEmotionReceived(const FString& ReceivedEmotionResponse, bool MultipleEmotions);
 
 	void OnTranscriptionReceived(FString Transcription, bool IsTranscriptionReady, bool IsFinal);
 	void onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal);
 	void OnFaceDataReceived(FAnimationSequence FaceDataAnimation);
 	void onSessionIDReceived(FString ReceivedSessionID);
 	void onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
-	void onEmotionReceived(FString ReceivedEmotionResponse, FAnimationFrame EmotionBlendshapesFrame);
+	void onEmotionReceived(FString ReceivedEmotionResponse, FAnimationFrame EmotionBlendshapesFrame, bool MultipleEmotions);
 	void onFinishedReceivingData();
 	void OnNarrativeSectionReceived(FString BT_Code, FString BT_Constants, FString ReceivedNarrativeSectionID);
 	void onFailure();
