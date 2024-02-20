@@ -26,7 +26,7 @@ DECLARE_DELEGATE_ThreeParams(FConvaiGRPCOnTranscriptionSignature, const FString 
 DECLARE_DELEGATE_FourParams(FConvaiGRPCOnDataSignature, const FString /*ReceivedText*/, const TArray<uint8>& /*ReceivedAudio*/, uint32 /*SampleRate*/, bool /*IsFinal*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnFaceDataSignature, FAnimationSequence /*FaceData*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnActionsSignature, const TArray<FConvaiResultAction>& /*ActionSequence*/);
-DECLARE_DELEGATE_TwoParams(FConvaiGRPCOnEmotionSignature, FString /*EmotionResponse*/, FAnimationFrame /*EmotionBlendshapes*/);
+DECLARE_DELEGATE_ThreeParams(FConvaiGRPCOnEmotionSignature, FString /*EmotionResponse*/, FAnimationFrame /*EmotionBlendshapes*/, bool /*MultipleEmotions*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnSessiondIDSignature, FString /*SessionID*/);
 DECLARE_DELEGATE(FConvaiGRPCOnEventSignature);
 

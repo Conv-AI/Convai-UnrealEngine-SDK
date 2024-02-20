@@ -370,7 +370,8 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 	audio_config->set_enable_facial_data(RequireFaceData);
 	if (RequireFaceData)
 	{
-		FaceModel faceModel = GeneratesVisemesAsBlendshapes ? FaceModel::FACE_MODEL_A_2X_MODEL_NAME : FaceModel::FACE_MODEL_OVR_MODEL_NAME;
+		//FaceModel faceModel = GeneratesVisemesAsBlendshapes ? FaceModel::FACE_MODEL_A_2X_MODEL_NAME : FaceModel::FACE_MODEL_OVR_MODEL_NAME;
+		FaceModel faceModel = GeneratesVisemesAsBlendshapes ? FaceModel::FACE_MODEL_PHONEMES_MODEL_NAME : FaceModel::FACE_MODEL_OVR_MODEL_NAME;
 		audio_config->set_face_model(faceModel);
 	}
 
@@ -482,8 +483,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 	// Prepare the request
 	request.set_allocated_get_response_data(get_response_data);
 
-
-
 	//#if ConvaiDebugMode
 	//    FString DebugString(request.DebugString().c_str());
 	//    UE_LOG(ConvaiGRPCLog, Warning, TEXT("request: %s"), *DebugString);
@@ -536,12 +535,12 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 	if (!ok)
 	{
 		// Tell the server that we are ready to finish the stream any time it wishes
+		if (!status.ok())
+			LogAndEcecuteFailure("OnStreamRead");
 		if (stream_handler)
 			CallFinish();
 		else
 			OnFinish.ExecuteIfBound();
-		if (!status.ok())
-			LogAndEcecuteFailure("OnStreamRead");
 		return;
 	}
 
@@ -585,7 +584,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		{
 			VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 46), audio_data.length() - 46);
 			SampleRate = reply->audio_response().audio_config().sample_rate_hertz();
-			UE_LOG(ConvaiGRPCLog, Log, TEXT("Received Audio Chunk: %f secs"), float(audio_data.length())/(SampleRate * 2.0));
+			UE_LOG(ConvaiGRPCLog, Log, TEXT("Received Audio Chunk: %f secs"), float(audio_data.length()) / (SampleRate * 2.0));
 		}
 		FAnimationSequence FaceDataAnimation;
 
@@ -593,7 +592,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		{
 			bool HasVisemes = reply->audio_response().has_visemes_data();
 			bool HasBlendshapesData = reply->audio_response().has_blendshapes_data();
-			bool HasBlendshapesFrame = reply->audio_response().has_blendshapes_frame();
+			//bool HasBlendshapesFrame = reply->audio_response().has_blendshapes_frame();
 
 			if (HasBlendshapesData && GeneratesVisemesAsBlendshapes)
 			{
@@ -604,77 +603,77 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 					FaceDataAnimation.AnimationFrames = UConvaiUtils::ParseJsonToBlendShapeData(FaceData_string);
 				}
 			}
-			else if (HasBlendshapesFrame && GeneratesVisemesAsBlendshapes)
-			{
-				float FPS = reply->audio_response().blendshapes_frame().fps();
-				int FrameIndex = reply->audio_response().blendshapes_frame().frame_index();
-				float FrameTime = FPS == 0.0 ? 1.0 / 30.0 : 1.0 / FPS;
-				auto BlendshapesFrame = reply->audio_response().blendshapes_frame().blendshapes();
-				float multipier = 1.5;
-				FAnimationFrame AnimationFrame;
-				AnimationFrame.FrameIndex = FrameIndex;
-				AnimationFrame.BlendShapes.Add("browDownLeft", BlendshapesFrame.brow_down_left() * multipier);
-				AnimationFrame.BlendShapes.Add("browDownRight", BlendshapesFrame.brow_down_right() * multipier);
-				AnimationFrame.BlendShapes.Add("browInnerUp", BlendshapesFrame.brow_inner_up() * multipier);
-				AnimationFrame.BlendShapes.Add("browOuterUpLeft", BlendshapesFrame.brow_outer_up_left() * multipier);
-				AnimationFrame.BlendShapes.Add("browOuterUpRight", BlendshapesFrame.brow_outer_up_right() * multipier);
-				AnimationFrame.BlendShapes.Add("cheekPuff", BlendshapesFrame.cheek_puff() * multipier);
-				AnimationFrame.BlendShapes.Add("cheekSquintLeft", BlendshapesFrame.cheek_squint_left() * multipier);
-				AnimationFrame.BlendShapes.Add("cheekSquintRight", BlendshapesFrame.cheek_squint_right() * multipier);
+			//else if (HasBlendshapesFrame && GeneratesVisemesAsBlendshapes)
+			//{
+			//	float FPS = reply->audio_response().blendshapes_frame().fps();
+			//	int FrameIndex = reply->audio_response().blendshapes_frame().frame_index();
+			//	float FrameTime = FPS == 0.0 ? 1.0 / 30.0 : 1.0 / FPS;
+			//	auto BlendshapesFrame = reply->audio_response().blendshapes_frame().blendshapes();
+			//	float multipier = 1.5;
+			//	FAnimationFrame AnimationFrame;
+			//	AnimationFrame.FrameIndex = FrameIndex;
+			//	AnimationFrame.BlendShapes.Add("browDownLeft", BlendshapesFrame.brow_down_left() * 1);
+			//	AnimationFrame.BlendShapes.Add("browDownRight", BlendshapesFrame.brow_down_right() * 1);
+			//	AnimationFrame.BlendShapes.Add("browInnerUp", BlendshapesFrame.brow_inner_up() * 1);
+			//	AnimationFrame.BlendShapes.Add("browOuterUpLeft", BlendshapesFrame.brow_outer_up_left() * 1);
+			//	AnimationFrame.BlendShapes.Add("browOuterUpRight", BlendshapesFrame.brow_outer_up_right() * 1);
+			//	AnimationFrame.BlendShapes.Add("cheekPuff", BlendshapesFrame.cheek_puff() * multipier);
+			//	AnimationFrame.BlendShapes.Add("cheekSquintLeft", BlendshapesFrame.cheek_squint_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("cheekSquintRight", BlendshapesFrame.cheek_squint_right() * multipier);
 
-				AnimationFrame.BlendShapes.Add("eyeBlinkLeft", BlendshapesFrame.eye_blink_left());
-				AnimationFrame.BlendShapes.Add("eyeBlinkRight", BlendshapesFrame.eye_blink_right());
+			//	AnimationFrame.BlendShapes.Add("eyeBlinkLeft", BlendshapesFrame.eye_blink_left());
+			//	AnimationFrame.BlendShapes.Add("eyeBlinkRight", BlendshapesFrame.eye_blink_right());
 
-				AnimationFrame.BlendShapes.Add("eyeLookDownLeft", BlendshapesFrame.eye_look_down_left() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeLookDownRight", BlendshapesFrame.eye_look_down_right() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeLookInLeft", BlendshapesFrame.eye_look_in_left() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeLookInRight", BlendshapesFrame.eye_look_in_right() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeLookOutLeft", BlendshapesFrame.eye_look_out_left() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeLookOutRight", BlendshapesFrame.eye_look_out_right() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeLookUpLeft", BlendshapesFrame.eye_look_up_left() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeLookUpRight", BlendshapesFrame.eye_look_up_right() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeSquintLeft", BlendshapesFrame.eye_squint_left() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeSquintRight", BlendshapesFrame.eye_squint_right() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeWideLeft", BlendshapesFrame.eye_wide_left() * multipier);
-				AnimationFrame.BlendShapes.Add("eyeWideRight", BlendshapesFrame.eye_wide_right() * multipier);
-				AnimationFrame.BlendShapes.Add("jawForward", BlendshapesFrame.jaw_forward() * multipier);
-				AnimationFrame.BlendShapes.Add("jawLeft", BlendshapesFrame.jaw_left() * multipier);
-				AnimationFrame.BlendShapes.Add("jawOpen", BlendshapesFrame.jaw_open() * multipier);
-				AnimationFrame.BlendShapes.Add("jawRight", BlendshapesFrame.jaw_right() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthClose", BlendshapesFrame.mouth_close() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthDimpleLeft", BlendshapesFrame.mouth_dimple_left() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthDimpleRight", BlendshapesFrame.mouth_dimple_right() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthFrownLeft", BlendshapesFrame.mouth_frown_left() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthFrownRight", BlendshapesFrame.mouth_frown_right() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthFunnel", BlendshapesFrame.mouth_funnel() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthLeft", BlendshapesFrame.mouth_left() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthLowerDownLeft", BlendshapesFrame.mouth_lower_down_left() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthLowerDownRight", BlendshapesFrame.mouth_lower_down_right() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthPressLeft", BlendshapesFrame.mouth_press_left() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthPressRight", BlendshapesFrame.mouth_press_right() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthPucker", BlendshapesFrame.mouth_pucker() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthRight", BlendshapesFrame.mouth_right() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthRollLower", BlendshapesFrame.mouth_roll_lower() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthRollUpper", BlendshapesFrame.mouth_roll_upper() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthShrugLower", BlendshapesFrame.mouth_shrug_lower() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthShrugUpper", BlendshapesFrame.mouth_shrug_upper() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthSmileLeft", BlendshapesFrame.mouth_smile_left() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthSmileRight", BlendshapesFrame.mouth_smile_right() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthStretchLeft", BlendshapesFrame.mouth_stretch_left() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthStretchRight", BlendshapesFrame.mouth_stretch_right() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthUpperUpLeft", BlendshapesFrame.mouth_upper_up_left() * multipier);
-				AnimationFrame.BlendShapes.Add("mouthUpperUpRight", BlendshapesFrame.mouth_upper_up_right() * multipier);
-				AnimationFrame.BlendShapes.Add("noseSneerLeft", BlendshapesFrame.nose_sneer_left() * multipier);
-				AnimationFrame.BlendShapes.Add("noseSneerRight", BlendshapesFrame.nose_sneer_right() * multipier);
-				AnimationFrame.BlendShapes.Add("tongueOut", BlendshapesFrame.tongue_out() * multipier);
-				//AnimationFrame.BlendShapes.Add("headRoll", BlendshapesFrame.head_roll() * (180.0/3.14));
-				//AnimationFrame.BlendShapes.Add("headPitch", BlendshapesFrame.head_pitch() * (180.0 / 3.14));
-				//AnimationFrame.BlendShapes.Add("headYaw", BlendshapesFrame.head_yaw() * (180.0 / 3.14));
-				FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
-				FaceDataAnimation.Duration = FrameTime;
-				FaceDataAnimation.FrameRate = FPS;
-				UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s - Frame Time: %f - Frame Index: %d"), *AnimationFrame.ToString(), FrameTime, FrameIndex);
-			}
+			//	AnimationFrame.BlendShapes.Add("eyeLookDownLeft", BlendshapesFrame.eye_look_down_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("eyeLookDownRight", BlendshapesFrame.eye_look_down_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("eyeLookInLeft", BlendshapesFrame.eye_look_in_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("eyeLookInRight", BlendshapesFrame.eye_look_in_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("eyeLookOutLeft", BlendshapesFrame.eye_look_out_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("eyeLookOutRight", BlendshapesFrame.eye_look_out_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("eyeLookUpLeft", BlendshapesFrame.eye_look_up_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("eyeLookUpRight", BlendshapesFrame.eye_look_up_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("eyeSquintLeft", BlendshapesFrame.eye_squint_left() * 1);
+			//	AnimationFrame.BlendShapes.Add("eyeSquintRight", BlendshapesFrame.eye_squint_right() * 1);
+			//	AnimationFrame.BlendShapes.Add("eyeWideLeft", BlendshapesFrame.eye_wide_left() * 1);
+			//	AnimationFrame.BlendShapes.Add("eyeWideRight", BlendshapesFrame.eye_wide_right() * 1);
+			//	AnimationFrame.BlendShapes.Add("jawForward", BlendshapesFrame.jaw_forward() * multipier);
+			//	AnimationFrame.BlendShapes.Add("jawLeft", BlendshapesFrame.jaw_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("jawOpen", BlendshapesFrame.jaw_open() * multipier);
+			//	AnimationFrame.BlendShapes.Add("jawRight", BlendshapesFrame.jaw_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthClose", BlendshapesFrame.mouth_close() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthDimpleLeft", BlendshapesFrame.mouth_dimple_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthDimpleRight", BlendshapesFrame.mouth_dimple_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthFrownLeft", BlendshapesFrame.mouth_frown_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthFrownRight", BlendshapesFrame.mouth_frown_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthFunnel", BlendshapesFrame.mouth_funnel() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthLeft", BlendshapesFrame.mouth_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthLowerDownLeft", BlendshapesFrame.mouth_lower_down_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthLowerDownRight", BlendshapesFrame.mouth_lower_down_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthPressLeft", BlendshapesFrame.mouth_press_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthPressRight", BlendshapesFrame.mouth_press_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthPucker", BlendshapesFrame.mouth_pucker() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthRight", BlendshapesFrame.mouth_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthRollLower", BlendshapesFrame.mouth_roll_lower() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthRollUpper", BlendshapesFrame.mouth_roll_upper() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthShrugLower", BlendshapesFrame.mouth_shrug_lower() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthShrugUpper", BlendshapesFrame.mouth_shrug_upper() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthSmileLeft", BlendshapesFrame.mouth_smile_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthSmileRight", BlendshapesFrame.mouth_smile_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthStretchLeft", BlendshapesFrame.mouth_stretch_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthStretchRight", BlendshapesFrame.mouth_stretch_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthUpperUpLeft", BlendshapesFrame.mouth_upper_up_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("mouthUpperUpRight", BlendshapesFrame.mouth_upper_up_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("noseSneerLeft", BlendshapesFrame.nose_sneer_left() * multipier);
+			//	AnimationFrame.BlendShapes.Add("noseSneerRight", BlendshapesFrame.nose_sneer_right() * multipier);
+			//	AnimationFrame.BlendShapes.Add("tongueOut", BlendshapesFrame.tongue_out() * multipier);
+			//	//AnimationFrame.BlendShapes.Add("headRoll", BlendshapesFrame.head_roll() * (180.0/3.14));
+			//	//AnimationFrame.BlendShapes.Add("headPitch", BlendshapesFrame.head_pitch() * (180.0 / 3.14));
+			//	//AnimationFrame.BlendShapes.Add("headYaw", BlendshapesFrame.head_yaw() * (180.0 / 3.14));
+			//	FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
+			//	FaceDataAnimation.Duration = FrameTime;
+			//	FaceDataAnimation.FrameRate = FPS;
+			//	// UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s - Frame Time: %f - Frame Index: %d"), *AnimationFrame.ToString(), FrameTime, FrameIndex);
+			//}
 			else if (HasVisemes && !GeneratesVisemesAsBlendshapes)
 			{
 				auto Visemes = reply->audio_response().visemes_data().visemes();
@@ -773,8 +772,10 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 	}
 	else if (!reply->emotion_response().empty())
 	{
-		// Deprecated
-
+		FString EmotionResponseDebug = UConvaiUtils::FUTF8ToFString(reply->DebugString().c_str());
+		UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse EmotionResponseDebug: %s"), *EmotionResponseDebug);
+		FString EmotionResponse = UConvaiUtils::FUTF8ToFString(reply->emotion_response().c_str());
+		OnEmotionReceived.ExecuteIfBound(EmotionResponse, FAnimationFrame(), true);
 	}
 	else if (!reply->debug_log().empty()) // This is a debug message response
 	{
