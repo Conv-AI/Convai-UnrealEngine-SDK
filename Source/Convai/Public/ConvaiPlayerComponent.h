@@ -241,6 +241,15 @@ public:
 		return Token == TokenToCheck;
 	}
 
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai|PixelStreaming")
+	TWeakObjectPtr<USynthComponent> PixelStreamingAudioComponent;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai|PixelStreaming")
+	bool UsePixelStreamingMicInput;
+
+	bool IsPixelStreamingEnabledAndAllowed();
+
 private:
 
 	uint32 GenerateNewToken()

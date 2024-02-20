@@ -38,11 +38,11 @@ static Audio::FMixerDevice* GetAudioMixerDeviceFromWorldContext(const UObject* W
 {
 	if (FAudioDevice* AudioDevice = GetAudioDeviceFromWorldContext(WorldContextObject))
 	{
-		#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 3
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 3
 		bool Found = AudioDevice != nullptr;
-		#else
-		bool Found = AudioDevice !=nullptr && AudioDevice->IsAudioMixerEnabled();
-		#endif
+#else
+		bool Found = AudioDevice != nullptr && AudioDevice->IsAudioMixerEnabled();
+#endif
 
 		if (!Found)
 		{
@@ -66,6 +66,7 @@ UConvaiPlayerComponent::UConvaiPlayerComponent()
 	IsInit = false;
 	VoiceCaptureRingBuffer.Init(ConvaiConstants::VoiceCaptureRingBufferCapacity);
 	VoiceCaptureBuffer.Empty(ConvaiConstants::VoiceCaptureBufferSize);
+	UsePixelStreamingMicInput = true;
 
 	const FString FoundSubmixPath = "/ConvAI/Submixes/AudioInput.AudioInput";
 	static ConstructorHelpers::FObjectFinder<USoundSubmixBase> SoundSubmixFinder(*FoundSubmixPath);
@@ -287,7 +288,7 @@ bool UConvaiPlayerComponent::SetCaptureDeviceByName(FString DeviceName)
 	if (!SetCaptureDeviceByIndex(DeviceIndex))
 	{
 		AvailableDeviceNames = GetAvailableCaptureDeviceNames();
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: SetCaptureDeviceByIndex failed for index: %d and device name: %s - Available Device names are: [%s]."), DeviceIndex, *DeviceName , *FString::Join(AvailableDeviceNames, *FString(" - ")));
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: SetCaptureDeviceByIndex failed for index: %d and device name: %s - Available Device names are: [%s]."), DeviceIndex, *DeviceName, *FString::Join(AvailableDeviceNames, *FString(" - ")));
 		return false;
 	}
 	return true;
@@ -296,13 +297,22 @@ bool UConvaiPlayerComponent::SetCaptureDeviceByName(FString DeviceName)
 void UConvaiPlayerComponent::SetMicrophoneVolumeMultiplier(float InVolumeMultiplier, bool& Success)
 {
 	Success = false;
-	if (!IsValid(AudioCaptureComponent))
+	if (IsValid(AudioCaptureComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetMicrophoneVolumeMultiplier: AudioCaptureComponent is not valid"));
-		return;
+		AudioCaptureComponent->SetVolumeMultiplier(InVolumeMultiplier);
+		Success = true;
 	}
-	AudioCaptureComponent->SetVolumeMultiplier(InVolumeMultiplier);
-	Success = true;
+
+	if (PixelStreamingAudioComponent.IsValid())
+	{
+		AudioCaptureComponent->SetVolumeMultiplier(InVolumeMultiplier*2); // multiply by 2 because Pixel Streaming mic is usually very low
+		Success = true;
+	}
+
+	if (!IsValid(AudioCaptureComponent) && !PixelStreamingAudioComponent.IsValid())
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetMicrophoneVolumeMultiplier: AudioCaptureComponent and PixelStreamingAudioComponent are not valid"));
+	}
 }
 
 void UConvaiPlayerComponent::GetMicrophoneVolumeMultiplier(float& OutVolumeMultiplier, bool& Success)
@@ -382,6 +392,11 @@ void UConvaiPlayerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	UpdateVoiceCapture(DeltaTime);
 }
 
+bool UConvaiPlayerComponent::IsPixelStreamingEnabledAndAllowed()
+{
+	return UsePixelStreamingMicInput && PixelStreamingAudioComponent.IsValid();
+}
+
 void UConvaiPlayerComponent::UpdateVoiceCapture(float DeltaTime)
 {
 	if (IsRecording || IsStreaming) {
@@ -430,11 +445,22 @@ void UConvaiPlayerComponent::ReadRecordedBuffer(Audio::AlignedFloatBuffer& Recor
 
 void UConvaiPlayerComponent::StartAudioCaptureComponent()
 {
+	if (IsPixelStreamingEnabledAndAllowed())
+	{
+		PixelStreamingAudioComponent->Start();
+	}
+	else
+	{
 		AudioCaptureComponent->Start();
+	}
 }
 
 void UConvaiPlayerComponent::StopAudioCaptureComponent()
 {
+	if (IsPixelStreamingEnabledAndAllowed())
+	{
+		PixelStreamingAudioComponent->Stop();
+	}
 	AudioCaptureComponent->Stop();
 }
 
@@ -600,7 +626,7 @@ void UConvaiPlayerComponent::StartTalking(
 	VoiceCaptureRingBuffer.Empty();
 
 	ReplicateVoiceToNetwork = RunOnServer;
-	
+
 	FString ClientAPI_Key = UseServerAPI_Key ? FString("") : UConvaiUtils::GetAPI_Key();
 
 	if (RunOnServer)
