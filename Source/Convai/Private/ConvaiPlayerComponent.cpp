@@ -7,7 +7,7 @@
 #include "ConvaiActionUtils.h"
 #include "ConvaiUtils.h"
 #include "ConvaiDefinitions.h"
-
+#include "Runtime/Launch/Resources/Version.h"
 #include "Net/UnrealNetwork.h"
 #include "Misc/FileHelper.h"
 #include "Http.h"
@@ -19,6 +19,7 @@
 #include "Sound/SoundWave.h"
 #include "AudioDevice.h"
 #include "AudioMixerDevice.h"
+#include "UObject/ConstructorHelpers.h"
 
 
 DEFINE_LOG_CATEGORY(ConvaiPlayerLog);

@@ -18,6 +18,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Misc/DefaultValueHelper.h"
 #include "HAL/PlatformFilemanager.h"
+#include "Engine/GameInstance.h"
 
 
 #include "../Convai.h"
