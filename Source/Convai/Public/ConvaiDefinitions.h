@@ -14,14 +14,21 @@ struct CONVAI_API FNarrativeDecision
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	FString Criteria;
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	FString NextSectionId;
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	int32 Priority;
+
+    FNarrativeDecision()
+        : Criteria(TEXT("")), // Initialize with default empty string
+          NextSectionId(TEXT("")), // Initialize with default empty string
+          Priority(0) // Initialize with default priority
+    {
+    }
 };
 
 USTRUCT(BlueprintType)
@@ -29,32 +36,43 @@ struct CONVAI_API FNarrativeSection
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	FString BehaviorTreeCode;
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	FString BtConstants;
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	FString CharacterId;
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	TArray<FNarrativeDecision> Decisions;
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	FString Objective;
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	FString Parents;
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	FString SectionId;
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	FString SectionName;
 
-	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	UPROPERTY(BlueprintReadOnly)
 	TMap<FString, FString> UpdatedCharacterData;
+
+    FNarrativeSection()
+        : BehaviorTreeCode(TEXT("")),
+          BtConstants(TEXT("")),
+          CharacterId(TEXT("")),
+          Objective(TEXT("")),
+          Parents(TEXT("")),
+          SectionId(TEXT("")),
+          SectionName(TEXT(""))
+    {
+    }
 };
 
 UENUM(BlueprintType)
