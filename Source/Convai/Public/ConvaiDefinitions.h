@@ -14,19 +14,19 @@ struct CONVAI_API FNarrativeDecision
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	FString Criteria;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	FString NextSectionId;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	int32 Priority;
 
     FNarrativeDecision()
-        : Criteria(TEXT("")), // Initialize with default empty string
-          NextSectionId(TEXT("")), // Initialize with default empty string
-          Priority(0) // Initialize with default priority
+        : Criteria(TEXT("")),
+          NextSectionId(TEXT("")),
+          Priority(0)
     {
     }
 };
@@ -36,31 +36,31 @@ struct CONVAI_API FNarrativeSection
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	FString BehaviorTreeCode;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	FString BtConstants;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	FString CharacterId;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	TArray<FNarrativeDecision> Decisions;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	FString Objective;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	FString Parents;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	FString SectionId;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	FString SectionName;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
 	TMap<FString, FString> UpdatedCharacterData;
 
     FNarrativeSection()
