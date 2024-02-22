@@ -150,6 +150,20 @@ void UConvaiChatBotQueryProxy::Activate()
 
 void UConvaiChatBotQueryProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful)
 {
+	if (!ResponsePtr)
+	{
+		if (bWasSuccessful)
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+		}
+		else
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+		}
+
+		failed();
+		return;
+	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
 		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), ResponsePtr->GetResponseCode());
@@ -466,6 +480,20 @@ void UConvaiChatBotQueryFromAudioProxy::Activate()
 
 void UConvaiChatBotQueryFromAudioProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful)
 {
+	if (!ResponsePtr)
+	{
+		if (bWasSuccessful)
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+		}
+		else
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+		}
+
+		failed();
+		return;
+	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
 		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, Response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
@@ -635,6 +663,20 @@ void UConvaiChatBotCreateProxy::Activate()
 
 void UConvaiChatBotCreateProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful)
 {
+	if (!ResponsePtr)
+	{
+		if (bWasSuccessful)
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+		}
+		else
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+		}
+
+		failed();
+		return;
+	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
 		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
@@ -785,6 +827,20 @@ void UConvaiChatBotUpdateProxy::Activate()
 
 void UConvaiChatBotUpdateProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful)
 {
+	if (!ResponsePtr)
+	{
+		if (bWasSuccessful)
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+		}
+		else
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+		}
+
+		failed();
+		return;
+	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
 		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
@@ -923,6 +979,20 @@ void UConvaiChatBotGetDetailsProxy::Activate()
 
 void UConvaiChatBotGetDetailsProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful)
 {
+	if (!ResponsePtr)
+	{
+		if (bWasSuccessful)
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+		}
+		else
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+		}
+
+		failed();
+		return;
+	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
 		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
@@ -1073,6 +1143,20 @@ void UConvaiChatBotGetCharsProxy::Activate()
 
 void UConvaiChatBotGetCharsProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful)
 {
+	if (!ResponsePtr)
+	{
+		if (bWasSuccessful)
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+		}
+		else
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+		}
+
+		failed();
+		return;
+	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
 		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
@@ -1194,6 +1278,20 @@ void UConvaiDownloadImageProxy::Activate()
 
 void UConvaiDownloadImageProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful)
 {
+	if (!ResponsePtr)
+	{
+		if (bWasSuccessful)
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+		}
+		else
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+		}
+
+		failed();
+		return;
+	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
 		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
