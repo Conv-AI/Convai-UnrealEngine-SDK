@@ -634,11 +634,15 @@ protected:
 
 	bool PlayNextLipSyncInQueue();
 
+	bool PlayAvailableAudioAndLipSync();
+
 	bool HasSufficentLipsyncFrames();
 
 	//UFUNCTION(BlueprintPure, Category = "Convai|LipSync", Meta = (Tooltip = "Calculates the lowest estimated time remaining until the next pause in the character's speech during lip-syncing. Returns true if the time could be determined"))
 	bool HasSufficentLipsyncFrames(float& InSyncTimeRemaining);
 
+	float LipSyncThresholdSecs = -1;
+	float VoiceTimeFactor = -1;
 private:
 
 	bool InitEncoder(int32 InSampleRate, int32 InNumChannels, EAudioEncodeHint EncodeHint);
