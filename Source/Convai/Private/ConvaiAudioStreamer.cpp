@@ -499,7 +499,7 @@ void UConvaiAudioStreamer::PlayLipSyncWithPreGeneratedDataSynced(FAnimationSeque
 	if (IsTalking && DataBuffer.NumLipSyncChunks > 0)
 	{
 		DataBuffer.EnqueueLipSync(FaceSequence, false);
-
+		PlayAvailableAudioAndLipSync();
 	}
 	else if (IsTalking && DataBuffer.NumLipSyncChunks == 0)
 	{
@@ -716,14 +716,16 @@ void UConvaiAudioStreamer::onAudioFinished()
 
 	if (!DataBuffer.IsEmpty())
 	{
-		AsyncTask(ENamedThreads::GameThread, [this] {
+		//AsyncTask(ENamedThreads::GameThread, [this] {
 			if (HasSufficentLipsyncFrames()) // returns true if the lipsync component is not available
 			{
 				UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("onAudioFinished: Resuming Voice and Lipsync"));
 				IsTalking = true; // put IsTalking to true to prevent triggering of the OnStartedTalking Trigger
-				PlayNextAudioInQueue();
-				PlayNextLipSyncInQueue();
+				PlayAvailableAudioAndLipSync();
+				//PlayNextAudioInQueue();
+				//PlayNextLipSyncInQueue();
 				ResumeVoice();
+
 				return;
 			}
 			else
@@ -732,7 +734,7 @@ void UConvaiAudioStreamer::onAudioFinished()
 				PauseVoice();
 				StopLipSync();
 			}
-		});
+		//});
 	}
 
 	AsyncTask(ENamedThreads::GameThread, [this] {
@@ -748,7 +750,7 @@ bool UConvaiAudioStreamer::PlayNextAudioInQueue()
 	ConvaiAudioChunk NextAudioChunk;
 	DataBuffer.Dequeue(NextAudioChunk);
 	PlayVoiceData(NextAudioChunk.AudioData.GetData(), NextAudioChunk.AudioData.Num(), false, NextAudioChunk.SampleRate, NextAudioChunk.NumChannels);
-	UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("PlayNextAudioInQueue - Duration: %f - Chunks Remaining: %d"), NextAudioChunk.AudioDuration, DataBuffer.NumAudioChunks);;
+	UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("PlayNextAudioInQueue - Duration: %f - Chunks Remaining: %d"), NextAudioChunk.AudioDuration, DataBuffer.NumAudioChunks);
 	return true;
 }
 
@@ -761,6 +763,55 @@ bool UConvaiAudioStreamer::PlayNextLipSyncInQueue()
 	PlayLipSyncWithPreGeneratedData(NextLipSyncChunk);
 	UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("PlayNextLipSyncInQueue - Duration: %f - Chunks Remaining: %d"), NextLipSyncChunk.Duration, DataBuffer.NumLipSyncChunks);
 	return true;
+}
+
+bool UConvaiAudioStreamer::PlayAvailableAudioAndLipSync()
+{
+	if (DataBuffer.IsEmpty() || DataBuffer.IsEmptyLipSync())
+		return false;
+
+	TArray<uint8> MergedVoiceData;
+	uint32 NumChannels;
+	uint32 SampleRate;
+	float AudioDuration = 0;
+	int AudioChunks = 0;
+
+	FAnimationSequence MergedLipSyncData;
+	int LipSyncChunks = 0;
+
+	while (HasSufficentLipsyncFrames() && !DataBuffer.IsEmpty())
+	{
+
+		ConvaiAudioChunk NextAudioChunk;
+		if (DataBuffer.Dequeue(NextAudioChunk))
+		{
+			MergedVoiceData.Append(NextAudioChunk.AudioData);
+			NumChannels = NextAudioChunk.NumChannels;
+			SampleRate = NextAudioChunk.SampleRate;
+			AudioDuration += NextAudioChunk.AudioDuration;
+			AudioChunks++;
+		}
+		FAnimationSequence NextLipSyncChunk;
+		if (DataBuffer.DequeueLipSync(NextLipSyncChunk))
+		{
+			MergedLipSyncData.FrameRate = NextLipSyncChunk.FrameRate;
+			MergedLipSyncData.Duration += NextLipSyncChunk.Duration;
+			MergedLipSyncData.AnimationFrames.Append(NextLipSyncChunk.AnimationFrames);
+			LipSyncChunks++;
+		}
+	}
+
+	if (MergedVoiceData.Num() == 0 && MergedLipSyncData.AnimationFrames.Num() == 0)
+	{
+		return false;
+	}
+	else
+	{
+		PlayVoiceData(MergedVoiceData.GetData(), MergedVoiceData.Num(), false, SampleRate, NumChannels);
+		PlayLipSyncWithPreGeneratedData(MergedLipSyncData);
+		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Play Available Audio and LipSync - Audio Duration: %f - Audio Chunks: %d - LipSync Duration: %f - LipSync Chunks: %d - Audio Chunks Remaining: %d - LipSync Chunks Remaining: %d"), AudioDuration, AudioChunks, MergedLipSyncData.Duration, LipSyncChunks, DataBuffer.NumAudioChunks, DataBuffer.NumLipSyncChunks);
+		return true;
+	}
 }
 
 bool UConvaiAudioStreamer::HasSufficentLipsyncFrames()
@@ -787,8 +838,16 @@ bool UConvaiAudioStreamer::HasSufficentLipsyncFrames(float& InSyncTimeRemaining)
 
 			//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("HasSufficentLipsyncFrames: TotalBufferedAudioDuration:%f TotalBufferedLipSyncDuration:%f, RemainingVoiceTime:%f, NumAudioChunks: %d, NumLipSyncChunks: %d"), DataBuffer.TotalBufferedAudioDuration, DataBuffer.TotalBufferedLipSyncDuration, RemainingVoiceTime, DataBuffer.NumAudioChunks, DataBuffer.NumLipSyncChunks);
 			
-			float LipSyncThresholdSecs = UConvaiSettingsUtils::GetParamValueAsFloat("LipSyncThresholdSecs", LipSyncThresholdSecs)? LipSyncThresholdSecs : 1.0f;
-			float VoiceTimeFactor = UConvaiSettingsUtils::GetParamValueAsFloat("VoiceTimeFactor", VoiceTimeFactor)? VoiceTimeFactor : 0.7f;
+			if (LipSyncThresholdSecs < 0)
+			{
+				LipSyncThresholdSecs = UConvaiSettingsUtils::GetParamValueAsFloat("LipSyncThresholdSecs", LipSyncThresholdSecs)? LipSyncThresholdSecs : 0.7f;
+				LipSyncThresholdSecs = LipSyncThresholdSecs < 0 ? 0 : LipSyncThresholdSecs;
+			}
+			if (VoiceTimeFactor < 0)
+			{
+				VoiceTimeFactor = UConvaiSettingsUtils::GetParamValueAsFloat("VoiceTimeFactor", VoiceTimeFactor) ? VoiceTimeFactor : 0.5f;
+				VoiceTimeFactor = VoiceTimeFactor < 0 ? 0 : VoiceTimeFactor;
+			}
 
 			if (RemainingLipSyncTime > LipSyncThresholdSecs ||  RemainingLipSyncTime >= RemainingVoiceTime * VoiceTimeFactor)
 			{
