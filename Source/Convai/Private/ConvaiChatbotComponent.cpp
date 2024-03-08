@@ -359,15 +359,15 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartGetResponseStream: Environment is not valid"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: Environment is not valid"));
 	}
 
 	FString Error;
 	bool ValidEnvironment = UConvaiActions::ValidateEnvironment(Environment, Error);
 	if (GenerateActions && !ValidEnvironment)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartGetResponseStream: %s"), *Error);
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("StartGetResponseStream: Environment object seems to have issues -> setting GenerateActions to false"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: %s"), *Error);
+		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("StartGetResponseStream: Environment object seems to have issues -> setting GenerateActions to false"));
 		GenerateActions = false;
 	}
 
@@ -409,10 +409,12 @@ void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerMessage, UC
 {
 	if (TriggerMessage.IsEmpty())
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("Invoke Speech: TriggerMessage is missing"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Invoke Speech: TriggerMessage is missing"));
 		return;
 	}
-	UE_LOG(ConvaiPlayerLog, Warning, TEXT("Invoke Speech: Executed"));
+	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Invoke Speech: Executed | Character ID : %s | Session ID : %s"),
+		*CharacterID,
+		*SessionID);
 	InvokeTrigger_Internal("", TriggerMessage, InEnvironment, InGenerateActions, InVoiceResponse, InReplicateOnNetwork);
 }
 
@@ -420,10 +422,12 @@ void UConvaiChatbotComponent::InvokeNarrativeDesignTrigger(FString TriggerName, 
 {
 	if (TriggerName.IsEmpty())
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("Invoke Narrative Design Trigger: TriggerName is missing"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Invoke Narrative Design Trigger: TriggerName is missing"));
 		return;
 	}
-	UE_LOG(ConvaiPlayerLog, Warning, TEXT("Invoke Narrative Design Trigger: Executed"));
+	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Invoke Narrative Design Trigger: Executed | Character ID : %s | Session ID : %s"),
+		*CharacterID,
+		*SessionID);
 	InvokeTrigger_Internal(TriggerName, "", InEnvironment, InGenerateActions, InVoiceResponse, InReplicateOnNetwork);
 }
 
@@ -431,7 +435,7 @@ void UConvaiChatbotComponent::InvokeTrigger_Internal(FString TriggerName, FStrin
 {
 	if (TriggerMessage.IsEmpty() && TriggerName.IsEmpty())
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("InvokeTrigger_Internal: TriggerName and TriggerMessage are missing - Please supply one of them"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("InvokeTrigger_Internal: TriggerName and TriggerMessage are missing - Please supply one of them"));
 		return;
 	}
 
@@ -441,15 +445,15 @@ void UConvaiChatbotComponent::InvokeTrigger_Internal(FString TriggerName, FStrin
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("InvokeTrigger_Internal: Environment is not valid"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("InvokeTrigger_Internal: Environment is not valid"));
 	}
 
 	FString Error;
 	bool ValidEnvironment = UConvaiActions::ValidateEnvironment(Environment, Error);
 	if (GenerateActions && !ValidEnvironment)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("InvokeTrigger_Internal: %s"), *Error);
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("InvokeTrigger_Internal: Environment object seems to have issues -> setting GenerateActions to false"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("InvokeTrigger_Internal: %s"), *Error);
+		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("InvokeTrigger_Internal: Environment object seems to have issues -> setting GenerateActions to false"));
 		GenerateActions = false;
 	}
 
@@ -482,7 +486,9 @@ void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 
 	if (GetIsTalking() || IsProcessing())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("InterruptSpeech: Interrupting character"));
+		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("InterruptSpeech: Interrupting character | Character ID : %s | Session ID : %s"),
+			*CharacterID,
+			*SessionID);
 		onFinishedReceivingData();
 		StopVoiceWithFade(InVoiceFadeOutDuration);
 
@@ -590,7 +596,9 @@ void UConvaiChatbotComponent::Unbind_GRPC_Request_Delegates()
 
 void UConvaiChatbotComponent::Cleanup(bool StreamConnectionFinished)
 {
-	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Cleanup"));
+	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Cleanup | Character ID : %s | Session ID : %s"),
+		*CharacterID,
+		*SessionID);
 	if (IsValid(CurrentConvaiPlayerComponent))
 	{
 		CurrentConvaiPlayerComponent->getOnDataReceivedDelegate().Unbind();
@@ -812,7 +820,9 @@ void UConvaiChatbotComponent::onFinishedReceivingData()
 {
 	if (ConvaiGRPCGetResponseProxy)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent Request Finished!"));
+		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent Request Finished! | Character ID : %s | Session ID : %s"),
+			*CharacterID,
+			*SessionID);
 		Unbind_GRPC_Request_Delegates();
 		ConvaiGRPCGetResponseProxy = nullptr;
 	}
@@ -834,7 +844,9 @@ void UConvaiChatbotComponent::OnNarrativeSectionReceived(FString BT_Code, FStrin
 
 void UConvaiChatbotComponent::onFailure()
 {
-	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("UConvaiChatbotComponent Get Response Failed!"));
+	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("UConvaiChatbotComponent Get Response Failed! | Character ID : %s | Session ID : %s"),
+		*CharacterID,
+		*SessionID);
 
 	// Broadcast the failure
 	AsyncTask(ENamedThreads::GameThread, [this] {OnFailureEvent.Broadcast(); });
@@ -850,7 +862,7 @@ void UConvaiChatbotComponent::OnRep_EnvironmentData()
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("OnRep_EnvironmentData: Environment is not valid"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("OnRep_EnvironmentData: Environment is not valid"));
 	}
 }
 
@@ -862,7 +874,7 @@ void UConvaiChatbotComponent::UpdateEnvironmentData()
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("UpdateEnvironmentData: Environment is not valid"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("UpdateEnvironmentData: Environment is not valid"));
 	}
 }
 
@@ -874,7 +886,7 @@ void UConvaiChatbotComponent::LoadEnvironment(UConvaiEnvironment* NewConvaiEnvir
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("LoadEnvironment: Environment is not valid"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("LoadEnvironment: Environment is not valid"));
 	}
 }
 
@@ -893,7 +905,9 @@ void UConvaiChatbotComponent::OnPlayerTimeOut()
 {
 	TimeOutTimerHandle.Invalidate();
 	CurrentConvaiPlayerComponent = nullptr;
-	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Player timed out"));
+	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Player timed out | Character ID : %s | Session ID : %s"),
+		*CharacterID,
+		*SessionID);
 }
 
 void UConvaiChatbotComponent::ClearTimeOutTimer()
@@ -920,7 +934,7 @@ void UConvaiChatbotComponent::BeginPlay()
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("BeginPlay: Environment is not valid"));
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("BeginPlay: Environment is not valid"));
 	}
 
 	// Get character details
