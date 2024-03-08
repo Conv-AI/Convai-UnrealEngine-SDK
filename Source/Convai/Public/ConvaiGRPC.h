@@ -159,6 +159,9 @@ private:
 	// Used to regulate access to the AudioBuffer to prevent racing condition
 	FCriticalSection m_mutex;
 
+	// Used to prevent early execution of the Init delegate 
+	FCriticalSection GPRCInitSection;
+
 	// Pointer to the world
 	TWeakObjectPtr<UWorld> WorldPtr;
 
