@@ -3,6 +3,7 @@
 #include "ConvaiNarrativeDesignProxy.h"
 #include "ConvaiUtils.h"
 #include "../Convai.h"
+#include "Engine.h"
 
 DEFINE_LOG_CATEGORY(ConvaiNarrativeHTTP);
 

@@ -15,20 +15,49 @@ struct CONVAI_API FNarrativeDecision
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	FString Criteria;
+	FString criteria;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	FString NextSectionId;
+	FString next_section_id;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	int32 Priority;
+	int32 priority;
 
     FNarrativeDecision()
-        : Criteria(TEXT("")),
-          NextSectionId(TEXT("")),
-          Priority(0)
+        : criteria(TEXT("")), // Initialize with default empty string
+		next_section_id(TEXT("")), // Initialize with default empty string
+		priority(0) // Initialize with default priority
     {
     }
+};
+
+USTRUCT(BlueprintType)
+struct CONVAI_API FNarrativeTrigger
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString character_id;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString destination_section;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString trigger_id;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString trigger_message;
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
+	FString trigger_name;
+
+	FNarrativeTrigger()
+		: destination_section(TEXT("")),
+		trigger_id(TEXT("")),
+		trigger_message(TEXT("")),
+		trigger_name(TEXT(""))
+	{
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -37,40 +66,39 @@ struct CONVAI_API FNarrativeSection
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	FString BehaviorTreeCode;
+	FString behavior_tree_code;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	FString BtConstants;
+	FString bt_constants;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	FString CharacterId;
+	FString character_id;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	TArray<FNarrativeDecision> Decisions;
+	TArray<FNarrativeDecision> decisions;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	FString Objective;
+	FString objective;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	FString Parents;
+	TArray<FString> parents;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	FString SectionId;
+	FString section_id;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	FString SectionName;
+	FString section_name;
 
 	UPROPERTY(BlueprintReadOnly, category = "Convai|Narrative Design")
-	TMap<FString, FString> UpdatedCharacterData;
+	TMap<FString, FString> updated_character_data;
 
     FNarrativeSection()
-        : BehaviorTreeCode(TEXT("")),
-          BtConstants(TEXT("")),
-          CharacterId(TEXT("")),
-          Objective(TEXT("")),
-          Parents(TEXT("")),
-          SectionId(TEXT("")),
-          SectionName(TEXT(""))
+        : behavior_tree_code(TEXT("")),
+		bt_constants(TEXT("")),
+		character_id(TEXT("")),
+		objective(TEXT("")),
+		section_id(TEXT("")),
+		section_name(TEXT(""))
     {
     }
 };
