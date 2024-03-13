@@ -136,7 +136,7 @@ public class ConvaiPlatform_Win64 : ConvaiPlatform
 public class ConvaiPlatform_Android : ConvaiPlatform
 {
     public override string LibrariesPath { get { return "android/"; } }
-    public override List<string> Architectures() { return new List<string> { "armeabi-v7a/", "arm64-v8a/" }; }
+    public override List<string> Architectures() { return new List<string> { "armeabi-v7a/", "arm64-v8a/", "x86_64/" }; }
     public override string LibraryPrefixName { get { return "lib"; } }
     public override string LibraryPostfixName { get { return ".a"; } }
 }
