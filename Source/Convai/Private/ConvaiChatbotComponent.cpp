@@ -334,6 +334,8 @@ bool UConvaiChatbotComponent::PlayRecordedVoice(USoundWave* RecordedVoice)
 
 	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Play Recorded Audio - Duration: %f"), RecordedVoice->Duration);
 
+	InterruptSpeech(InterruptVoiceFadeOutDuration);
+
 	ForcePlayVoice(RecordedVoice);
 
 	return true;
@@ -389,6 +391,8 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	VoiceResponse = InVoiceResponse;
 	ReplicateVoiceToNetwork = RunOnServer;
 	Token = InToken;
+	CurrentConvaiPlayerComponent = InConvaiPlayerComponent;
+	LastPlayerName = CurrentConvaiPlayerComponent->PlayerName;
 
 	if (!TextInput)
 	{
@@ -399,8 +403,6 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 		OnTranscriptionReceived(UserText, true, true);
 	}
 
-	CurrentConvaiPlayerComponent = InConvaiPlayerComponent;
-	LastPlayerName = CurrentConvaiPlayerComponent->PlayerName;
 
 	Start_GRPC_Request(UseOverrideAPI_Key, OverrideAPI_Key);
 }
@@ -684,17 +686,39 @@ void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, boo
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		Broadcast_OnTranscriptionReceived(Transcription, IsTranscriptionReady, IsFinal);
+		if (IsInGameThread())
+		{
+			Broadcast_OnTranscriptionReceived(Transcription, IsTranscriptionReady, IsFinal);
+		}
+		else
+		{
+			AsyncTask(ENamedThreads::GameThread, [this, Transcription, IsTranscriptionReady, IsFinal]
+				{
+					Broadcast_OnTranscriptionReceived(Transcription, IsTranscriptionReady, IsFinal);
+				});
+		}
 	}
 
-	AsyncTask(ENamedThreads::GameThread, [this, Transcription, IsTranscriptionReady, IsFinal]
-		{
-			FString PlayerName = IsValid(CurrentConvaiPlayerComponent) ? CurrentConvaiPlayerComponent->PlayerName : LastPlayerName;
-			OnTranscriptionReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, PlayerName, Transcription, IsTranscriptionReady, IsFinal);
+	FString PlayerName = IsValid(CurrentConvaiPlayerComponent) ? CurrentConvaiPlayerComponent->PlayerName : LastPlayerName;
 
-			// Run the deprecated event
-			OnTranscriptionReceivedEvent.Broadcast(Transcription, IsTranscriptionReady, IsFinal);
-		});
+	if (IsInGameThread())
+	{
+		OnTranscriptionReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, PlayerName, Transcription, IsTranscriptionReady, IsFinal);
+
+		// Run the deprecated event
+		OnTranscriptionReceivedEvent.Broadcast(Transcription, IsTranscriptionReady, IsFinal);
+	}
+	else
+	{
+		AsyncTask(ENamedThreads::GameThread, [this, Transcription, IsTranscriptionReady, IsFinal, PlayerName]
+			{
+				OnTranscriptionReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, PlayerName, Transcription, IsTranscriptionReady, IsFinal);
+
+				// Run the deprecated event
+				OnTranscriptionReceivedEvent.Broadcast(Transcription, IsTranscriptionReady, IsFinal);
+			});
+	}
+
 	LastTranscription = Transcription;
 	ReceivedFinalTranscription = IsFinal;
 }
@@ -704,7 +728,18 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+		if (IsInGameThread())
+		{
+			Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+		}
+		else
+		{
+			AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, IsFinal]
+				{
+					Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+				});
+		}
+		
 	}
 
 	float ReceieivedAudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
@@ -713,6 +748,16 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 			{
 				AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1); // Should be called in the game thread
 
+				//FString BasePath = TEXT("F:/Work/Convai/UE_Animation_Dev/TestRecordedAudioChunks");
+				//FString Timestamp = FDateTime::Now().ToString();
+				//Timestamp.ReplaceInline(TEXT(":"), TEXT("_"));
+				//FString FileName = FString::Printf(TEXT("Audio_%s.wav"), *Timestamp);
+				//FString FullPath = FPaths::Combine(*BasePath, *FileName);
+
+				//TArray<uint8> OutWaveFileData;
+				//UConvaiUtils::PCMDataToWav(ReceivedAudio, OutWaveFileData, 1, SampleRate);
+				//UConvaiUtils::SaveByteArrayAsFile(FullPath, OutWaveFileData);
+
 				if (IsRecordingAudio)
 				{
 					RecordedAudio.Append(ReceivedAudio);
@@ -720,14 +765,28 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 				}
 			}
 
-	AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal, ReceieivedAudioDuration]
-		{
-			// Send text and audio duration to blueprint event
-			OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
 
-			// Run the deprecated event
-			OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
-		});
+
+	if (IsInGameThread())
+	{
+		// Send text and audio duration to blueprint event
+		OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+
+		// Run the deprecated event
+		OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+	}
+	else
+	{
+		AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal, ReceieivedAudioDuration]
+			{
+				// Send text and audio duration to blueprint event
+				OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+
+				// Run the deprecated event
+				OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+			});
+	}
+
 	if (ReceieivedAudioDuration > 0)
 	{
 		TotalReceivedAudioDuration += ReceieivedAudioDuration;
@@ -751,7 +810,17 @@ void UConvaiChatbotComponent::onSessionIDReceived(const FString ReceivedSessionI
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		Broadcast_onSessionIDReceived(ReceivedSessionID);
+		if (IsInGameThread())
+		{
+			Broadcast_onSessionIDReceived(ReceivedSessionID);
+		}
+		else
+		{
+			AsyncTask(ENamedThreads::GameThread, [this, ReceivedSessionID]
+				{
+					Broadcast_onSessionIDReceived(ReceivedSessionID);
+				});
+		}
 	}
 
 	SessionID = ReceivedSessionID;
@@ -762,7 +831,17 @@ void UConvaiChatbotComponent::onActionSequenceReceived(const TArray<FConvaiResul
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		Broadcast_onActionSequenceReceived(ReceivedSequenceOfActions);
+		if (IsInGameThread())
+		{
+			Broadcast_onActionSequenceReceived(ReceivedSequenceOfActions);
+		}
+		else
+		{
+			AsyncTask(ENamedThreads::GameThread, [this, ReceivedSequenceOfActions]
+				{
+					Broadcast_onActionSequenceReceived(ReceivedSequenceOfActions);
+				});
+		}
 	}
 
 	if (UConvaiUtils::IsNewActionSystemEnabled())
@@ -793,7 +872,17 @@ void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse,
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		Broadcast_onEmotionReceived(ReceivedEmotionResponse, MultipleEmotions);
+		if (IsInGameThread())
+		{
+			Broadcast_onEmotionReceived(ReceivedEmotionResponse, MultipleEmotions);
+		}
+		else
+		{
+			AsyncTask(ENamedThreads::GameThread, [this, ReceivedEmotionResponse, MultipleEmotions]
+				{
+					Broadcast_onEmotionReceived(ReceivedEmotionResponse, MultipleEmotions);
+				});
+		}
 	}
 
 	// Update the emotion state
@@ -833,7 +922,18 @@ void UConvaiChatbotComponent::OnNarrativeSectionReceived(FString BT_Code, FStrin
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		Broadcast_OnNarrativeSectionReceived(BT_Code, BT_Constants, ReceivedNarrativeSectionID);
+		if (IsInGameThread())
+		{
+			Broadcast_OnNarrativeSectionReceived(BT_Code, BT_Constants, ReceivedNarrativeSectionID);
+		}
+		else
+		{
+			AsyncTask(ENamedThreads::GameThread, [this, BT_Code, BT_Constants, ReceivedNarrativeSectionID]
+				{
+					Broadcast_OnNarrativeSectionReceived(BT_Code, BT_Constants, ReceivedNarrativeSectionID);
+				});
+		}
+		
 	}
 
 	AsyncTask(ENamedThreads::GameThread, [this, ReceivedNarrativeSectionID]

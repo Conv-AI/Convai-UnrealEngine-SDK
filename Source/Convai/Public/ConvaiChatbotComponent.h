@@ -38,7 +38,7 @@ class UConvaiGRPCGetResponseProxy;
 class UConvaiChatBotGetDetailsProxy;
 
 UCLASS(meta = (BlueprintSpawnableComponent), DisplayName = "Convai Chatbot")
-class UConvaiChatbotComponent : public UConvaiAudioStreamer
+class CONVAI_API UConvaiChatbotComponent : public UConvaiAudioStreamer
 {
 	GENERATED_BODY()
 public:
