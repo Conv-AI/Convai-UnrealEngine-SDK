@@ -578,9 +578,18 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 
 	if (!ok || !status.ok())
 	{
-		// Tell the server that we are ready to finish the stream any time it wishes
-		if (!status.ok())
-			LogAndEcecuteFailure("OnStreamRead");
+		UE_LOG(ConvaiGRPCLog, Log,
+			TEXT("OnStreamRead - Done Reading: Status:%s | Debug Log:%s | message:%s | Details:%s | Code:%i | Character ID:%s | Session ID:%s"),
+			*FString(status.ok() ? "Ok" : "Not Ok"),
+			*FString(reply->DebugString().c_str()),
+			*FString(status.error_message().c_str()),
+			*FString(status.error_details().c_str()),
+			status.error_code(),
+			*CharID,
+			*SessionID);
+
+		//if (!status.ok() || !ok)
+			//LogAndEcecuteFailure("OnStreamRead");
 		if (stream_handler)
 			CallFinish();
 		else
@@ -829,6 +838,12 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		FString BT_Constants = UConvaiUtils::FUTF8ToFString(reply->bt_response().bt_constants().c_str());
 		FString NarrativeSectionID = UConvaiUtils::FUTF8ToFString(reply->bt_response().narrative_section_id().c_str());
 		OnNarrativeDataReceived.ExecuteIfBound(BT_Code, BT_Constants, NarrativeSectionID);
+		UE_LOG(ConvaiGRPCLog, Log,
+			TEXT("Narrative Section Received %s: | Character ID : %s | Session ID : %s | IsFinalResponse : %s"),
+			*NarrativeSectionID,
+			*CharID,
+			*SessionID,
+			*FString(IsFinalResponse ? "True" : "False"));
 	}
 	else if (!reply->emotion_response().empty())
 	{
