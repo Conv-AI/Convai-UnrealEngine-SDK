@@ -16,9 +16,6 @@ class UObject;
 class UConvaiSubsystem;
 struct FAnimationFrame;
 
-/**
- *
- */
 UCLASS()
 class CONVAI_API UConvaiUtils : public UBlueprintFunctionLibrary
 {
@@ -32,7 +29,7 @@ public:
 	static void StereoToMono(TArray<uint8> stereoWavBytes, TArray<uint8>& monoWavBytes);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Utilities")
-	static bool ReadFileAsByteArray(FString FilePath, TArray<uint8>& Bytes);
+	static bool ReadFileAsByteArray(const FString FilePath, TArray<uint8>& Bytes);
 
 	UFUNCTION(BlueprintCallable, Category = "Convai|Utilities")
 	static bool SaveByteArrayAsFile(FString FilePath, TArray<uint8> Bytes);

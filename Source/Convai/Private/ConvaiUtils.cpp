@@ -36,6 +36,27 @@
 DEFINE_LOG_CATEGORY(ConvaiUtilsLog);
 DEFINE_LOG_CATEGORY(ConvaiFormValidationLog);
 
+namespace
+{
+	FString GetAbsolutePathFromFilePath(const FString& FilePath)
+	{
+		FString ProcessedPath;
+		// Check if path is relative
+		if (FPaths::IsRelative(FilePath))
+		{
+			// Combine the build directory with the relative file path
+			ProcessedPath = FPaths::Combine(FPaths::LaunchDir(), FilePath);
+		}
+		else
+		{
+			// Path is absolute, use as is
+			ProcessedPath = FilePath;
+		}
+		return ProcessedPath;
+	}
+};
+
+
 UConvaiSubsystem* UConvaiUtils::GetConvaiSubsystem(const UObject* WorldContextObject)
 {
 	//UWorld* World = WorldPtr.Get();
@@ -120,9 +141,10 @@ void UConvaiUtils::StereoToMono(TArray<uint8> stereoWavBytes, TArray<uint8>& mon
 	}
 }
 
-bool UConvaiUtils::ReadFileAsByteArray(FString FilePath, TArray<uint8>& Bytes)
+bool UConvaiUtils::ReadFileAsByteArray(const FString FilePath, TArray<uint8>& Bytes)
 {
-	return FFileHelper::LoadFileToArray(Bytes, *FilePath, 0);
+	FString ProcessedFilePath = GetAbsolutePathFromFilePath(FilePath);
+	return FFileHelper::LoadFileToArray(Bytes, *ProcessedFilePath, 0);
 }
 
 bool UConvaiUtils::SaveByteArrayAsFile(FString FilePath, TArray<uint8> Bytes)
@@ -150,7 +172,8 @@ bool UConvaiUtils::WriteStringToFile(const FString& StringToWrite, const FString
 
 bool UConvaiUtils::ReadStringFromFile(FString& OutString, const FString& FilePath)
 {
-	return FFileHelper::LoadFileToString(OutString, *FilePath);
+	FString ProcessedFilePath = GetAbsolutePathFromFilePath(FilePath);
+	return FFileHelper::LoadFileToString(OutString, *ProcessedFilePath);
 }
 
 float UConvaiUtils::CalculateAudioDuration(uint32 AudioSize, uint8 Channels, uint32 SampleRate, uint8 SampleSize)
@@ -1076,8 +1099,10 @@ bool UConvaiUtils::WriteSoundWaveToWavFile(USoundWave* SoundWave, const FString&
 
 USoundWave* UConvaiUtils::ReadWavFileAsSoundWave(const FString & FilePath)
 {
+	FString ProcessedFilePath = GetAbsolutePathFromFilePath(FilePath);
+
 	TArray<uint8> RawData;
-	if (!ReadFileAsByteArray(FilePath, RawData))
+	if (!ReadFileAsByteArray(ProcessedFilePath, RawData))
 	{
 		return nullptr;
 	}
