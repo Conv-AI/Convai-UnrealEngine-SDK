@@ -71,7 +71,7 @@ void UConvaiAudioStreamer::BroadcastVoiceDataToClients_Implementation(TArray<uin
 	// Do not play if we want to mute on all clients "ShouldMuteGlobal() == true"
 	if (!(ShouldMuteLocal() && GetOwner()->HasLocalNetOwner()) && !ShouldMuteGlobal())
 	{
-		PlayVoiceData(ReceivedEncodedAudioDataBuffer.GetData(), outsize, false, SampleRate, NumChannels);
+		PlayVoiceSynced(ReceivedEncodedAudioDataBuffer.GetData(), outsize, false, SampleRate, NumChannels);
 	}
 
 	// Run this on server only
@@ -107,7 +107,8 @@ bool UConvaiAudioStreamer::ShouldMuteGlobal()
 
 void UConvaiAudioStreamer::PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
 {
-	if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData())
+	// TODO Mohamed: when we start streaming lipsync over network we should remove this contition UKismetSystemLibrary::IsServer(this)
+	if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() || !UKismetSystemLibrary::IsServer(this))
 	{
 		PlayVoiceData(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
 		return;
@@ -175,6 +176,9 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
 		float CurrentRemainingAudioDuration = GetWorld()->GetTimerManager().GetTimerRemaining(AudioFinishedTimerHandle);
 		if (CurrentRemainingAudioDuration < 0)
 			CurrentRemainingAudioDuration = 0; // Can never be less than zero
+
+		//if (CurrentRemainingAudioDuration == 0)
+		//	NewAudioDuration -= 0.1; // Hacky way - Reduce the duration by a small amount so that the OnAudioFinished would be called early and this will cause no gap between voice chunks
 
 		// New Duration = Remaining Duration + New Duration
 		float TotalAudioDuration = CurrentRemainingAudioDuration + NewAudioDuration;
@@ -822,13 +826,13 @@ bool UConvaiAudioStreamer::HasSufficentLipsyncFrames()
 
 bool UConvaiAudioStreamer::HasSufficentLipsyncFrames(float& InSyncTimeRemaining)
 {
-	float NextChunkAudioTime = 0;
-	if (auto Chunk = DataBuffer.Peek())
-	{
-		NextChunkAudioTime = Chunk->AudioDuration;
-	}
+	//float NextChunkAudioTime = 0;
+	//if (auto Chunk = DataBuffer.Peek())
+	//{
+	//	NextChunkAudioTime = Chunk->AudioDuration;
+	//}
 
-	float RemainingVoiceTime = NextChunkAudioTime;
+	float RemainingVoiceTime = DataBuffer.TotalBufferedAudioDuration;
 
 	if (ConvaiLipSync)
 	{
@@ -837,10 +841,10 @@ bool UConvaiAudioStreamer::HasSufficentLipsyncFrames(float& InSyncTimeRemaining)
 			float RemainingLipSyncTime = DataBuffer.TotalBufferedLipSyncDuration;
 
 			//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("HasSufficentLipsyncFrames: TotalBufferedAudioDuration:%f TotalBufferedLipSyncDuration:%f, RemainingVoiceTime:%f, NumAudioChunks: %d, NumLipSyncChunks: %d"), DataBuffer.TotalBufferedAudioDuration, DataBuffer.TotalBufferedLipSyncDuration, RemainingVoiceTime, DataBuffer.NumAudioChunks, DataBuffer.NumLipSyncChunks);
-			
+
 			if (LipSyncThresholdSecs < 0)
 			{
-				LipSyncThresholdSecs = UConvaiSettingsUtils::GetParamValueAsFloat("LipSyncThresholdSecs", LipSyncThresholdSecs)? LipSyncThresholdSecs : 0.7f;
+				LipSyncThresholdSecs = UConvaiSettingsUtils::GetParamValueAsFloat("LipSyncThresholdSecs", LipSyncThresholdSecs) ? LipSyncThresholdSecs : 0.7f;
 				LipSyncThresholdSecs = LipSyncThresholdSecs < 0 ? 0 : LipSyncThresholdSecs;
 			}
 			if (VoiceTimeFactor < 0)
@@ -849,7 +853,8 @@ bool UConvaiAudioStreamer::HasSufficentLipsyncFrames(float& InSyncTimeRemaining)
 				VoiceTimeFactor = VoiceTimeFactor < 0 ? 0 : VoiceTimeFactor;
 			}
 
-			if (RemainingLipSyncTime > LipSyncThresholdSecs ||  RemainingLipSyncTime >= RemainingVoiceTime * VoiceTimeFactor)
+
+			if (RemainingLipSyncTime > LipSyncThresholdSecs || (RemainingLipSyncTime >= RemainingVoiceTime * VoiceTimeFactor))
 			{
 				if (DataBuffer.LastLipSyncChunkDuration > LipSyncThresholdSecs || DataBuffer.LastLipSyncChunkDuration >= DataBuffer.LastAudioChunkDuration * VoiceTimeFactor)
 				{
@@ -872,6 +877,7 @@ bool UConvaiAudioStreamer::HasSufficentLipsyncFrames(float& InSyncTimeRemaining)
 	InSyncTimeRemaining = RemainingVoiceTime;
 	return true;
 }
+
 
 bool UConvaiAudioStreamer::InitEncoder(int32 InSampleRate, int32 InNumChannels, EAudioEncodeHint EncodeHint)
 {
