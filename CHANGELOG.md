@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 - Added Pixel Streaming support and documentation.
 - Added x86_64 Android support.
 - Added Narrative Design helper functions
+- Added more blueprint documentation.
 - Improved action accuracy with objects and characters.
 - Improved MetaHuman Facial and body Animation logic.
 - Improved lipsync.
