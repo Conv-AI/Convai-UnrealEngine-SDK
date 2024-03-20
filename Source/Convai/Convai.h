@@ -43,7 +43,7 @@ public:
 };
 
 
-class Convai : public IModuleInterface
+class CONVAI_API Convai : public IModuleInterface
 {
 public:
 
