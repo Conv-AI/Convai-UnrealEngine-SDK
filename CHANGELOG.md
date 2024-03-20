@@ -3,16 +3,16 @@ All notable changes to this project will be documented in this file.
 
 # Release 3.1.0
 - Added Pixel Streaming support and documentation.
+- Added x86_64 Android support.
+- Added Narrative Design helper functions
 - Improved action accuracy with objects and characters.
-- Fixed issue when adding custom MetaHuman animations.
 - Improved MetaHuman Facial and body Animation logic.
-- Updated Reallusion Animation blueprint.
 - Improved lipsync.
+- Updated Reallusion Animation blueprint.
+- Fixed issue when adding custom MetaHuman animations.
 - Fixed crash with Unreal Engine 5.3 when there is a connection issue.
 - Fixed multiplayer crash.
 - Fixed rare crash when using Invoke Speech with bad connection.
-- Added x86_64 Android support.
-- Added Narrative Design helper functions
 
 # Release 3.0.1 Hotfix
 - Fixed audio capture on Android would sometimes not capture properly.
