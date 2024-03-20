@@ -52,7 +52,8 @@ struct CONVAI_API FNarrativeTrigger
 	FString trigger_name;
 
 	FNarrativeTrigger()
-		: destination_section(TEXT("")),
+		: character_id(TEXT("")),
+		destination_section(TEXT("")),
 		trigger_id(TEXT("")),
 		trigger_message(TEXT("")),
 		trigger_name(TEXT(""))
