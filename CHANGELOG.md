@@ -1,5 +1,30 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+
+# Release 3.1.0
+- Added Pixel Streaming support and documentation.
+- Improved action accuracy with objects and characters.
+- Fixed issue when adding custom MetaHuman animations.
+- Improved MetaHuman Facial and body Animation logic.
+- Updated Reallusion Animation blueprint.
+- Improved lipsync.
+- Fixed crash with Unreal Engine 5.3 when there is a connection issue.
+- Fixed multiplayer crash.
+- Fixed rare crash when using Invoke Speech with bad connection.
+- Added x86_64 Android support.
+- Added Narrative Design helper functions
+
+# Release 3.0.1 Hotfix
+- Fixed audio capture on Android would sometimes not capture properly.
+- Fixed lipsync crash on Android and improved performance.
+- Fixed rare crash on Android when a huge amount of audio is spoken by the character.
+- Improved overall audio capture.
+- Fixed `Update Character` node not updating language.
+- Updated Convai ReadyPlayerMe plugin for improved head tracking.
+- Fixed lipsync not working issue when having a player component along with the chatbot component in the same character blueprint.
+- Added documentation guide for Mac microphone permissions issue.
+- Fixed startup crash for packaged apps on MacOS UE5.3 due to microphone permissions.
+
 # Release 3.0.0
 **Added**
 - New lipsync component FaceSync which no longer requires ConvaiOVRLipsync plugin.
