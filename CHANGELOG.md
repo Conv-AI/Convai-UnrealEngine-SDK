@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-# Release 3.1.0
+# Release 3.1.4
 - Added Pixel Streaming support and documentation.
 - Added x86_64 Android support.
 - Added Narrative Design helper functions
