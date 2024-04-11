@@ -53,7 +53,7 @@ There are multiple ways to install the plugin:
 	```
  - Build the plugin manually to get the latest updates and support for Custom Unreal Engine Versions, which you can do by [following below steps](#Building-the-plugin-from-source)
    
-# Building the plugin from source
+# Building the plugin from source - Method 1
 
 ## Cloning and Building the Plugin
 1. Open a command prompt or terminal.
@@ -96,6 +96,29 @@ There are multiple ways to install the plugin:
            ├── Convai
                ├── (plugin files and folders)
    ```
+
+# Building the plugin from source - Method 2
+
+1. Clone the plugin as described in [Method 1](#cloning-and-building-the-plugin) without running the build script.
+
+2. Go to this [drive link](https://drive.google.com/drive/folders/1FPGNIY9qobROUekYnw8Fr1EKCY1RRqen?usp=sharing) and download `Content.zip` and `ThirdParty.zip`.
+
+3. Copy the downloaded files into your cloned plugin folder (e.g., `Convai-UnrealEngine-SDK`) and extract them.
+
+4. Open `\Source\Convai\Convai.Build.cs` with a text editor and change `bUsePrecompiled = true;` to `bUsePrecompiled = false;`.
+
+5. Ensure your project is a C++ project by creating a new C++ class from the `Tools` menu. For conversion help, refer to [this Unreal forum thread](https://forums.unrealengine.com/t/is-it-possible-to-change-my-blueprint-project-to-a-c-project-in-ue5/540618/4).
+
+6. Copy the cloned plugin folder to the `Plugins` folder in your project directory. Create a `Plugins` folder if it doesn't exist.
+
+7. Restart your project to prompt a rebuild of the Convai plugin. Click **Yes** to rebuild the plugin, then after it opens navigate to `Edit->Plugins` - Note: if it gave you any errors then make sure you have the required [Prerequisites](#prerequisites).
+
+8. In the plugins menu, search for `Convai` and enable it.
+
+9. Restart the project.
+
+The Convai plugin should now be installed and ready for use in your Unreal Engine project.
+
 
 ## Need Support or Have Questions?
 If you encounter any issues or have questions, feel free to reach out to us at support@convai.com or join the community on [Discord](https://discord.gg/UVvBgV3xQ5) Our team is dedicated to providing you with the support you need to make the most out of Convai.
