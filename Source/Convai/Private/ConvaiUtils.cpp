@@ -20,7 +20,10 @@
 #include "HAL/PlatformFilemanager.h"
 #include "Engine/GameInstance.h"
 #include "ConvaiSubsystem.h"
-
+#include "Engine/GameEngine.h"
+#include "GameFramework/Pawn.h"
+#include "AudioDecompress.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 #include "../Convai.h"
 #include "ConvaiChatbotComponent.h"
