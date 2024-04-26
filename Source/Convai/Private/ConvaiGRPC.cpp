@@ -299,11 +299,10 @@ void UConvaiGRPCGetResponseProxy::ExtendDeadline()
 
 void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 {
-	FScopeLock Lock(&GPRCInitSection);
 
 	//TODO (Mohamed) handle status variable
 
-	if (!IsValid(this) || IsPendingKill() || HasAnyFlags(RF_BeginDestroyed))
+	if (!IsValid(this) || !IsValidChecked(this) || HasAnyFlags(RF_BeginDestroyed))
 	{
 		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
 			*CharID,
@@ -321,6 +320,8 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 	UE_LOG(ConvaiGRPCLog, Log, TEXT("GRPC GetResponse stream initialized | Character ID : %s | Session ID : %s"),
 		*CharID,
 		*SessionID);
+
+	FScopeLock Lock(&GPRCInitSection);
 
 	// Create Action Configuration
 	ActionConfig* action_config = new ActionConfig();

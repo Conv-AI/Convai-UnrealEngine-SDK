@@ -502,7 +502,7 @@ void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 
 		AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this)]
 			{
-				if (!WeakThis.IsValid() || WeakThis->IsPendingKill())
+				if (!WeakThis.IsValid())
 				{
 					// The object is no longer valid or is being destroyed.
 					return;

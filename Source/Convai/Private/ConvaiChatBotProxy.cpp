@@ -1339,7 +1339,7 @@ void UConvaiDownloadImageProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 			// Create texture from image data
 			Image = UTexture2D::CreateTransient(ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), PF_B8G8R8A8);
 			if (Image) {
-				FTexture2DMipMap& Mip = Image->PlatformData->Mips[0];
+				FTexture2DMipMap& Mip = Image->GetPlatformData()->Mips[0];
 				void* Data = Mip.BulkData.Lock(LOCK_READ_WRITE);
 				FMemory::Memcpy(Data, UncompressedImageData.GetData(), UncompressedImageData.Num());
 				Mip.BulkData.Unlock();

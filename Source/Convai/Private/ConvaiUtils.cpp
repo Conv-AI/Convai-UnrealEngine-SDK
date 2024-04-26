@@ -19,6 +19,7 @@
 #include "Misc/DefaultValueHelper.h"
 #include "HAL/PlatformFilemanager.h"
 #include "Engine/GameInstance.h"
+#include "ConvaiSubsystem.h"
 
 
 #include "../Convai.h"
@@ -630,10 +631,10 @@ namespace
 		bool breturn = false;
 
 		// Ensure we have the sound data. Compressed format is fine.
-		soundWave->InitAudioResource(audioDevice->GetRuntimeFormat(soundWave));
-
+		soundWave->InitAudioResource(soundWave->GetRuntimeFormat());
+		
 		// Create a decoder for this audio. We want the PCM data.
-		ICompressedAudioInfo* AudioInfo = audioDevice->CreateCompressedAudioInfo(soundWave);
+		ICompressedAudioInfo* AudioInfo = IAudioInfoFactoryRegistry::Get().Create(soundWave->GetRuntimeFormat());
 
 		// Decompress complete audio to this buffer
 		FSoundQualityInfo QualityInfo = { 0 };
@@ -652,7 +653,7 @@ namespace
 		FAudioDevice* AudioDevice = GEngine->GetMainAudioDeviceRaw();
 		if (AudioDevice)
 		{
-			FName format = AudioDevice->GetRuntimeFormat(soundWave);
+			FName format = soundWave->GetRuntimeFormat();
 			soundWave->InitAudioResource(format);
 		}
 
