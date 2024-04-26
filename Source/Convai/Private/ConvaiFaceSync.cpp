@@ -318,5 +318,5 @@ void UConvaiFaceSyncComponent::ConvaiStopLipSync()
 	ClearMainSequence();
 	SetCurrentFrametoZero();
 	OnVisemesDataReady.ExecuteIfBound();
-	UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Stopping LipSync"));
+	// UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("Stopping LipSync"));
 }
