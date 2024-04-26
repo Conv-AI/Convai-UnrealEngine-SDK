@@ -458,16 +458,16 @@ public:
 	}
 
 	// Deprecated
-	void SetEmotionData(const FString& EmotionRespponse)
+	void SetEmotionData(const FString& EmotionRespponse, float EmotionOffset)
 	{
 		TArray<FString> OutputEmotionsArray;
 		// Separate the string into an array based on the space delimiter
 		EmotionRespponse.ParseIntoArray(OutputEmotionsArray, TEXT(" "), true);
-		SetEmotionData(OutputEmotionsArray);
+		SetEmotionData(OutputEmotionsArray, EmotionOffset);
 	}
 
 	// Deprecated
-	void SetEmotionData(const TArray<FString>& EmotionArray)
+	void SetEmotionData(const TArray<FString>& EmotionArray, float EmotionOffset)
 	{
 		ResetEmotionScores();
 		EEmotionIntensity Intensity = EEmotionIntensity::None;
@@ -483,7 +483,9 @@ public:
 
 			if (const float* ScoreMultiplier = ScoreMultipliers.Find(Intensity))
 			{
-				Score = *ScoreMultiplier * FMath::Exp(float(-i) / float(EmotionArray.Num()));
+				Score = *ScoreMultiplier * (FMath::Exp(float(-i) / float(EmotionArray.Num())) + EmotionOffset);
+				Score = Score > 1 ? 1 : Score;
+				Score = Score < 0 ? 0 : Score;
 			}
 			else
 			{
@@ -521,13 +523,13 @@ public:
 	{
 		// Static dictionaries of emotions
 		static const TMap<FString, EBasicEmotions> BasicEmotions = {
-			{"Happy", EBasicEmotions::Joy},
+			{"Joy", EBasicEmotions::Joy},
 			{"Calm", EBasicEmotions::Trust},
-			{"Afraid", EBasicEmotions::Fear},
+			{"Fear", EBasicEmotions::Fear},
 			{"Surprise", EBasicEmotions::Surprise},
-			{"Sad", EBasicEmotions::Sadness},
+			{"Sadness", EBasicEmotions::Sadness},
 			{"Bored", EBasicEmotions::Disgust},
-			{"Angry", EBasicEmotions::Anger},
+			{"Anger", EBasicEmotions::Anger},
 			{"Neutral", EBasicEmotions::None}
 		};
 
@@ -542,14 +544,23 @@ public:
 	}
 
 
-	void SetEmotionDataSingleEmotion(const FString& EmotionRespponse)
+	void SetEmotionDataSingleEmotion(const FString& EmotionRespponse, float EmotionOffset)
 	{
 		FString EmotionString;
 		float Scale;
+		float MaxScale = 3;
 		ParseStringToStringAndFloat(EmotionRespponse, EmotionString, Scale);
 
+
+		Scale /= MaxScale;
+
+		// Increase the scale a bit
+		Scale += EmotionOffset;
+		Scale = Scale > 1? 1 : Scale;
+		Scale = Scale < 0? 0 : Scale;
+
 		EBasicEmotions Emotion;
-		GetTTSEmotion(EmotionRespponse, Emotion);
+		GetTTSEmotion(EmotionString, Emotion);
 
 		ResetEmotionScores();
 		EmotionsScore.Add(Emotion, Scale);

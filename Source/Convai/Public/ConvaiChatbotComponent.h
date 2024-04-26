@@ -133,6 +133,12 @@ public:
 	float InterruptVoiceFadeOutDuration;
 
 	/**
+	 *    Value between -1 and 1, a value greater than zero over extends the emotions strength and a value less than zero dimishes it.
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai")
+	float EmotionOffset = 0;
+
+	/**
 	 *    Reset the conversation with the character and remove previous memory, this is the same as setting the session ID property to -1.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Convai")

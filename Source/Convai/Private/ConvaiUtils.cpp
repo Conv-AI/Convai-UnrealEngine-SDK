@@ -633,11 +633,21 @@ namespace
 
 		bool breturn = false;
 
+#if ENGINE_MAJOR_VERSION == 4 || (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION < 3)
+
+		// Ensure we have the sound data. Compressed format is fine.
+		soundWave->InitAudioResource(audioDevice->GetRuntimeFormat(soundWave));
+
+		// Create a decoder for this audio. We want the PCM data.
+		ICompressedAudioInfo* AudioInfo = audioDevice->CreateCompressedAudioInfo(soundWave);
+
+#else
 		// Ensure we have the sound data. Compressed format is fine.
 		soundWave->InitAudioResource(soundWave->GetRuntimeFormat());
 		
 		// Create a decoder for this audio. We want the PCM data.
 		ICompressedAudioInfo* AudioInfo = IAudioInfoFactoryRegistry::Get().Create(soundWave->GetRuntimeFormat());
+#endif
 
 		// Decompress complete audio to this buffer
 		FSoundQualityInfo QualityInfo = { 0 };
@@ -656,7 +666,11 @@ namespace
 		FAudioDevice* AudioDevice = GEngine->GetMainAudioDeviceRaw();
 		if (AudioDevice)
 		{
+			#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION < 3)
+			FName format = AudioDevice->GetRuntimeFormat(soundWave);
+			#else
 			FName format = soundWave->GetRuntimeFormat();
+			#endif
 			soundWave->InitAudioResource(format);
 		}
 

@@ -890,11 +890,11 @@ void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse,
 	{
 		if (MultipleEmotions)
 		{
-			EmotionState.SetEmotionData(ReceivedEmotionResponse);
+			EmotionState.SetEmotionData(ReceivedEmotionResponse, EmotionOffset);
 		}
 		else
 		{
-			EmotionState.SetEmotionDataSingleEmotion(ReceivedEmotionResponse);
+			EmotionState.SetEmotionDataSingleEmotion(ReceivedEmotionResponse, EmotionOffset);
 			//EmotionBlendshapes = EmotionBlendshapesFrame.BlendShapes;
 		}
 	}
