@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.2.0
+- Added 5.4 support
+
 # Release 3.1.4
 - Added Pixel Streaming support and documentation.
 - Added x86_64 Android support.
