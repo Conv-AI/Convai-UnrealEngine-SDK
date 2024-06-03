@@ -10,6 +10,7 @@
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "HAL/ThreadSafeBool.h"
 #include "ConvaiDefinitions.h"
+#include "Containers/Map.h"
 #include "ConvaiGRPC.generated.h"
 
 
@@ -29,6 +30,51 @@ DECLARE_DELEGATE_OneParam(FConvaiGRPCOnActionsSignature, const TArray<FConvaiRes
 DECLARE_DELEGATE_ThreeParams(FConvaiGRPCOnEmotionSignature, FString /*EmotionResponse*/, FAnimationFrame /*EmotionBlendshapes*/, bool /*MultipleEmotions*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnSessiondIDSignature, FString /*SessionID*/);
 DECLARE_DELEGATE(FConvaiGRPCOnEventSignature);
+
+USTRUCT()
+struct FConvaiGRPCGetResponseParams
+{
+	GENERATED_BODY()
+
+	FString UserQuery;
+
+	FString TriggerName;
+
+	FString TriggerMessage;
+
+	FString CharID;
+
+	bool VoiceResponse;
+
+	bool RequireFaceData;
+
+	bool GeneratesVisemesAsBlendshapes;
+
+	FString SessionID;
+
+	UConvaiEnvironment* Environment;
+
+	bool GenerateActions;
+
+	FString API_Key;
+
+	TMap<FString, FString> Narrative_Template_Keys;
+
+	FConvaiGRPCGetResponseParams()
+		: UserQuery(TEXT(""))
+		, TriggerName(TEXT(""))
+		, TriggerMessage(TEXT(""))
+		, CharID(TEXT(""))
+		, VoiceResponse(false)
+		, RequireFaceData(false)
+		, GeneratesVisemesAsBlendshapes(false)
+		, SessionID(TEXT(""))
+		, Environment(nullptr)
+		, GenerateActions(false)
+		, API_Key(TEXT(""))
+	{
+	}
+};
 
 
 /**
@@ -66,8 +112,7 @@ public:
 	FThreadSafeDelegateWrapper<FConvaiGRPCOnEventSignature> OnFailure;
 
 	//UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai GRPC Test", WorldContext = "WorldContextObject"), Category = "Convai|gRPC")
-	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString TriggerName, FString TriggerMessage, FString CharID, bool VoiceResponse, bool RequireFaceData, bool GeneratesVisemesAsBlendshapes, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key);
-	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, bool RequireFaceData, bool GeneratesVisemesAsBlendshapes, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key);
+	static UConvaiGRPCGetResponseProxy* CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FConvaiGRPCGetResponseParams ConvaiGRPCGetResponseParams);
 
 	void Activate();
 
@@ -132,18 +177,7 @@ private:
 
 private:
 	// Inputs
-	FString URL;
-	FString API_Key;
-	FString UserQuery;
-	FString TriggerName;
-	FString TriggerMessage;
-	bool VoiceResponse;
-	bool RequireFaceData;
-	bool GeneratesVisemesAsBlendshapes;
-	FString CharID;
-	FString SessionID;
-	bool GenerateActions;
-	class UConvaiEnvironment* Environment;
+	FConvaiGRPCGetResponseParams ConvaiGRPCGetResponseParams;
 
 
 private:

@@ -551,7 +551,21 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAPI_Key, FStrin
 	RequireFaceData = RequireFaceData && VoiceResponse;
 
 	// Create the request proxy
-	ConvaiGRPCGetResponseProxy = UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(this, UserText, TriggerName, TriggerMessage, CharacterID, VoiceResponse, RequireFaceData, GeneratesVisemesAsBlendshapes, SessionID, Environment, GenerateActions, API_Key);
+	FConvaiGRPCGetResponseParams Params;
+	Params.UserQuery = UserText;
+	Params.TriggerName = TriggerName;
+	Params.TriggerMessage = TriggerMessage;
+	Params.CharID = CharacterID;
+	Params.VoiceResponse = VoiceResponse;
+	Params.RequireFaceData = RequireFaceData;
+	Params.GeneratesVisemesAsBlendshapes = GeneratesVisemesAsBlendshapes;
+	Params.SessionID = SessionID;
+	Params.Environment = Environment;
+	Params.GenerateActions = GenerateActions;
+	Params.API_Key = API_Key;
+	Params.Narrative_Template_Keys = NarrativeTemplateKeys;
+
+	ConvaiGRPCGetResponseProxy = UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(this, Params);
 
 	// Bind the needed delegates
 	Bind_GRPC_Request_Delegates();

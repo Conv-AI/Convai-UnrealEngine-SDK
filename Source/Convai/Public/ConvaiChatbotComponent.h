@@ -4,6 +4,7 @@
 //#include "CoreMinimal.h"
 #include "Components/AudioComponent.h"
 #include "ConvaiAudioStreamer.h"
+#include "Containers/Map.h"
 #include "ConvaiDefinitions.h"
 
 #include "ConvaiChatbotComponent.generated.h"
@@ -137,6 +138,12 @@ public:
 	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai")
 	float EmotionOffset = 0;
+
+	/**
+	 *    Contains key value pairs used for Narrative Design.
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai|NarrativeDesign")
+	TMap<FString, FString> NarrativeTemplateKeys;
 
 	/**
 	 *    Reset the conversation with the character and remove previous memory, this is the same as setting the session ID property to -1.
