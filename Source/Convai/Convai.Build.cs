@@ -73,7 +73,7 @@ public class Convai : ModuleRules
         // Target Platform Specific Settings
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
-            bUsePrecompiled = true;
+            bUsePrecompiled = false;
         }
 
         if (Target.Platform == UnrealTargetPlatform.Android)
