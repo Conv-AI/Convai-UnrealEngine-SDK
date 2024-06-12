@@ -64,7 +64,7 @@ namespace {
 	"DO_NOT_USE" };
 }
 
-UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString TriggerName, FString TriggerMessage, FString CharID, bool VoiceResponse, bool RequireFaceData, bool GeneratesVisemesAsBlendshapes, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
+UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString TriggerName, FString TriggerMessage, FString CharID, FString Personality, FString PersonalityVersion, FString Mood, bool VoiceResponse, bool RequireFaceData, bool GeneratesVisemesAsBlendshapes, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
 {
 	UConvaiGRPCGetResponseProxy* Proxy = NewObject<UConvaiGRPCGetResponseProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
@@ -72,6 +72,9 @@ UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetRes
 	Proxy->TriggerName = TriggerName;
 	Proxy->TriggerMessage = TriggerMessage;
 	Proxy->CharID = CharID;
+	Proxy->Personality = Personality;
+	Proxy->PersonalityVersion = PersonalityVersion;
+	Proxy->Mood = Mood;
 	Proxy->SessionID = SessionID;
 	Proxy->VoiceResponse = VoiceResponse;
 	Proxy->Environment = Environment;
@@ -83,9 +86,9 @@ UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetRes
 	return Proxy;
 }
 
-UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, bool VoiceResponse, bool RequireFaceData, bool GeneratesVisemesAsBlendshapes, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
+UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(UObject* WorldContextObject, FString UserQuery, FString CharID, FString Personality, FString PersonalityVersion, FString Mood, bool VoiceResponse, bool RequireFaceData, bool GeneratesVisemesAsBlendshapes, FString SessionID, UConvaiEnvironment* Environment, bool GenerateActions, FString API_Key)
 {
-	return CreateConvaiGRPCGetResponseProxy(WorldContextObject, UserQuery, FString(""), FString(""), CharID, VoiceResponse, RequireFaceData, GeneratesVisemesAsBlendshapes, SessionID, Environment, GenerateActions, API_Key);
+	return CreateConvaiGRPCGetResponseProxy(WorldContextObject, UserQuery, FString(""), FString(""), CharID, Personality, PersonalityVersion, Mood, VoiceResponse, RequireFaceData, GeneratesVisemesAsBlendshapes, SessionID, Environment, GenerateActions, API_Key);
 }
 
 void UConvaiGRPCGetResponseProxy::Activate()
@@ -401,6 +404,9 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 	getResponseConfig->set_api_key(TCHAR_TO_UTF8(*API_Key));
 	getResponseConfig->set_session_id(TCHAR_TO_UTF8(*SessionID));
 	getResponseConfig->set_character_id(TCHAR_TO_UTF8(*CharID));
+	getResponseConfig->set_personality(TCHAR_TO_UTF8(*Personality));
+	getResponseConfig->set_personality_version(TCHAR_TO_UTF8(*PersonalityVersion));
+	getResponseConfig->set_mood(TCHAR_TO_UTF8(*Mood));
 
 	if (GenerateActions)
 	{
