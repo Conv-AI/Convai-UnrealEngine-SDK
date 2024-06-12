@@ -32,6 +32,10 @@ void UConvaiChatbotComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 
 	DOREPLIFETIME(UConvaiChatbotComponent, CharacterID);
 	DOREPLIFETIME(UConvaiChatbotComponent, SessionID);
+	DOREPLIFETIME(UConvaiChatbotComponent, Personality);
+	DOREPLIFETIME(UConvaiChatbotComponent, PersonalityVersion);
+	DOREPLIFETIME(UConvaiChatbotComponent, Mood);
+	DOREPLIFETIME(UConvaiChatbotComponent, SessionID);
 	DOREPLIFETIME(UConvaiChatbotComponent, CharacterName);
 	DOREPLIFETIME(UConvaiChatbotComponent, VoiceType);
 	DOREPLIFETIME(UConvaiChatbotComponent, Backstory);
@@ -103,7 +107,8 @@ void UConvaiChatbotComponent::ResetConversation()
 void UConvaiChatbotComponent::LoadCharacter(FString NewCharacterID)
 {
 	CharacterID = NewCharacterID;
-	ConvaiGetDetails();
+	//so it doesnt  look for the  character details
+	//ConvaiGetDetails();
 }
 
 void UConvaiChatbotComponent::AppendActionsToQueue(TArray<FConvaiResultAction> NewActions)
@@ -551,7 +556,7 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAPI_Key, FStrin
 	RequireFaceData = RequireFaceData && VoiceResponse;
 
 	// Create the request proxy
-	ConvaiGRPCGetResponseProxy = UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(this, UserText, TriggerName, TriggerMessage, CharacterID, VoiceResponse, RequireFaceData, GeneratesVisemesAsBlendshapes, SessionID, Environment, GenerateActions, API_Key);
+	ConvaiGRPCGetResponseProxy = UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(this, UserText, TriggerName, TriggerMessage, CharacterID, Personality, PersonalityVersion, Mood, VoiceResponse, RequireFaceData, GeneratesVisemesAsBlendshapes, SessionID, Environment, GenerateActions, API_Key);
 
 	// Bind the needed delegates
 	Bind_GRPC_Request_Delegates();
@@ -1140,19 +1145,22 @@ UConvaiChatBotGetDetailsProxy* UConvaiChatbotComponent::ConvaiGetDetails()
 
 void UConvaiChatbotComponent::OnConvaiGetDetailsCompleted(FString ReceivedCharacterName, FString ReceivedVoiceType, FString ReceivedBackstory, FString ReceivedLanguageCode, bool HasReadyPlayerMeLink, FString ReceivedReadyPlayerMeLink, FString ReceivedAvatarImageLink)
 {
-	if (ReceivedCharacterName == "" && ReceivedVoiceType == "" && ReceivedBackstory == "")
+	//For checcking the character backstory and else 
+	/*if (ReceivedCharacterName == "" && ReceivedVoiceType == "" && ReceivedBackstory == "")
 	{
 		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("OnConvaiGetDetailsCompleted: Could not get character details for charID:\"%s\""), *CharacterID);
 		OnCharacterDataLoadEvent.Broadcast(false);
 		return;
-	}
+	}*/
 
-	CharacterName = ReceivedCharacterName;
+	CharacterName = *Personality;
+
+	/*CharacterName = ReceivedCharacterName;
 	VoiceType = ReceivedVoiceType;
 	Backstory = ReceivedBackstory;
 	LanguageCode = ReceivedLanguageCode;
 	ReadyPlayerMeLink = ReceivedReadyPlayerMeLink;
-	AvatarImageLink = ReceivedAvatarImageLink;
+	AvatarImageLink = ReceivedAvatarImageLink;*/
 
 	OnCharacterDataLoadEvent.Broadcast(true);
 	ConvaiChatBotGetDetailsProxy = nullptr;

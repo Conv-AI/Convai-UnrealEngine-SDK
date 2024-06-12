@@ -85,6 +85,15 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated)
 	FString CharacterName;
 
+	UPROPERTY(EditAnywhere, Category = "Convai", Replicated)
+	FString Personality;
+
+	UPROPERTY(EditAnywhere, Category = "Convai", Replicated)
+	FString PersonalityVersion;
+
+	UPROPERTY(EditAnywhere, Category = "Convai", Replicated)
+	FString Mood;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Convai", Replicated)
 	FString VoiceType;
 

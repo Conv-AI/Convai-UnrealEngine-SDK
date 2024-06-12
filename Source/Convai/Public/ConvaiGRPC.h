@@ -145,7 +145,6 @@ private:
 	FString Personality;
 	FString PersonalityVersion;
 	FString Mood;
-	FString SessionID;
 	bool GenerateActions;
 	class UConvaiEnvironment* Environment;
 
