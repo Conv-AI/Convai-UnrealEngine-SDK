@@ -1044,7 +1044,8 @@ void UConvaiChatbotComponent::BeginPlay()
 
 	// Get character details
 	if (CharacterID != "")
-		ConvaiGetDetails();
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Add character id "));
+		//ConvaiGetDetails();
 
 }
 
