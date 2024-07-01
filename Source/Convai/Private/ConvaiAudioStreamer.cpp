@@ -211,9 +211,9 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
 		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("New SampleRate: %d"), SampleRate);
 		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("New Channels: %d"), NumChannels);
 
-		SetSound(SoundWaveProcedural);
 		AsyncTask(ENamedThreads::GameThread, [this]
 		{
+			SetSound(SoundWaveProcedural);
 			Play();
 		});
 	}
