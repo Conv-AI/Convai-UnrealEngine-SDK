@@ -22,6 +22,7 @@ THIRD_PARTY_INCLUDES_END
 //#pragma comment (lib, "crypt32.lib")
 
 DEFINE_LOG_CATEGORY(ConvaiGRPCLog);
+DEFINE_LOG_CATEGORY(ConvaiGRPCFeedBackLog);
 
 using ::service::GetResponseRequest_GetResponseConfig;
 using ::service::TriggerConfig;
@@ -31,6 +32,9 @@ using ::service::ActionConfig_Object;
 using ::service::ActionConfig_Character;
 using ::service::GetResponseRequest_GetResponseData;
 using ::service::FaceModel;
+
+using ::service::FeedbackRequest;
+using ::service::FeedbackRequest_Feedback;
 
 using grpc::Channel;
 using grpc::ClientAsyncResponseReader;
@@ -603,7 +607,13 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		ConvaiGRPCGetResponseParams.SessionID = FString(SessionID_std.c_str());
 		// Broadcast the Session ID
 		OnSessionIDReceived.ExecuteIfBound(ConvaiGRPCGetResponseParams.SessionID);
+	}
 
+	std::string InteractionID_std = reply->interaction_id();
+	if (InteractionID_std.size())
+	{
+		// Broadcast the Interaction ID
+		OnInteractionIDReceived.ExecuteIfBound(FString(InteractionID_std.c_str()));
 	}
 
 	if (reply->has_user_query()) // Is there transcription ready
@@ -884,4 +894,170 @@ void UConvaiGRPCGetResponseProxy::OnStreamFinish(bool ok)
 
 
 	OnFinish.ExecuteIfBound();
+}
+
+
+
+
+UConvaiGRPCSubmitFeedbackProxy* UConvaiGRPCSubmitFeedbackProxy::CreateConvaiGRPCSubmitFeedbackProxy(UObject* WorldContextObject, FString InteractionID, bool ThumbsUp, FString FeedbackText)
+{
+	UConvaiGRPCSubmitFeedbackProxy* Proxy = NewObject<UConvaiGRPCSubmitFeedbackProxy>();
+	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	Proxy->InteractionID = InteractionID;
+	Proxy->ThumbsUp = ThumbsUp;
+	Proxy->FeedbackText = FeedbackText;
+	return Proxy;
+}
+
+void UConvaiGRPCSubmitFeedbackProxy::Activate()
+{
+	OnStreamFinishDelegate = FgRPC_Delegate::CreateUObject(this, &ThisClass::OnStreamFinish);
+
+	reply = std::unique_ptr<service::FeedbackResponse>(new service::FeedbackResponse());
+
+	// Form Validation
+	if (!(UConvaiFormValidation::ValidateSessionID(InteractionID)))
+	{
+		LogAndEcecuteFailure("Activate");
+		return;
+	}
+
+	if (!WorldPtr.IsValid())
+	{
+		UE_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("WorldPtr not valid"));
+		LogAndEcecuteFailure("Activate");
+		return;
+	}
+
+	UConvaiSubsystem* ConvaiSubsystem = UConvaiUtils::GetConvaiSubsystem(WorldPtr.Get());
+	if (!ConvaiSubsystem)
+	{
+		UE_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("Convai Subsystem is not valid"));
+		LogAndEcecuteFailure("Activate");
+		return;
+	}
+
+	// Create a new stub instance
+	stub_ = ConvaiSubsystem->gRPC_Runnable->GetNewStub();
+	if (!stub_)
+	{
+		UE_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("Could not aquire a new stub instance"));
+		LogAndEcecuteFailure("Activate");
+		return;
+	}
+
+	// Aquire the completion queue instance
+	cq_ = ConvaiSubsystem->gRPC_Runnable->GetCompletionQueue();
+	if (!cq_)
+	{
+		UE_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("Got an invalid completion queue instance"));
+		LogAndEcecuteFailure("Activate");
+		return;
+	}
+
+	bool Found;
+	FString VersionName;
+	FString EngineVersion;
+	FString PlatformName;
+	FString PluginEngineVersion;
+	FString FriendlyName;
+
+	UConvaiUtils::GetPluginInfo(FString("Convai"), Found, VersionName, FriendlyName, PluginEngineVersion);
+	UConvaiUtils::GetPlatformInfo(EngineVersion, PlatformName);
+
+	// Add metadata
+	client_context.AddMetadata("engine", "Unreal Engine");
+	client_context.AddMetadata("engine_version", TCHAR_TO_UTF8(*EngineVersion));
+	client_context.AddMetadata("platform_name", TCHAR_TO_UTF8(*PlatformName));
+
+	if (Found)
+	{
+		client_context.AddMetadata("plugin_engine_version", TCHAR_TO_UTF8(*PluginEngineVersion));
+		client_context.AddMetadata("plugin_version", TCHAR_TO_UTF8(*VersionName));
+		client_context.AddMetadata("plugin_base_name", TCHAR_TO_UTF8(*FriendlyName));
+	}
+	else
+	{
+		client_context.AddMetadata("plugin_engine_version", "Unknown");
+		client_context.AddMetadata("plugin_version", "Unknown");
+		client_context.AddMetadata("plugin_base_name", "Unknown");
+	}
+
+	FeedbackRequest_Feedback* feedbackRequest_Feedback = new FeedbackRequest_Feedback();
+	feedbackRequest_Feedback->set_feedback_text(TCHAR_TO_UTF8(*FeedbackText));
+	feedbackRequest_Feedback->set_thumbs_up(ThumbsUp);
+
+	request.set_allocated_text_feedback(feedbackRequest_Feedback);
+	request.set_interaction_id(TCHAR_TO_UTF8(*InteractionID));
+
+
+	stream_handler = stub_->AsyncSubmitFeedback(&client_context, request, cq_);
+	stream_handler->Finish(reply.get(), &status, (void*)&OnStreamFinishDelegate);
+}
+
+void UConvaiGRPCSubmitFeedbackProxy::OnStreamFinish(bool ok)
+{
+	if (!ok || !status.ok())
+	{
+		LogAndEcecuteFailure("OnStreamFinish");
+		return;
+	}
+
+	Response = FString(reply->feedback_response().c_str());
+
+#if ConvaiDebugMode
+	UE_LOG(ConvaiGRPCFeedBackLog, Log,
+		TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
+		*InteractionID,
+		*FeedbackText,
+		ThumbsUp? *FString("True") : *FString("False"));
+#endif 
+
+
+	success();
+}
+
+void UConvaiGRPCSubmitFeedbackProxy::BeginDestroy()
+{
+	client_context.TryCancel();
+	stub_.reset();
+	UE_LOG(ConvaiGRPCFeedBackLog, Log,
+		TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
+		*InteractionID,
+		*FeedbackText,
+		ThumbsUp ? "True" : "False");
+	Super::BeginDestroy();
+}
+
+void UConvaiGRPCSubmitFeedbackProxy::LogAndEcecuteFailure(FString FuncName)
+{
+	UE_LOG(ConvaiGRPCFeedBackLog, Warning,
+		TEXT("%s: Status:%s | Debug Log:%s | Error message:%s | Error Details:%s | Error Code:%i | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
+		*FString(FuncName),
+		*FString(status.ok() ? "Ok" : "Not Ok"),
+		*FString(reply->DebugString().c_str()),
+		*FString(status.error_message().c_str()),
+		*FString(status.error_details().c_str()),
+		status.error_code(),
+		*InteractionID,
+		*FeedbackText,
+		ThumbsUp ? "True" : "False");
+
+	failed();
+}
+
+void UConvaiGRPCSubmitFeedbackProxy::failed()
+{
+	OnFailure.Broadcast(Response);
+	finish();
+}
+
+void UConvaiGRPCSubmitFeedbackProxy::success()
+{
+	OnSuccess.Broadcast(Response);
+	finish();
+}
+
+void UConvaiGRPCSubmitFeedbackProxy::finish()
+{
 }

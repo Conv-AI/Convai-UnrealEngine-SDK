@@ -588,6 +588,7 @@ void UConvaiChatbotComponent::Bind_GRPC_Request_Delegates()
 	ConvaiGRPCGetResponseProxy->OnSessionIDReceived.BindUObject(this, &UConvaiChatbotComponent::onSessionIDReceived);
 	ConvaiGRPCGetResponseProxy->OnActionsReceived.BindUObject(this, &UConvaiChatbotComponent::onActionSequenceReceived);
 	ConvaiGRPCGetResponseProxy->OnNarrativeDataReceived.BindUObject(this, &UConvaiChatbotComponent::OnNarrativeSectionReceived);
+	ConvaiGRPCGetResponseProxy->OnInteractionIDReceived.BindUObject(this, &UConvaiChatbotComponent::onInteractionIDReceived);
 	ConvaiGRPCGetResponseProxy->OnEmotionReceived.BindUObject(this, &UConvaiChatbotComponent::onEmotionReceived);
 	ConvaiGRPCGetResponseProxy->OnFinish.BindUObject(this, &UConvaiChatbotComponent::onFinishedReceivingData);
 	ConvaiGRPCGetResponseProxy->OnFailure.BindUObject(this, &UConvaiChatbotComponent::onFailure);
@@ -605,6 +606,7 @@ void UConvaiChatbotComponent::Unbind_GRPC_Request_Delegates()
 	ConvaiGRPCGetResponseProxy->OnFaceDataReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnSessionIDReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnActionsReceived.Unbind();
+	ConvaiGRPCGetResponseProxy->OnInteractionIDReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnEmotionReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnFinish.Unbind();
 	ConvaiGRPCGetResponseProxy->OnFailure.Unbind();
@@ -668,6 +670,14 @@ void UConvaiChatbotComponent::Broadcast_onSessionIDReceived_Implementation(const
 	if (!UKismetSystemLibrary::IsServer(this))
 	{
 		onSessionIDReceived(ReceivedSessionID);
+	}
+}
+
+void UConvaiChatbotComponent::Broadcast_onInteractionIDReceived_Implementation(const FString& ReceivedInteractionID)
+{
+	if (!UKismetSystemLibrary::IsServer(this))
+	{
+		onInteractionIDReceived(ReceivedInteractionID);
 	}
 }
 
@@ -838,6 +848,39 @@ void UConvaiChatbotComponent::onSessionIDReceived(const FString ReceivedSessionI
 	}
 
 	SessionID = ReceivedSessionID;
+}
+
+void UConvaiChatbotComponent::onInteractionIDReceived(FString ReceivedInteractionID)
+{
+	// Broadcast to clients
+	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
+	{
+		if (IsInGameThread())
+		{
+			Broadcast_onInteractionIDReceived(ReceivedInteractionID);
+		}
+		else
+		{
+			AsyncTask(ENamedThreads::GameThread, [this, ReceivedInteractionID]
+				{
+					Broadcast_onInteractionIDReceived(ReceivedInteractionID);
+				});
+		}
+	}
+
+	if (IsInGameThread())
+	{
+		// Send Interaction ID to blueprint event
+		OnInteractionIDReceivedEvent.Broadcast(this, CurrentConvaiPlayerComponent, ReceivedInteractionID);
+	}
+	else
+	{
+		AsyncTask(ENamedThreads::GameThread, [this, ReceivedInteractionID]
+			{
+				// Send Interaction ID to blueprint event
+				OnInteractionIDReceivedEvent.Broadcast(this, CurrentConvaiPlayerComponent, ReceivedInteractionID);
+			});
+	}
 }
 
 void UConvaiChatbotComponent::onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions)

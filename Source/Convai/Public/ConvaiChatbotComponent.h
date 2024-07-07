@@ -17,7 +17,6 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_SixParams(FOnTranscriptionReceivedSign
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_FourParams(FOnTextReceivedSignature_Deprecated, UConvaiChatbotComponent, OnTextReceivedEvent, FString, CharacterName, FString, BotText, float, AudioDuration, bool, IsFinal);
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_SixParams(FOnTextReceivedSignature_V2, UConvaiChatbotComponent, OnTextReceivedEvent_V2, UConvaiChatbotComponent*, ChatbotComponent, UConvaiPlayerComponent*, InteractingPlayerComponent, FString, CharacterName, FString, BotText, float, AudioDuration, bool, IsFinal);
 
-
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnActionReceivedSignature_Deprecated, UConvaiChatbotComponent, OnActionReceivedEvent, const TArray<FConvaiResultAction>&, SequenceOfActions);
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(FOnActionReceivedSignature_V2, UConvaiChatbotComponent, OnActionReceivedEvent_V2, UConvaiChatbotComponent*, ChatbotComponent, UConvaiPlayerComponent*, InteractingPlayerComponent, const TArray<FConvaiResultAction>&, SequenceOfActions);
 
@@ -27,6 +26,8 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnCharacterDataLoadSignature
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnCharacterDataLoadSignature_V2, UConvaiChatbotComponent, OnCharacterDataLoadEvent_V2, UConvaiChatbotComponent*, ChatbotComponent, bool, Success);
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnNarrativeSectionReceivedSignature, UConvaiChatbotComponent, OnNarrativeSectionReceivedEvent, UConvaiChatbotComponent*, ChatbotComponent, FString, NarrativeSectionID);
+
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(FOnInteractionIDReceivedSignature, UConvaiChatbotComponent, OnInteractionIDReceivedEvent, UConvaiChatbotComponent*, ChatbotComponent, UConvaiPlayerComponent*, InteractingPlayerComponent, FString, InteractionID);
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(FOnFailureSignature, UConvaiChatbotComponent, OnFailureEvent);
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(FOnInterruptedSignature, UConvaiChatbotComponent, OnInterruptedEvent, UConvaiChatbotComponent*, ChatbotComponent, UConvaiPlayerComponent*, InteractingPlayerComponent);
@@ -290,6 +291,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Narrative Section Received"))
 	FOnNarrativeSectionReceivedSignature OnNarrativeSectionReceivedEvent;
 
+	UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Interaction ID Received"))
+	FOnInteractionIDReceivedSignature OnInteractionIDReceivedEvent;
+
 	/** Called when the character is interrupted */
 	 UPROPERTY(BlueprintAssignable, Category = "Convai", meta = (DisplayName = "On Interrupted"))
 	 FOnInterruptedSignature OnInterruptedEvent;
@@ -383,12 +387,15 @@ private:
 	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
 	void Broadcast_OnNarrativeSectionReceived(const FString& BT_Code, const FString& BT_Constants, const FString& ReceivedNarrativeSectionID);
 	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
+	void Broadcast_onInteractionIDReceived(const FString& ReceivedInteractionID);
+	UFUNCTION(NetMulticast, Reliable, Category = "Convai")
 	void Broadcast_onEmotionReceived(const FString& ReceivedEmotionResponse, bool MultipleEmotions);
 
 	void OnTranscriptionReceived(FString Transcription, bool IsTranscriptionReady, bool IsFinal);
 	void onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal);
 	void OnFaceDataReceived(FAnimationSequence FaceDataAnimation);
 	void onSessionIDReceived(FString ReceivedSessionID);
+	void onInteractionIDReceived(FString ReceivedInteractionID);
 	void onActionSequenceReceived(const TArray<FConvaiResultAction>& ReceivedSequenceOfActions);
 	void onEmotionReceived(FString ReceivedEmotionResponse, FAnimationFrame EmotionBlendshapesFrame, bool MultipleEmotions);
 	void onFinishedReceivingData();

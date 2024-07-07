@@ -15,6 +15,7 @@
 
 
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiGRPCLog, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(ConvaiGRPCFeedBackLog, Log, All);
 
 class USoundWave;
 class UConvaiEnvironment;
@@ -29,6 +30,7 @@ DECLARE_DELEGATE_OneParam(FConvaiGRPCOnFaceDataSignature, FAnimationSequence /*F
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnActionsSignature, const TArray<FConvaiResultAction>& /*ActionSequence*/);
 DECLARE_DELEGATE_ThreeParams(FConvaiGRPCOnEmotionSignature, FString /*EmotionResponse*/, FAnimationFrame /*EmotionBlendshapes*/, bool /*MultipleEmotions*/);
 DECLARE_DELEGATE_OneParam(FConvaiGRPCOnSessiondIDSignature, FString /*SessionID*/);
+DECLARE_DELEGATE_OneParam(FConvaiGRPCOnInteractionIDSignature, FString /*InteractionID*/);
 DECLARE_DELEGATE(FConvaiGRPCOnEventSignature);
 
 USTRUCT()
@@ -99,6 +101,9 @@ public:
 
 	// Called when new SessionID is received
 	FThreadSafeDelegateWrapper<FConvaiGRPCOnSessiondIDSignature> OnSessionIDReceived;
+
+	// Called when the InteractionID is received
+	FThreadSafeDelegateWrapper<FConvaiGRPCOnInteractionIDSignature> OnInteractionIDReceived;
 
 	FThreadSafeDelegateWrapper<FConvaiGRPCOnNarrativeDataSignature> OnNarrativeDataReceived;
 
@@ -203,4 +208,80 @@ private:
 	FThreadSafeBool CalledFinish;
 
 	int TotalLipSyncResponsesReceived = 0;
+};
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSubmitFeedbackCallbackSignature, FString, FeedbackResponse);
+
+UCLASS()
+class UConvaiGRPCSubmitFeedbackProxy : public UOnlineBlueprintCallProxyBase
+{
+	GENERATED_BODY()
+	public:
+
+	// Called when there is a successful response
+	UPROPERTY(BlueprintAssignable)
+	FSubmitFeedbackCallbackSignature OnSuccess;
+
+	// Called when there is an unsuccessful response
+	UPROPERTY(BlueprintAssignable)
+	FSubmitFeedbackCallbackSignature OnFailure;
+
+	/**
+	 *    Initiates a feedback request to the gRPC API.
+	 *    @param InteractionID		Identifies the message the feedback is being submitted for - Check "On Interaction ID Received" on the Convai Chatbot Component
+	 *    @param Thumbs Up			False if the message is incorrect or inaccurate, True otherwise.
+	 *    @param FeedbackText		Additionaly feedback that can further help the model learn why the user have given a thumbs up or thumbs down.
+	 */
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai Submit Feedback", WorldContext = "WorldContextObject"), Category = "Convai")
+	static UConvaiGRPCSubmitFeedbackProxy* CreateConvaiGRPCSubmitFeedbackProxy(UObject* WorldContextObject, FString InteractionID, bool ThumbsUp, FString FeedbackText);
+
+
+	virtual void Activate() override;
+
+	void failed();
+	void success();
+	void finish();
+
+private:
+
+	FString InteractionID; 
+	bool ThumbsUp; 
+	FString FeedbackText;
+
+	FString Response;
+
+	// Pointer to the world
+	TWeakObjectPtr<UWorld> WorldPtr;
+
+	//~ Begin UObject Interface.
+	virtual void BeginDestroy() override;
+	//~ End UObject Interface.
+
+private:
+
+	void LogAndEcecuteFailure(FString FuncName);
+
+	void OnStreamFinish(bool ok);
+
+	// called when a stream->finish is successful it means that the server decided
+	// to end the stream, we should check the status variable in that call
+	// https://groups.google.com/g/grpc-io/c/R0NTqKaHLdE 
+	FgRPC_Delegate OnStreamFinishDelegate;
+
+	service::FeedbackRequest request;
+	std::unique_ptr<service::FeedbackResponse> reply;
+
+	// Storage for the status of the RPC upon completion.
+	grpc::Status status;
+
+	std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::service::FeedbackResponse>> stream_handler;
+
+	// Context for the client. It could be used to convey extra information to
+	// the server and/or tweak certain RPC behaviors.
+	grpc::ClientContext client_context;
+
+	std::unique_ptr<service::ConvaiService::Stub> stub_;
+
+	grpc::CompletionQueue* cq_;
 };
