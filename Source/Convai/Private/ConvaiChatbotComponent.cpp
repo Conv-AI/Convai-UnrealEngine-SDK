@@ -707,6 +707,9 @@ void UConvaiChatbotComponent::Broadcast_onEmotionReceived_Implementation(const F
 
 void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, bool IsTranscriptionReady, bool IsFinal)
 {
+	LastTranscription = Transcription;
+	ReceivedFinalTranscription = IsFinal;
+
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
@@ -742,9 +745,6 @@ void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, boo
 				OnTranscriptionReceivedEvent.Broadcast(Transcription, IsTranscriptionReady, IsFinal);
 			});
 	}
-
-	LastTranscription = Transcription;
-	ReceivedFinalTranscription = IsFinal;
 }
 
 void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal)
