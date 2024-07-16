@@ -18,11 +18,13 @@
 			"Type": "Runtime",
 			"LoadingPhase": "PreDefault",
 			"PlatformAllowList": [
+				"Linux",
 				"Win64",
 				"Android",
 				"Mac"
 			],
 			"WhitelistPlatforms": [
+				"Linux",
 				"Win64",
 				"Android",
 				"Mac"
@@ -40,3 +42,4 @@
 		}
 	]
 }
+

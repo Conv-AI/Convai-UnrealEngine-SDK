@@ -65,7 +65,18 @@ public class Convai : ModuleRules
         PrecompileForTargets = PrecompileTargetsType.Any;
         ConvaiPlatformInstance = GetConvaiPlatformInstance(Target);
         
-        PrivateIncludePaths.AddRange(new string[] { "Convai/Private" });
+        if (Target.Platform == UnrealTargetPlatform.Mac || Target.Platform == UnrealTargetPlatform.IOS)
+        {
+            // Include .mm file only for Mac
+            PrivateIncludePaths.Add("Convai/Private");
+            PrivateIncludePaths.Add("Convai/Private/Mac");
+        }
+        else
+        {
+            // Exclude .mm file for other platforms
+            PrivateIncludePaths.Add("Convai/Private");
+        }
+
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" , "HTTP", "Json", "JsonUtilities", "AudioMixer", "AudioCaptureCore", "AudioCapture", "Voice", "SignalProcessing", "libOpus", "OpenSSL", "zlib" });
         PrivateDependencyModuleNames.AddRange(new string[] {"Projects"});
         PublicDefinitions.AddRange(new string[] { "ConvaiDebugMode=1", "GOOGLE_PROTOBUF_NO_RTTI", "GPR_FORBID_UNREACHABLE_CODE", "GRPC_ALLOW_EXCEPTIONS=0" });
