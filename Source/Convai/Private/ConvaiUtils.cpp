@@ -17,7 +17,11 @@
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/DefaultValueHelper.h"
-#include "HAL/PlatformFilemanager.h"
+#if PLATFORM_LINUX
+	#include "Linux/LinuxPlatformFile.h"
+#else
+	#include "HAL/PlatformFilemanager.h"
+#endif
 #include "Engine/GameInstance.h"
 #include "ConvaiSubsystem.h"
 #include "Engine/GameEngine.h"

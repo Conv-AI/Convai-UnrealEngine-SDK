@@ -1025,7 +1025,7 @@ void UConvaiGRPCSubmitFeedbackProxy::BeginDestroy()
 		TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
 		*InteractionID,
 		*FeedbackText,
-		ThumbsUp ? "True" : "False");
+		*FString(ThumbsUp ? "True" : "False"));
 	Super::BeginDestroy();
 }
 
@@ -1041,7 +1041,7 @@ void UConvaiGRPCSubmitFeedbackProxy::LogAndEcecuteFailure(FString FuncName)
 		status.error_code(),
 		*InteractionID,
 		*FeedbackText,
-		ThumbsUp ? "True" : "False");
+		*FString(ThumbsUp ? "True" : "False"));
 
 	failed();
 }
