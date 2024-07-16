@@ -9,10 +9,9 @@
 #include "service.pb.h"
 
 #include <functional>
-#include <grpc/impl/codegen/port_platform.h>
-#include <grpcpp/impl/codegen/async_generic_service.h>
-#include <grpcpp/impl/codegen/async_stream.h>
-#include <grpcpp/impl/codegen/async_unary_call.h>
+#include <grpcpp/generic/async_generic_service.h>
+#include <grpcpp/support/async_stream.h>
+#include <grpcpp/support/async_unary_call.h>
 #include <grpcpp/impl/codegen/client_callback.h>
 #include <grpcpp/impl/codegen/client_context.h>
 #include <grpcpp/impl/codegen/completion_queue.h>
@@ -88,50 +87,22 @@ class ConvaiService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::service::FeedbackResponse>> PrepareAsyncSubmitFeedback(::grpc::ClientContext* context, const ::service::FeedbackRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::service::FeedbackResponse>>(PrepareAsyncSubmitFeedbackRaw(context, request, cq));
     }
-    class experimental_async_interface {
+    class async_interface {
      public:
-      virtual ~experimental_async_interface() {}
+      virtual ~async_interface() {}
       virtual void Hello(::grpc::ClientContext* context, const ::service::HelloRequest* request, ::service::HelloResponse* response, std::function<void(::grpc::Status)>) = 0;
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       virtual void Hello(::grpc::ClientContext* context, const ::service::HelloRequest* request, ::service::HelloResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      #else
-      virtual void Hello(::grpc::ClientContext* context, const ::service::HelloRequest* request, ::service::HelloResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       virtual void HelloStream(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::HelloRequest,::service::HelloResponse>* reactor) = 0;
-      #else
-      virtual void HelloStream(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::service::HelloRequest,::service::HelloResponse>* reactor) = 0;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       virtual void SpeechToText(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::STTRequest,::service::STTResponse>* reactor) = 0;
-      #else
-      virtual void SpeechToText(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::service::STTRequest,::service::STTResponse>* reactor) = 0;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       virtual void GetResponse(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::GetResponseRequest,::service::GetResponseResponse>* reactor) = 0;
-      #else
-      virtual void GetResponse(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::service::GetResponseRequest,::service::GetResponseResponse>* reactor) = 0;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      virtual void GetResponseSingle(::grpc::ClientContext* context, ::service::GetResponseRequestSingle* request, ::grpc::ClientReadReactor< ::service::GetResponseResponse>* reactor) = 0;
-      #else
-      virtual void GetResponseSingle(::grpc::ClientContext* context, ::service::GetResponseRequestSingle* request, ::grpc::experimental::ClientReadReactor< ::service::GetResponseResponse>* reactor) = 0;
-      #endif
+      virtual void GetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle* request, ::grpc::ClientReadReactor< ::service::GetResponseResponse>* reactor) = 0;
       virtual void SubmitFeedback(::grpc::ClientContext* context, const ::service::FeedbackRequest* request, ::service::FeedbackResponse* response, std::function<void(::grpc::Status)>) = 0;
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       virtual void SubmitFeedback(::grpc::ClientContext* context, const ::service::FeedbackRequest* request, ::service::FeedbackResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      #else
-      virtual void SubmitFeedback(::grpc::ClientContext* context, const ::service::FeedbackRequest* request, ::service::FeedbackResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      #endif
     };
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    typedef class experimental_async_interface async_interface;
-    #endif
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    async_interface* async() { return experimental_async(); }
-    #endif
-    virtual class experimental_async_interface* experimental_async() { return nullptr; }
-  private:
+    typedef class async_interface experimental_async_interface;
+    virtual class async_interface* async() { return nullptr; }
+    class async_interface* experimental_async() { return async(); }
+   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::service::HelloResponse>* AsyncHelloRaw(::grpc::ClientContext* context, const ::service::HelloRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::service::HelloResponse>* PrepareAsyncHelloRaw(::grpc::ClientContext* context, const ::service::HelloRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientReaderWriterInterface< ::service::HelloRequest, ::service::HelloResponse>* HelloStreamRaw(::grpc::ClientContext* context) = 0;
@@ -151,7 +122,7 @@ class ConvaiService final {
   };
   class Stub final : public StubInterface {
    public:
-    Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel);
+    Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
     ::grpc::Status Hello(::grpc::ClientContext* context, const ::service::HelloRequest& request, ::service::HelloResponse* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::service::HelloResponse>> AsyncHello(::grpc::ClientContext* context, const ::service::HelloRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::service::HelloResponse>>(AsyncHelloRaw(context, request, cq));
@@ -202,52 +173,28 @@ class ConvaiService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::service::FeedbackResponse>> PrepareAsyncSubmitFeedback(::grpc::ClientContext* context, const ::service::FeedbackRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::service::FeedbackResponse>>(PrepareAsyncSubmitFeedbackRaw(context, request, cq));
     }
-    class experimental_async final :
-      public StubInterface::experimental_async_interface {
+    class async final :
+      public StubInterface::async_interface {
      public:
       void Hello(::grpc::ClientContext* context, const ::service::HelloRequest* request, ::service::HelloResponse* response, std::function<void(::grpc::Status)>) override;
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       void Hello(::grpc::ClientContext* context, const ::service::HelloRequest* request, ::service::HelloResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
-      #else
-      void Hello(::grpc::ClientContext* context, const ::service::HelloRequest* request, ::service::HelloResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       void HelloStream(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::HelloRequest,::service::HelloResponse>* reactor) override;
-      #else
-      void HelloStream(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::service::HelloRequest,::service::HelloResponse>* reactor) override;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       void SpeechToText(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::STTRequest,::service::STTResponse>* reactor) override;
-      #else
-      void SpeechToText(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::service::STTRequest,::service::STTResponse>* reactor) override;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       void GetResponse(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::service::GetResponseRequest,::service::GetResponseResponse>* reactor) override;
-      #else
-      void GetResponse(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::service::GetResponseRequest,::service::GetResponseResponse>* reactor) override;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      void GetResponseSingle(::grpc::ClientContext* context, ::service::GetResponseRequestSingle* request, ::grpc::ClientReadReactor< ::service::GetResponseResponse>* reactor) override;
-      #else
-      void GetResponseSingle(::grpc::ClientContext* context, ::service::GetResponseRequestSingle* request, ::grpc::experimental::ClientReadReactor< ::service::GetResponseResponse>* reactor) override;
-      #endif
+      void GetResponseSingle(::grpc::ClientContext* context, const ::service::GetResponseRequestSingle* request, ::grpc::ClientReadReactor< ::service::GetResponseResponse>* reactor) override;
       void SubmitFeedback(::grpc::ClientContext* context, const ::service::FeedbackRequest* request, ::service::FeedbackResponse* response, std::function<void(::grpc::Status)>) override;
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       void SubmitFeedback(::grpc::ClientContext* context, const ::service::FeedbackRequest* request, ::service::FeedbackResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
-      #else
-      void SubmitFeedback(::grpc::ClientContext* context, const ::service::FeedbackRequest* request, ::service::FeedbackResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      #endif
      private:
       friend class Stub;
-      explicit experimental_async(Stub* stub): stub_(stub) { }
+      explicit async(Stub* stub): stub_(stub) { }
       Stub* stub() { return stub_; }
       Stub* stub_;
     };
-    class experimental_async_interface* experimental_async() override { return &async_stub_; }
+    class async* async() override { return &async_stub_; }
 
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
-    class experimental_async async_stub_{this};
+    class async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::service::HelloResponse>* AsyncHelloRaw(::grpc::ClientContext* context, const ::service::HelloRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::service::HelloResponse>* PrepareAsyncHelloRaw(::grpc::ClientContext* context, const ::service::HelloRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientReaderWriter< ::service::HelloRequest, ::service::HelloResponse>* HelloStreamRaw(::grpc::ClientContext* context) override;
@@ -406,36 +353,22 @@ class ConvaiService final {
   };
   typedef WithAsyncMethod_Hello<WithAsyncMethod_HelloStream<WithAsyncMethod_SpeechToText<WithAsyncMethod_GetResponse<WithAsyncMethod_GetResponseSingle<WithAsyncMethod_SubmitFeedback<Service > > > > > > AsyncService;
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_Hello : public BaseClass {
+  class WithCallbackMethod_Hello : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithCallbackMethod_Hello() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodCallback(0,
+    WithCallbackMethod_Hello() {
+      ::grpc::Service::MarkMethodCallback(0,
           new ::grpc::internal::CallbackUnaryHandler< ::service::HelloRequest, ::service::HelloResponse>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::service::HelloRequest* request, ::service::HelloResponse* response) { return this->Hello(context, request, response); }));}
+                   ::grpc::CallbackServerContext* context, const ::service::HelloRequest* request, ::service::HelloResponse* response) { return this->Hello(context, request, response); }));}
     void SetMessageAllocatorFor_Hello(
-        ::grpc::experimental::MessageAllocator< ::service::HelloRequest, ::service::HelloResponse>* allocator) {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+        ::grpc::MessageAllocator< ::service::HelloRequest, ::service::HelloResponse>* allocator) {
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(0);
-    #else
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(0);
-    #endif
       static_cast<::grpc::internal::CallbackUnaryHandler< ::service::HelloRequest, ::service::HelloResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
-    ~ExperimentalWithCallbackMethod_Hello() override {
+    ~WithCallbackMethod_Hello() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -443,37 +376,21 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerUnaryReactor* Hello(
-      ::grpc::CallbackServerContext* /*context*/, const ::service::HelloRequest* /*request*/, ::service::HelloResponse* /*response*/)
-    #else
-    virtual ::grpc::experimental::ServerUnaryReactor* Hello(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::service::HelloRequest* /*request*/, ::service::HelloResponse* /*response*/)
-    #endif
-      { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::service::HelloRequest* /*request*/, ::service::HelloResponse* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_HelloStream : public BaseClass {
+  class WithCallbackMethod_HelloStream : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithCallbackMethod_HelloStream() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodCallback(1,
+    WithCallbackMethod_HelloStream() {
+      ::grpc::Service::MarkMethodCallback(1,
           new ::grpc::internal::CallbackBidiHandler< ::service::HelloRequest, ::service::HelloResponse>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context) { return this->HelloStream(context); }));
+                   ::grpc::CallbackServerContext* context) { return this->HelloStream(context); }));
     }
-    ~ExperimentalWithCallbackMethod_HelloStream() override {
+    ~WithCallbackMethod_HelloStream() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -481,37 +398,22 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerBidiReactor< ::service::HelloRequest, ::service::HelloResponse>* HelloStream(
       ::grpc::CallbackServerContext* /*context*/)
-    #else
-    virtual ::grpc::experimental::ServerBidiReactor< ::service::HelloRequest, ::service::HelloResponse>* HelloStream(
-      ::grpc::experimental::CallbackServerContext* /*context*/)
-    #endif
       { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_SpeechToText : public BaseClass {
+  class WithCallbackMethod_SpeechToText : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithCallbackMethod_SpeechToText() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodCallback(2,
+    WithCallbackMethod_SpeechToText() {
+      ::grpc::Service::MarkMethodCallback(2,
           new ::grpc::internal::CallbackBidiHandler< ::service::STTRequest, ::service::STTResponse>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context) { return this->SpeechToText(context); }));
+                   ::grpc::CallbackServerContext* context) { return this->SpeechToText(context); }));
     }
-    ~ExperimentalWithCallbackMethod_SpeechToText() override {
+    ~WithCallbackMethod_SpeechToText() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -519,37 +421,22 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerBidiReactor< ::service::STTRequest, ::service::STTResponse>* SpeechToText(
       ::grpc::CallbackServerContext* /*context*/)
-    #else
-    virtual ::grpc::experimental::ServerBidiReactor< ::service::STTRequest, ::service::STTResponse>* SpeechToText(
-      ::grpc::experimental::CallbackServerContext* /*context*/)
-    #endif
       { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_GetResponse : public BaseClass {
+  class WithCallbackMethod_GetResponse : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithCallbackMethod_GetResponse() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodCallback(3,
+    WithCallbackMethod_GetResponse() {
+      ::grpc::Service::MarkMethodCallback(3,
           new ::grpc::internal::CallbackBidiHandler< ::service::GetResponseRequest, ::service::GetResponseResponse>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context) { return this->GetResponse(context); }));
+                   ::grpc::CallbackServerContext* context) { return this->GetResponse(context); }));
     }
-    ~ExperimentalWithCallbackMethod_GetResponse() override {
+    ~WithCallbackMethod_GetResponse() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -557,37 +444,22 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerBidiReactor< ::service::GetResponseRequest, ::service::GetResponseResponse>* GetResponse(
       ::grpc::CallbackServerContext* /*context*/)
-    #else
-    virtual ::grpc::experimental::ServerBidiReactor< ::service::GetResponseRequest, ::service::GetResponseResponse>* GetResponse(
-      ::grpc::experimental::CallbackServerContext* /*context*/)
-    #endif
       { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_GetResponseSingle : public BaseClass {
+  class WithCallbackMethod_GetResponseSingle : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithCallbackMethod_GetResponseSingle() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodCallback(4,
+    WithCallbackMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodCallback(4,
           new ::grpc::internal::CallbackServerStreamingHandler< ::service::GetResponseRequestSingle, ::service::GetResponseResponse>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::service::GetResponseRequestSingle* request) { return this->GetResponseSingle(context, request); }));
+                   ::grpc::CallbackServerContext* context, const ::service::GetResponseRequestSingle* request) { return this->GetResponseSingle(context, request); }));
     }
-    ~ExperimentalWithCallbackMethod_GetResponseSingle() override {
+    ~WithCallbackMethod_GetResponseSingle() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -595,46 +467,26 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerWriteReactor< ::service::GetResponseResponse>* GetResponseSingle(
-      ::grpc::CallbackServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/)
-    #else
-    virtual ::grpc::experimental::ServerWriteReactor< ::service::GetResponseResponse>* GetResponseSingle(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/)
-    #endif
-      { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::service::GetResponseRequestSingle* /*request*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_SubmitFeedback : public BaseClass {
+  class WithCallbackMethod_SubmitFeedback : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithCallbackMethod_SubmitFeedback() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodCallback(5,
+    WithCallbackMethod_SubmitFeedback() {
+      ::grpc::Service::MarkMethodCallback(5,
           new ::grpc::internal::CallbackUnaryHandler< ::service::FeedbackRequest, ::service::FeedbackResponse>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::service::FeedbackRequest* request, ::service::FeedbackResponse* response) { return this->SubmitFeedback(context, request, response); }));}
+                   ::grpc::CallbackServerContext* context, const ::service::FeedbackRequest* request, ::service::FeedbackResponse* response) { return this->SubmitFeedback(context, request, response); }));}
     void SetMessageAllocatorFor_SubmitFeedback(
-        ::grpc::experimental::MessageAllocator< ::service::FeedbackRequest, ::service::FeedbackResponse>* allocator) {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+        ::grpc::MessageAllocator< ::service::FeedbackRequest, ::service::FeedbackResponse>* allocator) {
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(5);
-    #else
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(5);
-    #endif
       static_cast<::grpc::internal::CallbackUnaryHandler< ::service::FeedbackRequest, ::service::FeedbackResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
-    ~ExperimentalWithCallbackMethod_SubmitFeedback() override {
+    ~WithCallbackMethod_SubmitFeedback() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -642,20 +494,11 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerUnaryReactor* SubmitFeedback(
-      ::grpc::CallbackServerContext* /*context*/, const ::service::FeedbackRequest* /*request*/, ::service::FeedbackResponse* /*response*/)
-    #else
-    virtual ::grpc::experimental::ServerUnaryReactor* SubmitFeedback(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::service::FeedbackRequest* /*request*/, ::service::FeedbackResponse* /*response*/)
-    #endif
-      { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::service::FeedbackRequest* /*request*/, ::service::FeedbackResponse* /*response*/)  { return nullptr; }
   };
-  #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-  typedef ExperimentalWithCallbackMethod_Hello<ExperimentalWithCallbackMethod_HelloStream<ExperimentalWithCallbackMethod_SpeechToText<ExperimentalWithCallbackMethod_GetResponse<ExperimentalWithCallbackMethod_GetResponseSingle<ExperimentalWithCallbackMethod_SubmitFeedback<Service > > > > > > CallbackService;
-  #endif
-
-  typedef ExperimentalWithCallbackMethod_Hello<ExperimentalWithCallbackMethod_HelloStream<ExperimentalWithCallbackMethod_SpeechToText<ExperimentalWithCallbackMethod_GetResponse<ExperimentalWithCallbackMethod_GetResponseSingle<ExperimentalWithCallbackMethod_SubmitFeedback<Service > > > > > > ExperimentalCallbackService;
+  typedef WithCallbackMethod_Hello<WithCallbackMethod_HelloStream<WithCallbackMethod_SpeechToText<WithCallbackMethod_GetResponse<WithCallbackMethod_GetResponseSingle<WithCallbackMethod_SubmitFeedback<Service > > > > > > CallbackService;
+  typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Hello : public BaseClass {
    private:
@@ -879,27 +722,17 @@ class ConvaiService final {
     }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_Hello : public BaseClass {
+  class WithRawCallbackMethod_Hello : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithRawCallbackMethod_Hello() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodRawCallback(0,
+    WithRawCallbackMethod_Hello() {
+      ::grpc::Service::MarkMethodRawCallback(0,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Hello(context, request, response); }));
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Hello(context, request, response); }));
     }
-    ~ExperimentalWithRawCallbackMethod_Hello() override {
+    ~WithRawCallbackMethod_Hello() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -907,37 +740,21 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerUnaryReactor* Hello(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
-    #else
-    virtual ::grpc::experimental::ServerUnaryReactor* Hello(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
-    #endif
-      { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_HelloStream : public BaseClass {
+  class WithRawCallbackMethod_HelloStream : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithRawCallbackMethod_HelloStream() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodRawCallback(1,
+    WithRawCallbackMethod_HelloStream() {
+      ::grpc::Service::MarkMethodRawCallback(1,
           new ::grpc::internal::CallbackBidiHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context) { return this->HelloStream(context); }));
+                   ::grpc::CallbackServerContext* context) { return this->HelloStream(context); }));
     }
-    ~ExperimentalWithRawCallbackMethod_HelloStream() override {
+    ~WithRawCallbackMethod_HelloStream() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -945,37 +762,22 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* HelloStream(
       ::grpc::CallbackServerContext* /*context*/)
-    #else
-    virtual ::grpc::experimental::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* HelloStream(
-      ::grpc::experimental::CallbackServerContext* /*context*/)
-    #endif
       { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_SpeechToText : public BaseClass {
+  class WithRawCallbackMethod_SpeechToText : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithRawCallbackMethod_SpeechToText() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodRawCallback(2,
+    WithRawCallbackMethod_SpeechToText() {
+      ::grpc::Service::MarkMethodRawCallback(2,
           new ::grpc::internal::CallbackBidiHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context) { return this->SpeechToText(context); }));
+                   ::grpc::CallbackServerContext* context) { return this->SpeechToText(context); }));
     }
-    ~ExperimentalWithRawCallbackMethod_SpeechToText() override {
+    ~WithRawCallbackMethod_SpeechToText() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -983,37 +785,22 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* SpeechToText(
       ::grpc::CallbackServerContext* /*context*/)
-    #else
-    virtual ::grpc::experimental::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* SpeechToText(
-      ::grpc::experimental::CallbackServerContext* /*context*/)
-    #endif
       { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_GetResponse : public BaseClass {
+  class WithRawCallbackMethod_GetResponse : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithRawCallbackMethod_GetResponse() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodRawCallback(3,
+    WithRawCallbackMethod_GetResponse() {
+      ::grpc::Service::MarkMethodRawCallback(3,
           new ::grpc::internal::CallbackBidiHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context) { return this->GetResponse(context); }));
+                   ::grpc::CallbackServerContext* context) { return this->GetResponse(context); }));
     }
-    ~ExperimentalWithRawCallbackMethod_GetResponse() override {
+    ~WithRawCallbackMethod_GetResponse() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -1021,37 +808,22 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* GetResponse(
       ::grpc::CallbackServerContext* /*context*/)
-    #else
-    virtual ::grpc::experimental::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* GetResponse(
-      ::grpc::experimental::CallbackServerContext* /*context*/)
-    #endif
       { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_GetResponseSingle : public BaseClass {
+  class WithRawCallbackMethod_GetResponseSingle : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithRawCallbackMethod_GetResponseSingle() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodRawCallback(4,
+    WithRawCallbackMethod_GetResponseSingle() {
+      ::grpc::Service::MarkMethodRawCallback(4,
           new ::grpc::internal::CallbackServerStreamingHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const::grpc::ByteBuffer* request) { return this->GetResponseSingle(context, request); }));
+                   ::grpc::CallbackServerContext* context, const::grpc::ByteBuffer* request) { return this->GetResponseSingle(context, request); }));
     }
-    ~ExperimentalWithRawCallbackMethod_GetResponseSingle() override {
+    ~WithRawCallbackMethod_GetResponseSingle() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -1059,37 +831,21 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerWriteReactor< ::grpc::ByteBuffer>* GetResponseSingle(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
-    #else
-    virtual ::grpc::experimental::ServerWriteReactor< ::grpc::ByteBuffer>* GetResponseSingle(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
-    #endif
-      { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_SubmitFeedback : public BaseClass {
+  class WithRawCallbackMethod_SubmitFeedback : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithRawCallbackMethod_SubmitFeedback() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodRawCallback(5,
+    WithRawCallbackMethod_SubmitFeedback() {
+      ::grpc::Service::MarkMethodRawCallback(5,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->SubmitFeedback(context, request, response); }));
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->SubmitFeedback(context, request, response); }));
     }
-    ~ExperimentalWithRawCallbackMethod_SubmitFeedback() override {
+    ~WithRawCallbackMethod_SubmitFeedback() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
@@ -1097,14 +853,8 @@ class ConvaiService final {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerUnaryReactor* SubmitFeedback(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
-    #else
-    virtual ::grpc::experimental::ServerUnaryReactor* SubmitFeedback(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
-    #endif
-      { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_Hello : public BaseClass {
