@@ -292,6 +292,17 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	//TODO (Mohamed) handle status variable
 
+	
+#if ENGINE_MAJOR_VERSION < 5
+	if (!IsValid(this) || HasAnyFlags(RF_BeginDestroyed))
+	{
+		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
+			*ConvaiGRPCGetResponseParams.CharID,
+			*ConvaiGRPCGetResponseParams.SessionID);
+		LogAndEcecuteFailure("OnStreamInit");
+		return;
+}
+#else
 	if (!IsValid(this) || !IsValidChecked(this) || HasAnyFlags(RF_BeginDestroyed))
 	{
 		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
@@ -300,6 +311,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 		LogAndEcecuteFailure("OnStreamInit");
 		return;
 	}
+#endif
 
 	if (!ok || !status.ok())
 	{

@@ -371,7 +371,13 @@ public:
 				}
 			}
 
+#if ENGINE_MAJOR_VERSION < 5
+			double tempDuration;
+			JsonObject->TryGetNumberField(TEXT("Duration"), tempDuration);
+			Duration = (float)tempDuration;
+#else
 			JsonObject->TryGetNumberField(TEXT("Duration"), Duration);
+#endif
 			JsonObject->TryGetNumberField(TEXT("FrameRate"), FrameRate);
 
 			return true;
