@@ -35,16 +35,13 @@ void UFetchNarrativeSectionsProxy::Activate()
 		return;
 	}
 
-	// Get the list of all functions bound to the OnCompleted delegate
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
 
-	// Log the number of bindings
-
-	//UE_LOG(LogTemp, Log, TEXT("OnCompleted delegate is bound to %s object."), *InvocationList[0]->GetName());
-
-	FString API_key = Convai::Get().GetConvaiSettings()->API_Key;
 	// Form Validation
 	if (
-		!UConvaiFormValidation::ValidateAPIKey(API_key)
+		!UConvaiFormValidation::ValidateAuthKey(AuthKey)
 		|| !UConvaiFormValidation::ValidateCharacterID(CharacterId)
 		)
 	{
@@ -52,13 +49,14 @@ void UFetchNarrativeSectionsProxy::Activate()
 		failed();
 		return;
 	}
+
 	FHttpModule* HttpModule = &FHttpModule::Get();
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = HttpModule->CreateRequest();
 	HttpRequest->OnProcessRequestComplete().BindUObject(this, &UFetchNarrativeSectionsProxy::OnHttpRequestCompleted);
 	HttpRequest->SetURL(TEXT("https://api.convai.com/character/narrative/list-sections"));
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	HttpRequest->SetHeader(TEXT("CONVAI-API-KEY"), API_key);
+	HttpRequest->SetHeader(AuthHeader, AuthKey);
 	HttpRequest->SetContentAsString(FString::Printf(TEXT("{\"character_id\": \"%s\"}"), *CharacterId));
 	HttpRequest->ProcessRequest();
 }
@@ -133,8 +131,6 @@ void UFetchNarrativeSectionsProxy::finish()
 }
 
 
-
-
 UFetchNarrativeTriggersProxy* UFetchNarrativeTriggersProxy::FetchNarrativeTriggers(UObject* WorldContextObject, FString InCharacterId)
 {
 	UFetchNarrativeTriggersProxy* Proxy = NewObject<UFetchNarrativeTriggersProxy>();
@@ -163,16 +159,13 @@ void UFetchNarrativeTriggersProxy::Activate()
 		return;
 	}
 
-	// Get the list of all functions bound to the OnCompleted delegate
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
 
-	// Log the number of bindings
-
-	//UE_LOG(LogTemp, Log, TEXT("OnCompleted delegate is bound to %s object."), *InvocationList[0]->GetName());
-
-	FString API_key = Convai::Get().GetConvaiSettings()->API_Key;
 	// Form Validation
 	if (
-		!UConvaiFormValidation::ValidateAPIKey(API_key)
+		!UConvaiFormValidation::ValidateAuthKey(AuthKey)
 		|| !UConvaiFormValidation::ValidateCharacterID(CharacterId)
 		)
 	{
@@ -186,7 +179,7 @@ void UFetchNarrativeTriggersProxy::Activate()
 	HttpRequest->SetURL(TEXT("https://api.convai.com/character/narrative/list-triggers"));
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	HttpRequest->SetHeader(TEXT("CONVAI-API-KEY"), API_key);
+	HttpRequest->SetHeader(AuthHeader, AuthKey);
 	HttpRequest->SetContentAsString(FString::Printf(TEXT("{\"character_id\": \"%s\"}"), *CharacterId));
 	HttpRequest->ProcessRequest();
 }

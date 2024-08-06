@@ -88,7 +88,7 @@ void UConvaiGRPCGetResponseProxy::Activate()
 	reply = std::unique_ptr<service::GetResponseResponse>(new service::GetResponseResponse());
 
 	// Form Validation
-	if (!UConvaiFormValidation::ValidateAPIKey(ConvaiGRPCGetResponseParams.API_Key) || !(UConvaiFormValidation::ValidateCharacterID(ConvaiGRPCGetResponseParams.CharID)) || !(UConvaiFormValidation::ValidateSessionID(ConvaiGRPCGetResponseParams.SessionID)))
+	if (!UConvaiFormValidation::ValidateAuthKey(ConvaiGRPCGetResponseParams.AuthKey) || !(UConvaiFormValidation::ValidateCharacterID(ConvaiGRPCGetResponseParams.CharID)) || !(UConvaiFormValidation::ValidateSessionID(ConvaiGRPCGetResponseParams.SessionID)))
 	{
 		OnFailure.ExecuteIfBound();
 		return;
@@ -388,7 +388,27 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	// Create the config object that holds Audio and Action configs
 	GetResponseRequest_GetResponseConfig* getResponseConfig = new GetResponseRequest_GetResponseConfig();
-	getResponseConfig->set_api_key(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.API_Key));
+
+	if (ConvaiGRPCGetResponseParams.AuthHeader == ConvaiConstants::Auth_Token_Header)
+	{
+		getResponseConfig->set_api_auth_token(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.AuthKey));
+	}
+	else if (ConvaiGRPCGetResponseParams.AuthHeader == ConvaiConstants::API_Key_Header)
+	{
+		getResponseConfig->set_api_key(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.AuthKey));
+	}
+	else
+	{
+		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to invalid Authentication type! | Character ID : %s | Session ID : %s | Authentication type: %s | Authentication Key: %s"),
+			*ConvaiGRPCGetResponseParams.CharID,
+			*ConvaiGRPCGetResponseParams.SessionID,
+			*ConvaiGRPCGetResponseParams.AuthHeader,
+			*ConvaiGRPCGetResponseParams.AuthKey);
+		LogAndEcecuteFailure("OnStreamInit");
+		return;
+	}
+
+
 	getResponseConfig->set_session_id(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.SessionID));
 	getResponseConfig->set_character_id(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.CharID));
 

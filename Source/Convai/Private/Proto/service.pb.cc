@@ -39,10 +39,11 @@ extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::interna
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ActionConfig_Object_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_AudioConfig_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_BlendShapesData_service_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_DynamicInfoConfig_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_EmotionResponse_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_FeedbackRequest_Feedback_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_GetResponseRequest_service_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_GetResponseRequest_GetResponseConfig_service_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<5> scc_info_GetResponseRequest_GetResponseConfig_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GetResponseRequest_GetResponseData_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GetResponseResponse_ActionResponse_service_2eproto;
@@ -52,6 +53,9 @@ extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::interna
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_TriggerConfig_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Viseme_service_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_VisemesData_service_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_VisionInput_service_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_VisionInput_ImageData_service_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_service_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_VisionInput_VideoData_service_2eproto;
 namespace service {
 class AudioConfigDefaultTypeInternal {
  public:
@@ -81,6 +85,22 @@ class STTResponseDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<STTResponse> _instance;
 } _STTResponse_default_instance_;
+class DynamicInfoConfigDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<DynamicInfoConfig> _instance;
+} _DynamicInfoConfig_default_instance_;
+class VisionInput_ImageDataDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<VisionInput_ImageData> _instance;
+} _VisionInput_ImageData_default_instance_;
+class VisionInput_VideoDataDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<VisionInput_VideoData> _instance;
+} _VisionInput_VideoData_default_instance_;
+class VisionInputDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<VisionInput> _instance;
+} _VisionInput_default_instance_;
 class GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUseDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse> _instance;
@@ -225,6 +245,19 @@ static void InitDefaultsscc_info_BlendShapesData_service_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_BlendShapesData_service_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_BlendShapesData_service_2eproto}, {}};
 
+static void InitDefaultsscc_info_DynamicInfoConfig_service_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::service::_DynamicInfoConfig_default_instance_;
+    new (ptr) ::service::DynamicInfoConfig();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_DynamicInfoConfig_service_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_DynamicInfoConfig_service_2eproto}, {}};
+
 static void InitDefaultsscc_info_EmotionResponse_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -303,11 +336,13 @@ static void InitDefaultsscc_info_GetResponseRequest_GetResponseConfig_service_2e
   }
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_GetResponseRequest_GetResponseConfig_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 3, 0, InitDefaultsscc_info_GetResponseRequest_GetResponseConfig_service_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<5> scc_info_GetResponseRequest_GetResponseConfig_service_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 5, 0, InitDefaultsscc_info_GetResponseRequest_GetResponseConfig_service_2eproto}, {
       &scc_info_AudioConfig_service_2eproto.base,
       &scc_info_ActionConfig_service_2eproto.base,
-      &scc_info_GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse_service_2eproto.base,}};
+      &scc_info_GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse_service_2eproto.base,
+      &scc_info_DynamicInfoConfig_service_2eproto.base,
+      &scc_info_VisionInput_service_2eproto.base,}};
 
 static void InitDefaultsscc_info_GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -516,7 +551,48 @@ static void InitDefaultsscc_info_VisemesData_service_2eproto() {
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_VisemesData_service_2eproto}, {
       &scc_info_Viseme_service_2eproto.base,}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_service_2eproto[26];
+static void InitDefaultsscc_info_VisionInput_service_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::service::_VisionInput_default_instance_;
+    new (ptr) ::service::VisionInput();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_VisionInput_service_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_VisionInput_service_2eproto}, {
+      &scc_info_VisionInput_ImageData_service_2eproto.base,
+      &scc_info_VisionInput_VideoData_service_2eproto.base,}};
+
+static void InitDefaultsscc_info_VisionInput_ImageData_service_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::service::_VisionInput_ImageData_default_instance_;
+    new (ptr) ::service::VisionInput_ImageData();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_VisionInput_ImageData_service_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_VisionInput_ImageData_service_2eproto}, {}};
+
+static void InitDefaultsscc_info_VisionInput_VideoData_service_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::service::_VisionInput_VideoData_default_instance_;
+    new (ptr) ::service::VisionInput_VideoData();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_VisionInput_VideoData_service_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_VisionInput_VideoData_service_2eproto}, {}};
+
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_service_2eproto[30];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_service_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_service_2eproto = nullptr;
 
@@ -577,6 +653,37 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_service_2eproto::offsets[] PRO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::service::STTResponse, text_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::DynamicInfoConfig, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::service::DynamicInfoConfig, text_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_ImageData, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_ImageData, width_),
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_ImageData, height_),
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_ImageData, data_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_VideoData, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_VideoData, fps_),
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_VideoData, width_),
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_VideoData, height_),
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_VideoData, data_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput, _internal_metadata_),
+  ~0u,  // no _extensions_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput, _oneof_case_[0]),
+  ~0u,  // no _weak_field_map_
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput, vision_data_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -601,6 +708,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_service_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig, speaker_id_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig, api_auth_token_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig, narrative_template_keys_),
+  PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig, dynamic_info_config_),
+  PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig, vision_input_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseData, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -762,25 +871,29 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 31, -1, sizeof(::service::ActionConfig)},
   { 42, -1, sizeof(::service::STTRequest)},
   { 50, -1, sizeof(::service::STTResponse)},
-  { 56, 63, sizeof(::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse)},
-  { 65, -1, sizeof(::service::GetResponseRequest_GetResponseConfig)},
-  { 80, -1, sizeof(::service::GetResponseRequest_GetResponseData)},
-  { 89, -1, sizeof(::service::GetResponseRequest)},
-  { 97, -1, sizeof(::service::GetResponseRequestSingle)},
-  { 104, -1, sizeof(::service::GetResponseResponse_AudioResponse)},
-  { 119, -1, sizeof(::service::GetResponseResponse_ActionResponse)},
-  { 125, -1, sizeof(::service::GetResponseResponse_BehaviorTreeResponse)},
-  { 133, -1, sizeof(::service::GetResponseResponse_UserTranscript)},
-  { 141, -1, sizeof(::service::GetResponseResponse)},
-  { 155, -1, sizeof(::service::VisemesData)},
-  { 161, -1, sizeof(::service::EmotionResponse)},
-  { 168, -1, sizeof(::service::Viseme)},
-  { 188, -1, sizeof(::service::BlendShapesData)},
-  { 194, -1, sizeof(::service::HelloRequest)},
-  { 200, -1, sizeof(::service::HelloResponse)},
-  { 206, -1, sizeof(::service::FeedbackRequest_Feedback)},
-  { 215, -1, sizeof(::service::FeedbackRequest)},
-  { 226, -1, sizeof(::service::FeedbackResponse)},
+  { 56, -1, sizeof(::service::DynamicInfoConfig)},
+  { 62, -1, sizeof(::service::VisionInput_ImageData)},
+  { 70, -1, sizeof(::service::VisionInput_VideoData)},
+  { 79, -1, sizeof(::service::VisionInput)},
+  { 87, 94, sizeof(::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse)},
+  { 96, -1, sizeof(::service::GetResponseRequest_GetResponseConfig)},
+  { 113, -1, sizeof(::service::GetResponseRequest_GetResponseData)},
+  { 122, -1, sizeof(::service::GetResponseRequest)},
+  { 130, -1, sizeof(::service::GetResponseRequestSingle)},
+  { 137, -1, sizeof(::service::GetResponseResponse_AudioResponse)},
+  { 152, -1, sizeof(::service::GetResponseResponse_ActionResponse)},
+  { 158, -1, sizeof(::service::GetResponseResponse_BehaviorTreeResponse)},
+  { 166, -1, sizeof(::service::GetResponseResponse_UserTranscript)},
+  { 174, -1, sizeof(::service::GetResponseResponse)},
+  { 188, -1, sizeof(::service::VisemesData)},
+  { 194, -1, sizeof(::service::EmotionResponse)},
+  { 201, -1, sizeof(::service::Viseme)},
+  { 221, -1, sizeof(::service::BlendShapesData)},
+  { 227, -1, sizeof(::service::HelloRequest)},
+  { 233, -1, sizeof(::service::HelloResponse)},
+  { 239, -1, sizeof(::service::FeedbackRequest_Feedback)},
+  { 248, -1, sizeof(::service::FeedbackRequest)},
+  { 259, -1, sizeof(::service::FeedbackResponse)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -791,6 +904,10 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_ActionConfig_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_STTRequest_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_STTResponse_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_DynamicInfoConfig_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_VisionInput_ImageData_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_VisionInput_VideoData_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_VisionInput_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_GetResponseRequest_GetResponseConfig_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::service::_GetResponseRequest_GetResponseData_default_instance_),
@@ -830,97 +947,108 @@ const char descriptor_table_protodef_service_2eproto[] PROTOBUF_SECTION_VARIABLE
   "\001(\t\022\023\n\013description\030\002 \001(\t\"a\n\nSTTRequest\022,"
   "\n\014audio_config\030\001 \001(\0132\024.service.AudioConf"
   "igH\000\022\025\n\013audio_chunk\030\002 \001(\014H\000B\016\n\014request_t"
-  "ype\"\033\n\013STTResponse\022\014\n\004text\030\001 \001(\t\"\340\005\n\022Get"
-  "ResponseRequest\022L\n\023get_response_config\030\001"
-  " \001(\0132-.service.GetResponseRequest.GetRes"
-  "ponseConfigH\000\022H\n\021get_response_data\030\002 \001(\013"
-  "2+.service.GetResponseRequest.GetRespons"
-  "eDataH\000\032\245\003\n\021GetResponseConfig\022\024\n\014charact"
-  "er_id\030\002 \001(\t\022\017\n\007api_key\030\003 \001(\t\022\022\n\nsession_"
-  "id\030\004 \001(\t\022*\n\014audio_config\030\005 \001(\0132\024.service"
-  ".AudioConfig\022,\n\raction_config\030\006 \001(\0132\025.se"
-  "rvice.ActionConfig\022\017\n\007speaker\030\007 \001(\t\022\025\n\rl"
-  "anguage_code\030\010 \001(\t\022\022\n\nspeaker_id\030\t \001(\t\022\026"
-  "\n\016api_auth_token\030\n \001(\t\022i\n\027narrative_temp"
-  "late_keys\030\013 \003(\0132H.service.GetResponseReq"
-  "uest.GetResponseConfig.NarrativeTemplate"
-  "KeysEntry\032<\n\032NarrativeTemplateKeysEntry\022"
-  "\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032z\n\017GetRe"
-  "sponseData\022\024\n\naudio_data\030\001 \001(\014H\000\022\023\n\ttext"
-  "_data\030\002 \001(\tH\000\022.\n\014trigger_data\030\003 \001(\0132\026.se"
-  "rvice.TriggerConfigH\000B\014\n\ninput_typeB\016\n\014r"
-  "equest_type\"\204\001\n\030GetResponseRequestSingle"
-  "\0224\n\017response_config\030\001 \001(\0132\033.service.GetR"
-  "esponseRequest\0222\n\rresponse_data\030\002 \001(\0132\033."
-  "service.GetResponseRequest\"\337\007\n\023GetRespon"
-  "seResponse\022\022\n\nsession_id\030\001 \001(\t\022F\n\017action"
-  "_response\030\002 \001(\0132+.service.GetResponseRes"
-  "ponse.ActionResponseH\000\022D\n\016audio_response"
-  "\030\003 \001(\0132*.service.GetResponseResponse.Aud"
-  "ioResponseH\000\022\023\n\tdebug_log\030\004 \001(\tH\000\022A\n\nuse"
-  "r_query\030\005 \001(\0132+.service.GetResponseRespo"
-  "nse.UserTranscriptH\000\022H\n\013bt_response\030\006 \001("
-  "\01321.service.GetResponseResponse.Behavior"
-  "TreeResponseH\000\022\032\n\020emotion_response\030\007 \001(\t"
-  "H\000\022\030\n\016interaction_id\030\010 \001(\tH\000\032\355\002\n\rAudioRe"
-  "sponse\022\022\n\naudio_data\030\001 \001(\014\022*\n\014audio_conf"
-  "ig\030\002 \001(\0132\024.service.AudioConfig\022\021\n\ttext_d"
-  "ata\030\003 \001(\t\022\027\n\017end_of_response\030\004 \001(\010\022\021\n\tfa"
-  "ce_data\030\005 \001(\t\022,\n\014visemes_data\030\006 \001(\0132\024.se"
-  "rvice.VisemesDataH\000\0224\n\020blendshapes_data\030"
-  "\007 \001(\0132\030.service.BlendShapesDataH\000\0223\n\014fac"
-  "e_emotion\030\010 \001(\0132\035.service.ARKitBlendShap"
-  "esData\0222\n\020emotion_response\030\t \001(\0132\030.servi"
-  "ce.EmotionResponseB\020\n\016face_data_type\032 \n\016"
-  "ActionResponse\022\016\n\006action\030\001 \001(\t\032[\n\024Behavi"
-  "orTreeResponse\022\017\n\007bt_code\030\001 \001(\t\022\024\n\014bt_co"
-  "nstants\030\002 \001(\t\022\034\n\024narrative_section_id\030\003 "
-  "\001(\t\032N\n\016UserTranscript\022\021\n\ttext_data\030\001 \001(\t"
-  "\022\020\n\010is_final\030\002 \001(\010\022\027\n\017end_of_response\030\003 "
-  "\001(\010B\017\n\rresponse_type\"/\n\013VisemesData\022 \n\007v"
-  "isemes\030\001 \001(\0132\017.service.Viseme\"1\n\017Emotion"
-  "Response\022\017\n\007emotion\030\001 \001(\t\022\r\n\005scale\030\002 \001(\t"
-  "\"\274\001\n\006Viseme\022\013\n\003sil\030\001 \001(\002\022\n\n\002pp\030\002 \001(\002\022\n\n\002"
-  "ff\030\003 \001(\002\022\n\n\002th\030\004 \001(\002\022\n\n\002dd\030\005 \001(\002\022\n\n\002kk\030\006"
-  " \001(\002\022\n\n\002ch\030\007 \001(\002\022\n\n\002ss\030\010 \001(\002\022\n\n\002nn\030\t \001(\002"
-  "\022\n\n\002rr\030\n \001(\002\022\n\n\002aa\030\013 \001(\002\022\t\n\001e\030\014 \001(\002\022\n\n\002i"
-  "h\030\r \001(\002\022\n\n\002oh\030\016 \001(\002\022\n\n\002ou\030\017 \001(\002\"*\n\017Blend"
-  "ShapesData\022\027\n\017blendshape_data\030\001 \001(\t\"\034\n\014H"
-  "elloRequest\022\014\n\004name\030\001 \001(\t\" \n\rHelloRespon"
-  "se\022\017\n\007message\030\001 \001(\t\"\215\002\n\017FeedbackRequest\022"
-  "\026\n\016interaction_id\030\001 \001(\t\022\024\n\014character_id\030"
-  "\002 \001(\t\022\022\n\nsession_id\030\003 \001(\t\0228\n\rtext_feedba"
-  "ck\030\005 \001(\0132!.service.FeedbackRequest.Feedb"
-  "ack\022\022\n\nuser_query\030\006 \001(\t\022\020\n\010response\030\007 \001("
-  "\t\032X\n\010Feedback\022\021\n\tthumbs_up\030\001 \001(\010\022\025\n\rfeed"
-  "back_text\030\002 \001(\t\022\014\n\004tags\030\003 \003(\t\022\024\n\014is_test"
-  "_case\030\004 \001(\010\"-\n\020FeedbackResponse\022\031\n\021feedb"
-  "ack_response\030\001 \001(\t*\212\001\n\tFaceModel\022\032\n\026FACE"
-  "_MODEL_UNSPECIFIED\020\000\022\036\n\032FACE_MODEL_A_2F_"
-  "MODEL_NAME\020\001\022\"\n\036FACE_MODEL_PHONEMES_MODE"
-  "L_NAME\020\002\022\035\n\031FACE_MODEL_OVR_MODEL_NAME\020\0032"
-  "\301\003\n\rConvaiService\0228\n\005Hello\022\025.service.Hel"
-  "loRequest\032\026.service.HelloResponse\"\000\022B\n\013H"
-  "elloStream\022\025.service.HelloRequest\032\026.serv"
-  "ice.HelloResponse\"\000(\0010\001\022\?\n\014SpeechToText\022"
-  "\023.service.STTRequest\032\024.service.STTRespon"
-  "se\"\000(\0010\001\022N\n\013GetResponse\022\033.service.GetRes"
-  "ponseRequest\032\034.service.GetResponseRespon"
-  "se\"\000(\0010\001\022X\n\021GetResponseSingle\022!.service."
-  "GetResponseRequestSingle\032\034.service.GetRe"
-  "sponseResponse\"\0000\001\022G\n\016SubmitFeedback\022\030.s"
-  "ervice.FeedbackRequest\032\031.service.Feedbac"
-  "kResponse\"\000b\006proto3"
+  "ype\"\033\n\013STTResponse\022\014\n\004text\030\001 \001(\t\"!\n\021Dyna"
+  "micInfoConfig\022\014\n\004text\030\001 \001(\t\"\211\002\n\013VisionIn"
+  "put\0224\n\nimage_data\030\001 \001(\0132\036.service.Vision"
+  "Input.ImageDataH\000\0224\n\nvideo_data\030\002 \001(\0132\036."
+  "service.VisionInput.VideoDataH\000\0328\n\tImage"
+  "Data\022\r\n\005width\030\001 \001(\005\022\016\n\006height\030\002 \001(\005\022\014\n\004d"
+  "ata\030\003 \001(\014\032E\n\tVideoData\022\013\n\003fps\030\001 \001(\005\022\r\n\005w"
+  "idth\030\002 \001(\005\022\016\n\006height\030\003 \001(\005\022\014\n\004data\030\004 \001(\014"
+  "B\r\n\013vision_data\"\305\006\n\022GetResponseRequest\022L"
+  "\n\023get_response_config\030\001 \001(\0132-.service.Ge"
+  "tResponseRequest.GetResponseConfigH\000\022H\n\021"
+  "get_response_data\030\002 \001(\0132+.service.GetRes"
+  "ponseRequest.GetResponseDataH\000\032\212\004\n\021GetRe"
+  "sponseConfig\022\024\n\014character_id\030\002 \001(\t\022\017\n\007ap"
+  "i_key\030\003 \001(\t\022\022\n\nsession_id\030\004 \001(\t\022*\n\014audio"
+  "_config\030\005 \001(\0132\024.service.AudioConfig\022,\n\ra"
+  "ction_config\030\006 \001(\0132\025.service.ActionConfi"
+  "g\022\017\n\007speaker\030\007 \001(\t\022\025\n\rlanguage_code\030\010 \001("
+  "\t\022\022\n\nspeaker_id\030\t \001(\t\022\026\n\016api_auth_token\030"
+  "\n \001(\t\022i\n\027narrative_template_keys\030\013 \003(\0132H"
+  ".service.GetResponseRequest.GetResponseC"
+  "onfig.NarrativeTemplateKeysEntry\0227\n\023dyna"
+  "mic_info_config\030\014 \001(\0132\032.service.DynamicI"
+  "nfoConfig\022*\n\014vision_input\030\r \001(\0132\024.servic"
+  "e.VisionInput\032<\n\032NarrativeTemplateKeysEn"
+  "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032z\n\017G"
+  "etResponseData\022\024\n\naudio_data\030\001 \001(\014H\000\022\023\n\t"
+  "text_data\030\002 \001(\tH\000\022.\n\014trigger_data\030\003 \001(\0132"
+  "\026.service.TriggerConfigH\000B\014\n\ninput_typeB"
+  "\016\n\014request_type\"\204\001\n\030GetResponseRequestSi"
+  "ngle\0224\n\017response_config\030\001 \001(\0132\033.service."
+  "GetResponseRequest\0222\n\rresponse_data\030\002 \001("
+  "\0132\033.service.GetResponseRequest\"\337\007\n\023GetRe"
+  "sponseResponse\022\022\n\nsession_id\030\001 \001(\t\022F\n\017ac"
+  "tion_response\030\002 \001(\0132+.service.GetRespons"
+  "eResponse.ActionResponseH\000\022D\n\016audio_resp"
+  "onse\030\003 \001(\0132*.service.GetResponseResponse"
+  ".AudioResponseH\000\022\023\n\tdebug_log\030\004 \001(\tH\000\022A\n"
+  "\nuser_query\030\005 \001(\0132+.service.GetResponseR"
+  "esponse.UserTranscriptH\000\022H\n\013bt_response\030"
+  "\006 \001(\01321.service.GetResponseResponse.Beha"
+  "viorTreeResponseH\000\022\032\n\020emotion_response\030\007"
+  " \001(\tH\000\022\030\n\016interaction_id\030\010 \001(\tH\000\032\355\002\n\rAud"
+  "ioResponse\022\022\n\naudio_data\030\001 \001(\014\022*\n\014audio_"
+  "config\030\002 \001(\0132\024.service.AudioConfig\022\021\n\tte"
+  "xt_data\030\003 \001(\t\022\027\n\017end_of_response\030\004 \001(\010\022\021"
+  "\n\tface_data\030\005 \001(\t\022,\n\014visemes_data\030\006 \001(\0132"
+  "\024.service.VisemesDataH\000\0224\n\020blendshapes_d"
+  "ata\030\007 \001(\0132\030.service.BlendShapesDataH\000\0223\n"
+  "\014face_emotion\030\010 \001(\0132\035.service.ARKitBlend"
+  "ShapesData\0222\n\020emotion_response\030\t \001(\0132\030.s"
+  "ervice.EmotionResponseB\020\n\016face_data_type"
+  "\032 \n\016ActionResponse\022\016\n\006action\030\001 \001(\t\032[\n\024Be"
+  "haviorTreeResponse\022\017\n\007bt_code\030\001 \001(\t\022\024\n\014b"
+  "t_constants\030\002 \001(\t\022\034\n\024narrative_section_i"
+  "d\030\003 \001(\t\032N\n\016UserTranscript\022\021\n\ttext_data\030\001"
+  " \001(\t\022\020\n\010is_final\030\002 \001(\010\022\027\n\017end_of_respons"
+  "e\030\003 \001(\010B\017\n\rresponse_type\"/\n\013VisemesData\022"
+  " \n\007visemes\030\001 \001(\0132\017.service.Viseme\"1\n\017Emo"
+  "tionResponse\022\017\n\007emotion\030\001 \001(\t\022\r\n\005scale\030\002"
+  " \001(\t\"\274\001\n\006Viseme\022\013\n\003sil\030\001 \001(\002\022\n\n\002pp\030\002 \001(\002"
+  "\022\n\n\002ff\030\003 \001(\002\022\n\n\002th\030\004 \001(\002\022\n\n\002dd\030\005 \001(\002\022\n\n\002"
+  "kk\030\006 \001(\002\022\n\n\002ch\030\007 \001(\002\022\n\n\002ss\030\010 \001(\002\022\n\n\002nn\030\t"
+  " \001(\002\022\n\n\002rr\030\n \001(\002\022\n\n\002aa\030\013 \001(\002\022\t\n\001e\030\014 \001(\002\022"
+  "\n\n\002ih\030\r \001(\002\022\n\n\002oh\030\016 \001(\002\022\n\n\002ou\030\017 \001(\002\"*\n\017B"
+  "lendShapesData\022\027\n\017blendshape_data\030\001 \001(\t\""
+  "\034\n\014HelloRequest\022\014\n\004name\030\001 \001(\t\" \n\rHelloRe"
+  "sponse\022\017\n\007message\030\001 \001(\t\"\215\002\n\017FeedbackRequ"
+  "est\022\026\n\016interaction_id\030\001 \001(\t\022\024\n\014character"
+  "_id\030\002 \001(\t\022\022\n\nsession_id\030\003 \001(\t\0228\n\rtext_fe"
+  "edback\030\005 \001(\0132!.service.FeedbackRequest.F"
+  "eedback\022\022\n\nuser_query\030\006 \001(\t\022\020\n\010response\030"
+  "\007 \001(\t\032X\n\010Feedback\022\021\n\tthumbs_up\030\001 \001(\010\022\025\n\r"
+  "feedback_text\030\002 \001(\t\022\014\n\004tags\030\003 \003(\t\022\024\n\014is_"
+  "test_case\030\004 \001(\010\"-\n\020FeedbackResponse\022\031\n\021f"
+  "eedback_response\030\001 \001(\t*\212\001\n\tFaceModel\022\032\n\026"
+  "FACE_MODEL_UNSPECIFIED\020\000\022\036\n\032FACE_MODEL_A"
+  "_2F_MODEL_NAME\020\001\022\"\n\036FACE_MODEL_PHONEMES_"
+  "MODEL_NAME\020\002\022\035\n\031FACE_MODEL_OVR_MODEL_NAM"
+  "E\020\0032\301\003\n\rConvaiService\0228\n\005Hello\022\025.service"
+  ".HelloRequest\032\026.service.HelloResponse\"\000\022"
+  "B\n\013HelloStream\022\025.service.HelloRequest\032\026."
+  "service.HelloResponse\"\000(\0010\001\022\?\n\014SpeechToT"
+  "ext\022\023.service.STTRequest\032\024.service.STTRe"
+  "sponse\"\000(\0010\001\022N\n\013GetResponse\022\033.service.Ge"
+  "tResponseRequest\032\034.service.GetResponseRe"
+  "sponse\"\000(\0010\001\022X\n\021GetResponseSingle\022!.serv"
+  "ice.GetResponseRequestSingle\032\034.service.G"
+  "etResponseResponse\"\0000\001\022G\n\016SubmitFeedback"
+  "\022\030.service.FeedbackRequest\032\031.service.Fee"
+  "dbackResponse\"\000B\017Z\rproto/serviceb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_service_2eproto_deps[1] = {
   &::descriptor_table_arkit_5fblend_5fshapes_2eproto,
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_service_2eproto_sccs[26] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_service_2eproto_sccs[30] = {
   &scc_info_ActionConfig_service_2eproto.base,
   &scc_info_ActionConfig_Character_service_2eproto.base,
   &scc_info_ActionConfig_Object_service_2eproto.base,
   &scc_info_AudioConfig_service_2eproto.base,
   &scc_info_BlendShapesData_service_2eproto.base,
+  &scc_info_DynamicInfoConfig_service_2eproto.base,
   &scc_info_EmotionResponse_service_2eproto.base,
   &scc_info_FeedbackRequest_service_2eproto.base,
   &scc_info_FeedbackRequest_Feedback_service_2eproto.base,
@@ -942,13 +1070,16 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ser
   &scc_info_TriggerConfig_service_2eproto.base,
   &scc_info_Viseme_service_2eproto.base,
   &scc_info_VisemesData_service_2eproto.base,
+  &scc_info_VisionInput_service_2eproto.base,
+  &scc_info_VisionInput_ImageData_service_2eproto.base,
+  &scc_info_VisionInput_VideoData_service_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_service_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_service_2eproto = {
-  false, false, descriptor_table_protodef_service_2eproto, "service.proto", 3899,
-  &descriptor_table_service_2eproto_once, descriptor_table_service_2eproto_sccs, descriptor_table_service_2eproto_deps, 26, 1,
+  false, false, descriptor_table_protodef_service_2eproto, "service.proto", 4320,
+  &descriptor_table_service_2eproto_once, descriptor_table_service_2eproto_sccs, descriptor_table_service_2eproto_deps, 30, 1,
   schemas, file_default_instances, TableStruct_service_2eproto::offsets,
-  file_level_metadata_service_2eproto, 26, file_level_enum_descriptors_service_2eproto, file_level_service_descriptors_service_2eproto,
+  file_level_metadata_service_2eproto, 30, file_level_enum_descriptors_service_2eproto, file_level_service_descriptors_service_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -2867,6 +2998,1075 @@ void STTResponse::InternalSwap(STTResponse* other) {
 
 // ===================================================================
 
+class DynamicInfoConfig::_Internal {
+ public:
+};
+
+DynamicInfoConfig::DynamicInfoConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:service.DynamicInfoConfig)
+}
+DynamicInfoConfig::DynamicInfoConfig(const DynamicInfoConfig& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  text_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_text().empty()) {
+    text_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_text(), 
+      GetArena());
+  }
+  // @@protoc_insertion_point(copy_constructor:service.DynamicInfoConfig)
+}
+
+void DynamicInfoConfig::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_DynamicInfoConfig_service_2eproto.base);
+  text_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+DynamicInfoConfig::~DynamicInfoConfig() {
+  // @@protoc_insertion_point(destructor:service.DynamicInfoConfig)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void DynamicInfoConfig::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  text_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void DynamicInfoConfig::ArenaDtor(void* object) {
+  DynamicInfoConfig* _this = reinterpret_cast< DynamicInfoConfig* >(object);
+  (void)_this;
+}
+void DynamicInfoConfig::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void DynamicInfoConfig::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const DynamicInfoConfig& DynamicInfoConfig::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_DynamicInfoConfig_service_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void DynamicInfoConfig::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.DynamicInfoConfig)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  text_.ClearToEmpty();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* DynamicInfoConfig::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // string text = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_text();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "service.DynamicInfoConfig.text"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* DynamicInfoConfig::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.DynamicInfoConfig)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string text = 1;
+  if (this->text().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_text().data(), static_cast<int>(this->_internal_text().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "service.DynamicInfoConfig.text");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_text(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.DynamicInfoConfig)
+  return target;
+}
+
+size_t DynamicInfoConfig::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.DynamicInfoConfig)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string text = 1;
+  if (this->text().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_text());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void DynamicInfoConfig::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:service.DynamicInfoConfig)
+  GOOGLE_DCHECK_NE(&from, this);
+  const DynamicInfoConfig* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<DynamicInfoConfig>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:service.DynamicInfoConfig)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:service.DynamicInfoConfig)
+    MergeFrom(*source);
+  }
+}
+
+void DynamicInfoConfig::MergeFrom(const DynamicInfoConfig& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:service.DynamicInfoConfig)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.text().size() > 0) {
+    _internal_set_text(from._internal_text());
+  }
+}
+
+void DynamicInfoConfig::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:service.DynamicInfoConfig)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void DynamicInfoConfig::CopyFrom(const DynamicInfoConfig& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.DynamicInfoConfig)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DynamicInfoConfig::IsInitialized() const {
+  return true;
+}
+
+void DynamicInfoConfig::InternalSwap(DynamicInfoConfig* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  text_.Swap(&other->text_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata DynamicInfoConfig::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+class VisionInput_ImageData::_Internal {
+ public:
+};
+
+VisionInput_ImageData::VisionInput_ImageData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:service.VisionInput.ImageData)
+}
+VisionInput_ImageData::VisionInput_ImageData(const VisionInput_ImageData& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_data().empty()) {
+    data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_data(), 
+      GetArena());
+  }
+  ::memcpy(&width_, &from.width_,
+    static_cast<size_t>(reinterpret_cast<char*>(&height_) -
+    reinterpret_cast<char*>(&width_)) + sizeof(height_));
+  // @@protoc_insertion_point(copy_constructor:service.VisionInput.ImageData)
+}
+
+void VisionInput_ImageData::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_VisionInput_ImageData_service_2eproto.base);
+  data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+      reinterpret_cast<char*>(&width_) - reinterpret_cast<char*>(this)),
+      0, static_cast<size_t>(reinterpret_cast<char*>(&height_) -
+      reinterpret_cast<char*>(&width_)) + sizeof(height_));
+}
+
+VisionInput_ImageData::~VisionInput_ImageData() {
+  // @@protoc_insertion_point(destructor:service.VisionInput.ImageData)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void VisionInput_ImageData::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  data_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void VisionInput_ImageData::ArenaDtor(void* object) {
+  VisionInput_ImageData* _this = reinterpret_cast< VisionInput_ImageData* >(object);
+  (void)_this;
+}
+void VisionInput_ImageData::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void VisionInput_ImageData::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const VisionInput_ImageData& VisionInput_ImageData::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_VisionInput_ImageData_service_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void VisionInput_ImageData::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.VisionInput.ImageData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  data_.ClearToEmpty();
+  ::memset(&width_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&height_) -
+      reinterpret_cast<char*>(&width_)) + sizeof(height_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* VisionInput_ImageData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // int32 width = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 height = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bytes data = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          auto str = _internal_mutable_data();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* VisionInput_ImageData::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.VisionInput.ImageData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 width = 1;
+  if (this->width() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_width(), target);
+  }
+
+  // int32 height = 2;
+  if (this->height() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_height(), target);
+  }
+
+  // bytes data = 3;
+  if (this->data().size() > 0) {
+    target = stream->WriteBytesMaybeAliased(
+        3, this->_internal_data(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.VisionInput.ImageData)
+  return target;
+}
+
+size_t VisionInput_ImageData::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.VisionInput.ImageData)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // bytes data = 3;
+  if (this->data().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_data());
+  }
+
+  // int32 width = 1;
+  if (this->width() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_width());
+  }
+
+  // int32 height = 2;
+  if (this->height() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_height());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void VisionInput_ImageData::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:service.VisionInput.ImageData)
+  GOOGLE_DCHECK_NE(&from, this);
+  const VisionInput_ImageData* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<VisionInput_ImageData>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:service.VisionInput.ImageData)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:service.VisionInput.ImageData)
+    MergeFrom(*source);
+  }
+}
+
+void VisionInput_ImageData::MergeFrom(const VisionInput_ImageData& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:service.VisionInput.ImageData)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.data().size() > 0) {
+    _internal_set_data(from._internal_data());
+  }
+  if (from.width() != 0) {
+    _internal_set_width(from._internal_width());
+  }
+  if (from.height() != 0) {
+    _internal_set_height(from._internal_height());
+  }
+}
+
+void VisionInput_ImageData::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:service.VisionInput.ImageData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void VisionInput_ImageData::CopyFrom(const VisionInput_ImageData& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.VisionInput.ImageData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool VisionInput_ImageData::IsInitialized() const {
+  return true;
+}
+
+void VisionInput_ImageData::InternalSwap(VisionInput_ImageData* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  data_.Swap(&other->data_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(VisionInput_ImageData, height_)
+      + sizeof(VisionInput_ImageData::height_)
+      - PROTOBUF_FIELD_OFFSET(VisionInput_ImageData, width_)>(
+          reinterpret_cast<char*>(&width_),
+          reinterpret_cast<char*>(&other->width_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata VisionInput_ImageData::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+class VisionInput_VideoData::_Internal {
+ public:
+};
+
+VisionInput_VideoData::VisionInput_VideoData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:service.VisionInput.VideoData)
+}
+VisionInput_VideoData::VisionInput_VideoData(const VisionInput_VideoData& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_data().empty()) {
+    data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_data(), 
+      GetArena());
+  }
+  ::memcpy(&fps_, &from.fps_,
+    static_cast<size_t>(reinterpret_cast<char*>(&height_) -
+    reinterpret_cast<char*>(&fps_)) + sizeof(height_));
+  // @@protoc_insertion_point(copy_constructor:service.VisionInput.VideoData)
+}
+
+void VisionInput_VideoData::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_VisionInput_VideoData_service_2eproto.base);
+  data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+      reinterpret_cast<char*>(&fps_) - reinterpret_cast<char*>(this)),
+      0, static_cast<size_t>(reinterpret_cast<char*>(&height_) -
+      reinterpret_cast<char*>(&fps_)) + sizeof(height_));
+}
+
+VisionInput_VideoData::~VisionInput_VideoData() {
+  // @@protoc_insertion_point(destructor:service.VisionInput.VideoData)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void VisionInput_VideoData::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  data_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void VisionInput_VideoData::ArenaDtor(void* object) {
+  VisionInput_VideoData* _this = reinterpret_cast< VisionInput_VideoData* >(object);
+  (void)_this;
+}
+void VisionInput_VideoData::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void VisionInput_VideoData::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const VisionInput_VideoData& VisionInput_VideoData::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_VisionInput_VideoData_service_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void VisionInput_VideoData::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.VisionInput.VideoData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  data_.ClearToEmpty();
+  ::memset(&fps_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&height_) -
+      reinterpret_cast<char*>(&fps_)) + sizeof(height_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* VisionInput_VideoData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // int32 fps = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          fps_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 width = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 height = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+          height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bytes data = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+          auto str = _internal_mutable_data();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* VisionInput_VideoData::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.VisionInput.VideoData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 fps = 1;
+  if (this->fps() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_fps(), target);
+  }
+
+  // int32 width = 2;
+  if (this->width() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_width(), target);
+  }
+
+  // int32 height = 3;
+  if (this->height() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(3, this->_internal_height(), target);
+  }
+
+  // bytes data = 4;
+  if (this->data().size() > 0) {
+    target = stream->WriteBytesMaybeAliased(
+        4, this->_internal_data(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.VisionInput.VideoData)
+  return target;
+}
+
+size_t VisionInput_VideoData::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.VisionInput.VideoData)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // bytes data = 4;
+  if (this->data().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_data());
+  }
+
+  // int32 fps = 1;
+  if (this->fps() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_fps());
+  }
+
+  // int32 width = 2;
+  if (this->width() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_width());
+  }
+
+  // int32 height = 3;
+  if (this->height() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_height());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void VisionInput_VideoData::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:service.VisionInput.VideoData)
+  GOOGLE_DCHECK_NE(&from, this);
+  const VisionInput_VideoData* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<VisionInput_VideoData>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:service.VisionInput.VideoData)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:service.VisionInput.VideoData)
+    MergeFrom(*source);
+  }
+}
+
+void VisionInput_VideoData::MergeFrom(const VisionInput_VideoData& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:service.VisionInput.VideoData)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.data().size() > 0) {
+    _internal_set_data(from._internal_data());
+  }
+  if (from.fps() != 0) {
+    _internal_set_fps(from._internal_fps());
+  }
+  if (from.width() != 0) {
+    _internal_set_width(from._internal_width());
+  }
+  if (from.height() != 0) {
+    _internal_set_height(from._internal_height());
+  }
+}
+
+void VisionInput_VideoData::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:service.VisionInput.VideoData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void VisionInput_VideoData::CopyFrom(const VisionInput_VideoData& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.VisionInput.VideoData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool VisionInput_VideoData::IsInitialized() const {
+  return true;
+}
+
+void VisionInput_VideoData::InternalSwap(VisionInput_VideoData* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  data_.Swap(&other->data_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(VisionInput_VideoData, height_)
+      + sizeof(VisionInput_VideoData::height_)
+      - PROTOBUF_FIELD_OFFSET(VisionInput_VideoData, fps_)>(
+          reinterpret_cast<char*>(&fps_),
+          reinterpret_cast<char*>(&other->fps_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata VisionInput_VideoData::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+class VisionInput::_Internal {
+ public:
+  static const ::service::VisionInput_ImageData& image_data(const VisionInput* msg);
+  static const ::service::VisionInput_VideoData& video_data(const VisionInput* msg);
+};
+
+const ::service::VisionInput_ImageData&
+VisionInput::_Internal::image_data(const VisionInput* msg) {
+  return *msg->vision_data_.image_data_;
+}
+const ::service::VisionInput_VideoData&
+VisionInput::_Internal::video_data(const VisionInput* msg) {
+  return *msg->vision_data_.video_data_;
+}
+void VisionInput::set_allocated_image_data(::service::VisionInput_ImageData* image_data) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_vision_data();
+  if (image_data) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(image_data);
+    if (message_arena != submessage_arena) {
+      image_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, image_data, submessage_arena);
+    }
+    set_has_image_data();
+    vision_data_.image_data_ = image_data;
+  }
+  // @@protoc_insertion_point(field_set_allocated:service.VisionInput.image_data)
+}
+void VisionInput::set_allocated_video_data(::service::VisionInput_VideoData* video_data) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_vision_data();
+  if (video_data) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(video_data);
+    if (message_arena != submessage_arena) {
+      video_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, video_data, submessage_arena);
+    }
+    set_has_video_data();
+    vision_data_.video_data_ = video_data;
+  }
+  // @@protoc_insertion_point(field_set_allocated:service.VisionInput.video_data)
+}
+VisionInput::VisionInput(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:service.VisionInput)
+}
+VisionInput::VisionInput(const VisionInput& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  clear_has_vision_data();
+  switch (from.vision_data_case()) {
+    case kImageData: {
+      _internal_mutable_image_data()->::service::VisionInput_ImageData::MergeFrom(from._internal_image_data());
+      break;
+    }
+    case kVideoData: {
+      _internal_mutable_video_data()->::service::VisionInput_VideoData::MergeFrom(from._internal_video_data());
+      break;
+    }
+    case VISION_DATA_NOT_SET: {
+      break;
+    }
+  }
+  // @@protoc_insertion_point(copy_constructor:service.VisionInput)
+}
+
+void VisionInput::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_VisionInput_service_2eproto.base);
+  clear_has_vision_data();
+}
+
+VisionInput::~VisionInput() {
+  // @@protoc_insertion_point(destructor:service.VisionInput)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void VisionInput::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  if (has_vision_data()) {
+    clear_vision_data();
+  }
+}
+
+void VisionInput::ArenaDtor(void* object) {
+  VisionInput* _this = reinterpret_cast< VisionInput* >(object);
+  (void)_this;
+}
+void VisionInput::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void VisionInput::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const VisionInput& VisionInput::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_VisionInput_service_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void VisionInput::clear_vision_data() {
+// @@protoc_insertion_point(one_of_clear_start:service.VisionInput)
+  switch (vision_data_case()) {
+    case kImageData: {
+      if (GetArena() == nullptr) {
+        delete vision_data_.image_data_;
+      }
+      break;
+    }
+    case kVideoData: {
+      if (GetArena() == nullptr) {
+        delete vision_data_.video_data_;
+      }
+      break;
+    }
+    case VISION_DATA_NOT_SET: {
+      break;
+    }
+  }
+  _oneof_case_[0] = VISION_DATA_NOT_SET;
+}
+
+
+void VisionInput::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.VisionInput)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  clear_vision_data();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* VisionInput::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // .service.VisionInput.ImageData image_data = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ctx->ParseMessage(_internal_mutable_image_data(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .service.VisionInput.VideoData video_data = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          ptr = ctx->ParseMessage(_internal_mutable_video_data(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* VisionInput::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.VisionInput)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .service.VisionInput.ImageData image_data = 1;
+  if (_internal_has_image_data()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        1, _Internal::image_data(this), target, stream);
+  }
+
+  // .service.VisionInput.VideoData video_data = 2;
+  if (_internal_has_video_data()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        2, _Internal::video_data(this), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.VisionInput)
+  return target;
+}
+
+size_t VisionInput::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.VisionInput)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  switch (vision_data_case()) {
+    // .service.VisionInput.ImageData image_data = 1;
+    case kImageData: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *vision_data_.image_data_);
+      break;
+    }
+    // .service.VisionInput.VideoData video_data = 2;
+    case kVideoData: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *vision_data_.video_data_);
+      break;
+    }
+    case VISION_DATA_NOT_SET: {
+      break;
+    }
+  }
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void VisionInput::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:service.VisionInput)
+  GOOGLE_DCHECK_NE(&from, this);
+  const VisionInput* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<VisionInput>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:service.VisionInput)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:service.VisionInput)
+    MergeFrom(*source);
+  }
+}
+
+void VisionInput::MergeFrom(const VisionInput& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:service.VisionInput)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  switch (from.vision_data_case()) {
+    case kImageData: {
+      _internal_mutable_image_data()->::service::VisionInput_ImageData::MergeFrom(from._internal_image_data());
+      break;
+    }
+    case kVideoData: {
+      _internal_mutable_video_data()->::service::VisionInput_VideoData::MergeFrom(from._internal_video_data());
+      break;
+    }
+    case VISION_DATA_NOT_SET: {
+      break;
+    }
+  }
+}
+
+void VisionInput::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:service.VisionInput)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void VisionInput::CopyFrom(const VisionInput& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.VisionInput)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool VisionInput::IsInitialized() const {
+  return true;
+}
+
+void VisionInput::InternalSwap(VisionInput* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  swap(vision_data_, other->vision_data_);
+  swap(_oneof_case_[0], other->_oneof_case_[0]);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata VisionInput::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
 GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse() {}
 GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
     : SuperType(arena) {}
@@ -2888,6 +4088,8 @@ class GetResponseRequest_GetResponseConfig::_Internal {
  public:
   static const ::service::AudioConfig& audio_config(const GetResponseRequest_GetResponseConfig* msg);
   static const ::service::ActionConfig& action_config(const GetResponseRequest_GetResponseConfig* msg);
+  static const ::service::DynamicInfoConfig& dynamic_info_config(const GetResponseRequest_GetResponseConfig* msg);
+  static const ::service::VisionInput& vision_input(const GetResponseRequest_GetResponseConfig* msg);
 };
 
 const ::service::AudioConfig&
@@ -2897,6 +4099,14 @@ GetResponseRequest_GetResponseConfig::_Internal::audio_config(const GetResponseR
 const ::service::ActionConfig&
 GetResponseRequest_GetResponseConfig::_Internal::action_config(const GetResponseRequest_GetResponseConfig* msg) {
   return *msg->action_config_;
+}
+const ::service::DynamicInfoConfig&
+GetResponseRequest_GetResponseConfig::_Internal::dynamic_info_config(const GetResponseRequest_GetResponseConfig* msg) {
+  return *msg->dynamic_info_config_;
+}
+const ::service::VisionInput&
+GetResponseRequest_GetResponseConfig::_Internal::vision_input(const GetResponseRequest_GetResponseConfig* msg) {
+  return *msg->vision_input_;
 }
 GetResponseRequest_GetResponseConfig::GetResponseRequest_GetResponseConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
@@ -2954,6 +4164,16 @@ GetResponseRequest_GetResponseConfig::GetResponseRequest_GetResponseConfig(const
   } else {
     action_config_ = nullptr;
   }
+  if (from._internal_has_dynamic_info_config()) {
+    dynamic_info_config_ = new ::service::DynamicInfoConfig(*from.dynamic_info_config_);
+  } else {
+    dynamic_info_config_ = nullptr;
+  }
+  if (from._internal_has_vision_input()) {
+    vision_input_ = new ::service::VisionInput(*from.vision_input_);
+  } else {
+    vision_input_ = nullptr;
+  }
   // @@protoc_insertion_point(copy_constructor:service.GetResponseRequest.GetResponseConfig)
 }
 
@@ -2968,8 +4188,8 @@ void GetResponseRequest_GetResponseConfig::SharedCtor() {
   api_auth_token_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
       reinterpret_cast<char*>(&audio_config_) - reinterpret_cast<char*>(this)),
-      0, static_cast<size_t>(reinterpret_cast<char*>(&action_config_) -
-      reinterpret_cast<char*>(&audio_config_)) + sizeof(action_config_));
+      0, static_cast<size_t>(reinterpret_cast<char*>(&vision_input_) -
+      reinterpret_cast<char*>(&audio_config_)) + sizeof(vision_input_));
 }
 
 GetResponseRequest_GetResponseConfig::~GetResponseRequest_GetResponseConfig() {
@@ -2989,6 +4209,8 @@ void GetResponseRequest_GetResponseConfig::SharedDtor() {
   api_auth_token_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete audio_config_;
   if (this != internal_default_instance()) delete action_config_;
+  if (this != internal_default_instance()) delete dynamic_info_config_;
+  if (this != internal_default_instance()) delete vision_input_;
 }
 
 void GetResponseRequest_GetResponseConfig::ArenaDtor(void* object) {
@@ -3028,6 +4250,14 @@ void GetResponseRequest_GetResponseConfig::Clear() {
     delete action_config_;
   }
   action_config_ = nullptr;
+  if (GetArena() == nullptr && dynamic_info_config_ != nullptr) {
+    delete dynamic_info_config_;
+  }
+  dynamic_info_config_ = nullptr;
+  if (GetArena() == nullptr && vision_input_ != nullptr) {
+    delete vision_input_;
+  }
+  vision_input_ = nullptr;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -3125,6 +4355,20 @@ const char* GetResponseRequest_GetResponseConfig::_InternalParse(const char* ptr
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<90>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // .service.DynamicInfoConfig dynamic_info_config = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
+          ptr = ctx->ParseMessage(_internal_mutable_dynamic_info_config(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .service.VisionInput vision_input = 13;
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 106)) {
+          ptr = ctx->ParseMessage(_internal_mutable_vision_input(), ptr);
+          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       default: {
@@ -3286,6 +4530,22 @@ failure:
     }
   }
 
+  // .service.DynamicInfoConfig dynamic_info_config = 12;
+  if (this->has_dynamic_info_config()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        12, _Internal::dynamic_info_config(this), target, stream);
+  }
+
+  // .service.VisionInput vision_input = 13;
+  if (this->has_vision_input()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        13, _Internal::vision_input(this), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -3374,6 +4634,20 @@ size_t GetResponseRequest_GetResponseConfig::ByteSizeLong() const {
         *action_config_);
   }
 
+  // .service.DynamicInfoConfig dynamic_info_config = 12;
+  if (this->has_dynamic_info_config()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *dynamic_info_config_);
+  }
+
+  // .service.VisionInput vision_input = 13;
+  if (this->has_vision_input()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *vision_input_);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -3433,6 +4707,12 @@ void GetResponseRequest_GetResponseConfig::MergeFrom(const GetResponseRequest_Ge
   if (from.has_action_config()) {
     _internal_mutable_action_config()->::service::ActionConfig::MergeFrom(from._internal_action_config());
   }
+  if (from.has_dynamic_info_config()) {
+    _internal_mutable_dynamic_info_config()->::service::DynamicInfoConfig::MergeFrom(from._internal_dynamic_info_config());
+  }
+  if (from.has_vision_input()) {
+    _internal_mutable_vision_input()->::service::VisionInput::MergeFrom(from._internal_vision_input());
+  }
 }
 
 void GetResponseRequest_GetResponseConfig::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -3465,8 +4745,8 @@ void GetResponseRequest_GetResponseConfig::InternalSwap(GetResponseRequest_GetRe
   speaker_id_.Swap(&other->speaker_id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   api_auth_token_.Swap(&other->api_auth_token_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(GetResponseRequest_GetResponseConfig, action_config_)
-      + sizeof(GetResponseRequest_GetResponseConfig::action_config_)
+      PROTOBUF_FIELD_OFFSET(GetResponseRequest_GetResponseConfig, vision_input_)
+      + sizeof(GetResponseRequest_GetResponseConfig::vision_input_)
       - PROTOBUF_FIELD_OFFSET(GetResponseRequest_GetResponseConfig, audio_config_)>(
           reinterpret_cast<char*>(&audio_config_),
           reinterpret_cast<char*>(&other->audio_config_));
@@ -8791,6 +10071,18 @@ template<> PROTOBUF_NOINLINE ::service::STTRequest* Arena::CreateMaybeMessage< :
 template<> PROTOBUF_NOINLINE ::service::STTResponse* Arena::CreateMaybeMessage< ::service::STTResponse >(Arena* arena) {
   return Arena::CreateMessageInternal< ::service::STTResponse >(arena);
 }
+template<> PROTOBUF_NOINLINE ::service::DynamicInfoConfig* Arena::CreateMaybeMessage< ::service::DynamicInfoConfig >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::DynamicInfoConfig >(arena);
+}
+template<> PROTOBUF_NOINLINE ::service::VisionInput_ImageData* Arena::CreateMaybeMessage< ::service::VisionInput_ImageData >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::VisionInput_ImageData >(arena);
+}
+template<> PROTOBUF_NOINLINE ::service::VisionInput_VideoData* Arena::CreateMaybeMessage< ::service::VisionInput_VideoData >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::VisionInput_VideoData >(arena);
+}
+template<> PROTOBUF_NOINLINE ::service::VisionInput* Arena::CreateMaybeMessage< ::service::VisionInput >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::VisionInput >(arena);
+}
 template<> PROTOBUF_NOINLINE ::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse* Arena::CreateMaybeMessage< ::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse >(Arena* arena) {
   return Arena::CreateMessageInternal< ::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse >(arena);
 }
@@ -8980,6 +10272,64 @@ struct STTResponseDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 STTResponseDefaultTypeInternal _STTResponse_default_instance_;
+PROTOBUF_CONSTEXPR DynamicInfoConfig::DynamicInfoConfig(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.text_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct DynamicInfoConfigDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR DynamicInfoConfigDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~DynamicInfoConfigDefaultTypeInternal() {}
+  union {
+    DynamicInfoConfig _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DynamicInfoConfigDefaultTypeInternal _DynamicInfoConfig_default_instance_;
+PROTOBUF_CONSTEXPR VisionInput_ImageData::VisionInput_ImageData(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.data_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.width_)*/0
+  , /*decltype(_impl_.height_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct VisionInput_ImageDataDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR VisionInput_ImageDataDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~VisionInput_ImageDataDefaultTypeInternal() {}
+  union {
+    VisionInput_ImageData _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 VisionInput_ImageDataDefaultTypeInternal _VisionInput_ImageData_default_instance_;
+PROTOBUF_CONSTEXPR VisionInput_VideoData::VisionInput_VideoData(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.data_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.fps_)*/0
+  , /*decltype(_impl_.width_)*/0
+  , /*decltype(_impl_.height_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct VisionInput_VideoDataDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR VisionInput_VideoDataDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~VisionInput_VideoDataDefaultTypeInternal() {}
+  union {
+    VisionInput_VideoData _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 VisionInput_VideoDataDefaultTypeInternal _VisionInput_VideoData_default_instance_;
+PROTOBUF_CONSTEXPR VisionInput::VisionInput(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.vision_data_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}
+  , /*decltype(_impl_._oneof_case_)*/{}} {}
+struct VisionInputDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR VisionInputDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~VisionInputDefaultTypeInternal() {}
+  union {
+    VisionInput _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 VisionInputDefaultTypeInternal _VisionInput_default_instance_;
 PROTOBUF_CONSTEXPR GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse(
     ::_pbi::ConstantInitialized) {}
 struct GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUseDefaultTypeInternal {
@@ -9003,6 +10353,8 @@ PROTOBUF_CONSTEXPR GetResponseRequest_GetResponseConfig::GetResponseRequest_GetR
   , /*decltype(_impl_.api_auth_token_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.audio_config_)*/nullptr
   , /*decltype(_impl_.action_config_)*/nullptr
+  , /*decltype(_impl_.dynamic_info_config_)*/nullptr
+  , /*decltype(_impl_.vision_input_)*/nullptr
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct GetResponseRequest_GetResponseConfigDefaultTypeInternal {
   PROTOBUF_CONSTEXPR GetResponseRequest_GetResponseConfigDefaultTypeInternal()
@@ -9275,7 +10627,7 @@ struct FeedbackResponseDefaultTypeInternal {
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 FeedbackResponseDefaultTypeInternal _FeedbackResponse_default_instance_;
 }  // namespace service
-static ::_pb::Metadata file_level_metadata_service_2eproto[26];
+static ::_pb::Metadata file_level_metadata_service_2eproto[30];
 static const ::_pb::EnumDescriptor* file_level_enum_descriptors_service_2eproto[1];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_service_2eproto = nullptr;
 
@@ -9343,6 +10695,41 @@ const uint32_t TableStruct_service_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::service::STTResponse, _impl_.text_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::DynamicInfoConfig, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::service::DynamicInfoConfig, _impl_.text_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_ImageData, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_ImageData, _impl_.width_),
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_ImageData, _impl_.height_),
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_ImageData, _impl_.data_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_VideoData, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_VideoData, _impl_.fps_),
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_VideoData, _impl_.width_),
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_VideoData, _impl_.height_),
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput_VideoData, _impl_.data_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput, _internal_metadata_),
+  ~0u,  // no _extensions_
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput, _impl_._oneof_case_[0]),
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  ::_pbi::kInvalidFieldOffsetTag,
+  ::_pbi::kInvalidFieldOffsetTag,
+  PROTOBUF_FIELD_OFFSET(::service::VisionInput, _impl_.vision_data_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -9369,6 +10756,8 @@ const uint32_t TableStruct_service_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig, _impl_.speaker_id_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig, _impl_.api_auth_token_),
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig, _impl_.narrative_template_keys_),
+  PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig, _impl_.dynamic_info_config_),
+  PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseConfig, _impl_.vision_input_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::service::GetResponseRequest_GetResponseData, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -9547,25 +10936,29 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 35, -1, -1, sizeof(::service::ActionConfig)},
   { 47, -1, -1, sizeof(::service::STTRequest)},
   { 56, -1, -1, sizeof(::service::STTResponse)},
-  { 63, 71, -1, sizeof(::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse)},
-  { 73, -1, -1, sizeof(::service::GetResponseRequest_GetResponseConfig)},
-  { 89, -1, -1, sizeof(::service::GetResponseRequest_GetResponseData)},
-  { 99, -1, -1, sizeof(::service::GetResponseRequest)},
-  { 108, -1, -1, sizeof(::service::GetResponseRequestSingle)},
-  { 116, -1, -1, sizeof(::service::GetResponseResponse_AudioResponse)},
-  { 132, -1, -1, sizeof(::service::GetResponseResponse_ActionResponse)},
-  { 139, -1, -1, sizeof(::service::GetResponseResponse_BehaviorTreeResponse)},
-  { 148, -1, -1, sizeof(::service::GetResponseResponse_UserTranscript)},
-  { 157, -1, -1, sizeof(::service::GetResponseResponse)},
-  { 172, -1, -1, sizeof(::service::VisemesData)},
-  { 179, -1, -1, sizeof(::service::EmotionResponse)},
-  { 187, -1, -1, sizeof(::service::Viseme)},
-  { 208, -1, -1, sizeof(::service::BlendShapesData)},
-  { 215, -1, -1, sizeof(::service::HelloRequest)},
-  { 222, -1, -1, sizeof(::service::HelloResponse)},
-  { 229, -1, -1, sizeof(::service::FeedbackRequest_Feedback)},
-  { 239, -1, -1, sizeof(::service::FeedbackRequest)},
-  { 251, -1, -1, sizeof(::service::FeedbackResponse)},
+  { 63, -1, -1, sizeof(::service::DynamicInfoConfig)},
+  { 70, -1, -1, sizeof(::service::VisionInput_ImageData)},
+  { 79, -1, -1, sizeof(::service::VisionInput_VideoData)},
+  { 89, -1, -1, sizeof(::service::VisionInput)},
+  { 98, 106, -1, sizeof(::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse)},
+  { 108, -1, -1, sizeof(::service::GetResponseRequest_GetResponseConfig)},
+  { 126, -1, -1, sizeof(::service::GetResponseRequest_GetResponseData)},
+  { 136, -1, -1, sizeof(::service::GetResponseRequest)},
+  { 145, -1, -1, sizeof(::service::GetResponseRequestSingle)},
+  { 153, -1, -1, sizeof(::service::GetResponseResponse_AudioResponse)},
+  { 169, -1, -1, sizeof(::service::GetResponseResponse_ActionResponse)},
+  { 176, -1, -1, sizeof(::service::GetResponseResponse_BehaviorTreeResponse)},
+  { 185, -1, -1, sizeof(::service::GetResponseResponse_UserTranscript)},
+  { 194, -1, -1, sizeof(::service::GetResponseResponse)},
+  { 209, -1, -1, sizeof(::service::VisemesData)},
+  { 216, -1, -1, sizeof(::service::EmotionResponse)},
+  { 224, -1, -1, sizeof(::service::Viseme)},
+  { 245, -1, -1, sizeof(::service::BlendShapesData)},
+  { 252, -1, -1, sizeof(::service::HelloRequest)},
+  { 259, -1, -1, sizeof(::service::HelloResponse)},
+  { 266, -1, -1, sizeof(::service::FeedbackRequest_Feedback)},
+  { 276, -1, -1, sizeof(::service::FeedbackRequest)},
+  { 288, -1, -1, sizeof(::service::FeedbackResponse)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -9576,6 +10969,10 @@ static const ::_pb::Message* const file_default_instances[] = {
   &::service::_ActionConfig_default_instance_._instance,
   &::service::_STTRequest_default_instance_._instance,
   &::service::_STTResponse_default_instance_._instance,
+  &::service::_DynamicInfoConfig_default_instance_._instance,
+  &::service::_VisionInput_ImageData_default_instance_._instance,
+  &::service::_VisionInput_VideoData_default_instance_._instance,
+  &::service::_VisionInput_default_instance_._instance,
   &::service::_GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse_default_instance_._instance,
   &::service::_GetResponseRequest_GetResponseConfig_default_instance_._instance,
   &::service::_GetResponseRequest_GetResponseData_default_instance_._instance,
@@ -9615,96 +11012,106 @@ const char descriptor_table_protodef_service_2eproto[] PROTOBUF_SECTION_VARIABLE
   "\001(\t\022\023\n\013description\030\002 \001(\t\"a\n\nSTTRequest\022,"
   "\n\014audio_config\030\001 \001(\0132\024.service.AudioConf"
   "igH\000\022\025\n\013audio_chunk\030\002 \001(\014H\000B\016\n\014request_t"
-  "ype\"\033\n\013STTResponse\022\014\n\004text\030\001 \001(\t\"\340\005\n\022Get"
-  "ResponseRequest\022L\n\023get_response_config\030\001"
-  " \001(\0132-.service.GetResponseRequest.GetRes"
-  "ponseConfigH\000\022H\n\021get_response_data\030\002 \001(\013"
-  "2+.service.GetResponseRequest.GetRespons"
-  "eDataH\000\032\245\003\n\021GetResponseConfig\022\024\n\014charact"
-  "er_id\030\002 \001(\t\022\017\n\007api_key\030\003 \001(\t\022\022\n\nsession_"
-  "id\030\004 \001(\t\022*\n\014audio_config\030\005 \001(\0132\024.service"
-  ".AudioConfig\022,\n\raction_config\030\006 \001(\0132\025.se"
-  "rvice.ActionConfig\022\017\n\007speaker\030\007 \001(\t\022\025\n\rl"
-  "anguage_code\030\010 \001(\t\022\022\n\nspeaker_id\030\t \001(\t\022\026"
-  "\n\016api_auth_token\030\n \001(\t\022i\n\027narrative_temp"
-  "late_keys\030\013 \003(\0132H.service.GetResponseReq"
-  "uest.GetResponseConfig.NarrativeTemplate"
-  "KeysEntry\032<\n\032NarrativeTemplateKeysEntry\022"
-  "\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032z\n\017GetRe"
-  "sponseData\022\024\n\naudio_data\030\001 \001(\014H\000\022\023\n\ttext"
-  "_data\030\002 \001(\tH\000\022.\n\014trigger_data\030\003 \001(\0132\026.se"
-  "rvice.TriggerConfigH\000B\014\n\ninput_typeB\016\n\014r"
-  "equest_type\"\204\001\n\030GetResponseRequestSingle"
-  "\0224\n\017response_config\030\001 \001(\0132\033.service.GetR"
-  "esponseRequest\0222\n\rresponse_data\030\002 \001(\0132\033."
-  "service.GetResponseRequest\"\337\007\n\023GetRespon"
-  "seResponse\022\022\n\nsession_id\030\001 \001(\t\022F\n\017action"
-  "_response\030\002 \001(\0132+.service.GetResponseRes"
-  "ponse.ActionResponseH\000\022D\n\016audio_response"
-  "\030\003 \001(\0132*.service.GetResponseResponse.Aud"
-  "ioResponseH\000\022\023\n\tdebug_log\030\004 \001(\tH\000\022A\n\nuse"
-  "r_query\030\005 \001(\0132+.service.GetResponseRespo"
-  "nse.UserTranscriptH\000\022H\n\013bt_response\030\006 \001("
-  "\01321.service.GetResponseResponse.Behavior"
-  "TreeResponseH\000\022\032\n\020emotion_response\030\007 \001(\t"
-  "H\000\022\030\n\016interaction_id\030\010 \001(\tH\000\032\355\002\n\rAudioRe"
-  "sponse\022\022\n\naudio_data\030\001 \001(\014\022*\n\014audio_conf"
-  "ig\030\002 \001(\0132\024.service.AudioConfig\022\021\n\ttext_d"
-  "ata\030\003 \001(\t\022\027\n\017end_of_response\030\004 \001(\010\022\021\n\tfa"
-  "ce_data\030\005 \001(\t\022,\n\014visemes_data\030\006 \001(\0132\024.se"
-  "rvice.VisemesDataH\000\0224\n\020blendshapes_data\030"
-  "\007 \001(\0132\030.service.BlendShapesDataH\000\0223\n\014fac"
-  "e_emotion\030\010 \001(\0132\035.service.ARKitBlendShap"
-  "esData\0222\n\020emotion_response\030\t \001(\0132\030.servi"
-  "ce.EmotionResponseB\020\n\016face_data_type\032 \n\016"
-  "ActionResponse\022\016\n\006action\030\001 \001(\t\032[\n\024Behavi"
-  "orTreeResponse\022\017\n\007bt_code\030\001 \001(\t\022\024\n\014bt_co"
-  "nstants\030\002 \001(\t\022\034\n\024narrative_section_id\030\003 "
-  "\001(\t\032N\n\016UserTranscript\022\021\n\ttext_data\030\001 \001(\t"
-  "\022\020\n\010is_final\030\002 \001(\010\022\027\n\017end_of_response\030\003 "
-  "\001(\010B\017\n\rresponse_type\"/\n\013VisemesData\022 \n\007v"
-  "isemes\030\001 \001(\0132\017.service.Viseme\"1\n\017Emotion"
-  "Response\022\017\n\007emotion\030\001 \001(\t\022\r\n\005scale\030\002 \001(\t"
-  "\"\274\001\n\006Viseme\022\013\n\003sil\030\001 \001(\002\022\n\n\002pp\030\002 \001(\002\022\n\n\002"
-  "ff\030\003 \001(\002\022\n\n\002th\030\004 \001(\002\022\n\n\002dd\030\005 \001(\002\022\n\n\002kk\030\006"
-  " \001(\002\022\n\n\002ch\030\007 \001(\002\022\n\n\002ss\030\010 \001(\002\022\n\n\002nn\030\t \001(\002"
-  "\022\n\n\002rr\030\n \001(\002\022\n\n\002aa\030\013 \001(\002\022\t\n\001e\030\014 \001(\002\022\n\n\002i"
-  "h\030\r \001(\002\022\n\n\002oh\030\016 \001(\002\022\n\n\002ou\030\017 \001(\002\"*\n\017Blend"
-  "ShapesData\022\027\n\017blendshape_data\030\001 \001(\t\"\034\n\014H"
-  "elloRequest\022\014\n\004name\030\001 \001(\t\" \n\rHelloRespon"
-  "se\022\017\n\007message\030\001 \001(\t\"\215\002\n\017FeedbackRequest\022"
-  "\026\n\016interaction_id\030\001 \001(\t\022\024\n\014character_id\030"
-  "\002 \001(\t\022\022\n\nsession_id\030\003 \001(\t\0228\n\rtext_feedba"
-  "ck\030\005 \001(\0132!.service.FeedbackRequest.Feedb"
-  "ack\022\022\n\nuser_query\030\006 \001(\t\022\020\n\010response\030\007 \001("
-  "\t\032X\n\010Feedback\022\021\n\tthumbs_up\030\001 \001(\010\022\025\n\rfeed"
-  "back_text\030\002 \001(\t\022\014\n\004tags\030\003 \003(\t\022\024\n\014is_test"
-  "_case\030\004 \001(\010\"-\n\020FeedbackResponse\022\031\n\021feedb"
-  "ack_response\030\001 \001(\t*\212\001\n\tFaceModel\022\032\n\026FACE"
-  "_MODEL_UNSPECIFIED\020\000\022\036\n\032FACE_MODEL_A_2F_"
-  "MODEL_NAME\020\001\022\"\n\036FACE_MODEL_PHONEMES_MODE"
-  "L_NAME\020\002\022\035\n\031FACE_MODEL_OVR_MODEL_NAME\020\0032"
-  "\301\003\n\rConvaiService\0228\n\005Hello\022\025.service.Hel"
-  "loRequest\032\026.service.HelloResponse\"\000\022B\n\013H"
-  "elloStream\022\025.service.HelloRequest\032\026.serv"
-  "ice.HelloResponse\"\000(\0010\001\022\?\n\014SpeechToText\022"
-  "\023.service.STTRequest\032\024.service.STTRespon"
-  "se\"\000(\0010\001\022N\n\013GetResponse\022\033.service.GetRes"
-  "ponseRequest\032\034.service.GetResponseRespon"
-  "se\"\000(\0010\001\022X\n\021GetResponseSingle\022!.service."
-  "GetResponseRequestSingle\032\034.service.GetRe"
-  "sponseResponse\"\0000\001\022G\n\016SubmitFeedback\022\030.s"
-  "ervice.FeedbackRequest\032\031.service.Feedbac"
-  "kResponse\"\000b\006proto3"
+  "ype\"\033\n\013STTResponse\022\014\n\004text\030\001 \001(\t\"!\n\021Dyna"
+  "micInfoConfig\022\014\n\004text\030\001 \001(\t\"\211\002\n\013VisionIn"
+  "put\0224\n\nimage_data\030\001 \001(\0132\036.service.Vision"
+  "Input.ImageDataH\000\0224\n\nvideo_data\030\002 \001(\0132\036."
+  "service.VisionInput.VideoDataH\000\0328\n\tImage"
+  "Data\022\r\n\005width\030\001 \001(\005\022\016\n\006height\030\002 \001(\005\022\014\n\004d"
+  "ata\030\003 \001(\014\032E\n\tVideoData\022\013\n\003fps\030\001 \001(\005\022\r\n\005w"
+  "idth\030\002 \001(\005\022\016\n\006height\030\003 \001(\005\022\014\n\004data\030\004 \001(\014"
+  "B\r\n\013vision_data\"\305\006\n\022GetResponseRequest\022L"
+  "\n\023get_response_config\030\001 \001(\0132-.service.Ge"
+  "tResponseRequest.GetResponseConfigH\000\022H\n\021"
+  "get_response_data\030\002 \001(\0132+.service.GetRes"
+  "ponseRequest.GetResponseDataH\000\032\212\004\n\021GetRe"
+  "sponseConfig\022\024\n\014character_id\030\002 \001(\t\022\017\n\007ap"
+  "i_key\030\003 \001(\t\022\022\n\nsession_id\030\004 \001(\t\022*\n\014audio"
+  "_config\030\005 \001(\0132\024.service.AudioConfig\022,\n\ra"
+  "ction_config\030\006 \001(\0132\025.service.ActionConfi"
+  "g\022\017\n\007speaker\030\007 \001(\t\022\025\n\rlanguage_code\030\010 \001("
+  "\t\022\022\n\nspeaker_id\030\t \001(\t\022\026\n\016api_auth_token\030"
+  "\n \001(\t\022i\n\027narrative_template_keys\030\013 \003(\0132H"
+  ".service.GetResponseRequest.GetResponseC"
+  "onfig.NarrativeTemplateKeysEntry\0227\n\023dyna"
+  "mic_info_config\030\014 \001(\0132\032.service.DynamicI"
+  "nfoConfig\022*\n\014vision_input\030\r \001(\0132\024.servic"
+  "e.VisionInput\032<\n\032NarrativeTemplateKeysEn"
+  "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032z\n\017G"
+  "etResponseData\022\024\n\naudio_data\030\001 \001(\014H\000\022\023\n\t"
+  "text_data\030\002 \001(\tH\000\022.\n\014trigger_data\030\003 \001(\0132"
+  "\026.service.TriggerConfigH\000B\014\n\ninput_typeB"
+  "\016\n\014request_type\"\204\001\n\030GetResponseRequestSi"
+  "ngle\0224\n\017response_config\030\001 \001(\0132\033.service."
+  "GetResponseRequest\0222\n\rresponse_data\030\002 \001("
+  "\0132\033.service.GetResponseRequest\"\337\007\n\023GetRe"
+  "sponseResponse\022\022\n\nsession_id\030\001 \001(\t\022F\n\017ac"
+  "tion_response\030\002 \001(\0132+.service.GetRespons"
+  "eResponse.ActionResponseH\000\022D\n\016audio_resp"
+  "onse\030\003 \001(\0132*.service.GetResponseResponse"
+  ".AudioResponseH\000\022\023\n\tdebug_log\030\004 \001(\tH\000\022A\n"
+  "\nuser_query\030\005 \001(\0132+.service.GetResponseR"
+  "esponse.UserTranscriptH\000\022H\n\013bt_response\030"
+  "\006 \001(\01321.service.GetResponseResponse.Beha"
+  "viorTreeResponseH\000\022\032\n\020emotion_response\030\007"
+  " \001(\tH\000\022\030\n\016interaction_id\030\010 \001(\tH\000\032\355\002\n\rAud"
+  "ioResponse\022\022\n\naudio_data\030\001 \001(\014\022*\n\014audio_"
+  "config\030\002 \001(\0132\024.service.AudioConfig\022\021\n\tte"
+  "xt_data\030\003 \001(\t\022\027\n\017end_of_response\030\004 \001(\010\022\021"
+  "\n\tface_data\030\005 \001(\t\022,\n\014visemes_data\030\006 \001(\0132"
+  "\024.service.VisemesDataH\000\0224\n\020blendshapes_d"
+  "ata\030\007 \001(\0132\030.service.BlendShapesDataH\000\0223\n"
+  "\014face_emotion\030\010 \001(\0132\035.service.ARKitBlend"
+  "ShapesData\0222\n\020emotion_response\030\t \001(\0132\030.s"
+  "ervice.EmotionResponseB\020\n\016face_data_type"
+  "\032 \n\016ActionResponse\022\016\n\006action\030\001 \001(\t\032[\n\024Be"
+  "haviorTreeResponse\022\017\n\007bt_code\030\001 \001(\t\022\024\n\014b"
+  "t_constants\030\002 \001(\t\022\034\n\024narrative_section_i"
+  "d\030\003 \001(\t\032N\n\016UserTranscript\022\021\n\ttext_data\030\001"
+  " \001(\t\022\020\n\010is_final\030\002 \001(\010\022\027\n\017end_of_respons"
+  "e\030\003 \001(\010B\017\n\rresponse_type\"/\n\013VisemesData\022"
+  " \n\007visemes\030\001 \001(\0132\017.service.Viseme\"1\n\017Emo"
+  "tionResponse\022\017\n\007emotion\030\001 \001(\t\022\r\n\005scale\030\002"
+  " \001(\t\"\274\001\n\006Viseme\022\013\n\003sil\030\001 \001(\002\022\n\n\002pp\030\002 \001(\002"
+  "\022\n\n\002ff\030\003 \001(\002\022\n\n\002th\030\004 \001(\002\022\n\n\002dd\030\005 \001(\002\022\n\n\002"
+  "kk\030\006 \001(\002\022\n\n\002ch\030\007 \001(\002\022\n\n\002ss\030\010 \001(\002\022\n\n\002nn\030\t"
+  " \001(\002\022\n\n\002rr\030\n \001(\002\022\n\n\002aa\030\013 \001(\002\022\t\n\001e\030\014 \001(\002\022"
+  "\n\n\002ih\030\r \001(\002\022\n\n\002oh\030\016 \001(\002\022\n\n\002ou\030\017 \001(\002\"*\n\017B"
+  "lendShapesData\022\027\n\017blendshape_data\030\001 \001(\t\""
+  "\034\n\014HelloRequest\022\014\n\004name\030\001 \001(\t\" \n\rHelloRe"
+  "sponse\022\017\n\007message\030\001 \001(\t\"\215\002\n\017FeedbackRequ"
+  "est\022\026\n\016interaction_id\030\001 \001(\t\022\024\n\014character"
+  "_id\030\002 \001(\t\022\022\n\nsession_id\030\003 \001(\t\0228\n\rtext_fe"
+  "edback\030\005 \001(\0132!.service.FeedbackRequest.F"
+  "eedback\022\022\n\nuser_query\030\006 \001(\t\022\020\n\010response\030"
+  "\007 \001(\t\032X\n\010Feedback\022\021\n\tthumbs_up\030\001 \001(\010\022\025\n\r"
+  "feedback_text\030\002 \001(\t\022\014\n\004tags\030\003 \003(\t\022\024\n\014is_"
+  "test_case\030\004 \001(\010\"-\n\020FeedbackResponse\022\031\n\021f"
+  "eedback_response\030\001 \001(\t*\212\001\n\tFaceModel\022\032\n\026"
+  "FACE_MODEL_UNSPECIFIED\020\000\022\036\n\032FACE_MODEL_A"
+  "_2F_MODEL_NAME\020\001\022\"\n\036FACE_MODEL_PHONEMES_"
+  "MODEL_NAME\020\002\022\035\n\031FACE_MODEL_OVR_MODEL_NAM"
+  "E\020\0032\301\003\n\rConvaiService\0228\n\005Hello\022\025.service"
+  ".HelloRequest\032\026.service.HelloResponse\"\000\022"
+  "B\n\013HelloStream\022\025.service.HelloRequest\032\026."
+  "service.HelloResponse\"\000(\0010\001\022\?\n\014SpeechToT"
+  "ext\022\023.service.STTRequest\032\024.service.STTRe"
+  "sponse\"\000(\0010\001\022N\n\013GetResponse\022\033.service.Ge"
+  "tResponseRequest\032\034.service.GetResponseRe"
+  "sponse\"\000(\0010\001\022X\n\021GetResponseSingle\022!.serv"
+  "ice.GetResponseRequestSingle\032\034.service.G"
+  "etResponseResponse\"\0000\001\022G\n\016SubmitFeedback"
+  "\022\030.service.FeedbackRequest\032\031.service.Fee"
+  "dbackResponse\"\000B\017Z\rproto/serviceb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_service_2eproto_deps[1] = {
   &::descriptor_table_arkit_5fblend_5fshapes_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_service_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_service_2eproto = {
-    false, false, 3899, descriptor_table_protodef_service_2eproto,
+    false, false, 4320, descriptor_table_protodef_service_2eproto,
     "service.proto",
-    &descriptor_table_service_2eproto_once, descriptor_table_service_2eproto_deps, 1, 26,
+    &descriptor_table_service_2eproto_once, descriptor_table_service_2eproto_deps, 1, 30,
     schemas, file_default_instances, TableStruct_service_2eproto::offsets,
     file_level_metadata_service_2eproto, file_level_enum_descriptors_service_2eproto,
     file_level_service_descriptors_service_2eproto,
@@ -11651,6 +13058,1054 @@ void STTResponse::InternalSwap(STTResponse* other) {
 
 // ===================================================================
 
+class DynamicInfoConfig::_Internal {
+ public:
+};
+
+DynamicInfoConfig::DynamicInfoConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:service.DynamicInfoConfig)
+}
+DynamicInfoConfig::DynamicInfoConfig(const DynamicInfoConfig& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  DynamicInfoConfig* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.text_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.text_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.text_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_text().empty()) {
+    _this->_impl_.text_.Set(from._internal_text(), 
+      _this->GetArenaForAllocation());
+  }
+  // @@protoc_insertion_point(copy_constructor:service.DynamicInfoConfig)
+}
+
+inline void DynamicInfoConfig::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.text_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.text_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.text_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+DynamicInfoConfig::~DynamicInfoConfig() {
+  // @@protoc_insertion_point(destructor:service.DynamicInfoConfig)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void DynamicInfoConfig::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.text_.Destroy();
+}
+
+void DynamicInfoConfig::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void DynamicInfoConfig::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.DynamicInfoConfig)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.text_.ClearToEmpty();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* DynamicInfoConfig::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // string text = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          auto str = _internal_mutable_text();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "service.DynamicInfoConfig.text"));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* DynamicInfoConfig::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.DynamicInfoConfig)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string text = 1;
+  if (!this->_internal_text().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_text().data(), static_cast<int>(this->_internal_text().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "service.DynamicInfoConfig.text");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_text(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.DynamicInfoConfig)
+  return target;
+}
+
+size_t DynamicInfoConfig::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.DynamicInfoConfig)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string text = 1;
+  if (!this->_internal_text().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_text());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData DynamicInfoConfig::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    DynamicInfoConfig::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*DynamicInfoConfig::GetClassData() const { return &_class_data_; }
+
+
+void DynamicInfoConfig::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<DynamicInfoConfig*>(&to_msg);
+  auto& from = static_cast<const DynamicInfoConfig&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:service.DynamicInfoConfig)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_text().empty()) {
+    _this->_internal_set_text(from._internal_text());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void DynamicInfoConfig::CopyFrom(const DynamicInfoConfig& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.DynamicInfoConfig)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DynamicInfoConfig::IsInitialized() const {
+  return true;
+}
+
+void DynamicInfoConfig::InternalSwap(DynamicInfoConfig* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.text_, lhs_arena,
+      &other->_impl_.text_, rhs_arena
+  );
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata DynamicInfoConfig::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
+      file_level_metadata_service_2eproto[7]);
+}
+
+// ===================================================================
+
+class VisionInput_ImageData::_Internal {
+ public:
+};
+
+VisionInput_ImageData::VisionInput_ImageData(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:service.VisionInput.ImageData)
+}
+VisionInput_ImageData::VisionInput_ImageData(const VisionInput_ImageData& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  VisionInput_ImageData* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.data_){}
+    , decltype(_impl_.width_){}
+    , decltype(_impl_.height_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.data_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.data_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_data().empty()) {
+    _this->_impl_.data_.Set(from._internal_data(), 
+      _this->GetArenaForAllocation());
+  }
+  ::memcpy(&_impl_.width_, &from._impl_.width_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.height_) -
+    reinterpret_cast<char*>(&_impl_.width_)) + sizeof(_impl_.height_));
+  // @@protoc_insertion_point(copy_constructor:service.VisionInput.ImageData)
+}
+
+inline void VisionInput_ImageData::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.data_){}
+    , decltype(_impl_.width_){0}
+    , decltype(_impl_.height_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.data_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.data_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+VisionInput_ImageData::~VisionInput_ImageData() {
+  // @@protoc_insertion_point(destructor:service.VisionInput.ImageData)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void VisionInput_ImageData::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.data_.Destroy();
+}
+
+void VisionInput_ImageData::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void VisionInput_ImageData::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.VisionInput.ImageData)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.data_.ClearToEmpty();
+  ::memset(&_impl_.width_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.height_) -
+      reinterpret_cast<char*>(&_impl_.width_)) + sizeof(_impl_.height_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* VisionInput_ImageData::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // int32 width = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 height = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          _impl_.height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes data = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          auto str = _internal_mutable_data();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* VisionInput_ImageData::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.VisionInput.ImageData)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 width = 1;
+  if (this->_internal_width() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(1, this->_internal_width(), target);
+  }
+
+  // int32 height = 2;
+  if (this->_internal_height() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(2, this->_internal_height(), target);
+  }
+
+  // bytes data = 3;
+  if (!this->_internal_data().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        3, this->_internal_data(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.VisionInput.ImageData)
+  return target;
+}
+
+size_t VisionInput_ImageData::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.VisionInput.ImageData)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // bytes data = 3;
+  if (!this->_internal_data().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_data());
+  }
+
+  // int32 width = 1;
+  if (this->_internal_width() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_width());
+  }
+
+  // int32 height = 2;
+  if (this->_internal_height() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_height());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData VisionInput_ImageData::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    VisionInput_ImageData::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*VisionInput_ImageData::GetClassData() const { return &_class_data_; }
+
+
+void VisionInput_ImageData::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<VisionInput_ImageData*>(&to_msg);
+  auto& from = static_cast<const VisionInput_ImageData&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:service.VisionInput.ImageData)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_data().empty()) {
+    _this->_internal_set_data(from._internal_data());
+  }
+  if (from._internal_width() != 0) {
+    _this->_internal_set_width(from._internal_width());
+  }
+  if (from._internal_height() != 0) {
+    _this->_internal_set_height(from._internal_height());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void VisionInput_ImageData::CopyFrom(const VisionInput_ImageData& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.VisionInput.ImageData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool VisionInput_ImageData::IsInitialized() const {
+  return true;
+}
+
+void VisionInput_ImageData::InternalSwap(VisionInput_ImageData* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.data_, lhs_arena,
+      &other->_impl_.data_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(VisionInput_ImageData, _impl_.height_)
+      + sizeof(VisionInput_ImageData::_impl_.height_)
+      - PROTOBUF_FIELD_OFFSET(VisionInput_ImageData, _impl_.width_)>(
+          reinterpret_cast<char*>(&_impl_.width_),
+          reinterpret_cast<char*>(&other->_impl_.width_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata VisionInput_ImageData::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
+      file_level_metadata_service_2eproto[8]);
+}
+
+// ===================================================================
+
+class VisionInput_VideoData::_Internal {
+ public:
+};
+
+VisionInput_VideoData::VisionInput_VideoData(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:service.VisionInput.VideoData)
+}
+VisionInput_VideoData::VisionInput_VideoData(const VisionInput_VideoData& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  VisionInput_VideoData* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.data_){}
+    , decltype(_impl_.fps_){}
+    , decltype(_impl_.width_){}
+    , decltype(_impl_.height_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.data_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.data_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_data().empty()) {
+    _this->_impl_.data_.Set(from._internal_data(), 
+      _this->GetArenaForAllocation());
+  }
+  ::memcpy(&_impl_.fps_, &from._impl_.fps_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.height_) -
+    reinterpret_cast<char*>(&_impl_.fps_)) + sizeof(_impl_.height_));
+  // @@protoc_insertion_point(copy_constructor:service.VisionInput.VideoData)
+}
+
+inline void VisionInput_VideoData::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.data_){}
+    , decltype(_impl_.fps_){0}
+    , decltype(_impl_.width_){0}
+    , decltype(_impl_.height_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.data_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.data_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+VisionInput_VideoData::~VisionInput_VideoData() {
+  // @@protoc_insertion_point(destructor:service.VisionInput.VideoData)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void VisionInput_VideoData::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.data_.Destroy();
+}
+
+void VisionInput_VideoData::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void VisionInput_VideoData::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.VisionInput.VideoData)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.data_.ClearToEmpty();
+  ::memset(&_impl_.fps_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.height_) -
+      reinterpret_cast<char*>(&_impl_.fps_)) + sizeof(_impl_.height_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* VisionInput_VideoData::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // int32 fps = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.fps_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 width = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          _impl_.width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 height = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          _impl_.height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes data = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          auto str = _internal_mutable_data();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* VisionInput_VideoData::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.VisionInput.VideoData)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 fps = 1;
+  if (this->_internal_fps() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(1, this->_internal_fps(), target);
+  }
+
+  // int32 width = 2;
+  if (this->_internal_width() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(2, this->_internal_width(), target);
+  }
+
+  // int32 height = 3;
+  if (this->_internal_height() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(3, this->_internal_height(), target);
+  }
+
+  // bytes data = 4;
+  if (!this->_internal_data().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        4, this->_internal_data(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.VisionInput.VideoData)
+  return target;
+}
+
+size_t VisionInput_VideoData::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.VisionInput.VideoData)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // bytes data = 4;
+  if (!this->_internal_data().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_data());
+  }
+
+  // int32 fps = 1;
+  if (this->_internal_fps() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_fps());
+  }
+
+  // int32 width = 2;
+  if (this->_internal_width() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_width());
+  }
+
+  // int32 height = 3;
+  if (this->_internal_height() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_height());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData VisionInput_VideoData::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    VisionInput_VideoData::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*VisionInput_VideoData::GetClassData() const { return &_class_data_; }
+
+
+void VisionInput_VideoData::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<VisionInput_VideoData*>(&to_msg);
+  auto& from = static_cast<const VisionInput_VideoData&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:service.VisionInput.VideoData)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_data().empty()) {
+    _this->_internal_set_data(from._internal_data());
+  }
+  if (from._internal_fps() != 0) {
+    _this->_internal_set_fps(from._internal_fps());
+  }
+  if (from._internal_width() != 0) {
+    _this->_internal_set_width(from._internal_width());
+  }
+  if (from._internal_height() != 0) {
+    _this->_internal_set_height(from._internal_height());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void VisionInput_VideoData::CopyFrom(const VisionInput_VideoData& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.VisionInput.VideoData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool VisionInput_VideoData::IsInitialized() const {
+  return true;
+}
+
+void VisionInput_VideoData::InternalSwap(VisionInput_VideoData* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.data_, lhs_arena,
+      &other->_impl_.data_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(VisionInput_VideoData, _impl_.height_)
+      + sizeof(VisionInput_VideoData::_impl_.height_)
+      - PROTOBUF_FIELD_OFFSET(VisionInput_VideoData, _impl_.fps_)>(
+          reinterpret_cast<char*>(&_impl_.fps_),
+          reinterpret_cast<char*>(&other->_impl_.fps_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata VisionInput_VideoData::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
+      file_level_metadata_service_2eproto[9]);
+}
+
+// ===================================================================
+
+class VisionInput::_Internal {
+ public:
+  static const ::service::VisionInput_ImageData& image_data(const VisionInput* msg);
+  static const ::service::VisionInput_VideoData& video_data(const VisionInput* msg);
+};
+
+const ::service::VisionInput_ImageData&
+VisionInput::_Internal::image_data(const VisionInput* msg) {
+  return *msg->_impl_.vision_data_.image_data_;
+}
+const ::service::VisionInput_VideoData&
+VisionInput::_Internal::video_data(const VisionInput* msg) {
+  return *msg->_impl_.vision_data_.video_data_;
+}
+void VisionInput::set_allocated_image_data(::service::VisionInput_ImageData* image_data) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_vision_data();
+  if (image_data) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(image_data);
+    if (message_arena != submessage_arena) {
+      image_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, image_data, submessage_arena);
+    }
+    set_has_image_data();
+    _impl_.vision_data_.image_data_ = image_data;
+  }
+  // @@protoc_insertion_point(field_set_allocated:service.VisionInput.image_data)
+}
+void VisionInput::set_allocated_video_data(::service::VisionInput_VideoData* video_data) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_vision_data();
+  if (video_data) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(video_data);
+    if (message_arena != submessage_arena) {
+      video_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, video_data, submessage_arena);
+    }
+    set_has_video_data();
+    _impl_.vision_data_.video_data_ = video_data;
+  }
+  // @@protoc_insertion_point(field_set_allocated:service.VisionInput.video_data)
+}
+VisionInput::VisionInput(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:service.VisionInput)
+}
+VisionInput::VisionInput(const VisionInput& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  VisionInput* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.vision_data_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , /*decltype(_impl_._oneof_case_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  clear_has_vision_data();
+  switch (from.vision_data_case()) {
+    case kImageData: {
+      _this->_internal_mutable_image_data()->::service::VisionInput_ImageData::MergeFrom(
+          from._internal_image_data());
+      break;
+    }
+    case kVideoData: {
+      _this->_internal_mutable_video_data()->::service::VisionInput_VideoData::MergeFrom(
+          from._internal_video_data());
+      break;
+    }
+    case VISION_DATA_NOT_SET: {
+      break;
+    }
+  }
+  // @@protoc_insertion_point(copy_constructor:service.VisionInput)
+}
+
+inline void VisionInput::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.vision_data_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , /*decltype(_impl_._oneof_case_)*/{}
+  };
+  clear_has_vision_data();
+}
+
+VisionInput::~VisionInput() {
+  // @@protoc_insertion_point(destructor:service.VisionInput)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void VisionInput::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  if (has_vision_data()) {
+    clear_vision_data();
+  }
+}
+
+void VisionInput::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void VisionInput::clear_vision_data() {
+// @@protoc_insertion_point(one_of_clear_start:service.VisionInput)
+  switch (vision_data_case()) {
+    case kImageData: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete _impl_.vision_data_.image_data_;
+      }
+      break;
+    }
+    case kVideoData: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete _impl_.vision_data_.video_data_;
+      }
+      break;
+    }
+    case VISION_DATA_NOT_SET: {
+      break;
+    }
+  }
+  _impl_._oneof_case_[0] = VISION_DATA_NOT_SET;
+}
+
+
+void VisionInput::Clear() {
+// @@protoc_insertion_point(message_clear_start:service.VisionInput)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  clear_vision_data();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* VisionInput::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // .service.VisionInput.ImageData image_data = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          ptr = ctx->ParseMessage(_internal_mutable_image_data(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .service.VisionInput.VideoData video_data = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          ptr = ctx->ParseMessage(_internal_mutable_video_data(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* VisionInput::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:service.VisionInput)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .service.VisionInput.ImageData image_data = 1;
+  if (_internal_has_image_data()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, _Internal::image_data(this),
+        _Internal::image_data(this).GetCachedSize(), target, stream);
+  }
+
+  // .service.VisionInput.VideoData video_data = 2;
+  if (_internal_has_video_data()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(2, _Internal::video_data(this),
+        _Internal::video_data(this).GetCachedSize(), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:service.VisionInput)
+  return target;
+}
+
+size_t VisionInput::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:service.VisionInput)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  switch (vision_data_case()) {
+    // .service.VisionInput.ImageData image_data = 1;
+    case kImageData: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *_impl_.vision_data_.image_data_);
+      break;
+    }
+    // .service.VisionInput.VideoData video_data = 2;
+    case kVideoData: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *_impl_.vision_data_.video_data_);
+      break;
+    }
+    case VISION_DATA_NOT_SET: {
+      break;
+    }
+  }
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData VisionInput::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    VisionInput::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*VisionInput::GetClassData() const { return &_class_data_; }
+
+
+void VisionInput::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<VisionInput*>(&to_msg);
+  auto& from = static_cast<const VisionInput&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:service.VisionInput)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  switch (from.vision_data_case()) {
+    case kImageData: {
+      _this->_internal_mutable_image_data()->::service::VisionInput_ImageData::MergeFrom(
+          from._internal_image_data());
+      break;
+    }
+    case kVideoData: {
+      _this->_internal_mutable_video_data()->::service::VisionInput_VideoData::MergeFrom(
+          from._internal_video_data());
+      break;
+    }
+    case VISION_DATA_NOT_SET: {
+      break;
+    }
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void VisionInput::CopyFrom(const VisionInput& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:service.VisionInput)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool VisionInput::IsInitialized() const {
+  return true;
+}
+
+void VisionInput::InternalSwap(VisionInput* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_.vision_data_, other->_impl_.vision_data_);
+  swap(_impl_._oneof_case_[0], other->_impl_._oneof_case_[0]);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata VisionInput::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
+      file_level_metadata_service_2eproto[10]);
+}
+
+// ===================================================================
+
 GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse() {}
 GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
     : SuperType(arena) {}
@@ -11660,7 +14115,7 @@ void GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse::M
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[7]);
+      file_level_metadata_service_2eproto[11]);
 }
 
 // ===================================================================
@@ -11669,6 +14124,8 @@ class GetResponseRequest_GetResponseConfig::_Internal {
  public:
   static const ::service::AudioConfig& audio_config(const GetResponseRequest_GetResponseConfig* msg);
   static const ::service::ActionConfig& action_config(const GetResponseRequest_GetResponseConfig* msg);
+  static const ::service::DynamicInfoConfig& dynamic_info_config(const GetResponseRequest_GetResponseConfig* msg);
+  static const ::service::VisionInput& vision_input(const GetResponseRequest_GetResponseConfig* msg);
 };
 
 const ::service::AudioConfig&
@@ -11678,6 +14135,14 @@ GetResponseRequest_GetResponseConfig::_Internal::audio_config(const GetResponseR
 const ::service::ActionConfig&
 GetResponseRequest_GetResponseConfig::_Internal::action_config(const GetResponseRequest_GetResponseConfig* msg) {
   return *msg->_impl_.action_config_;
+}
+const ::service::DynamicInfoConfig&
+GetResponseRequest_GetResponseConfig::_Internal::dynamic_info_config(const GetResponseRequest_GetResponseConfig* msg) {
+  return *msg->_impl_.dynamic_info_config_;
+}
+const ::service::VisionInput&
+GetResponseRequest_GetResponseConfig::_Internal::vision_input(const GetResponseRequest_GetResponseConfig* msg) {
+  return *msg->_impl_.vision_input_;
 }
 GetResponseRequest_GetResponseConfig::GetResponseRequest_GetResponseConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
@@ -11702,6 +14167,8 @@ GetResponseRequest_GetResponseConfig::GetResponseRequest_GetResponseConfig(const
     , decltype(_impl_.api_auth_token_){}
     , decltype(_impl_.audio_config_){nullptr}
     , decltype(_impl_.action_config_){nullptr}
+    , decltype(_impl_.dynamic_info_config_){nullptr}
+    , decltype(_impl_.vision_input_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -11768,6 +14235,12 @@ GetResponseRequest_GetResponseConfig::GetResponseRequest_GetResponseConfig(const
   if (from._internal_has_action_config()) {
     _this->_impl_.action_config_ = new ::service::ActionConfig(*from._impl_.action_config_);
   }
+  if (from._internal_has_dynamic_info_config()) {
+    _this->_impl_.dynamic_info_config_ = new ::service::DynamicInfoConfig(*from._impl_.dynamic_info_config_);
+  }
+  if (from._internal_has_vision_input()) {
+    _this->_impl_.vision_input_ = new ::service::VisionInput(*from._impl_.vision_input_);
+  }
   // @@protoc_insertion_point(copy_constructor:service.GetResponseRequest.GetResponseConfig)
 }
 
@@ -11786,6 +14259,8 @@ inline void GetResponseRequest_GetResponseConfig::SharedCtor(
     , decltype(_impl_.api_auth_token_){}
     , decltype(_impl_.audio_config_){nullptr}
     , decltype(_impl_.action_config_){nullptr}
+    , decltype(_impl_.dynamic_info_config_){nullptr}
+    , decltype(_impl_.vision_input_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.character_id_.InitDefault();
@@ -11841,6 +14316,8 @@ inline void GetResponseRequest_GetResponseConfig::SharedDtor() {
   _impl_.api_auth_token_.Destroy();
   if (this != internal_default_instance()) delete _impl_.audio_config_;
   if (this != internal_default_instance()) delete _impl_.action_config_;
+  if (this != internal_default_instance()) delete _impl_.dynamic_info_config_;
+  if (this != internal_default_instance()) delete _impl_.vision_input_;
 }
 
 void GetResponseRequest_GetResponseConfig::ArenaDtor(void* object) {
@@ -11873,6 +14350,14 @@ void GetResponseRequest_GetResponseConfig::Clear() {
     delete _impl_.action_config_;
   }
   _impl_.action_config_ = nullptr;
+  if (GetArenaForAllocation() == nullptr && _impl_.dynamic_info_config_ != nullptr) {
+    delete _impl_.dynamic_info_config_;
+  }
+  _impl_.dynamic_info_config_ = nullptr;
+  if (GetArenaForAllocation() == nullptr && _impl_.vision_input_ != nullptr) {
+    delete _impl_.vision_input_;
+  }
+  _impl_.vision_input_ = nullptr;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -11978,6 +14463,22 @@ const char* GetResponseRequest_GetResponseConfig::_InternalParse(const char* ptr
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<90>(ptr));
+        } else
+          goto handle_unusual;
+        continue;
+      // .service.DynamicInfoConfig dynamic_info_config = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 98)) {
+          ptr = ctx->ParseMessage(_internal_mutable_dynamic_info_config(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .service.VisionInput vision_input = 13;
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 106)) {
+          ptr = ctx->ParseMessage(_internal_mutable_vision_input(), ptr);
+          CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
@@ -12124,6 +14625,20 @@ uint8_t* GetResponseRequest_GetResponseConfig::_InternalSerialize(
     }
   }
 
+  // .service.DynamicInfoConfig dynamic_info_config = 12;
+  if (this->_internal_has_dynamic_info_config()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(12, _Internal::dynamic_info_config(this),
+        _Internal::dynamic_info_config(this).GetCachedSize(), target, stream);
+  }
+
+  // .service.VisionInput vision_input = 13;
+  if (this->_internal_has_vision_input()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(13, _Internal::vision_input(this),
+        _Internal::vision_input(this).GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -12212,6 +14727,20 @@ size_t GetResponseRequest_GetResponseConfig::ByteSizeLong() const {
         *_impl_.action_config_);
   }
 
+  // .service.DynamicInfoConfig dynamic_info_config = 12;
+  if (this->_internal_has_dynamic_info_config()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.dynamic_info_config_);
+  }
+
+  // .service.VisionInput vision_input = 13;
+  if (this->_internal_has_vision_input()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.vision_input_);
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -12259,6 +14788,14 @@ void GetResponseRequest_GetResponseConfig::MergeImpl(::PROTOBUF_NAMESPACE_ID::Me
   if (from._internal_has_action_config()) {
     _this->_internal_mutable_action_config()->::service::ActionConfig::MergeFrom(
         from._internal_action_config());
+  }
+  if (from._internal_has_dynamic_info_config()) {
+    _this->_internal_mutable_dynamic_info_config()->::service::DynamicInfoConfig::MergeFrom(
+        from._internal_dynamic_info_config());
+  }
+  if (from._internal_has_vision_input()) {
+    _this->_internal_mutable_vision_input()->::service::VisionInput::MergeFrom(
+        from._internal_vision_input());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -12309,8 +14846,8 @@ void GetResponseRequest_GetResponseConfig::InternalSwap(GetResponseRequest_GetRe
       &other->_impl_.api_auth_token_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(GetResponseRequest_GetResponseConfig, _impl_.action_config_)
-      + sizeof(GetResponseRequest_GetResponseConfig::_impl_.action_config_)
+      PROTOBUF_FIELD_OFFSET(GetResponseRequest_GetResponseConfig, _impl_.vision_input_)
+      + sizeof(GetResponseRequest_GetResponseConfig::_impl_.vision_input_)
       - PROTOBUF_FIELD_OFFSET(GetResponseRequest_GetResponseConfig, _impl_.audio_config_)>(
           reinterpret_cast<char*>(&_impl_.audio_config_),
           reinterpret_cast<char*>(&other->_impl_.audio_config_));
@@ -12319,7 +14856,7 @@ void GetResponseRequest_GetResponseConfig::InternalSwap(GetResponseRequest_GetRe
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseRequest_GetResponseConfig::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[8]);
+      file_level_metadata_service_2eproto[12]);
 }
 
 // ===================================================================
@@ -12639,7 +15176,7 @@ void GetResponseRequest_GetResponseData::InternalSwap(GetResponseRequest_GetResp
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseRequest_GetResponseData::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[9]);
+      file_level_metadata_service_2eproto[13]);
 }
 
 // ===================================================================
@@ -12944,7 +15481,7 @@ void GetResponseRequest::InternalSwap(GetResponseRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[10]);
+      file_level_metadata_service_2eproto[14]);
 }
 
 // ===================================================================
@@ -13183,7 +15720,7 @@ void GetResponseRequestSingle::InternalSwap(GetResponseRequestSingle* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseRequestSingle::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[11]);
+      file_level_metadata_service_2eproto[15]);
 }
 
 // ===================================================================
@@ -13796,7 +16333,7 @@ void GetResponseResponse_AudioResponse::InternalSwap(GetResponseResponse_AudioRe
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseResponse_AudioResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[12]);
+      file_level_metadata_service_2eproto[16]);
 }
 
 // ===================================================================
@@ -13999,7 +16536,7 @@ void GetResponseResponse_ActionResponse::InternalSwap(GetResponseResponse_Action
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseResponse_ActionResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[13]);
+      file_level_metadata_service_2eproto[17]);
 }
 
 // ===================================================================
@@ -14302,7 +16839,7 @@ void GetResponseResponse_BehaviorTreeResponse::InternalSwap(GetResponseResponse_
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseResponse_BehaviorTreeResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[14]);
+      file_level_metadata_service_2eproto[18]);
 }
 
 // ===================================================================
@@ -14565,7 +17102,7 @@ void GetResponseResponse_UserTranscript::InternalSwap(GetResponseResponse_UserTr
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseResponse_UserTranscript::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[15]);
+      file_level_metadata_service_2eproto[19]);
 }
 
 // ===================================================================
@@ -15155,7 +17692,7 @@ void GetResponseResponse::InternalSwap(GetResponseResponse* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetResponseResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[16]);
+      file_level_metadata_service_2eproto[20]);
 }
 
 // ===================================================================
@@ -15348,7 +17885,7 @@ void VisemesData::InternalSwap(VisemesData* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata VisemesData::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[17]);
+      file_level_metadata_service_2eproto[21]);
 }
 
 // ===================================================================
@@ -15601,7 +18138,7 @@ void EmotionResponse::InternalSwap(EmotionResponse* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata EmotionResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[18]);
+      file_level_metadata_service_2eproto[22]);
 }
 
 // ===================================================================
@@ -16304,7 +18841,7 @@ void Viseme::InternalSwap(Viseme* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Viseme::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[19]);
+      file_level_metadata_service_2eproto[23]);
 }
 
 // ===================================================================
@@ -16507,7 +19044,7 @@ void BlendShapesData::InternalSwap(BlendShapesData* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata BlendShapesData::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[20]);
+      file_level_metadata_service_2eproto[24]);
 }
 
 // ===================================================================
@@ -16710,7 +19247,7 @@ void HelloRequest::InternalSwap(HelloRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata HelloRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[21]);
+      file_level_metadata_service_2eproto[25]);
 }
 
 // ===================================================================
@@ -16913,7 +19450,7 @@ void HelloResponse::InternalSwap(HelloResponse* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata HelloResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[22]);
+      file_level_metadata_service_2eproto[26]);
 }
 
 // ===================================================================
@@ -17215,7 +19752,7 @@ void FeedbackRequest_Feedback::InternalSwap(FeedbackRequest_Feedback* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata FeedbackRequest_Feedback::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[23]);
+      file_level_metadata_service_2eproto[27]);
 }
 
 // ===================================================================
@@ -17660,7 +20197,7 @@ void FeedbackRequest::InternalSwap(FeedbackRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata FeedbackRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[24]);
+      file_level_metadata_service_2eproto[28]);
 }
 
 // ===================================================================
@@ -17863,7 +20400,7 @@ void FeedbackResponse::InternalSwap(FeedbackResponse* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata FeedbackResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_service_2eproto_getter, &descriptor_table_service_2eproto_once,
-      file_level_metadata_service_2eproto[25]);
+      file_level_metadata_service_2eproto[29]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
@@ -17896,6 +20433,22 @@ Arena::CreateMaybeMessage< ::service::STTRequest >(Arena* arena) {
 template<> PROTOBUF_NOINLINE ::service::STTResponse*
 Arena::CreateMaybeMessage< ::service::STTResponse >(Arena* arena) {
   return Arena::CreateMessageInternal< ::service::STTResponse >(arena);
+}
+template<> PROTOBUF_NOINLINE ::service::DynamicInfoConfig*
+Arena::CreateMaybeMessage< ::service::DynamicInfoConfig >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::DynamicInfoConfig >(arena);
+}
+template<> PROTOBUF_NOINLINE ::service::VisionInput_ImageData*
+Arena::CreateMaybeMessage< ::service::VisionInput_ImageData >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::VisionInput_ImageData >(arena);
+}
+template<> PROTOBUF_NOINLINE ::service::VisionInput_VideoData*
+Arena::CreateMaybeMessage< ::service::VisionInput_VideoData >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::VisionInput_VideoData >(arena);
+}
+template<> PROTOBUF_NOINLINE ::service::VisionInput*
+Arena::CreateMaybeMessage< ::service::VisionInput >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::service::VisionInput >(arena);
 }
 template<> PROTOBUF_NOINLINE ::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse*
 Arena::CreateMaybeMessage< ::service::GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse >(Arena* arena) {

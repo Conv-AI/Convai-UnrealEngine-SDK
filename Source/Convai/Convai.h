@@ -22,9 +22,13 @@ public:
 	UPROPERTY(Config, EditAnywhere, Category = "Convai API")
 	FString API_Key;
 
-	/* API Key Issued from the website */
+	/* Enable new actions system */
 	UPROPERTY(Config, EditAnywhere, Category = "Convai API", meta = (DisplayName = "Enable New Action System (Experimental)"))
 	bool EnableNewActionSystem;
+
+	/* Authentication token used for Convai Connect */
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	FString AuthToken;
 
 	/* Custom Server URL (Used for debugging) */
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")

@@ -517,6 +517,44 @@ FString UConvaiUtils::GetAPI_Key()
 	return Convai::Get().GetConvaiSettings()->API_Key;
 }
 
+void UConvaiUtils::SetAuthToken(FString AuthToken)
+{
+	Convai::Get().GetConvaiSettings()->AuthToken = AuthToken;
+}
+
+FString UConvaiUtils::GetAuthToken()
+{
+	return Convai::Get().GetConvaiSettings()->AuthToken;
+}
+
+TPair<FString, FString> UConvaiUtils::GetAuthHeaderAndKey()
+{
+	FString API_Key = GetAPI_Key();
+	FString AuthToken = GetAuthToken();
+
+	FString KeyOrToken;
+	FString HeaderString;
+
+	if (!API_Key.IsEmpty())
+	{
+		KeyOrToken = API_Key;
+		HeaderString = ConvaiConstants::API_Key_Header;
+	}
+	else if (!AuthToken.IsEmpty())
+	{
+		KeyOrToken = AuthToken;
+		HeaderString = ConvaiConstants::Auth_Token_Header;
+	}
+	else
+	{
+		// Handle the case where both are empty if necessary
+		KeyOrToken = "";
+		HeaderString = "";
+	}
+
+	return TPair<FString, FString>(HeaderString, KeyOrToken);
+}
+
 FString UConvaiUtils::GetTestCharacterID()
 {
 	return Convai::Get().GetConvaiSettings()->TestCharacterID;

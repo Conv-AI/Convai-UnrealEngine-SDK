@@ -79,7 +79,6 @@ class UConvaiGetActionProxy : public UOnlineBlueprintCallProxyBase
 	void finish();
 
 	FString URL;
-	FString API_key;
 	UConvaiActionContext* Context;
 	FString TextQuery;
 
@@ -159,7 +158,6 @@ class UConvaiGetActionResponseProxy : public UOnlineBlueprintCallProxyBase
 
 	// Inputs
 	FString URL;
-	FString API_key;
 	UConvaiActionContext* Context;
 	FString TextQuery;
 	TArray<uint8> Payload;

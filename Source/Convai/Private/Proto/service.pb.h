@@ -70,7 +70,7 @@ struct TableStruct_service_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[26]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[30]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -93,6 +93,9 @@ extern AudioConfigDefaultTypeInternal _AudioConfig_default_instance_;
 class BlendShapesData;
 class BlendShapesDataDefaultTypeInternal;
 extern BlendShapesDataDefaultTypeInternal _BlendShapesData_default_instance_;
+class DynamicInfoConfig;
+class DynamicInfoConfigDefaultTypeInternal;
+extern DynamicInfoConfigDefaultTypeInternal _DynamicInfoConfig_default_instance_;
 class EmotionResponse;
 class EmotionResponseDefaultTypeInternal;
 extern EmotionResponseDefaultTypeInternal _EmotionResponse_default_instance_;
@@ -156,6 +159,15 @@ extern VisemeDefaultTypeInternal _Viseme_default_instance_;
 class VisemesData;
 class VisemesDataDefaultTypeInternal;
 extern VisemesDataDefaultTypeInternal _VisemesData_default_instance_;
+class VisionInput;
+class VisionInputDefaultTypeInternal;
+extern VisionInputDefaultTypeInternal _VisionInput_default_instance_;
+class VisionInput_ImageData;
+class VisionInput_ImageDataDefaultTypeInternal;
+extern VisionInput_ImageDataDefaultTypeInternal _VisionInput_ImageData_default_instance_;
+class VisionInput_VideoData;
+class VisionInput_VideoDataDefaultTypeInternal;
+extern VisionInput_VideoDataDefaultTypeInternal _VisionInput_VideoData_default_instance_;
 }  // namespace service
 PROTOBUF_NAMESPACE_OPEN
 template<> ::service::ActionConfig* Arena::CreateMaybeMessage<::service::ActionConfig>(Arena*);
@@ -163,6 +175,7 @@ template<> ::service::ActionConfig_Character* Arena::CreateMaybeMessage<::servic
 template<> ::service::ActionConfig_Object* Arena::CreateMaybeMessage<::service::ActionConfig_Object>(Arena*);
 template<> ::service::AudioConfig* Arena::CreateMaybeMessage<::service::AudioConfig>(Arena*);
 template<> ::service::BlendShapesData* Arena::CreateMaybeMessage<::service::BlendShapesData>(Arena*);
+template<> ::service::DynamicInfoConfig* Arena::CreateMaybeMessage<::service::DynamicInfoConfig>(Arena*);
 template<> ::service::EmotionResponse* Arena::CreateMaybeMessage<::service::EmotionResponse>(Arena*);
 template<> ::service::FeedbackRequest* Arena::CreateMaybeMessage<::service::FeedbackRequest>(Arena*);
 template<> ::service::FeedbackRequest_Feedback* Arena::CreateMaybeMessage<::service::FeedbackRequest_Feedback>(Arena*);
@@ -184,6 +197,9 @@ template<> ::service::STTResponse* Arena::CreateMaybeMessage<::service::STTRespo
 template<> ::service::TriggerConfig* Arena::CreateMaybeMessage<::service::TriggerConfig>(Arena*);
 template<> ::service::Viseme* Arena::CreateMaybeMessage<::service::Viseme>(Arena*);
 template<> ::service::VisemesData* Arena::CreateMaybeMessage<::service::VisemesData>(Arena*);
+template<> ::service::VisionInput* Arena::CreateMaybeMessage<::service::VisionInput>(Arena*);
+template<> ::service::VisionInput_ImageData* Arena::CreateMaybeMessage<::service::VisionInput_ImageData>(Arena*);
+template<> ::service::VisionInput_VideoData* Arena::CreateMaybeMessage<::service::VisionInput_VideoData>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace service {
 
@@ -1447,6 +1463,676 @@ class STTResponse PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class DynamicInfoConfig PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.DynamicInfoConfig) */ {
+ public:
+  inline DynamicInfoConfig() : DynamicInfoConfig(nullptr) {}
+  virtual ~DynamicInfoConfig();
+
+  DynamicInfoConfig(const DynamicInfoConfig& from);
+  DynamicInfoConfig(DynamicInfoConfig&& from) noexcept
+    : DynamicInfoConfig() {
+    *this = ::std::move(from);
+  }
+
+  inline DynamicInfoConfig& operator=(const DynamicInfoConfig& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline DynamicInfoConfig& operator=(DynamicInfoConfig&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const DynamicInfoConfig& default_instance();
+
+  static inline const DynamicInfoConfig* internal_default_instance() {
+    return reinterpret_cast<const DynamicInfoConfig*>(
+               &_DynamicInfoConfig_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  friend void swap(DynamicInfoConfig& a, DynamicInfoConfig& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(DynamicInfoConfig* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(DynamicInfoConfig* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DynamicInfoConfig* New() const final {
+    return CreateMaybeMessage<DynamicInfoConfig>(nullptr);
+  }
+
+  DynamicInfoConfig* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<DynamicInfoConfig>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const DynamicInfoConfig& from);
+  void MergeFrom(const DynamicInfoConfig& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DynamicInfoConfig* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.DynamicInfoConfig";
+  }
+  protected:
+  explicit DynamicInfoConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
+    return ::descriptor_table_service_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTextFieldNumber = 1,
+  };
+  // string text = 1;
+  void clear_text();
+  const std::string& text() const;
+  void set_text(const std::string& value);
+  void set_text(std::string&& value);
+  void set_text(const char* value);
+  void set_text(const char* value, size_t size);
+  std::string* mutable_text();
+  std::string* release_text();
+  void set_allocated_text(std::string* text);
+  private:
+  const std::string& _internal_text() const;
+  void _internal_set_text(const std::string& value);
+  std::string* _internal_mutable_text();
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.DynamicInfoConfig)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr text_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class VisionInput_ImageData PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.VisionInput.ImageData) */ {
+ public:
+  inline VisionInput_ImageData() : VisionInput_ImageData(nullptr) {}
+  virtual ~VisionInput_ImageData();
+
+  VisionInput_ImageData(const VisionInput_ImageData& from);
+  VisionInput_ImageData(VisionInput_ImageData&& from) noexcept
+    : VisionInput_ImageData() {
+    *this = ::std::move(from);
+  }
+
+  inline VisionInput_ImageData& operator=(const VisionInput_ImageData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline VisionInput_ImageData& operator=(VisionInput_ImageData&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const VisionInput_ImageData& default_instance();
+
+  static inline const VisionInput_ImageData* internal_default_instance() {
+    return reinterpret_cast<const VisionInput_ImageData*>(
+               &_VisionInput_ImageData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  friend void swap(VisionInput_ImageData& a, VisionInput_ImageData& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(VisionInput_ImageData* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(VisionInput_ImageData* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline VisionInput_ImageData* New() const final {
+    return CreateMaybeMessage<VisionInput_ImageData>(nullptr);
+  }
+
+  VisionInput_ImageData* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<VisionInput_ImageData>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const VisionInput_ImageData& from);
+  void MergeFrom(const VisionInput_ImageData& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(VisionInput_ImageData* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.VisionInput.ImageData";
+  }
+  protected:
+  explicit VisionInput_ImageData(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
+    return ::descriptor_table_service_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kDataFieldNumber = 3,
+    kWidthFieldNumber = 1,
+    kHeightFieldNumber = 2,
+  };
+  // bytes data = 3;
+  void clear_data();
+  const std::string& data() const;
+  void set_data(const std::string& value);
+  void set_data(std::string&& value);
+  void set_data(const char* value);
+  void set_data(const void* value, size_t size);
+  std::string* mutable_data();
+  std::string* release_data();
+  void set_allocated_data(std::string* data);
+  private:
+  const std::string& _internal_data() const;
+  void _internal_set_data(const std::string& value);
+  std::string* _internal_mutable_data();
+  public:
+
+  // int32 width = 1;
+  void clear_width();
+  ::PROTOBUF_NAMESPACE_ID::int32 width() const;
+  void set_width(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_width() const;
+  void _internal_set_width(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 height = 2;
+  void clear_height();
+  ::PROTOBUF_NAMESPACE_ID::int32 height() const;
+  void set_height(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_height() const;
+  void _internal_set_height(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.VisionInput.ImageData)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
+  ::PROTOBUF_NAMESPACE_ID::int32 width_;
+  ::PROTOBUF_NAMESPACE_ID::int32 height_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class VisionInput_VideoData PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.VisionInput.VideoData) */ {
+ public:
+  inline VisionInput_VideoData() : VisionInput_VideoData(nullptr) {}
+  virtual ~VisionInput_VideoData();
+
+  VisionInput_VideoData(const VisionInput_VideoData& from);
+  VisionInput_VideoData(VisionInput_VideoData&& from) noexcept
+    : VisionInput_VideoData() {
+    *this = ::std::move(from);
+  }
+
+  inline VisionInput_VideoData& operator=(const VisionInput_VideoData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline VisionInput_VideoData& operator=(VisionInput_VideoData&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const VisionInput_VideoData& default_instance();
+
+  static inline const VisionInput_VideoData* internal_default_instance() {
+    return reinterpret_cast<const VisionInput_VideoData*>(
+               &_VisionInput_VideoData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  friend void swap(VisionInput_VideoData& a, VisionInput_VideoData& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(VisionInput_VideoData* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(VisionInput_VideoData* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline VisionInput_VideoData* New() const final {
+    return CreateMaybeMessage<VisionInput_VideoData>(nullptr);
+  }
+
+  VisionInput_VideoData* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<VisionInput_VideoData>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const VisionInput_VideoData& from);
+  void MergeFrom(const VisionInput_VideoData& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(VisionInput_VideoData* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.VisionInput.VideoData";
+  }
+  protected:
+  explicit VisionInput_VideoData(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
+    return ::descriptor_table_service_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kDataFieldNumber = 4,
+    kFpsFieldNumber = 1,
+    kWidthFieldNumber = 2,
+    kHeightFieldNumber = 3,
+  };
+  // bytes data = 4;
+  void clear_data();
+  const std::string& data() const;
+  void set_data(const std::string& value);
+  void set_data(std::string&& value);
+  void set_data(const char* value);
+  void set_data(const void* value, size_t size);
+  std::string* mutable_data();
+  std::string* release_data();
+  void set_allocated_data(std::string* data);
+  private:
+  const std::string& _internal_data() const;
+  void _internal_set_data(const std::string& value);
+  std::string* _internal_mutable_data();
+  public:
+
+  // int32 fps = 1;
+  void clear_fps();
+  ::PROTOBUF_NAMESPACE_ID::int32 fps() const;
+  void set_fps(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_fps() const;
+  void _internal_set_fps(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 width = 2;
+  void clear_width();
+  ::PROTOBUF_NAMESPACE_ID::int32 width() const;
+  void set_width(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_width() const;
+  void _internal_set_width(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 height = 3;
+  void clear_height();
+  ::PROTOBUF_NAMESPACE_ID::int32 height() const;
+  void set_height(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_height() const;
+  void _internal_set_height(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.VisionInput.VideoData)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
+  ::PROTOBUF_NAMESPACE_ID::int32 fps_;
+  ::PROTOBUF_NAMESPACE_ID::int32 width_;
+  ::PROTOBUF_NAMESPACE_ID::int32 height_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class VisionInput PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.VisionInput) */ {
+ public:
+  inline VisionInput() : VisionInput(nullptr) {}
+  virtual ~VisionInput();
+
+  VisionInput(const VisionInput& from);
+  VisionInput(VisionInput&& from) noexcept
+    : VisionInput() {
+    *this = ::std::move(from);
+  }
+
+  inline VisionInput& operator=(const VisionInput& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline VisionInput& operator=(VisionInput&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const VisionInput& default_instance();
+
+  enum VisionDataCase {
+    kImageData = 1,
+    kVideoData = 2,
+    VISION_DATA_NOT_SET = 0,
+  };
+
+  static inline const VisionInput* internal_default_instance() {
+    return reinterpret_cast<const VisionInput*>(
+               &_VisionInput_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  friend void swap(VisionInput& a, VisionInput& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(VisionInput* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(VisionInput* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline VisionInput* New() const final {
+    return CreateMaybeMessage<VisionInput>(nullptr);
+  }
+
+  VisionInput* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<VisionInput>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const VisionInput& from);
+  void MergeFrom(const VisionInput& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(VisionInput* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.VisionInput";
+  }
+  protected:
+  explicit VisionInput(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
+    return ::descriptor_table_service_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  typedef VisionInput_ImageData ImageData;
+  typedef VisionInput_VideoData VideoData;
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kImageDataFieldNumber = 1,
+    kVideoDataFieldNumber = 2,
+  };
+  // .service.VisionInput.ImageData image_data = 1;
+  bool has_image_data() const;
+  private:
+  bool _internal_has_image_data() const;
+  public:
+  void clear_image_data();
+  const ::service::VisionInput_ImageData& image_data() const;
+  ::service::VisionInput_ImageData* release_image_data();
+  ::service::VisionInput_ImageData* mutable_image_data();
+  void set_allocated_image_data(::service::VisionInput_ImageData* image_data);
+  private:
+  const ::service::VisionInput_ImageData& _internal_image_data() const;
+  ::service::VisionInput_ImageData* _internal_mutable_image_data();
+  public:
+  void unsafe_arena_set_allocated_image_data(
+      ::service::VisionInput_ImageData* image_data);
+  ::service::VisionInput_ImageData* unsafe_arena_release_image_data();
+
+  // .service.VisionInput.VideoData video_data = 2;
+  bool has_video_data() const;
+  private:
+  bool _internal_has_video_data() const;
+  public:
+  void clear_video_data();
+  const ::service::VisionInput_VideoData& video_data() const;
+  ::service::VisionInput_VideoData* release_video_data();
+  ::service::VisionInput_VideoData* mutable_video_data();
+  void set_allocated_video_data(::service::VisionInput_VideoData* video_data);
+  private:
+  const ::service::VisionInput_VideoData& _internal_video_data() const;
+  ::service::VisionInput_VideoData* _internal_mutable_video_data();
+  public:
+  void unsafe_arena_set_allocated_video_data(
+      ::service::VisionInput_VideoData* video_data);
+  ::service::VisionInput_VideoData* unsafe_arena_release_video_data();
+
+  void clear_vision_data();
+  VisionDataCase vision_data_case() const;
+  // @@protoc_insertion_point(class_scope:service.VisionInput)
+ private:
+  class _Internal;
+  void set_has_image_data();
+  void set_has_video_data();
+
+  inline bool has_vision_data() const;
+  inline void clear_has_vision_data();
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  union VisionDataUnion {
+    VisionDataUnion() {}
+    ::service::VisionInput_ImageData* image_data_;
+    ::service::VisionInput_VideoData* video_data_;
+  } vision_data_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
+
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
 class GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse, 
     std::string, std::string,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
@@ -1471,7 +2157,7 @@ public:
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
     ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_service_2eproto);
-    return ::descriptor_table_service_2eproto.file_level_metadata[7];
+    return ::descriptor_table_service_2eproto.file_level_metadata[11];
   }
 
   public:
@@ -1520,7 +2206,7 @@ class GetResponseRequest_GetResponseConfig PROTOBUF_FINAL :
                &_GetResponseRequest_GetResponseConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    12;
 
   friend void swap(GetResponseRequest_GetResponseConfig& a, GetResponseRequest_GetResponseConfig& b) {
     a.Swap(&b);
@@ -1602,6 +2288,8 @@ class GetResponseRequest_GetResponseConfig PROTOBUF_FINAL :
     kApiAuthTokenFieldNumber = 10,
     kAudioConfigFieldNumber = 5,
     kActionConfigFieldNumber = 6,
+    kDynamicInfoConfigFieldNumber = 12,
+    kVisionInputFieldNumber = 13,
   };
   // map<string, string> narrative_template_keys = 11;
   int narrative_template_keys_size() const;
@@ -1768,6 +2456,42 @@ class GetResponseRequest_GetResponseConfig PROTOBUF_FINAL :
       ::service::ActionConfig* action_config);
   ::service::ActionConfig* unsafe_arena_release_action_config();
 
+  // .service.DynamicInfoConfig dynamic_info_config = 12;
+  bool has_dynamic_info_config() const;
+  private:
+  bool _internal_has_dynamic_info_config() const;
+  public:
+  void clear_dynamic_info_config();
+  const ::service::DynamicInfoConfig& dynamic_info_config() const;
+  ::service::DynamicInfoConfig* release_dynamic_info_config();
+  ::service::DynamicInfoConfig* mutable_dynamic_info_config();
+  void set_allocated_dynamic_info_config(::service::DynamicInfoConfig* dynamic_info_config);
+  private:
+  const ::service::DynamicInfoConfig& _internal_dynamic_info_config() const;
+  ::service::DynamicInfoConfig* _internal_mutable_dynamic_info_config();
+  public:
+  void unsafe_arena_set_allocated_dynamic_info_config(
+      ::service::DynamicInfoConfig* dynamic_info_config);
+  ::service::DynamicInfoConfig* unsafe_arena_release_dynamic_info_config();
+
+  // .service.VisionInput vision_input = 13;
+  bool has_vision_input() const;
+  private:
+  bool _internal_has_vision_input() const;
+  public:
+  void clear_vision_input();
+  const ::service::VisionInput& vision_input() const;
+  ::service::VisionInput* release_vision_input();
+  ::service::VisionInput* mutable_vision_input();
+  void set_allocated_vision_input(::service::VisionInput* vision_input);
+  private:
+  const ::service::VisionInput& _internal_vision_input() const;
+  ::service::VisionInput* _internal_mutable_vision_input();
+  public:
+  void unsafe_arena_set_allocated_vision_input(
+      ::service::VisionInput* vision_input);
+  ::service::VisionInput* unsafe_arena_release_vision_input();
+
   // @@protoc_insertion_point(class_scope:service.GetResponseRequest.GetResponseConfig)
  private:
   class _Internal;
@@ -1789,6 +2513,8 @@ class GetResponseRequest_GetResponseConfig PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr api_auth_token_;
   ::service::AudioConfig* audio_config_;
   ::service::ActionConfig* action_config_;
+  ::service::DynamicInfoConfig* dynamic_info_config_;
+  ::service::VisionInput* vision_input_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_service_2eproto;
 };
@@ -1842,7 +2568,7 @@ class GetResponseRequest_GetResponseData PROTOBUF_FINAL :
                &_GetResponseRequest_GetResponseData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    13;
 
   friend void swap(GetResponseRequest_GetResponseData& a, GetResponseRequest_GetResponseData& b) {
     a.Swap(&b);
@@ -2048,7 +2774,7 @@ class GetResponseRequest PROTOBUF_FINAL :
                &_GetResponseRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    14;
 
   friend void swap(GetResponseRequest& a, GetResponseRequest& b) {
     a.Swap(&b);
@@ -2228,7 +2954,7 @@ class GetResponseRequestSingle PROTOBUF_FINAL :
                &_GetResponseRequestSingle_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    15;
 
   friend void swap(GetResponseRequestSingle& a, GetResponseRequestSingle& b) {
     a.Swap(&b);
@@ -2399,7 +3125,7 @@ class GetResponseResponse_AudioResponse PROTOBUF_FINAL :
                &_GetResponseResponse_AudioResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    16;
 
   friend void swap(GetResponseResponse_AudioResponse& a, GetResponseResponse_AudioResponse& b) {
     a.Swap(&b);
@@ -2701,7 +3427,7 @@ class GetResponseResponse_ActionResponse PROTOBUF_FINAL :
                &_GetResponseResponse_ActionResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    17;
 
   friend void swap(GetResponseResponse_ActionResponse& a, GetResponseResponse_ActionResponse& b) {
     a.Swap(&b);
@@ -2844,7 +3570,7 @@ class GetResponseResponse_BehaviorTreeResponse PROTOBUF_FINAL :
                &_GetResponseResponse_BehaviorTreeResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    18;
 
   friend void swap(GetResponseResponse_BehaviorTreeResponse& a, GetResponseResponse_BehaviorTreeResponse& b) {
     a.Swap(&b);
@@ -3023,7 +3749,7 @@ class GetResponseResponse_UserTranscript PROTOBUF_FINAL :
                &_GetResponseResponse_UserTranscript_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    19;
 
   friend void swap(GetResponseResponse_UserTranscript& a, GetResponseResponse_UserTranscript& b) {
     a.Swap(&b);
@@ -3199,7 +3925,7 @@ class GetResponseResponse PROTOBUF_FINAL :
                &_GetResponseResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    20;
 
   friend void swap(GetResponseResponse& a, GetResponseResponse& b) {
     a.Swap(&b);
@@ -3507,7 +4233,7 @@ class VisemesData PROTOBUF_FINAL :
                &_VisemesData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    21;
 
   friend void swap(VisemesData& a, VisemesData& b) {
     a.Swap(&b);
@@ -3652,7 +4378,7 @@ class EmotionResponse PROTOBUF_FINAL :
                &_EmotionResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    22;
 
   friend void swap(EmotionResponse& a, EmotionResponse& b) {
     a.Swap(&b);
@@ -3813,7 +4539,7 @@ class Viseme PROTOBUF_FINAL :
                &_Viseme_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    23;
 
   friend void swap(Viseme& a, Viseme& b) {
     a.Swap(&b);
@@ -4103,7 +4829,7 @@ class BlendShapesData PROTOBUF_FINAL :
                &_BlendShapesData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    24;
 
   friend void swap(BlendShapesData& a, BlendShapesData& b) {
     a.Swap(&b);
@@ -4246,7 +4972,7 @@ class HelloRequest PROTOBUF_FINAL :
                &_HelloRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    25;
 
   friend void swap(HelloRequest& a, HelloRequest& b) {
     a.Swap(&b);
@@ -4389,7 +5115,7 @@ class HelloResponse PROTOBUF_FINAL :
                &_HelloResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    26;
 
   friend void swap(HelloResponse& a, HelloResponse& b) {
     a.Swap(&b);
@@ -4532,7 +5258,7 @@ class FeedbackRequest_Feedback PROTOBUF_FINAL :
                &_FeedbackRequest_Feedback_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    27;
 
   friend void swap(FeedbackRequest_Feedback& a, FeedbackRequest_Feedback& b) {
     a.Swap(&b);
@@ -4723,7 +5449,7 @@ class FeedbackRequest PROTOBUF_FINAL :
                &_FeedbackRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    28;
 
   friend void swap(FeedbackRequest& a, FeedbackRequest& b) {
     a.Swap(&b);
@@ -4960,7 +5686,7 @@ class FeedbackResponse PROTOBUF_FINAL :
                &_FeedbackResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    29;
 
   friend void swap(FeedbackResponse& a, FeedbackResponse& b) {
     a.Swap(&b);
@@ -6107,6 +6833,460 @@ inline void STTResponse::set_allocated_text(std::string* text) {
 
 // -------------------------------------------------------------------
 
+// DynamicInfoConfig
+
+// string text = 1;
+inline void DynamicInfoConfig::clear_text() {
+  text_.ClearToEmpty();
+}
+inline const std::string& DynamicInfoConfig::text() const {
+  // @@protoc_insertion_point(field_get:service.DynamicInfoConfig.text)
+  return _internal_text();
+}
+inline void DynamicInfoConfig::set_text(const std::string& value) {
+  _internal_set_text(value);
+  // @@protoc_insertion_point(field_set:service.DynamicInfoConfig.text)
+}
+inline std::string* DynamicInfoConfig::mutable_text() {
+  // @@protoc_insertion_point(field_mutable:service.DynamicInfoConfig.text)
+  return _internal_mutable_text();
+}
+inline const std::string& DynamicInfoConfig::_internal_text() const {
+  return text_.Get();
+}
+inline void DynamicInfoConfig::_internal_set_text(const std::string& value) {
+  
+  text_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void DynamicInfoConfig::set_text(std::string&& value) {
+  
+  text_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.DynamicInfoConfig.text)
+}
+inline void DynamicInfoConfig::set_text(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  text_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.DynamicInfoConfig.text)
+}
+inline void DynamicInfoConfig::set_text(const char* value,
+    size_t size) {
+  
+  text_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.DynamicInfoConfig.text)
+}
+inline std::string* DynamicInfoConfig::_internal_mutable_text() {
+  
+  return text_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* DynamicInfoConfig::release_text() {
+  // @@protoc_insertion_point(field_release:service.DynamicInfoConfig.text)
+  return text_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void DynamicInfoConfig::set_allocated_text(std::string* text) {
+  if (text != nullptr) {
+    
+  } else {
+    
+  }
+  text_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), text,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.DynamicInfoConfig.text)
+}
+
+// -------------------------------------------------------------------
+
+// VisionInput_ImageData
+
+// int32 width = 1;
+inline void VisionInput_ImageData::clear_width() {
+  width_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 VisionInput_ImageData::_internal_width() const {
+  return width_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 VisionInput_ImageData::width() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.ImageData.width)
+  return _internal_width();
+}
+inline void VisionInput_ImageData::_internal_set_width(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  width_ = value;
+}
+inline void VisionInput_ImageData::set_width(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_width(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.ImageData.width)
+}
+
+// int32 height = 2;
+inline void VisionInput_ImageData::clear_height() {
+  height_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 VisionInput_ImageData::_internal_height() const {
+  return height_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 VisionInput_ImageData::height() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.ImageData.height)
+  return _internal_height();
+}
+inline void VisionInput_ImageData::_internal_set_height(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  height_ = value;
+}
+inline void VisionInput_ImageData::set_height(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_height(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.ImageData.height)
+}
+
+// bytes data = 3;
+inline void VisionInput_ImageData::clear_data() {
+  data_.ClearToEmpty();
+}
+inline const std::string& VisionInput_ImageData::data() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.ImageData.data)
+  return _internal_data();
+}
+inline void VisionInput_ImageData::set_data(const std::string& value) {
+  _internal_set_data(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.ImageData.data)
+}
+inline std::string* VisionInput_ImageData::mutable_data() {
+  // @@protoc_insertion_point(field_mutable:service.VisionInput.ImageData.data)
+  return _internal_mutable_data();
+}
+inline const std::string& VisionInput_ImageData::_internal_data() const {
+  return data_.Get();
+}
+inline void VisionInput_ImageData::_internal_set_data(const std::string& value) {
+  
+  data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void VisionInput_ImageData::set_data(std::string&& value) {
+  
+  data_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.VisionInput.ImageData.data)
+}
+inline void VisionInput_ImageData::set_data(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.VisionInput.ImageData.data)
+}
+inline void VisionInput_ImageData::set_data(const void* value,
+    size_t size) {
+  
+  data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.VisionInput.ImageData.data)
+}
+inline std::string* VisionInput_ImageData::_internal_mutable_data() {
+  
+  return data_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* VisionInput_ImageData::release_data() {
+  // @@protoc_insertion_point(field_release:service.VisionInput.ImageData.data)
+  return data_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void VisionInput_ImageData::set_allocated_data(std::string* data) {
+  if (data != nullptr) {
+    
+  } else {
+    
+  }
+  data_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), data,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.VisionInput.ImageData.data)
+}
+
+// -------------------------------------------------------------------
+
+// VisionInput_VideoData
+
+// int32 fps = 1;
+inline void VisionInput_VideoData::clear_fps() {
+  fps_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 VisionInput_VideoData::_internal_fps() const {
+  return fps_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 VisionInput_VideoData::fps() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.VideoData.fps)
+  return _internal_fps();
+}
+inline void VisionInput_VideoData::_internal_set_fps(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  fps_ = value;
+}
+inline void VisionInput_VideoData::set_fps(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_fps(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.VideoData.fps)
+}
+
+// int32 width = 2;
+inline void VisionInput_VideoData::clear_width() {
+  width_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 VisionInput_VideoData::_internal_width() const {
+  return width_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 VisionInput_VideoData::width() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.VideoData.width)
+  return _internal_width();
+}
+inline void VisionInput_VideoData::_internal_set_width(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  width_ = value;
+}
+inline void VisionInput_VideoData::set_width(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_width(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.VideoData.width)
+}
+
+// int32 height = 3;
+inline void VisionInput_VideoData::clear_height() {
+  height_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 VisionInput_VideoData::_internal_height() const {
+  return height_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 VisionInput_VideoData::height() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.VideoData.height)
+  return _internal_height();
+}
+inline void VisionInput_VideoData::_internal_set_height(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  height_ = value;
+}
+inline void VisionInput_VideoData::set_height(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_height(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.VideoData.height)
+}
+
+// bytes data = 4;
+inline void VisionInput_VideoData::clear_data() {
+  data_.ClearToEmpty();
+}
+inline const std::string& VisionInput_VideoData::data() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.VideoData.data)
+  return _internal_data();
+}
+inline void VisionInput_VideoData::set_data(const std::string& value) {
+  _internal_set_data(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.VideoData.data)
+}
+inline std::string* VisionInput_VideoData::mutable_data() {
+  // @@protoc_insertion_point(field_mutable:service.VisionInput.VideoData.data)
+  return _internal_mutable_data();
+}
+inline const std::string& VisionInput_VideoData::_internal_data() const {
+  return data_.Get();
+}
+inline void VisionInput_VideoData::_internal_set_data(const std::string& value) {
+  
+  data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void VisionInput_VideoData::set_data(std::string&& value) {
+  
+  data_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:service.VisionInput.VideoData.data)
+}
+inline void VisionInput_VideoData::set_data(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:service.VisionInput.VideoData.data)
+}
+inline void VisionInput_VideoData::set_data(const void* value,
+    size_t size) {
+  
+  data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:service.VisionInput.VideoData.data)
+}
+inline std::string* VisionInput_VideoData::_internal_mutable_data() {
+  
+  return data_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* VisionInput_VideoData::release_data() {
+  // @@protoc_insertion_point(field_release:service.VisionInput.VideoData.data)
+  return data_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void VisionInput_VideoData::set_allocated_data(std::string* data) {
+  if (data != nullptr) {
+    
+  } else {
+    
+  }
+  data_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), data,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:service.VisionInput.VideoData.data)
+}
+
+// -------------------------------------------------------------------
+
+// VisionInput
+
+// .service.VisionInput.ImageData image_data = 1;
+inline bool VisionInput::_internal_has_image_data() const {
+  return vision_data_case() == kImageData;
+}
+inline bool VisionInput::has_image_data() const {
+  return _internal_has_image_data();
+}
+inline void VisionInput::set_has_image_data() {
+  _oneof_case_[0] = kImageData;
+}
+inline void VisionInput::clear_image_data() {
+  if (_internal_has_image_data()) {
+    if (GetArena() == nullptr) {
+      delete vision_data_.image_data_;
+    }
+    clear_has_vision_data();
+  }
+}
+inline ::service::VisionInput_ImageData* VisionInput::release_image_data() {
+  // @@protoc_insertion_point(field_release:service.VisionInput.image_data)
+  if (_internal_has_image_data()) {
+    clear_has_vision_data();
+      ::service::VisionInput_ImageData* temp = vision_data_.image_data_;
+    if (GetArena() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    vision_data_.image_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::service::VisionInput_ImageData& VisionInput::_internal_image_data() const {
+  return _internal_has_image_data()
+      ? *vision_data_.image_data_
+      : reinterpret_cast< ::service::VisionInput_ImageData&>(::service::_VisionInput_ImageData_default_instance_);
+}
+inline const ::service::VisionInput_ImageData& VisionInput::image_data() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.image_data)
+  return _internal_image_data();
+}
+inline ::service::VisionInput_ImageData* VisionInput::unsafe_arena_release_image_data() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:service.VisionInput.image_data)
+  if (_internal_has_image_data()) {
+    clear_has_vision_data();
+    ::service::VisionInput_ImageData* temp = vision_data_.image_data_;
+    vision_data_.image_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void VisionInput::unsafe_arena_set_allocated_image_data(::service::VisionInput_ImageData* image_data) {
+  clear_vision_data();
+  if (image_data) {
+    set_has_image_data();
+    vision_data_.image_data_ = image_data;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.VisionInput.image_data)
+}
+inline ::service::VisionInput_ImageData* VisionInput::_internal_mutable_image_data() {
+  if (!_internal_has_image_data()) {
+    clear_vision_data();
+    set_has_image_data();
+    vision_data_.image_data_ = CreateMaybeMessage< ::service::VisionInput_ImageData >(GetArena());
+  }
+  return vision_data_.image_data_;
+}
+inline ::service::VisionInput_ImageData* VisionInput::mutable_image_data() {
+  // @@protoc_insertion_point(field_mutable:service.VisionInput.image_data)
+  return _internal_mutable_image_data();
+}
+
+// .service.VisionInput.VideoData video_data = 2;
+inline bool VisionInput::_internal_has_video_data() const {
+  return vision_data_case() == kVideoData;
+}
+inline bool VisionInput::has_video_data() const {
+  return _internal_has_video_data();
+}
+inline void VisionInput::set_has_video_data() {
+  _oneof_case_[0] = kVideoData;
+}
+inline void VisionInput::clear_video_data() {
+  if (_internal_has_video_data()) {
+    if (GetArena() == nullptr) {
+      delete vision_data_.video_data_;
+    }
+    clear_has_vision_data();
+  }
+}
+inline ::service::VisionInput_VideoData* VisionInput::release_video_data() {
+  // @@protoc_insertion_point(field_release:service.VisionInput.video_data)
+  if (_internal_has_video_data()) {
+    clear_has_vision_data();
+      ::service::VisionInput_VideoData* temp = vision_data_.video_data_;
+    if (GetArena() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    vision_data_.video_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::service::VisionInput_VideoData& VisionInput::_internal_video_data() const {
+  return _internal_has_video_data()
+      ? *vision_data_.video_data_
+      : reinterpret_cast< ::service::VisionInput_VideoData&>(::service::_VisionInput_VideoData_default_instance_);
+}
+inline const ::service::VisionInput_VideoData& VisionInput::video_data() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.video_data)
+  return _internal_video_data();
+}
+inline ::service::VisionInput_VideoData* VisionInput::unsafe_arena_release_video_data() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:service.VisionInput.video_data)
+  if (_internal_has_video_data()) {
+    clear_has_vision_data();
+    ::service::VisionInput_VideoData* temp = vision_data_.video_data_;
+    vision_data_.video_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void VisionInput::unsafe_arena_set_allocated_video_data(::service::VisionInput_VideoData* video_data) {
+  clear_vision_data();
+  if (video_data) {
+    set_has_video_data();
+    vision_data_.video_data_ = video_data;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.VisionInput.video_data)
+}
+inline ::service::VisionInput_VideoData* VisionInput::_internal_mutable_video_data() {
+  if (!_internal_has_video_data()) {
+    clear_vision_data();
+    set_has_video_data();
+    vision_data_.video_data_ = CreateMaybeMessage< ::service::VisionInput_VideoData >(GetArena());
+  }
+  return vision_data_.video_data_;
+}
+inline ::service::VisionInput_VideoData* VisionInput::mutable_video_data() {
+  // @@protoc_insertion_point(field_mutable:service.VisionInput.video_data)
+  return _internal_mutable_video_data();
+}
+
+inline bool VisionInput::has_vision_data() const {
+  return vision_data_case() != VISION_DATA_NOT_SET;
+}
+inline void VisionInput::clear_has_vision_data() {
+  _oneof_case_[0] = VISION_DATA_NOT_SET;
+}
+inline VisionInput::VisionDataCase VisionInput::vision_data_case() const {
+  return VisionInput::VisionDataCase(_oneof_case_[0]);
+}
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // GetResponseRequest_GetResponseConfig
@@ -6731,6 +7911,172 @@ inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >*
 GetResponseRequest_GetResponseConfig::mutable_narrative_template_keys() {
   // @@protoc_insertion_point(field_mutable_map:service.GetResponseRequest.GetResponseConfig.narrative_template_keys)
   return _internal_mutable_narrative_template_keys();
+}
+
+// .service.DynamicInfoConfig dynamic_info_config = 12;
+inline bool GetResponseRequest_GetResponseConfig::_internal_has_dynamic_info_config() const {
+  return this != internal_default_instance() && dynamic_info_config_ != nullptr;
+}
+inline bool GetResponseRequest_GetResponseConfig::has_dynamic_info_config() const {
+  return _internal_has_dynamic_info_config();
+}
+inline void GetResponseRequest_GetResponseConfig::clear_dynamic_info_config() {
+  if (GetArena() == nullptr && dynamic_info_config_ != nullptr) {
+    delete dynamic_info_config_;
+  }
+  dynamic_info_config_ = nullptr;
+}
+inline const ::service::DynamicInfoConfig& GetResponseRequest_GetResponseConfig::_internal_dynamic_info_config() const {
+  const ::service::DynamicInfoConfig* p = dynamic_info_config_;
+  return p != nullptr ? *p : reinterpret_cast<const ::service::DynamicInfoConfig&>(
+      ::service::_DynamicInfoConfig_default_instance_);
+}
+inline const ::service::DynamicInfoConfig& GetResponseRequest_GetResponseConfig::dynamic_info_config() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequest.GetResponseConfig.dynamic_info_config)
+  return _internal_dynamic_info_config();
+}
+inline void GetResponseRequest_GetResponseConfig::unsafe_arena_set_allocated_dynamic_info_config(
+    ::service::DynamicInfoConfig* dynamic_info_config) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(dynamic_info_config_);
+  }
+  dynamic_info_config_ = dynamic_info_config;
+  if (dynamic_info_config) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseRequest.GetResponseConfig.dynamic_info_config)
+}
+inline ::service::DynamicInfoConfig* GetResponseRequest_GetResponseConfig::release_dynamic_info_config() {
+  
+  ::service::DynamicInfoConfig* temp = dynamic_info_config_;
+  dynamic_info_config_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::service::DynamicInfoConfig* GetResponseRequest_GetResponseConfig::unsafe_arena_release_dynamic_info_config() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequest.GetResponseConfig.dynamic_info_config)
+  
+  ::service::DynamicInfoConfig* temp = dynamic_info_config_;
+  dynamic_info_config_ = nullptr;
+  return temp;
+}
+inline ::service::DynamicInfoConfig* GetResponseRequest_GetResponseConfig::_internal_mutable_dynamic_info_config() {
+  
+  if (dynamic_info_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::service::DynamicInfoConfig>(GetArena());
+    dynamic_info_config_ = p;
+  }
+  return dynamic_info_config_;
+}
+inline ::service::DynamicInfoConfig* GetResponseRequest_GetResponseConfig::mutable_dynamic_info_config() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequest.GetResponseConfig.dynamic_info_config)
+  return _internal_mutable_dynamic_info_config();
+}
+inline void GetResponseRequest_GetResponseConfig::set_allocated_dynamic_info_config(::service::DynamicInfoConfig* dynamic_info_config) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete dynamic_info_config_;
+  }
+  if (dynamic_info_config) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(dynamic_info_config);
+    if (message_arena != submessage_arena) {
+      dynamic_info_config = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, dynamic_info_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  dynamic_info_config_ = dynamic_info_config;
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequest.GetResponseConfig.dynamic_info_config)
+}
+
+// .service.VisionInput vision_input = 13;
+inline bool GetResponseRequest_GetResponseConfig::_internal_has_vision_input() const {
+  return this != internal_default_instance() && vision_input_ != nullptr;
+}
+inline bool GetResponseRequest_GetResponseConfig::has_vision_input() const {
+  return _internal_has_vision_input();
+}
+inline void GetResponseRequest_GetResponseConfig::clear_vision_input() {
+  if (GetArena() == nullptr && vision_input_ != nullptr) {
+    delete vision_input_;
+  }
+  vision_input_ = nullptr;
+}
+inline const ::service::VisionInput& GetResponseRequest_GetResponseConfig::_internal_vision_input() const {
+  const ::service::VisionInput* p = vision_input_;
+  return p != nullptr ? *p : reinterpret_cast<const ::service::VisionInput&>(
+      ::service::_VisionInput_default_instance_);
+}
+inline const ::service::VisionInput& GetResponseRequest_GetResponseConfig::vision_input() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequest.GetResponseConfig.vision_input)
+  return _internal_vision_input();
+}
+inline void GetResponseRequest_GetResponseConfig::unsafe_arena_set_allocated_vision_input(
+    ::service::VisionInput* vision_input) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(vision_input_);
+  }
+  vision_input_ = vision_input;
+  if (vision_input) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseRequest.GetResponseConfig.vision_input)
+}
+inline ::service::VisionInput* GetResponseRequest_GetResponseConfig::release_vision_input() {
+  
+  ::service::VisionInput* temp = vision_input_;
+  vision_input_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::service::VisionInput* GetResponseRequest_GetResponseConfig::unsafe_arena_release_vision_input() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequest.GetResponseConfig.vision_input)
+  
+  ::service::VisionInput* temp = vision_input_;
+  vision_input_ = nullptr;
+  return temp;
+}
+inline ::service::VisionInput* GetResponseRequest_GetResponseConfig::_internal_mutable_vision_input() {
+  
+  if (vision_input_ == nullptr) {
+    auto* p = CreateMaybeMessage<::service::VisionInput>(GetArena());
+    vision_input_ = p;
+  }
+  return vision_input_;
+}
+inline ::service::VisionInput* GetResponseRequest_GetResponseConfig::mutable_vision_input() {
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequest.GetResponseConfig.vision_input)
+  return _internal_mutable_vision_input();
+}
+inline void GetResponseRequest_GetResponseConfig::set_allocated_vision_input(::service::VisionInput* vision_input) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete vision_input_;
+  }
+  if (vision_input) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(vision_input);
+    if (message_arena != submessage_arena) {
+      vision_input = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, vision_input, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  vision_input_ = vision_input;
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequest.GetResponseConfig.vision_input)
 }
 
 // -------------------------------------------------------------------
@@ -10412,6 +11758,14 @@ inline void FeedbackResponse::set_allocated_feedback_response(std::string* feedb
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -10499,6 +11853,9 @@ extern AudioConfigDefaultTypeInternal _AudioConfig_default_instance_;
 class BlendShapesData;
 struct BlendShapesDataDefaultTypeInternal;
 extern BlendShapesDataDefaultTypeInternal _BlendShapesData_default_instance_;
+class DynamicInfoConfig;
+struct DynamicInfoConfigDefaultTypeInternal;
+extern DynamicInfoConfigDefaultTypeInternal _DynamicInfoConfig_default_instance_;
 class EmotionResponse;
 struct EmotionResponseDefaultTypeInternal;
 extern EmotionResponseDefaultTypeInternal _EmotionResponse_default_instance_;
@@ -10562,6 +11919,15 @@ extern VisemeDefaultTypeInternal _Viseme_default_instance_;
 class VisemesData;
 struct VisemesDataDefaultTypeInternal;
 extern VisemesDataDefaultTypeInternal _VisemesData_default_instance_;
+class VisionInput;
+struct VisionInputDefaultTypeInternal;
+extern VisionInputDefaultTypeInternal _VisionInput_default_instance_;
+class VisionInput_ImageData;
+struct VisionInput_ImageDataDefaultTypeInternal;
+extern VisionInput_ImageDataDefaultTypeInternal _VisionInput_ImageData_default_instance_;
+class VisionInput_VideoData;
+struct VisionInput_VideoDataDefaultTypeInternal;
+extern VisionInput_VideoDataDefaultTypeInternal _VisionInput_VideoData_default_instance_;
 }  // namespace service
 PROTOBUF_NAMESPACE_OPEN
 template<> ::service::ActionConfig* Arena::CreateMaybeMessage<::service::ActionConfig>(Arena*);
@@ -10569,6 +11935,7 @@ template<> ::service::ActionConfig_Character* Arena::CreateMaybeMessage<::servic
 template<> ::service::ActionConfig_Object* Arena::CreateMaybeMessage<::service::ActionConfig_Object>(Arena*);
 template<> ::service::AudioConfig* Arena::CreateMaybeMessage<::service::AudioConfig>(Arena*);
 template<> ::service::BlendShapesData* Arena::CreateMaybeMessage<::service::BlendShapesData>(Arena*);
+template<> ::service::DynamicInfoConfig* Arena::CreateMaybeMessage<::service::DynamicInfoConfig>(Arena*);
 template<> ::service::EmotionResponse* Arena::CreateMaybeMessage<::service::EmotionResponse>(Arena*);
 template<> ::service::FeedbackRequest* Arena::CreateMaybeMessage<::service::FeedbackRequest>(Arena*);
 template<> ::service::FeedbackRequest_Feedback* Arena::CreateMaybeMessage<::service::FeedbackRequest_Feedback>(Arena*);
@@ -10590,6 +11957,9 @@ template<> ::service::STTResponse* Arena::CreateMaybeMessage<::service::STTRespo
 template<> ::service::TriggerConfig* Arena::CreateMaybeMessage<::service::TriggerConfig>(Arena*);
 template<> ::service::Viseme* Arena::CreateMaybeMessage<::service::Viseme>(Arena*);
 template<> ::service::VisemesData* Arena::CreateMaybeMessage<::service::VisemesData>(Arena*);
+template<> ::service::VisionInput* Arena::CreateMaybeMessage<::service::VisionInput>(Arena*);
+template<> ::service::VisionInput_ImageData* Arena::CreateMaybeMessage<::service::VisionInput_ImageData>(Arena*);
+template<> ::service::VisionInput_VideoData* Arena::CreateMaybeMessage<::service::VisionInput_VideoData>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace service {
 
@@ -11919,6 +13289,719 @@ class STTResponse final :
 };
 // -------------------------------------------------------------------
 
+class DynamicInfoConfig final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.DynamicInfoConfig) */ {
+ public:
+  inline DynamicInfoConfig() : DynamicInfoConfig(nullptr) {}
+  ~DynamicInfoConfig() override;
+  explicit PROTOBUF_CONSTEXPR DynamicInfoConfig(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  DynamicInfoConfig(const DynamicInfoConfig& from);
+  DynamicInfoConfig(DynamicInfoConfig&& from) noexcept
+    : DynamicInfoConfig() {
+    *this = ::std::move(from);
+  }
+
+  inline DynamicInfoConfig& operator=(const DynamicInfoConfig& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline DynamicInfoConfig& operator=(DynamicInfoConfig&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const DynamicInfoConfig& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const DynamicInfoConfig* internal_default_instance() {
+    return reinterpret_cast<const DynamicInfoConfig*>(
+               &_DynamicInfoConfig_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  friend void swap(DynamicInfoConfig& a, DynamicInfoConfig& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(DynamicInfoConfig* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(DynamicInfoConfig* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  DynamicInfoConfig* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<DynamicInfoConfig>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const DynamicInfoConfig& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const DynamicInfoConfig& from) {
+    DynamicInfoConfig::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DynamicInfoConfig* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.DynamicInfoConfig";
+  }
+  protected:
+  explicit DynamicInfoConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTextFieldNumber = 1,
+  };
+  // string text = 1;
+  void clear_text();
+  const std::string& text() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_text(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_text();
+  PROTOBUF_NODISCARD std::string* release_text();
+  void set_allocated_text(std::string* text);
+  private:
+  const std::string& _internal_text() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_text(const std::string& value);
+  std::string* _internal_mutable_text();
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.DynamicInfoConfig)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr text_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class VisionInput_ImageData final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.VisionInput.ImageData) */ {
+ public:
+  inline VisionInput_ImageData() : VisionInput_ImageData(nullptr) {}
+  ~VisionInput_ImageData() override;
+  explicit PROTOBUF_CONSTEXPR VisionInput_ImageData(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  VisionInput_ImageData(const VisionInput_ImageData& from);
+  VisionInput_ImageData(VisionInput_ImageData&& from) noexcept
+    : VisionInput_ImageData() {
+    *this = ::std::move(from);
+  }
+
+  inline VisionInput_ImageData& operator=(const VisionInput_ImageData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline VisionInput_ImageData& operator=(VisionInput_ImageData&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const VisionInput_ImageData& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const VisionInput_ImageData* internal_default_instance() {
+    return reinterpret_cast<const VisionInput_ImageData*>(
+               &_VisionInput_ImageData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  friend void swap(VisionInput_ImageData& a, VisionInput_ImageData& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(VisionInput_ImageData* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(VisionInput_ImageData* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  VisionInput_ImageData* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<VisionInput_ImageData>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const VisionInput_ImageData& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const VisionInput_ImageData& from) {
+    VisionInput_ImageData::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(VisionInput_ImageData* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.VisionInput.ImageData";
+  }
+  protected:
+  explicit VisionInput_ImageData(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kDataFieldNumber = 3,
+    kWidthFieldNumber = 1,
+    kHeightFieldNumber = 2,
+  };
+  // bytes data = 3;
+  void clear_data();
+  const std::string& data() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_data(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_data();
+  PROTOBUF_NODISCARD std::string* release_data();
+  void set_allocated_data(std::string* data);
+  private:
+  const std::string& _internal_data() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_data(const std::string& value);
+  std::string* _internal_mutable_data();
+  public:
+
+  // int32 width = 1;
+  void clear_width();
+  int32_t width() const;
+  void set_width(int32_t value);
+  private:
+  int32_t _internal_width() const;
+  void _internal_set_width(int32_t value);
+  public:
+
+  // int32 height = 2;
+  void clear_height();
+  int32_t height() const;
+  void set_height(int32_t value);
+  private:
+  int32_t _internal_height() const;
+  void _internal_set_height(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.VisionInput.ImageData)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
+    int32_t width_;
+    int32_t height_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class VisionInput_VideoData final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.VisionInput.VideoData) */ {
+ public:
+  inline VisionInput_VideoData() : VisionInput_VideoData(nullptr) {}
+  ~VisionInput_VideoData() override;
+  explicit PROTOBUF_CONSTEXPR VisionInput_VideoData(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  VisionInput_VideoData(const VisionInput_VideoData& from);
+  VisionInput_VideoData(VisionInput_VideoData&& from) noexcept
+    : VisionInput_VideoData() {
+    *this = ::std::move(from);
+  }
+
+  inline VisionInput_VideoData& operator=(const VisionInput_VideoData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline VisionInput_VideoData& operator=(VisionInput_VideoData&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const VisionInput_VideoData& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const VisionInput_VideoData* internal_default_instance() {
+    return reinterpret_cast<const VisionInput_VideoData*>(
+               &_VisionInput_VideoData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  friend void swap(VisionInput_VideoData& a, VisionInput_VideoData& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(VisionInput_VideoData* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(VisionInput_VideoData* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  VisionInput_VideoData* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<VisionInput_VideoData>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const VisionInput_VideoData& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const VisionInput_VideoData& from) {
+    VisionInput_VideoData::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(VisionInput_VideoData* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.VisionInput.VideoData";
+  }
+  protected:
+  explicit VisionInput_VideoData(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kDataFieldNumber = 4,
+    kFpsFieldNumber = 1,
+    kWidthFieldNumber = 2,
+    kHeightFieldNumber = 3,
+  };
+  // bytes data = 4;
+  void clear_data();
+  const std::string& data() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_data(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_data();
+  PROTOBUF_NODISCARD std::string* release_data();
+  void set_allocated_data(std::string* data);
+  private:
+  const std::string& _internal_data() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_data(const std::string& value);
+  std::string* _internal_mutable_data();
+  public:
+
+  // int32 fps = 1;
+  void clear_fps();
+  int32_t fps() const;
+  void set_fps(int32_t value);
+  private:
+  int32_t _internal_fps() const;
+  void _internal_set_fps(int32_t value);
+  public:
+
+  // int32 width = 2;
+  void clear_width();
+  int32_t width() const;
+  void set_width(int32_t value);
+  private:
+  int32_t _internal_width() const;
+  void _internal_set_width(int32_t value);
+  public:
+
+  // int32 height = 3;
+  void clear_height();
+  int32_t height() const;
+  void set_height(int32_t value);
+  private:
+  int32_t _internal_height() const;
+  void _internal_set_height(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:service.VisionInput.VideoData)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
+    int32_t fps_;
+    int32_t width_;
+    int32_t height_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
+class VisionInput final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:service.VisionInput) */ {
+ public:
+  inline VisionInput() : VisionInput(nullptr) {}
+  ~VisionInput() override;
+  explicit PROTOBUF_CONSTEXPR VisionInput(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  VisionInput(const VisionInput& from);
+  VisionInput(VisionInput&& from) noexcept
+    : VisionInput() {
+    *this = ::std::move(from);
+  }
+
+  inline VisionInput& operator=(const VisionInput& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline VisionInput& operator=(VisionInput&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const VisionInput& default_instance() {
+    return *internal_default_instance();
+  }
+  enum VisionDataCase {
+    kImageData = 1,
+    kVideoData = 2,
+    VISION_DATA_NOT_SET = 0,
+  };
+
+  static inline const VisionInput* internal_default_instance() {
+    return reinterpret_cast<const VisionInput*>(
+               &_VisionInput_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  friend void swap(VisionInput& a, VisionInput& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(VisionInput* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(VisionInput* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  VisionInput* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<VisionInput>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const VisionInput& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const VisionInput& from) {
+    VisionInput::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(VisionInput* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "service.VisionInput";
+  }
+  protected:
+  explicit VisionInput(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef VisionInput_ImageData ImageData;
+  typedef VisionInput_VideoData VideoData;
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kImageDataFieldNumber = 1,
+    kVideoDataFieldNumber = 2,
+  };
+  // .service.VisionInput.ImageData image_data = 1;
+  bool has_image_data() const;
+  private:
+  bool _internal_has_image_data() const;
+  public:
+  void clear_image_data();
+  const ::service::VisionInput_ImageData& image_data() const;
+  PROTOBUF_NODISCARD ::service::VisionInput_ImageData* release_image_data();
+  ::service::VisionInput_ImageData* mutable_image_data();
+  void set_allocated_image_data(::service::VisionInput_ImageData* image_data);
+  private:
+  const ::service::VisionInput_ImageData& _internal_image_data() const;
+  ::service::VisionInput_ImageData* _internal_mutable_image_data();
+  public:
+  void unsafe_arena_set_allocated_image_data(
+      ::service::VisionInput_ImageData* image_data);
+  ::service::VisionInput_ImageData* unsafe_arena_release_image_data();
+
+  // .service.VisionInput.VideoData video_data = 2;
+  bool has_video_data() const;
+  private:
+  bool _internal_has_video_data() const;
+  public:
+  void clear_video_data();
+  const ::service::VisionInput_VideoData& video_data() const;
+  PROTOBUF_NODISCARD ::service::VisionInput_VideoData* release_video_data();
+  ::service::VisionInput_VideoData* mutable_video_data();
+  void set_allocated_video_data(::service::VisionInput_VideoData* video_data);
+  private:
+  const ::service::VisionInput_VideoData& _internal_video_data() const;
+  ::service::VisionInput_VideoData* _internal_mutable_video_data();
+  public:
+  void unsafe_arena_set_allocated_video_data(
+      ::service::VisionInput_VideoData* video_data);
+  ::service::VisionInput_VideoData* unsafe_arena_release_video_data();
+
+  void clear_vision_data();
+  VisionDataCase vision_data_case() const;
+  // @@protoc_insertion_point(class_scope:service.VisionInput)
+ private:
+  class _Internal;
+  void set_has_image_data();
+  void set_has_video_data();
+
+  inline bool has_vision_data() const;
+  inline void clear_has_vision_data();
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    union VisionDataUnion {
+      constexpr VisionDataUnion() : _constinit_{} {}
+        ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
+      ::service::VisionInput_ImageData* image_data_;
+      ::service::VisionInput_VideoData* video_data_;
+    } vision_data_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+    uint32_t _oneof_case_[1];
+
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_service_2eproto;
+};
+// -------------------------------------------------------------------
+
 class GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse, 
     std::string, std::string,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
@@ -11995,7 +14078,7 @@ class GetResponseRequest_GetResponseConfig final :
                &_GetResponseRequest_GetResponseConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    12;
 
   friend void swap(GetResponseRequest_GetResponseConfig& a, GetResponseRequest_GetResponseConfig& b) {
     a.Swap(&b);
@@ -12081,6 +14164,8 @@ class GetResponseRequest_GetResponseConfig final :
     kApiAuthTokenFieldNumber = 10,
     kAudioConfigFieldNumber = 5,
     kActionConfigFieldNumber = 6,
+    kDynamicInfoConfigFieldNumber = 12,
+    kVisionInputFieldNumber = 13,
   };
   // map<string, string> narrative_template_keys = 11;
   int narrative_template_keys_size() const;
@@ -12233,6 +14318,42 @@ class GetResponseRequest_GetResponseConfig final :
       ::service::ActionConfig* action_config);
   ::service::ActionConfig* unsafe_arena_release_action_config();
 
+  // .service.DynamicInfoConfig dynamic_info_config = 12;
+  bool has_dynamic_info_config() const;
+  private:
+  bool _internal_has_dynamic_info_config() const;
+  public:
+  void clear_dynamic_info_config();
+  const ::service::DynamicInfoConfig& dynamic_info_config() const;
+  PROTOBUF_NODISCARD ::service::DynamicInfoConfig* release_dynamic_info_config();
+  ::service::DynamicInfoConfig* mutable_dynamic_info_config();
+  void set_allocated_dynamic_info_config(::service::DynamicInfoConfig* dynamic_info_config);
+  private:
+  const ::service::DynamicInfoConfig& _internal_dynamic_info_config() const;
+  ::service::DynamicInfoConfig* _internal_mutable_dynamic_info_config();
+  public:
+  void unsafe_arena_set_allocated_dynamic_info_config(
+      ::service::DynamicInfoConfig* dynamic_info_config);
+  ::service::DynamicInfoConfig* unsafe_arena_release_dynamic_info_config();
+
+  // .service.VisionInput vision_input = 13;
+  bool has_vision_input() const;
+  private:
+  bool _internal_has_vision_input() const;
+  public:
+  void clear_vision_input();
+  const ::service::VisionInput& vision_input() const;
+  PROTOBUF_NODISCARD ::service::VisionInput* release_vision_input();
+  ::service::VisionInput* mutable_vision_input();
+  void set_allocated_vision_input(::service::VisionInput* vision_input);
+  private:
+  const ::service::VisionInput& _internal_vision_input() const;
+  ::service::VisionInput* _internal_mutable_vision_input();
+  public:
+  void unsafe_arena_set_allocated_vision_input(
+      ::service::VisionInput* vision_input);
+  ::service::VisionInput* unsafe_arena_release_vision_input();
+
   // @@protoc_insertion_point(class_scope:service.GetResponseRequest.GetResponseConfig)
  private:
   class _Internal;
@@ -12255,6 +14376,8 @@ class GetResponseRequest_GetResponseConfig final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr api_auth_token_;
     ::service::AudioConfig* audio_config_;
     ::service::ActionConfig* action_config_;
+    ::service::DynamicInfoConfig* dynamic_info_config_;
+    ::service::VisionInput* vision_input_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -12317,7 +14440,7 @@ class GetResponseRequest_GetResponseData final :
                &_GetResponseRequest_GetResponseData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    13;
 
   friend void swap(GetResponseRequest_GetResponseData& a, GetResponseRequest_GetResponseData& b) {
     a.Swap(&b);
@@ -12534,7 +14657,7 @@ class GetResponseRequest final :
                &_GetResponseRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    14;
 
   friend void swap(GetResponseRequest& a, GetResponseRequest& b) {
     a.Swap(&b);
@@ -12727,7 +14850,7 @@ class GetResponseRequestSingle final :
                &_GetResponseRequestSingle_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    15;
 
   friend void swap(GetResponseRequestSingle& a, GetResponseRequestSingle& b) {
     a.Swap(&b);
@@ -12910,7 +15033,7 @@ class GetResponseResponse_AudioResponse final :
                &_GetResponseResponse_AudioResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    16;
 
   friend void swap(GetResponseResponse_AudioResponse& a, GetResponseResponse_AudioResponse& b) {
     a.Swap(&b);
@@ -13219,7 +15342,7 @@ class GetResponseResponse_ActionResponse final :
                &_GetResponseResponse_ActionResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    17;
 
   friend void swap(GetResponseResponse_ActionResponse& a, GetResponseResponse_ActionResponse& b) {
     a.Swap(&b);
@@ -13372,7 +15495,7 @@ class GetResponseResponse_BehaviorTreeResponse final :
                &_GetResponseResponse_BehaviorTreeResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    18;
 
   friend void swap(GetResponseResponse_BehaviorTreeResponse& a, GetResponseResponse_BehaviorTreeResponse& b) {
     a.Swap(&b);
@@ -13557,7 +15680,7 @@ class GetResponseResponse_UserTranscript final :
                &_GetResponseResponse_UserTranscript_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    19;
 
   friend void swap(GetResponseResponse_UserTranscript& a, GetResponseResponse_UserTranscript& b) {
     a.Swap(&b);
@@ -13743,7 +15866,7 @@ class GetResponseResponse final :
                &_GetResponseResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    20;
 
   friend void swap(GetResponseResponse& a, GetResponseResponse& b) {
     a.Swap(&b);
@@ -14059,7 +16182,7 @@ class VisemesData final :
                &_VisemesData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    21;
 
   friend void swap(VisemesData& a, VisemesData& b) {
     a.Swap(&b);
@@ -14216,7 +16339,7 @@ class EmotionResponse final :
                &_EmotionResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    22;
 
   friend void swap(EmotionResponse& a, EmotionResponse& b) {
     a.Swap(&b);
@@ -14385,7 +16508,7 @@ class Viseme final :
                &_Viseme_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    23;
 
   friend void swap(Viseme& a, Viseme& b) {
     a.Swap(&b);
@@ -14687,7 +16810,7 @@ class BlendShapesData final :
                &_BlendShapesData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    24;
 
   friend void swap(BlendShapesData& a, BlendShapesData& b) {
     a.Swap(&b);
@@ -14840,7 +16963,7 @@ class HelloRequest final :
                &_HelloRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    25;
 
   friend void swap(HelloRequest& a, HelloRequest& b) {
     a.Swap(&b);
@@ -14993,7 +17116,7 @@ class HelloResponse final :
                &_HelloResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    26;
 
   friend void swap(HelloResponse& a, HelloResponse& b) {
     a.Swap(&b);
@@ -15146,7 +17269,7 @@ class FeedbackRequest_Feedback final :
                &_FeedbackRequest_Feedback_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    27;
 
   friend void swap(FeedbackRequest_Feedback& a, FeedbackRequest_Feedback& b) {
     a.Swap(&b);
@@ -15347,7 +17470,7 @@ class FeedbackRequest final :
                &_FeedbackRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    28;
 
   friend void swap(FeedbackRequest& a, FeedbackRequest& b) {
     a.Swap(&b);
@@ -15586,7 +17709,7 @@ class FeedbackResponse final :
                &_FeedbackResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    29;
 
   friend void swap(FeedbackResponse& a, FeedbackResponse& b) {
     a.Swap(&b);
@@ -16611,6 +18734,429 @@ inline void STTResponse::set_allocated_text(std::string* text) {
 
 // -------------------------------------------------------------------
 
+// DynamicInfoConfig
+
+// string text = 1;
+inline void DynamicInfoConfig::clear_text() {
+  _impl_.text_.ClearToEmpty();
+}
+inline const std::string& DynamicInfoConfig::text() const {
+  // @@protoc_insertion_point(field_get:service.DynamicInfoConfig.text)
+  return _internal_text();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void DynamicInfoConfig::set_text(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.text_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:service.DynamicInfoConfig.text)
+}
+inline std::string* DynamicInfoConfig::mutable_text() {
+  std::string* _s = _internal_mutable_text();
+  // @@protoc_insertion_point(field_mutable:service.DynamicInfoConfig.text)
+  return _s;
+}
+inline const std::string& DynamicInfoConfig::_internal_text() const {
+  return _impl_.text_.Get();
+}
+inline void DynamicInfoConfig::_internal_set_text(const std::string& value) {
+  
+  _impl_.text_.Set(value, GetArenaForAllocation());
+}
+inline std::string* DynamicInfoConfig::_internal_mutable_text() {
+  
+  return _impl_.text_.Mutable(GetArenaForAllocation());
+}
+inline std::string* DynamicInfoConfig::release_text() {
+  // @@protoc_insertion_point(field_release:service.DynamicInfoConfig.text)
+  return _impl_.text_.Release();
+}
+inline void DynamicInfoConfig::set_allocated_text(std::string* text) {
+  if (text != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.text_.SetAllocated(text, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.text_.IsDefault()) {
+    _impl_.text_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:service.DynamicInfoConfig.text)
+}
+
+// -------------------------------------------------------------------
+
+// VisionInput_ImageData
+
+// int32 width = 1;
+inline void VisionInput_ImageData::clear_width() {
+  _impl_.width_ = 0;
+}
+inline int32_t VisionInput_ImageData::_internal_width() const {
+  return _impl_.width_;
+}
+inline int32_t VisionInput_ImageData::width() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.ImageData.width)
+  return _internal_width();
+}
+inline void VisionInput_ImageData::_internal_set_width(int32_t value) {
+  
+  _impl_.width_ = value;
+}
+inline void VisionInput_ImageData::set_width(int32_t value) {
+  _internal_set_width(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.ImageData.width)
+}
+
+// int32 height = 2;
+inline void VisionInput_ImageData::clear_height() {
+  _impl_.height_ = 0;
+}
+inline int32_t VisionInput_ImageData::_internal_height() const {
+  return _impl_.height_;
+}
+inline int32_t VisionInput_ImageData::height() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.ImageData.height)
+  return _internal_height();
+}
+inline void VisionInput_ImageData::_internal_set_height(int32_t value) {
+  
+  _impl_.height_ = value;
+}
+inline void VisionInput_ImageData::set_height(int32_t value) {
+  _internal_set_height(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.ImageData.height)
+}
+
+// bytes data = 3;
+inline void VisionInput_ImageData::clear_data() {
+  _impl_.data_.ClearToEmpty();
+}
+inline const std::string& VisionInput_ImageData::data() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.ImageData.data)
+  return _internal_data();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void VisionInput_ImageData::set_data(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.data_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:service.VisionInput.ImageData.data)
+}
+inline std::string* VisionInput_ImageData::mutable_data() {
+  std::string* _s = _internal_mutable_data();
+  // @@protoc_insertion_point(field_mutable:service.VisionInput.ImageData.data)
+  return _s;
+}
+inline const std::string& VisionInput_ImageData::_internal_data() const {
+  return _impl_.data_.Get();
+}
+inline void VisionInput_ImageData::_internal_set_data(const std::string& value) {
+  
+  _impl_.data_.Set(value, GetArenaForAllocation());
+}
+inline std::string* VisionInput_ImageData::_internal_mutable_data() {
+  
+  return _impl_.data_.Mutable(GetArenaForAllocation());
+}
+inline std::string* VisionInput_ImageData::release_data() {
+  // @@protoc_insertion_point(field_release:service.VisionInput.ImageData.data)
+  return _impl_.data_.Release();
+}
+inline void VisionInput_ImageData::set_allocated_data(std::string* data) {
+  if (data != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.data_.SetAllocated(data, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.data_.IsDefault()) {
+    _impl_.data_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:service.VisionInput.ImageData.data)
+}
+
+// -------------------------------------------------------------------
+
+// VisionInput_VideoData
+
+// int32 fps = 1;
+inline void VisionInput_VideoData::clear_fps() {
+  _impl_.fps_ = 0;
+}
+inline int32_t VisionInput_VideoData::_internal_fps() const {
+  return _impl_.fps_;
+}
+inline int32_t VisionInput_VideoData::fps() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.VideoData.fps)
+  return _internal_fps();
+}
+inline void VisionInput_VideoData::_internal_set_fps(int32_t value) {
+  
+  _impl_.fps_ = value;
+}
+inline void VisionInput_VideoData::set_fps(int32_t value) {
+  _internal_set_fps(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.VideoData.fps)
+}
+
+// int32 width = 2;
+inline void VisionInput_VideoData::clear_width() {
+  _impl_.width_ = 0;
+}
+inline int32_t VisionInput_VideoData::_internal_width() const {
+  return _impl_.width_;
+}
+inline int32_t VisionInput_VideoData::width() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.VideoData.width)
+  return _internal_width();
+}
+inline void VisionInput_VideoData::_internal_set_width(int32_t value) {
+  
+  _impl_.width_ = value;
+}
+inline void VisionInput_VideoData::set_width(int32_t value) {
+  _internal_set_width(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.VideoData.width)
+}
+
+// int32 height = 3;
+inline void VisionInput_VideoData::clear_height() {
+  _impl_.height_ = 0;
+}
+inline int32_t VisionInput_VideoData::_internal_height() const {
+  return _impl_.height_;
+}
+inline int32_t VisionInput_VideoData::height() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.VideoData.height)
+  return _internal_height();
+}
+inline void VisionInput_VideoData::_internal_set_height(int32_t value) {
+  
+  _impl_.height_ = value;
+}
+inline void VisionInput_VideoData::set_height(int32_t value) {
+  _internal_set_height(value);
+  // @@protoc_insertion_point(field_set:service.VisionInput.VideoData.height)
+}
+
+// bytes data = 4;
+inline void VisionInput_VideoData::clear_data() {
+  _impl_.data_.ClearToEmpty();
+}
+inline const std::string& VisionInput_VideoData::data() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.VideoData.data)
+  return _internal_data();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void VisionInput_VideoData::set_data(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.data_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:service.VisionInput.VideoData.data)
+}
+inline std::string* VisionInput_VideoData::mutable_data() {
+  std::string* _s = _internal_mutable_data();
+  // @@protoc_insertion_point(field_mutable:service.VisionInput.VideoData.data)
+  return _s;
+}
+inline const std::string& VisionInput_VideoData::_internal_data() const {
+  return _impl_.data_.Get();
+}
+inline void VisionInput_VideoData::_internal_set_data(const std::string& value) {
+  
+  _impl_.data_.Set(value, GetArenaForAllocation());
+}
+inline std::string* VisionInput_VideoData::_internal_mutable_data() {
+  
+  return _impl_.data_.Mutable(GetArenaForAllocation());
+}
+inline std::string* VisionInput_VideoData::release_data() {
+  // @@protoc_insertion_point(field_release:service.VisionInput.VideoData.data)
+  return _impl_.data_.Release();
+}
+inline void VisionInput_VideoData::set_allocated_data(std::string* data) {
+  if (data != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.data_.SetAllocated(data, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.data_.IsDefault()) {
+    _impl_.data_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:service.VisionInput.VideoData.data)
+}
+
+// -------------------------------------------------------------------
+
+// VisionInput
+
+// .service.VisionInput.ImageData image_data = 1;
+inline bool VisionInput::_internal_has_image_data() const {
+  return vision_data_case() == kImageData;
+}
+inline bool VisionInput::has_image_data() const {
+  return _internal_has_image_data();
+}
+inline void VisionInput::set_has_image_data() {
+  _impl_._oneof_case_[0] = kImageData;
+}
+inline void VisionInput::clear_image_data() {
+  if (_internal_has_image_data()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete _impl_.vision_data_.image_data_;
+    }
+    clear_has_vision_data();
+  }
+}
+inline ::service::VisionInput_ImageData* VisionInput::release_image_data() {
+  // @@protoc_insertion_point(field_release:service.VisionInput.image_data)
+  if (_internal_has_image_data()) {
+    clear_has_vision_data();
+    ::service::VisionInput_ImageData* temp = _impl_.vision_data_.image_data_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    _impl_.vision_data_.image_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::service::VisionInput_ImageData& VisionInput::_internal_image_data() const {
+  return _internal_has_image_data()
+      ? *_impl_.vision_data_.image_data_
+      : reinterpret_cast< ::service::VisionInput_ImageData&>(::service::_VisionInput_ImageData_default_instance_);
+}
+inline const ::service::VisionInput_ImageData& VisionInput::image_data() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.image_data)
+  return _internal_image_data();
+}
+inline ::service::VisionInput_ImageData* VisionInput::unsafe_arena_release_image_data() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:service.VisionInput.image_data)
+  if (_internal_has_image_data()) {
+    clear_has_vision_data();
+    ::service::VisionInput_ImageData* temp = _impl_.vision_data_.image_data_;
+    _impl_.vision_data_.image_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void VisionInput::unsafe_arena_set_allocated_image_data(::service::VisionInput_ImageData* image_data) {
+  clear_vision_data();
+  if (image_data) {
+    set_has_image_data();
+    _impl_.vision_data_.image_data_ = image_data;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.VisionInput.image_data)
+}
+inline ::service::VisionInput_ImageData* VisionInput::_internal_mutable_image_data() {
+  if (!_internal_has_image_data()) {
+    clear_vision_data();
+    set_has_image_data();
+    _impl_.vision_data_.image_data_ = CreateMaybeMessage< ::service::VisionInput_ImageData >(GetArenaForAllocation());
+  }
+  return _impl_.vision_data_.image_data_;
+}
+inline ::service::VisionInput_ImageData* VisionInput::mutable_image_data() {
+  ::service::VisionInput_ImageData* _msg = _internal_mutable_image_data();
+  // @@protoc_insertion_point(field_mutable:service.VisionInput.image_data)
+  return _msg;
+}
+
+// .service.VisionInput.VideoData video_data = 2;
+inline bool VisionInput::_internal_has_video_data() const {
+  return vision_data_case() == kVideoData;
+}
+inline bool VisionInput::has_video_data() const {
+  return _internal_has_video_data();
+}
+inline void VisionInput::set_has_video_data() {
+  _impl_._oneof_case_[0] = kVideoData;
+}
+inline void VisionInput::clear_video_data() {
+  if (_internal_has_video_data()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete _impl_.vision_data_.video_data_;
+    }
+    clear_has_vision_data();
+  }
+}
+inline ::service::VisionInput_VideoData* VisionInput::release_video_data() {
+  // @@protoc_insertion_point(field_release:service.VisionInput.video_data)
+  if (_internal_has_video_data()) {
+    clear_has_vision_data();
+    ::service::VisionInput_VideoData* temp = _impl_.vision_data_.video_data_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    _impl_.vision_data_.video_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::service::VisionInput_VideoData& VisionInput::_internal_video_data() const {
+  return _internal_has_video_data()
+      ? *_impl_.vision_data_.video_data_
+      : reinterpret_cast< ::service::VisionInput_VideoData&>(::service::_VisionInput_VideoData_default_instance_);
+}
+inline const ::service::VisionInput_VideoData& VisionInput::video_data() const {
+  // @@protoc_insertion_point(field_get:service.VisionInput.video_data)
+  return _internal_video_data();
+}
+inline ::service::VisionInput_VideoData* VisionInput::unsafe_arena_release_video_data() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:service.VisionInput.video_data)
+  if (_internal_has_video_data()) {
+    clear_has_vision_data();
+    ::service::VisionInput_VideoData* temp = _impl_.vision_data_.video_data_;
+    _impl_.vision_data_.video_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void VisionInput::unsafe_arena_set_allocated_video_data(::service::VisionInput_VideoData* video_data) {
+  clear_vision_data();
+  if (video_data) {
+    set_has_video_data();
+    _impl_.vision_data_.video_data_ = video_data;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.VisionInput.video_data)
+}
+inline ::service::VisionInput_VideoData* VisionInput::_internal_mutable_video_data() {
+  if (!_internal_has_video_data()) {
+    clear_vision_data();
+    set_has_video_data();
+    _impl_.vision_data_.video_data_ = CreateMaybeMessage< ::service::VisionInput_VideoData >(GetArenaForAllocation());
+  }
+  return _impl_.vision_data_.video_data_;
+}
+inline ::service::VisionInput_VideoData* VisionInput::mutable_video_data() {
+  ::service::VisionInput_VideoData* _msg = _internal_mutable_video_data();
+  // @@protoc_insertion_point(field_mutable:service.VisionInput.video_data)
+  return _msg;
+}
+
+inline bool VisionInput::has_vision_data() const {
+  return vision_data_case() != VISION_DATA_NOT_SET;
+}
+inline void VisionInput::clear_has_vision_data() {
+  _impl_._oneof_case_[0] = VISION_DATA_NOT_SET;
+}
+inline VisionInput::VisionDataCase VisionInput::vision_data_case() const {
+  return VisionInput::VisionDataCase(_impl_._oneof_case_[0]);
+}
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // GetResponseRequest_GetResponseConfig
@@ -17172,6 +19718,186 @@ inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >*
 GetResponseRequest_GetResponseConfig::mutable_narrative_template_keys() {
   // @@protoc_insertion_point(field_mutable_map:service.GetResponseRequest.GetResponseConfig.narrative_template_keys)
   return _internal_mutable_narrative_template_keys();
+}
+
+// .service.DynamicInfoConfig dynamic_info_config = 12;
+inline bool GetResponseRequest_GetResponseConfig::_internal_has_dynamic_info_config() const {
+  return this != internal_default_instance() && _impl_.dynamic_info_config_ != nullptr;
+}
+inline bool GetResponseRequest_GetResponseConfig::has_dynamic_info_config() const {
+  return _internal_has_dynamic_info_config();
+}
+inline void GetResponseRequest_GetResponseConfig::clear_dynamic_info_config() {
+  if (GetArenaForAllocation() == nullptr && _impl_.dynamic_info_config_ != nullptr) {
+    delete _impl_.dynamic_info_config_;
+  }
+  _impl_.dynamic_info_config_ = nullptr;
+}
+inline const ::service::DynamicInfoConfig& GetResponseRequest_GetResponseConfig::_internal_dynamic_info_config() const {
+  const ::service::DynamicInfoConfig* p = _impl_.dynamic_info_config_;
+  return p != nullptr ? *p : reinterpret_cast<const ::service::DynamicInfoConfig&>(
+      ::service::_DynamicInfoConfig_default_instance_);
+}
+inline const ::service::DynamicInfoConfig& GetResponseRequest_GetResponseConfig::dynamic_info_config() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequest.GetResponseConfig.dynamic_info_config)
+  return _internal_dynamic_info_config();
+}
+inline void GetResponseRequest_GetResponseConfig::unsafe_arena_set_allocated_dynamic_info_config(
+    ::service::DynamicInfoConfig* dynamic_info_config) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.dynamic_info_config_);
+  }
+  _impl_.dynamic_info_config_ = dynamic_info_config;
+  if (dynamic_info_config) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseRequest.GetResponseConfig.dynamic_info_config)
+}
+inline ::service::DynamicInfoConfig* GetResponseRequest_GetResponseConfig::release_dynamic_info_config() {
+  
+  ::service::DynamicInfoConfig* temp = _impl_.dynamic_info_config_;
+  _impl_.dynamic_info_config_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::service::DynamicInfoConfig* GetResponseRequest_GetResponseConfig::unsafe_arena_release_dynamic_info_config() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequest.GetResponseConfig.dynamic_info_config)
+  
+  ::service::DynamicInfoConfig* temp = _impl_.dynamic_info_config_;
+  _impl_.dynamic_info_config_ = nullptr;
+  return temp;
+}
+inline ::service::DynamicInfoConfig* GetResponseRequest_GetResponseConfig::_internal_mutable_dynamic_info_config() {
+  
+  if (_impl_.dynamic_info_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::service::DynamicInfoConfig>(GetArenaForAllocation());
+    _impl_.dynamic_info_config_ = p;
+  }
+  return _impl_.dynamic_info_config_;
+}
+inline ::service::DynamicInfoConfig* GetResponseRequest_GetResponseConfig::mutable_dynamic_info_config() {
+  ::service::DynamicInfoConfig* _msg = _internal_mutable_dynamic_info_config();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequest.GetResponseConfig.dynamic_info_config)
+  return _msg;
+}
+inline void GetResponseRequest_GetResponseConfig::set_allocated_dynamic_info_config(::service::DynamicInfoConfig* dynamic_info_config) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete _impl_.dynamic_info_config_;
+  }
+  if (dynamic_info_config) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(dynamic_info_config);
+    if (message_arena != submessage_arena) {
+      dynamic_info_config = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, dynamic_info_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.dynamic_info_config_ = dynamic_info_config;
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequest.GetResponseConfig.dynamic_info_config)
+}
+
+// .service.VisionInput vision_input = 13;
+inline bool GetResponseRequest_GetResponseConfig::_internal_has_vision_input() const {
+  return this != internal_default_instance() && _impl_.vision_input_ != nullptr;
+}
+inline bool GetResponseRequest_GetResponseConfig::has_vision_input() const {
+  return _internal_has_vision_input();
+}
+inline void GetResponseRequest_GetResponseConfig::clear_vision_input() {
+  if (GetArenaForAllocation() == nullptr && _impl_.vision_input_ != nullptr) {
+    delete _impl_.vision_input_;
+  }
+  _impl_.vision_input_ = nullptr;
+}
+inline const ::service::VisionInput& GetResponseRequest_GetResponseConfig::_internal_vision_input() const {
+  const ::service::VisionInput* p = _impl_.vision_input_;
+  return p != nullptr ? *p : reinterpret_cast<const ::service::VisionInput&>(
+      ::service::_VisionInput_default_instance_);
+}
+inline const ::service::VisionInput& GetResponseRequest_GetResponseConfig::vision_input() const {
+  // @@protoc_insertion_point(field_get:service.GetResponseRequest.GetResponseConfig.vision_input)
+  return _internal_vision_input();
+}
+inline void GetResponseRequest_GetResponseConfig::unsafe_arena_set_allocated_vision_input(
+    ::service::VisionInput* vision_input) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.vision_input_);
+  }
+  _impl_.vision_input_ = vision_input;
+  if (vision_input) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:service.GetResponseRequest.GetResponseConfig.vision_input)
+}
+inline ::service::VisionInput* GetResponseRequest_GetResponseConfig::release_vision_input() {
+  
+  ::service::VisionInput* temp = _impl_.vision_input_;
+  _impl_.vision_input_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::service::VisionInput* GetResponseRequest_GetResponseConfig::unsafe_arena_release_vision_input() {
+  // @@protoc_insertion_point(field_release:service.GetResponseRequest.GetResponseConfig.vision_input)
+  
+  ::service::VisionInput* temp = _impl_.vision_input_;
+  _impl_.vision_input_ = nullptr;
+  return temp;
+}
+inline ::service::VisionInput* GetResponseRequest_GetResponseConfig::_internal_mutable_vision_input() {
+  
+  if (_impl_.vision_input_ == nullptr) {
+    auto* p = CreateMaybeMessage<::service::VisionInput>(GetArenaForAllocation());
+    _impl_.vision_input_ = p;
+  }
+  return _impl_.vision_input_;
+}
+inline ::service::VisionInput* GetResponseRequest_GetResponseConfig::mutable_vision_input() {
+  ::service::VisionInput* _msg = _internal_mutable_vision_input();
+  // @@protoc_insertion_point(field_mutable:service.GetResponseRequest.GetResponseConfig.vision_input)
+  return _msg;
+}
+inline void GetResponseRequest_GetResponseConfig::set_allocated_vision_input(::service::VisionInput* vision_input) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete _impl_.vision_input_;
+  }
+  if (vision_input) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(vision_input);
+    if (message_arena != submessage_arena) {
+      vision_input = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, vision_input, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.vision_input_ = vision_input;
+  // @@protoc_insertion_point(field_set_allocated:service.GetResponseRequest.GetResponseConfig.vision_input)
 }
 
 // -------------------------------------------------------------------
@@ -20482,6 +23208,14 @@ inline void FeedbackResponse::set_allocated_feedback_response(std::string* feedb
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

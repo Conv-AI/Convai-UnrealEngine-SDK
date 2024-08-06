@@ -20,7 +20,7 @@ UConvaiGetActionProxy* UConvaiGetActionProxy::CreateGetActionQueryProxy(UObject*
 	UConvaiGetActionProxy* Proxy = NewObject<UConvaiGetActionProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	Proxy->URL = "https://api.convai.com/character/getActions";
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	Proxy->Context = Context;
 	Proxy->TextQuery = TextQuery;
 	return Proxy;
@@ -61,8 +61,12 @@ void UConvaiGetActionProxy::Activate()
 		return;
 	}
 
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
 	// Form Validation
-	if (!UConvaiFormValidation::ValidateAPIKey(API_key) || !UConvaiFormValidation::ValidateInputText(TextQuery))
+	if (!UConvaiFormValidation::ValidateAuthKey(AuthKey) || !UConvaiFormValidation::ValidateInputText(TextQuery))
 	{
 		failed();
 		return;
@@ -76,7 +80,7 @@ void UConvaiGetActionProxy::Activate()
 	Request->SetURL(URL);
 	Request->SetVerb("POST");
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	Request->SetHeader(TEXT("CONVAI-API-KEY"), *API_key);
+	Request->SetHeader(AuthHeader, AuthKey);
 
 	// prepare json data
 	FString JsonString;
@@ -257,7 +261,7 @@ UConvaiGetActionResponseProxy* UConvaiGetActionResponseProxy::CreateGetActionRes
 	Proxy->VoiceResponse = VoiceResponse;
 	Proxy->CharID = CharID;
 	Proxy->SessionID = SessionID;
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	Proxy->bAudioInput = false;
 	return Proxy;
 }
@@ -295,7 +299,7 @@ UConvaiGetActionResponseProxy* UConvaiGetActionResponseProxy::CreateGetActionQue
 	Proxy->VoiceResponse = VoiceResponse;
 	Proxy->CharID = CharID;
 	Proxy->SessionID = SessionID;
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	Proxy->bAudioInput = true;
 
 	return Proxy;
@@ -340,7 +344,7 @@ UConvaiGetActionResponseProxy* UConvaiGetActionResponseProxy::CreateGetActionQue
 	Proxy->Context = Context;
 	Proxy->CharID = CharID;
 	Proxy->SessionID = SessionID;
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	Proxy->bAudioInput = true;
 
 
@@ -403,9 +407,13 @@ void UConvaiGetActionResponseProxy::Activate()
 	//	}
 	//}
 
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
 	// Form Validation
 	if (
-		!UConvaiFormValidation::ValidateAPIKey(API_key) 
+		!UConvaiFormValidation::ValidateAuthKey(AuthKey) 
 		|| (!bAudioInput && !UConvaiFormValidation::ValidateInputText(TextQuery))
 		|| (bAudioInput && !UConvaiFormValidation::ValidateInputVoice(Payload))
 		|| !UConvaiFormValidation::ValidateCharacterID(CharID)
@@ -423,7 +431,7 @@ void UConvaiGetActionResponseProxy::Activate()
 	// Set request fields
 	Request->SetURL(URL);
 	Request->SetVerb("POST");
-	Request->SetHeader(TEXT("CONVAI-API-KEY"), *API_key);
+	Request->SetHeader(AuthHeader, AuthKey);
 
 	if (!bAudioInput)
 	{

@@ -72,7 +72,6 @@ class UConvaiTextToSpeechProxy : public UOnlineBlueprintCallProxyBase
 
 
 	FString URL;
-	FString API_key;
 	FString Transcript;
 	ETTS_Voice_Type Voice;
 	FString VoiceStr;

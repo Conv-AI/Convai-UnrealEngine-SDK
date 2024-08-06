@@ -341,7 +341,7 @@ bool UConvaiChatbotComponent::PlayRecordedVoice(USoundWave* RecordedVoice)
 	return true;
 }
 
-void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAPI_Key, FString OverrideAPI_Key, uint32 InToken)
+void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, uint32 InToken)
 {
 	if (!IsValid(InConvaiPlayerComponent))
 	{
@@ -404,7 +404,7 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	}
 
 
-	Start_GRPC_Request(UseOverrideAPI_Key, OverrideAPI_Key);
+	Start_GRPC_Request(UseOverrideAuthKey, OverrideAuthKey, OverrideAuthHeader);
 }
 
 void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateOnNetwork)
@@ -475,7 +475,7 @@ void UConvaiChatbotComponent::InvokeTrigger_Internal(FString TriggerName, FStrin
 	VoiceResponse = InVoiceResponse;
 	ReplicateVoiceToNetwork = InReplicateOnNetwork;
 
-	Start_GRPC_Request(false, "", TriggerName, TriggerMessage);
+	Start_GRPC_Request(false, "", "", TriggerName, TriggerMessage);
 }
 
 void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
@@ -537,9 +537,15 @@ void UConvaiChatbotComponent::Broadcast_InterruptSpeech_Implementation(float InV
 	}
 }
 
-void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAPI_Key, FString OverrideAPI_Key, FString TriggerName, FString TriggerMessage)
+void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, FString TriggerName, FString TriggerMessage)
 {
-	FString API_Key = UseOverrideAPI_Key ? OverrideAPI_Key : UConvaiUtils::GetAPI_Key();
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
+	AuthKey = UseOverrideAuthKey ? OverrideAuthKey : AuthKey;
+	AuthHeader = UseOverrideAuthKey ? OverrideAuthHeader : AuthHeader;
+
 	bool RequireFaceData = false;
 	bool GeneratesVisemesAsBlendshapes = false;
 	ReceivedFinalData = false;
@@ -562,8 +568,8 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAPI_Key, FStrin
 	Params.SessionID = SessionID;
 	Params.Environment = Environment;
 	Params.GenerateActions = GenerateActions;
-	Params.API_Key = API_Key;
-	Params.Narrative_Template_Keys = NarrativeTemplateKeys;
+	Params.AuthKey = AuthKey;
+	Params.AuthHeader = AuthHeader;
 
 	ConvaiGRPCGetResponseProxy = UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(this, Params);
 

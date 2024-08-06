@@ -187,7 +187,8 @@ const char descriptor_table_protodef_arkit_5fblend_5fshapes_2eproto[] PROTOBUF_S
   "t\030/ \001(\002\022\033\n\023mouth_upper_up_left\0300 \001(\002\022\034\n\024"
   "mouth_upper_up_right\0301 \001(\002\022\027\n\017nose_sneer"
   "_left\0302 \001(\002\022\030\n\020nose_sneer_right\0303 \001(\002\022\022\n"
-  "\ntongue_out\0304 \001(\002b\006proto3"
+  "\ntongue_out\0304 \001(\002B\017Z\rproto/serviceb\006prot"
+  "o3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_arkit_5fblend_5fshapes_2eproto_deps[1] = {
 };
@@ -197,7 +198,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ark
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_arkit_5fblend_5fshapes_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_arkit_5fblend_5fshapes_2eproto = {
-  false, false, descriptor_table_protodef_arkit_5fblend_5fshapes_2eproto, "arkit_blend_shapes.proto", 1465,
+  false, false, descriptor_table_protodef_arkit_5fblend_5fshapes_2eproto, "arkit_blend_shapes.proto", 1482,
   &descriptor_table_arkit_5fblend_5fshapes_2eproto_once, descriptor_table_arkit_5fblend_5fshapes_2eproto_sccs, descriptor_table_arkit_5fblend_5fshapes_2eproto_deps, 2, 0,
   schemas, file_default_instances, TableStruct_arkit_5fblend_5fshapes_2eproto::offsets,
   file_level_metadata_arkit_5fblend_5fshapes_2eproto, 2, file_level_enum_descriptors_arkit_5fblend_5fshapes_2eproto, file_level_service_descriptors_arkit_5fblend_5fshapes_2eproto,
@@ -1925,11 +1926,12 @@ const char descriptor_table_protodef_arkit_5fblend_5fshapes_2eproto[] PROTOBUF_S
   "t\030/ \001(\002\022\033\n\023mouth_upper_up_left\0300 \001(\002\022\034\n\024"
   "mouth_upper_up_right\0301 \001(\002\022\027\n\017nose_sneer"
   "_left\0302 \001(\002\022\030\n\020nose_sneer_right\0303 \001(\002\022\022\n"
-  "\ntongue_out\0304 \001(\002b\006proto3"
+  "\ntongue_out\0304 \001(\002B\017Z\rproto/serviceb\006prot"
+  "o3"
   ;
 static ::_pbi::once_flag descriptor_table_arkit_5fblend_5fshapes_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_arkit_5fblend_5fshapes_2eproto = {
-    false, false, 1465, descriptor_table_protodef_arkit_5fblend_5fshapes_2eproto,
+    false, false, 1482, descriptor_table_protodef_arkit_5fblend_5fshapes_2eproto,
     "arkit_blend_shapes.proto",
     &descriptor_table_arkit_5fblend_5fshapes_2eproto_once, nullptr, 0, 2,
     schemas, file_default_instances, TableStruct_arkit_5fblend_5fshapes_2eproto::offsets,

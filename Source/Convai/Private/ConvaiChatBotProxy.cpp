@@ -42,7 +42,7 @@ UConvaiChatBotQueryProxy* UConvaiChatBotQueryProxy::CreateChatBotQueryProxy(UObj
 	Proxy->VoiceResponse = VoiceResponse;
 	Proxy->CharID = CharID;
 	Proxy->SessionID = SessionID;
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	Proxy->Classification = Classification;
 	Proxy->ClassLabels = ClassLabels;
 	return Proxy;
@@ -70,9 +70,13 @@ void UConvaiChatBotQueryProxy::Activate()
 		return;
 	}
 
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
 	// Form Validation
 	if (
-		!UConvaiFormValidation::ValidateAPIKey(API_key)
+		!UConvaiFormValidation::ValidateAuthKey(AuthKey)
 		|| !UConvaiFormValidation::ValidateInputText(UserQuery)
 		|| !UConvaiFormValidation::ValidateCharacterID(CharID)
 		|| !UConvaiFormValidation::ValidateSessionID(SessionID)
@@ -91,7 +95,7 @@ void UConvaiChatBotQueryProxy::Activate()
 	Request->SetURL(URL);
 	Request->SetVerb("POST");
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
-	Request->SetHeader(TEXT("CONVAI-API-KEY"), API_key);
+	Request->SetHeader(AuthHeader, AuthKey);
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/x-www-form-urlencoded"));
 
 	// Prepare x-www-form-urlencoded data
@@ -286,7 +290,7 @@ UConvaiChatBotQueryFromAudioProxy* UConvaiChatBotQueryFromAudioProxy::CreateChat
 	Proxy->VoiceResponse = VoiceResponse;
 	Proxy->CharID = CharID;
 	Proxy->SessionID = SessionID;
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	Proxy->Classification = Classification;
 	Proxy->ClassLabels = ClassLabels;
 
@@ -332,7 +336,7 @@ UConvaiChatBotQueryFromAudioProxy* UConvaiChatBotQueryFromAudioProxy::CreateChat
 	Proxy->VoiceResponse = VoiceResponse;
 	Proxy->CharID = CharID;
 	Proxy->SessionID = SessionID;
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	Proxy->Classification = Classification;
 	Proxy->ClassLabels = ClassLabels;
 
@@ -367,9 +371,13 @@ void UConvaiChatBotQueryFromAudioProxy::Activate()
 		return;
 	}
 
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
 	// Form Validation
 	if (
-		!UConvaiFormValidation::ValidateAPIKey(API_key)
+		!UConvaiFormValidation::ValidateAuthKey(AuthKey)
 		|| !UConvaiFormValidation::ValidateInputVoice(Payload)
 		|| !UConvaiFormValidation::ValidateCharacterID(CharID)
 		|| !UConvaiFormValidation::ValidateSessionID(SessionID)
@@ -393,7 +401,7 @@ void UConvaiChatBotQueryFromAudioProxy::Activate()
 	Request->SetURL(URL);
 	Request->SetVerb("POST");
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
-	Request->SetHeader(TEXT("CONVAI-API-KEY"), API_key);
+	Request->SetHeader(AuthHeader, AuthKey);
 	Request->SetHeader("Content-Type", "multipart/form-data; boundary=blahblahsomeboundary");
 
 	// Set request fields
@@ -589,7 +597,7 @@ UConvaiChatBotCreateProxy* UConvaiChatBotCreateProxy::CreateCharacterCreateProxy
 	UConvaiChatBotCreateProxy* Proxy = NewObject<UConvaiChatBotCreateProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	Proxy->URL = "https://api.convai.com/character/create";
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	Proxy->CharName = CharName;
 	Proxy->Voice = Voice;
 	Proxy->Backstory = Backstory;
@@ -618,9 +626,13 @@ void UConvaiChatBotCreateProxy::Activate()
 		return;
 	}
 
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
 	// Form Validation
 	if (
-		!UConvaiFormValidation::ValidateAPIKey(API_key)
+		!UConvaiFormValidation::ValidateAuthKey(AuthKey)
 		|| !UConvaiFormValidation::ValidateCharacterName(CharName)
 		|| !UConvaiFormValidation::ValidateBackstory(Backstory)
 		|| !UConvaiFormValidation::ValidateVoiceType(Voice)
@@ -638,7 +650,7 @@ void UConvaiChatBotCreateProxy::Activate()
 	Request->SetURL(URL);
 	Request->SetVerb("POST");
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
-	Request->SetHeader(TEXT("CONVAI-API-KEY"), API_key);
+	Request->SetHeader(AuthHeader, AuthKey);
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
 	// prepare json data
@@ -742,7 +754,7 @@ UConvaiChatBotUpdateProxy* UConvaiChatBotUpdateProxy::CreateCharacterUpdateProxy
 	UConvaiChatBotUpdateProxy* Proxy = NewObject<UConvaiChatBotUpdateProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	Proxy->URL = "https://api.convai.com/character/update";
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	Proxy->CharID = CharID;
 	Proxy->NewVoice = NewVoice;
 	Proxy->NewBackstory = NewBackstory;
@@ -773,9 +785,13 @@ void UConvaiChatBotUpdateProxy::Activate()
 		return;
 	}
 
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
 	// Form Validation
 	if (
-		!UConvaiFormValidation::ValidateAPIKey(API_key)
+		!UConvaiFormValidation::ValidateAuthKey(AuthKey)
 		|| !UConvaiFormValidation::ValidateCharacterID(CharID)
 		//|| !UConvaiFormValidation::ValidateCharacterName(NewCharName)
 		//|| !UConvaiFormValidation::ValidateBackstory(NewBackstory)
@@ -794,7 +810,7 @@ void UConvaiChatBotUpdateProxy::Activate()
 	Request->SetURL(URL);
 	Request->SetVerb("POST");
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
-	Request->SetHeader(TEXT("CONVAI-API-KEY"), API_key);
+	Request->SetHeader(AuthHeader, AuthKey);
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
 
@@ -913,7 +929,7 @@ UConvaiChatBotGetDetailsProxy* UConvaiChatBotGetDetailsProxy::CreateCharacterGet
 	UConvaiChatBotGetDetailsProxy* Proxy = NewObject<UConvaiChatBotGetDetailsProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	Proxy->URL = "https://api.convai.com/character/get";
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	Proxy->CharID = CharID;
 	Proxy->HasReadyPlayerMeLink = false;
 	return Proxy;
@@ -939,9 +955,13 @@ void UConvaiChatBotGetDetailsProxy::Activate()
 		return;
 	}
 
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
 	// Form Validation
 	if (
-		!UConvaiFormValidation::ValidateAPIKey(API_key)
+		!UConvaiFormValidation::ValidateAuthKey(AuthKey)
 		|| !UConvaiFormValidation::ValidateCharacterID(CharID)
 		)
 	{
@@ -957,7 +977,7 @@ void UConvaiChatBotGetDetailsProxy::Activate()
 	Request->SetURL(URL);
 	Request->SetVerb("POST");
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
-	Request->SetHeader(TEXT("CONVAI-API-KEY"), API_key);
+	Request->SetHeader(AuthHeader, AuthKey);
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
 	// prepare json data
@@ -1100,7 +1120,7 @@ UConvaiChatBotGetCharsProxy* UConvaiChatBotGetCharsProxy::CreateCharacterGetChar
 	UConvaiChatBotGetCharsProxy* Proxy = NewObject<UConvaiChatBotGetCharsProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	Proxy->URL = "https://api.convai.com/character/list";
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	return Proxy;
 }
 
@@ -1126,6 +1146,17 @@ void UConvaiChatBotGetCharsProxy::Activate()
 		return;
 	}
 
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
+	// Form Validation
+	if (!UConvaiFormValidation::ValidateAuthKey(AuthKey))
+	{
+		failed();
+		return;
+	}
+
 	// Create the request
 	FHttpRequestRef Request = Http->CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &UConvaiChatBotGetCharsProxy::onHttpRequestComplete);
@@ -1134,7 +1165,8 @@ void UConvaiChatBotGetCharsProxy::Activate()
 	Request->SetURL(URL);
 	Request->SetVerb("POST");
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
-	Request->SetHeader(TEXT("CONVAI-API-KEY"), API_key);
+	Request->SetHeader(AuthHeader, AuthKey);
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
 	// Run the request
 	if (!Request->ProcessRequest()) failed();
