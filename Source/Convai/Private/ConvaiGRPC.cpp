@@ -292,6 +292,17 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	//TODO (Mohamed) handle status variable
 
+	
+#if ENGINE_MAJOR_VERSION < 5
+	if (!IsValid(this) || HasAnyFlags(RF_BeginDestroyed))
+	{
+		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
+			*ConvaiGRPCGetResponseParams.CharID,
+			*ConvaiGRPCGetResponseParams.SessionID);
+		LogAndEcecuteFailure("OnStreamInit");
+		return;
+}
+#else
 	if (!IsValid(this) || !IsValidChecked(this) || HasAnyFlags(RF_BeginDestroyed))
 	{
 		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
@@ -300,6 +311,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 		LogAndEcecuteFailure("OnStreamInit");
 		return;
 	}
+#endif
 
 	if (!ok || !status.ok())
 	{
@@ -1025,12 +1037,15 @@ void UConvaiGRPCSubmitFeedbackProxy::OnStreamFinish(bool ok)
 
 	Response = FString(reply->feedback_response().c_str());
 
+	Response = FString(reply->feedback_response().c_str());
+
 #if ConvaiDebugMode
+	FString ThumbsUpString = ThumbsUp ? "True" : "False";
 	UE_LOG(ConvaiGRPCFeedBackLog, Log,
 		TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
 		*InteractionID,
 		*FeedbackText,
-		ThumbsUp? *FString("True") : *FString("False"));
+		*ThumbsUpString);
 #endif 
 
 
@@ -1041,16 +1056,19 @@ void UConvaiGRPCSubmitFeedbackProxy::BeginDestroy()
 {
 	client_context.TryCancel();
 	stub_.reset();
+	FString ThumbsUpString = ThumbsUp ? "True" : "False";
 	UE_LOG(ConvaiGRPCFeedBackLog, Log,
-		TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
-		*InteractionID,
-		*FeedbackText,
-		*FString(ThumbsUp ? "True" : "False"));
+	TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
+	*InteractionID,
+	*FeedbackText,
+	*ThumbsUpString);
 	Super::BeginDestroy();
 }
 
 void UConvaiGRPCSubmitFeedbackProxy::LogAndEcecuteFailure(FString FuncName)
 {
+	FString ThumbsUpString = ThumbsUp ? "True" : "False";
+
 	UE_LOG(ConvaiGRPCFeedBackLog, Warning,
 		TEXT("%s: Status:%s | Debug Log:%s | Error message:%s | Error Details:%s | Error Code:%i | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
 		*FString(FuncName),
@@ -1061,7 +1079,7 @@ void UConvaiGRPCSubmitFeedbackProxy::LogAndEcecuteFailure(FString FuncName)
 		status.error_code(),
 		*InteractionID,
 		*FeedbackText,
-		*FString(ThumbsUp ? "True" : "False"));
+		*ThumbsUpString);
 
 	failed();
 }

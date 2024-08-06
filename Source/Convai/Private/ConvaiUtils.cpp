@@ -1146,8 +1146,13 @@ bool UConvaiUtils::WriteSoundWaveToWavFile(USoundWave* SoundWave, const FString&
 	int32 OutNumChannels;
 	TArray<uint8> RawData = ExtractPCMDataFromSoundWave(SoundWave, OutSampleRate, OutNumChannels);
 
+#if ENGINE_MAJOR_VERSION < 5
+	if (RawData.Num() == 0)
+		return false;
+#else
 	if (RawData.IsEmpty())
 		return false;
+#endif
 
 	TArray<uint8> OutWaveFileData;
 
