@@ -7,6 +7,8 @@
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonReader.h"
+#include "Engine/GameEngine.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "ConvaiDefinitions.generated.h"
 
 USTRUCT(BlueprintType)
