@@ -394,11 +394,15 @@ bool UConvaiActions::ParseAction(UConvaiEnvironment* Environment, FString Action
 	// find actions
 	ActionToAdd = FindAction(ActionToBeParsed, Environment->Actions);
 
-	// find characters
-	FindNearestObjectByName(ActionToBeParsed, Environment->Characters, RelatedObjOrChar);
+	TArray<FConvaiObjectEntry> AllCharsAndObjs;
+	AllCharsAndObjs.Append(Environment->Characters);
+	AllCharsAndObjs.Append(Environment->Objects);
+
+	// find objects or characters
+	FindNearestObjectByName(ActionToBeParsed, AllCharsAndObjs, RelatedObjOrChar);
 	
 	// find objects
-	FindNearestObjectByName(ActionToBeParsed, Environment->Objects, RelatedObjOrChar);
+	//FindNearestObjectByName(ActionToBeParsed, Environment->Objects, RelatedObjOrChar);
 
 	// Find extra numeric param
 	float ExtraNumber = ExtractNumber(ActionToBeParsed);
