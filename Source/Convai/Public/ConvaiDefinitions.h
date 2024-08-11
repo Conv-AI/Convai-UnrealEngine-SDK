@@ -942,8 +942,7 @@ namespace ConvaiConstants
 	const FString Auth_Token_Header = "API-AUTH-TOKEN";
 
 	const FString ExperienceUpdateEndpoint = "https://api.convai.com/xp/experiences/update";
-	//const FString ExperienceSessionDetailEndpoint = "https://api.convai.com/xp/sessions/detail";
-	const FString ExperienceSessionDetailEndpoint = "http://35.223.122.153:8080/xp/sessions/detail";
+	const FString ExperienceSessionDetailEndpoint = "https://api.convai.com/xp/sessions/detail";
 
 	//char* AvatarDefaultImage2 = "https://convai.com/_next/static/images/placeholder-3d-cab6463359f6ccedb4cda311c4056788.jpg";
 };
