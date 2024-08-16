@@ -1272,6 +1272,38 @@ UConvaiDownloadImageProxy* UConvaiDownloadImageProxy::CreateDownloadImageProxy(U
 	return Proxy;
 }
 
+UConvaiDownloadImageProxy* UConvaiDownloadImageProxy::CreateDownloadImageForRPMProxy(UObject* WorldContextObject, FString URL)
+{
+	UConvaiDownloadImageProxy* Proxy = NewObject<UConvaiDownloadImageProxy>();
+	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+
+	// Define the base URL for the model
+	FString BaseUrl = TEXT("https://models.readyplayer.me/");
+
+	// Check if the URL starts with the base URL and ends with .glb
+	if (URL.StartsWith(BaseUrl) && URL.EndsWith(TEXT(".glb")))
+	{
+		// Extract the model ID
+		FString ModelId;
+		int32 StartIndex = BaseUrl.Len();
+		int32 EndIndex = URL.Len() - 4; // Exclude the length of ".glb"
+		ModelId = URL.Mid(StartIndex, EndIndex - StartIndex);
+
+		// Generate the new URL
+		FString NewURL = BaseUrl + ModelId + TEXT(".png?pose=relaxed&background=0,0,60&size=512");
+
+		// Assign the new URL to the Proxy
+		Proxy->URL = NewURL;
+	}
+	else
+	{
+		// If URL doesn't match, just assign the original URL
+		Proxy->URL = URL;
+	}
+
+	return Proxy;
+}
+
 void UConvaiDownloadImageProxy::Activate()
 {
 	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
