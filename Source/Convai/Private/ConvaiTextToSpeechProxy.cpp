@@ -45,7 +45,7 @@ UConvaiTextToSpeechProxy* UConvaiTextToSpeechProxy::CreateTextToSpeechQueryProxy
 	Proxy->VoiceStr = Voice;
 	//Proxy->VoiceStr = FString(TTS_Voice_Type_str[uint8(Voice)]);
 	
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
+
 	return Proxy;
 }
 
@@ -70,8 +70,12 @@ void UConvaiTextToSpeechProxy::Activate()
 		return;
 	}
 
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
 	// Form Validation
-	if (!UConvaiFormValidation::ValidateAPIKey(API_key) || !UConvaiFormValidation::ValidateInputText(Transcript) || !UConvaiFormValidation::ValidateVoiceType(VoiceStr))
+	if (!UConvaiFormValidation::ValidateAuthKey(AuthKey) || !UConvaiFormValidation::ValidateInputText(Transcript) || !UConvaiFormValidation::ValidateVoiceType(VoiceStr))
 	{
 		failed();
 		return;
@@ -86,13 +90,13 @@ void UConvaiTextToSpeechProxy::Activate()
 	Request->SetVerb("POST");
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	Request->SetHeader(TEXT("CONVAI-API-KEY"), *API_key);
+	Request->SetHeader(AuthHeader, AuthKey);
 
 	// prepare json data
 	FString JsonString;
 	TSharedRef<TJsonWriter<TCHAR>> JsonWriter = TJsonWriterFactory<TCHAR>::Create(&JsonString);
 	JsonWriter->WriteObjectStart();
-	JsonWriter->WriteValue("api_key", API_key);
+	JsonWriter->WriteValue(AuthHeader, AuthKey);
 	JsonWriter->WriteValue("transcript", Transcript);
 	JsonWriter->WriteValue("voice", VoiceStr);
 	JsonWriter->WriteValue("filename", FString("testAudio"));

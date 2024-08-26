@@ -164,7 +164,8 @@ public:
 		bool VoiceResponse,
 		bool StreamPlayerMic,
 		bool UseServerAPI_Key,
-		const FString& ClientAPI_Key);
+		const FString& ClientAuthKey,
+		const FString& AuthHeader);
 
 	UFUNCTION(Server, Reliable, Category = "Convai|Network")
 	void FinishTalkingServer();
@@ -200,7 +201,8 @@ public:
 		bool GenerateActions,
 		bool VoiceResponse,
 		bool UseServerAPI_Key,
-		const FString& ClientAPI_Key);
+		const FString& ClientAuthKey,
+		const FString& AuthHeader);
 
 	virtual bool ShouldMuteLocal() override;
 

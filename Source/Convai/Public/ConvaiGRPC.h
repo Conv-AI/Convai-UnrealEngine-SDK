@@ -58,7 +58,9 @@ struct FConvaiGRPCGetResponseParams
 
 	bool GenerateActions;
 
-	FString API_Key;
+	FString AuthKey;
+
+	FString AuthHeader;
 
 	TMap<FString, FString> Narrative_Template_Keys;
 
@@ -73,7 +75,8 @@ struct FConvaiGRPCGetResponseParams
 		, SessionID(TEXT(""))
 		, Environment(nullptr)
 		, GenerateActions(false)
-		, API_Key(TEXT(""))
+		, AuthKey(TEXT(""))
+		, AuthHeader(TEXT(""))
 	{
 	}
 };

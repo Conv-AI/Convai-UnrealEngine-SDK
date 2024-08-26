@@ -78,7 +78,6 @@ class UConvaiSpeechToTextProxy : public UOnlineBlueprintCallProxyBase
 
 
 	FString URL;
-	FString API_key;
 	FString filename;
 	TArray<uint8> Payload;
 	bool bStereo;

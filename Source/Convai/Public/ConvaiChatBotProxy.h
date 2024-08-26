@@ -62,7 +62,6 @@ class UConvaiChatBotQueryProxy : public UOnlineBlueprintCallProxyBase
 	void finish();
 
 	FString URL;
-	FString API_key;
 	FString UserQuery;
 	bool VoiceResponse;
 	FString CharID;
@@ -148,7 +147,6 @@ class UConvaiChatBotQueryFromAudioProxy : public UOnlineBlueprintCallProxyBase
 	void finish();
 
 	FString URL;
-	FString API_key;
 	TArray<uint8> Payload;
 	bool VoiceResponse;
 	FString CharID;
@@ -212,7 +210,6 @@ class UConvaiChatBotCreateProxy : public UOnlineBlueprintCallProxyBase
 	void finish();
 
 	FString URL;
-	FString API_key;
 	FString CharName;
 	FString Voice;
 	FString Backstory;
@@ -270,7 +267,6 @@ class UConvaiChatBotUpdateProxy : public UOnlineBlueprintCallProxyBase
 	void finish();
 
 	FString URL;
-	FString API_key;
 	FString CharID;
 	FString NewCharName;
 	FString NewVoice;
@@ -333,7 +329,6 @@ public:
 
 	// inputs
 	FString URL;
-	FString API_key;
 	FString CharID;
 
 	// outputs
@@ -396,7 +391,6 @@ class UConvaiChatBotGetCharsProxy : public UOnlineBlueprintCallProxyBase
 	void finish();
 
 	FString URL;
-	FString API_key;
 
 
 

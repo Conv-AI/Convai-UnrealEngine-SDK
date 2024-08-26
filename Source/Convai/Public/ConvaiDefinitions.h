@@ -7,6 +7,8 @@
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonReader.h"
+#include "Engine/GameEngine.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "ConvaiDefinitions.generated.h"
 
 USTRUCT(BlueprintType)
@@ -371,7 +373,13 @@ public:
 				}
 			}
 
+#if ENGINE_MAJOR_VERSION < 5
+			double tempDuration;
+			JsonObject->TryGetNumberField(TEXT("Duration"), tempDuration);
+			Duration = (float)tempDuration;
+#else
 			JsonObject->TryGetNumberField(TEXT("Duration"), Duration);
+#endif
 			JsonObject->TryGetNumberField(TEXT("FrameRate"), FrameRate);
 
 			return true;
@@ -929,6 +937,12 @@ namespace ConvaiConstants
 
 	const TArray<FString> BlendShapesNames = { "browDownLeft", "browDownRight", "browInnerUp", "browOuterUpLeft", "browOuterUpRight", "cheekPuff", "cheekSquintLeft", "cheekSquintRight", "eyeBlinkLeft", "eyeBlinkRight", "eyeLookDownLeft", "eyeLookDownRight", "eyeLookInLeft", "eyeLookInRight", "eyeLookOutLeft", "eyeLookOutRight", "eyeLookUpLeft", "eyeLookUpRight", "eyeSquintLeft", "eyeSquintRight", "eyeWideLeft", "eyeWideRight", "jawForward", "jawLeft", "jawOpen", "jawRight", "mouthClose", "mouthDimpleLeft", "mouthDimpleRight", "mouthFrownLeft", "mouthFrownRight", "mouthFunnel", "mouthLeft", "mouthLowerDownLeft", "mouthLowerDownRight", "mouthPressLeft", "mouthPressRight", "mouthPucker", "mouthRight", "mouthRollLower", "mouthRollUpper", "mouthShrugLower", "mouthShrugUpper", "mouthSmileLeft", "mouthSmileRight", "mouthStretchLeft", "mouthStretchRight", "mouthUpperUpLeft", "mouthUpperUpRight", "noseSneerLeft", "noseSneerRight", "tongueOut", /*"headRoll", "headPitch", "headYaw"*/ };
 	const TArray<FString> VisemeNames = { "sil", "PP", "FF", "TH", "DD", "kk", "CH", "SS", "nn", "RR", "aa", "E", "ih", "oh", "ou" };
+
+	const FString API_Key_Header = "CONVAI-API-KEY";
+	const FString Auth_Token_Header = "API-AUTH-TOKEN";
+
+	const FString ExperienceUpdateEndpoint = "https://api.convai.com/xp/experiences/update";
+	const FString ExperienceSessionDetailEndpoint = "https://api.convai.com/xp/sessions/detail";
 
 	//char* AvatarDefaultImage2 = "https://convai.com/_next/static/images/placeholder-3d-cab6463359f6ccedb4cda311c4056788.jpg";
 };

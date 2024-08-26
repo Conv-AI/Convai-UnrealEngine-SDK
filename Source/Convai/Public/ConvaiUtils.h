@@ -65,6 +65,14 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Convai|Settings")
 	static FString GetAPI_Key();
 
+	UFUNCTION(BlueprintCallable, Category = "Convai|Settings")
+	static void SetAuthToken(FString AuthToken);
+
+	UFUNCTION(BlueprintPure, Category = "Convai|Settings")
+	static FString GetAuthToken();
+
+	static TPair<FString, FString> GetAuthHeaderAndKey();
+
 	UFUNCTION(BlueprintPure, Category = "Convai|Settings")
 	static FString GetTestCharacterID();
 
@@ -136,7 +144,7 @@ class CONVAI_API UConvaiFormValidation : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
-	static bool ValidateAPIKey(FString API_Key)
+	static bool ValidateAuthKey(FString API_Key)
 	{
 		if ((API_Key.Len()))
 		{

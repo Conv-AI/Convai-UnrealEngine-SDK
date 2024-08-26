@@ -36,8 +36,6 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromFileNam
 	// Read the file into a byte array
 	FFileHelper::LoadFileToArray(Proxy->Payload, *filename, 0);
 
-
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
 	Proxy->bStereo = true;
 	return Proxy;
 }
@@ -84,7 +82,6 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromSoundWa
 	SerializeWaveFile(Proxy->Payload, RawPCMData.GetData(), RawPCMData.Num(), SoundWave->NumChannels, SoundWave->GetSampleRateForCurrentPlatform());
 
 	//UE_LOG(ConvaiS2THttpLog, Warning, TEXT("Sound wave sample rate: %f"), SoundWave->GetSampleRateForCurrentPlatform());
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
 	Proxy->bStereo = SoundWave->NumChannels>1? true : false;
 	return Proxy;
 }
@@ -95,7 +92,6 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromArrayQu
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	Proxy->URL = "https://te-apis.convai.com/asr";
 	Proxy->Payload = Payload;
-	Proxy->API_key = Convai::Get().GetConvaiSettings()->API_Key;
 	Proxy->bStereo = true;
 	return Proxy;
 }
@@ -128,8 +124,12 @@ void UConvaiSpeechToTextProxy::Activate()
 	}
 
 
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
 	// Form Validation
-	if (!UConvaiFormValidation::ValidateAPIKey(API_key) || !UConvaiFormValidation::ValidateInputVoice(Payload))
+	if (!UConvaiFormValidation::ValidateAuthKey(AuthKey) || !UConvaiFormValidation::ValidateInputVoice(Payload))
 	{
 		failed();
 		return;
@@ -156,12 +156,12 @@ void UConvaiSpeechToTextProxy::Activate()
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
 
 	Request->SetHeader("Content-Type", "multipart/form-data; boundary=blahblahsomeboundary");
-	Request->SetHeader(TEXT("CONVAI-API-KEY"), *API_key);
+	Request->SetHeader(AuthHeader, AuthKey);
 
 	// prepare request content data
 	//FString a = "\r\n--blahblahsomeboundary\r\n";
-	//FString b = "Content-Disposition: form-data; name=\"api_key\"\r\n\r\n";
-	// api_key
+	//FString b = "Content-Disposition: form-data; name=\"Request->SetHeader(AuthHeader, AuthKey);\"\r\n\r\n";
+	// Request->SetHeader(AuthHeader, AuthKey);
 	FString c = "\r\n--blahblahsomeboundary\r\n";
 	FString d = "Content-Disposition: form-data; name=\"file\";  filename=\"out.wav\"\r\n\r\n";
 
@@ -171,7 +171,7 @@ void UConvaiSpeechToTextProxy::Activate()
 	TArray<uint8> data;
 	//data.Append((uint8*)TCHAR_TO_UTF8(*a), a.Len());
 	//data.Append((uint8*)TCHAR_TO_UTF8(*b), b.Len());
-	//data.Append((uint8*)TCHAR_TO_UTF8(*API_key), API_key.Len());
+	//data.Append((uint8*)TCHAR_TO_UTF8(*Request->SetHeader(AuthHeader, AuthKey);), Request->SetHeader(AuthHeader, AuthKey);.Len());
 	data.Append((uint8*)TCHAR_TO_UTF8(*c), c.Len());
 	data.Append((uint8*)TCHAR_TO_UTF8(*d), d.Len());
 	data.Append(monoWavBytes);

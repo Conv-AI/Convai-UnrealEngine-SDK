@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.3.0
+- Added Linux Support.
+- Fixed issue where if an object is similar to a character name it would be picked up as the related object or character.
+ 
+
+# Release 3.2.1-Beta
+- Fixed NPC2NPC crash when interrupting the character early on.
+
+# Release 3.2.1-Beta
+- Fixed body gestures not animating while talking.
+- Added [Narrative Trigger Keys](https://docs.convai.com/api-docs/plugins-and-integrations/unreal-engine/guides/narrative-design-keys)
+- Improved emotion animations for MetaHumans.
+
 # Release 3.2.0
 - Added 5.4 support
 

@@ -17,7 +17,11 @@
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/DefaultValueHelper.h"
-#include "HAL/PlatformFilemanager.h"
+#if PLATFORM_LINUX
+	#include "Linux/LinuxPlatformFile.h"
+#else
+	#include "HAL/PlatformFilemanager.h"
+#endif
 #include "Engine/GameInstance.h"
 #include "ConvaiSubsystem.h"
 #include "Engine/GameEngine.h"
@@ -511,6 +515,44 @@ void UConvaiUtils::SetAPI_Key(FString API_Key)
 FString UConvaiUtils::GetAPI_Key()
 {
 	return Convai::Get().GetConvaiSettings()->API_Key;
+}
+
+void UConvaiUtils::SetAuthToken(FString AuthToken)
+{
+	Convai::Get().GetConvaiSettings()->AuthToken = AuthToken;
+}
+
+FString UConvaiUtils::GetAuthToken()
+{
+	return Convai::Get().GetConvaiSettings()->AuthToken;
+}
+
+TPair<FString, FString> UConvaiUtils::GetAuthHeaderAndKey()
+{
+	FString API_Key = GetAPI_Key();
+	FString AuthToken = GetAuthToken();
+
+	FString KeyOrToken;
+	FString HeaderString;
+
+	if (!API_Key.IsEmpty())
+	{
+		KeyOrToken = API_Key;
+		HeaderString = ConvaiConstants::API_Key_Header;
+	}
+	else if (!AuthToken.IsEmpty())
+	{
+		KeyOrToken = AuthToken;
+		HeaderString = ConvaiConstants::Auth_Token_Header;
+	}
+	else
+	{
+		// Handle the case where both are empty if necessary
+		KeyOrToken = "";
+		HeaderString = "";
+	}
+
+	return TPair<FString, FString>(HeaderString, KeyOrToken);
 }
 
 FString UConvaiUtils::GetTestCharacterID()
@@ -1104,8 +1146,13 @@ bool UConvaiUtils::WriteSoundWaveToWavFile(USoundWave* SoundWave, const FString&
 	int32 OutNumChannels;
 	TArray<uint8> RawData = ExtractPCMDataFromSoundWave(SoundWave, OutSampleRate, OutNumChannels);
 
+#if ENGINE_MAJOR_VERSION < 5
+	if (RawData.Num() == 0)
+		return false;
+#else
 	if (RawData.IsEmpty())
 		return false;
+#endif
 
 	TArray<uint8> OutWaveFileData;
 

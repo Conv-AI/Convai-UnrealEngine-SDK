@@ -628,19 +628,23 @@ void UConvaiPlayerComponent::StartTalking(
 
 	ReplicateVoiceToNetwork = RunOnServer;
 
-	FString ClientAPI_Key = UseServerAPI_Key ? FString("") : UConvaiUtils::GetAPI_Key();
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
+	FString ClientAuthKey = UseServerAPI_Key ? FString("") : AuthKey;
 
 	if (RunOnServer)
 	{
 		if (IsValid(Environment))
-			StartTalkingServer(ConvaiChatbotComponent, true, Environment->Actions, Environment->Objects, Environment->Characters, Environment->MainCharacter, GenerateActions, VoiceResponse, StreamPlayerMic, UseServerAPI_Key, ClientAPI_Key);
+			StartTalkingServer(ConvaiChatbotComponent, true, Environment->Actions, Environment->Objects, Environment->Characters, Environment->MainCharacter, GenerateActions, VoiceResponse, StreamPlayerMic, UseServerAPI_Key, ClientAuthKey, AuthHeader);
 		else
-			StartTalkingServer(ConvaiChatbotComponent, false, TArray<FString>(), TArray<FConvaiObjectEntry>(), TArray<FConvaiObjectEntry>(), FConvaiObjectEntry(), GenerateActions, VoiceResponse, StreamPlayerMic, UseServerAPI_Key, ClientAPI_Key);
+			StartTalkingServer(ConvaiChatbotComponent, false, TArray<FString>(), TArray<FConvaiObjectEntry>(), TArray<FConvaiObjectEntry>(), FConvaiObjectEntry(), GenerateActions, VoiceResponse, StreamPlayerMic, UseServerAPI_Key, ClientAuthKey, AuthHeader);
 	}
 	else
 	{
-		bool UseOverrideAPI_Key = false;
-		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, false, UseOverrideAPI_Key, FString(""), Token);
+		bool UseOverrideAuthKey = false;
+		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, false, UseOverrideAuthKey, FString(""), FString(""), Token);
 	}
 }
 
@@ -680,7 +684,8 @@ void UConvaiPlayerComponent::StartTalkingServer_Implementation(
 	bool VoiceResponse,
 	bool StreamPlayerMic,
 	bool UseServerAPI_Key,
-	const FString& ClientAPI_Key)
+	const FString& ClientAuthKey, 
+	const FString& AuthHeader)
 {
 	// if "StreamPlayerMic" is true then "bShouldMuteGlobal" should be false, meaning we will play the player's audio on other clients
 	bShouldMuteGlobal = !StreamPlayerMic;
@@ -706,8 +711,8 @@ void UConvaiPlayerComponent::StartTalkingServer_Implementation(
 			Environment->Objects = Objects;
 			Environment->MainCharacter = MainCharacter;
 		}
-		bool UseOverrideAPI_Key = !UseServerAPI_Key;
-		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, true, UseOverrideAPI_Key, ClientAPI_Key, Token);
+		bool UseOverrideAuthKey = !UseServerAPI_Key;
+		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, true, UseOverrideAuthKey, ClientAuthKey, AuthHeader, Token);
 	}
 }
 
@@ -742,20 +747,23 @@ void UConvaiPlayerComponent::SendText(UConvaiChatbotComponent* ConvaiChatbotComp
 
 	ReplicateVoiceToNetwork = RunOnServer;
 
-	FString ClientAPI_Key = UseServerAPI_Key ? FString("") : UConvaiUtils::GetAPI_Key();
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
 
+	FString ClientAuthKey = UseServerAPI_Key ? FString("") : AuthKey;
 
 	if (RunOnServer)
 	{
 		if (IsValid(Environment))
-			SendTextServer(ConvaiChatbotComponent, Text, true, Environment->Actions, Environment->Objects, Environment->Characters, Environment->MainCharacter, GenerateActions, VoiceResponse, UseServerAPI_Key, ClientAPI_Key);
+			SendTextServer(ConvaiChatbotComponent, Text, true, Environment->Actions, Environment->Objects, Environment->Characters, Environment->MainCharacter, GenerateActions, VoiceResponse, UseServerAPI_Key, ClientAuthKey, AuthHeader);
 		else
-			SendTextServer(ConvaiChatbotComponent, Text, false, TArray<FString>(), TArray<FConvaiObjectEntry>(), TArray<FConvaiObjectEntry>(), FConvaiObjectEntry(), GenerateActions, VoiceResponse, UseServerAPI_Key, ClientAPI_Key);
+			SendTextServer(ConvaiChatbotComponent, Text, false, TArray<FString>(), TArray<FConvaiObjectEntry>(), TArray<FConvaiObjectEntry>(), FConvaiObjectEntry(), GenerateActions, VoiceResponse, UseServerAPI_Key, ClientAuthKey, AuthHeader);
 	}
 	else
 	{
-		bool UseOverrideAPI_Key = false;
-		ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, false, UseOverrideAPI_Key, FString(""), Token);
+		bool UseOverrideAuthKey = false;
+		ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, false, UseOverrideAuthKey, FString(""), FString(""), Token);
 
 		// Invalidate the token by generating a new one
 		GenerateNewToken();
@@ -773,7 +781,8 @@ void UConvaiPlayerComponent::SendTextServer_Implementation(
 	bool GenerateActions,
 	bool VoiceResponse,
 	bool UseServerAPI_Key,
-	const FString& ClientAPI_Key)
+	const FString& ClientAuthKey, 
+	const FString& AuthHeader)
 {
 	if (!IsValid(ConvaiChatbotComponent))
 	{
@@ -794,8 +803,8 @@ void UConvaiPlayerComponent::SendTextServer_Implementation(
 	Environment->Objects = Objects;
 	Environment->MainCharacter = MainCharacter;
 
-	bool UseOverrideAPI_Key = !UseServerAPI_Key;
-	ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, true, UseOverrideAPI_Key, ClientAPI_Key, Token);
+	bool UseOverrideAuthKey = !UseServerAPI_Key;
+	ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, true, UseOverrideAuthKey, ClientAuthKey, AuthHeader, Token);
 
 	// Invalidate the token by generating a new one
 	GenerateNewToken();

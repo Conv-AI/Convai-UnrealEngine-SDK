@@ -25,6 +25,7 @@ THIRD_PARTY_INCLUDES_START
 #undef MemoryBarrier
 #undef Yield
 #undef CaptureStackBackTrace
+#undef GetCurrentTime
 THIRD_PARTY_INCLUDES_END
 
 #include "ConvaiSubsystem.generated.h"

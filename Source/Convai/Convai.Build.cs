@@ -46,7 +46,7 @@ public class Convai : ModuleRules
         string root = ThirdPartyPath;
         foreach (var arch in ConvaiPlatformInstance.Architectures())
         {
-            string grpcPath = root + "grpc/" + "lib/" + ConvaiPlatformInstance.LibrariesPath + arch;
+            string grpcPath = root + "gRPC/" + "lib/" + ConvaiPlatformInstance.LibrariesPath + arch;
             
             // Add files that end with .lib
             PublicAdditionalLibraries.AddRange(Directory.GetFiles(grpcPath, "*.lib"));
@@ -64,9 +64,17 @@ public class Convai : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PrecompileForTargets = PrecompileTargetsType.Any;
         ConvaiPlatformInstance = GetConvaiPlatformInstance(Target);
-        
-        PrivateIncludePaths.AddRange(new string[] { "Convai/Private" });
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" , "HTTP", "Json", "JsonUtilities", "AudioMixer", "AudioCaptureCore", "AudioCapture", "Voice", "SignalProcessing", "libOpus", "OpenSSL", "zlib" });
+
+        PrivateIncludePaths.Add("Convai/Private");
+
+        if (Target.Platform == UnrealTargetPlatform.Mac || Target.Platform == UnrealTargetPlatform.IOS)
+        {
+            // Include .mm file only for Mac
+            PrivateIncludePaths.Add("Convai/Private/Mac");
+        }
+
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" , "HTTP", "Json", "JsonUtilities", "AudioMixer", "AudioCaptureCore", "AudioCapture", "Voice", "SignalProcessing", "libOpus", "OpenSSL", "zlib", "SSL" });
         PrivateDependencyModuleNames.AddRange(new string[] {"Projects"});
         PublicDefinitions.AddRange(new string[] { "ConvaiDebugMode=1", "GOOGLE_PROTOBUF_NO_RTTI", "GPR_FORBID_UNREACHABLE_CODE", "GRPC_ALLOW_EXCEPTIONS=0" });
 
@@ -83,14 +91,10 @@ public class Convai : ModuleRules
             AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(BuildPath, "Convai_AndroidAPL.xml"));
         }
 
-        if (Target.Platform == UnrealTargetPlatform.Mac)
+        if (Target.Platform == UnrealTargetPlatform.Mac || Target.Platform == UnrealTargetPlatform.IOS || Target.Platform == UnrealTargetPlatform.Linux)
         {
             PublicDefinitions.AddRange(new string[] { "GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE=0", "GOOGLE_PROTOBUF_USE_UNALIGNED=0", "PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0" });
-        }
-
-        if (Target.Platform == UnrealTargetPlatform.Mac || Target.Platform == UnrealTargetPlatform.IOS)
-        {
-            PrivateIncludePaths.AddRange(new string[] { Path.Combine(ThirdPartyPath, "gRPC", "Include_apple") });
+            PrivateIncludePaths.AddRange(new string[] { Path.Combine(ThirdPartyPath, "gRPC", "Include_1.50.x") });
         }
         else
         {
@@ -150,13 +154,13 @@ public class ConvaiPlatform_Mac : ConvaiPlatform
 }
 
 
-//public class ConvaiPlatform_Linux : ConvaiPlatform
-//{
-//    public override string LibrariesPath { get { return "linux/"; } }
-//    public override List<string> Architectures() { return new List<string> { "" }; }
-//    public override string LibraryPrefixName { get { return "lib"; } }
-//    public override string LibraryPostfixName { get { return ".a"; } }
-//}
+public class ConvaiPlatform_Linux : ConvaiPlatform
+{
+   public override string LibrariesPath { get { return "linux/"; } }
+   public override List<string> Architectures() { return new List<string> { "" }; }
+   public override string LibraryPrefixName { get { return "lib"; } }
+   public override string LibraryPostfixName { get { return ".a"; } }
+}
 
 //public class ConvaiPlatform_PS5 : ConvaiPlatform
 //{

@@ -88,7 +88,7 @@ void UConvaiGRPCGetResponseProxy::Activate()
 	reply = std::unique_ptr<service::GetResponseResponse>(new service::GetResponseResponse());
 
 	// Form Validation
-	if (!UConvaiFormValidation::ValidateAPIKey(ConvaiGRPCGetResponseParams.API_Key) || !(UConvaiFormValidation::ValidateCharacterID(ConvaiGRPCGetResponseParams.CharID)) || !(UConvaiFormValidation::ValidateSessionID(ConvaiGRPCGetResponseParams.SessionID)))
+	if (!UConvaiFormValidation::ValidateAuthKey(ConvaiGRPCGetResponseParams.AuthKey) || !(UConvaiFormValidation::ValidateCharacterID(ConvaiGRPCGetResponseParams.CharID)) || !(UConvaiFormValidation::ValidateSessionID(ConvaiGRPCGetResponseParams.SessionID)))
 	{
 		OnFailure.ExecuteIfBound();
 		return;
@@ -292,6 +292,17 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	//TODO (Mohamed) handle status variable
 
+	
+#if ENGINE_MAJOR_VERSION < 5
+	if (!IsValid(this) || HasAnyFlags(RF_BeginDestroyed))
+	{
+		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
+			*ConvaiGRPCGetResponseParams.CharID,
+			*ConvaiGRPCGetResponseParams.SessionID);
+		LogAndEcecuteFailure("OnStreamInit");
+		return;
+}
+#else
 	if (!IsValid(this) || !IsValidChecked(this) || HasAnyFlags(RF_BeginDestroyed))
 	{
 		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
@@ -300,6 +311,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 		LogAndEcecuteFailure("OnStreamInit");
 		return;
 	}
+#endif
 
 	if (!ok || !status.ok())
 	{
@@ -388,7 +400,27 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	// Create the config object that holds Audio and Action configs
 	GetResponseRequest_GetResponseConfig* getResponseConfig = new GetResponseRequest_GetResponseConfig();
-	getResponseConfig->set_api_key(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.API_Key));
+
+	if (ConvaiGRPCGetResponseParams.AuthHeader == ConvaiConstants::Auth_Token_Header)
+	{
+		getResponseConfig->set_api_auth_token(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.AuthKey));
+	}
+	else if (ConvaiGRPCGetResponseParams.AuthHeader == ConvaiConstants::API_Key_Header)
+	{
+		getResponseConfig->set_api_key(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.AuthKey));
+	}
+	else
+	{
+		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to invalid Authentication type! | Character ID : %s | Session ID : %s | Authentication type: %s | Authentication Key: %s"),
+			*ConvaiGRPCGetResponseParams.CharID,
+			*ConvaiGRPCGetResponseParams.SessionID,
+			*ConvaiGRPCGetResponseParams.AuthHeader,
+			*ConvaiGRPCGetResponseParams.AuthKey);
+		LogAndEcecuteFailure("OnStreamInit");
+		return;
+	}
+
+
 	getResponseConfig->set_session_id(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.SessionID));
 	getResponseConfig->set_character_id(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.CharID));
 
@@ -1005,12 +1037,15 @@ void UConvaiGRPCSubmitFeedbackProxy::OnStreamFinish(bool ok)
 
 	Response = FString(reply->feedback_response().c_str());
 
+	Response = FString(reply->feedback_response().c_str());
+
 #if ConvaiDebugMode
+	FString ThumbsUpString = ThumbsUp ? "True" : "False";
 	UE_LOG(ConvaiGRPCFeedBackLog, Log,
 		TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
 		*InteractionID,
 		*FeedbackText,
-		ThumbsUp? *FString("True") : *FString("False"));
+		*ThumbsUpString);
 #endif 
 
 
@@ -1021,16 +1056,19 @@ void UConvaiGRPCSubmitFeedbackProxy::BeginDestroy()
 {
 	client_context.TryCancel();
 	stub_.reset();
+	FString ThumbsUpString = ThumbsUp ? "True" : "False";
 	UE_LOG(ConvaiGRPCFeedBackLog, Log,
-		TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
-		*InteractionID,
-		*FeedbackText,
-		ThumbsUp ? "True" : "False");
+	TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
+	*InteractionID,
+	*FeedbackText,
+	*ThumbsUpString);
 	Super::BeginDestroy();
 }
 
 void UConvaiGRPCSubmitFeedbackProxy::LogAndEcecuteFailure(FString FuncName)
 {
+	FString ThumbsUpString = ThumbsUp ? "True" : "False";
+
 	UE_LOG(ConvaiGRPCFeedBackLog, Warning,
 		TEXT("%s: Status:%s | Debug Log:%s | Error message:%s | Error Details:%s | Error Code:%i | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
 		*FString(FuncName),
@@ -1041,7 +1079,7 @@ void UConvaiGRPCSubmitFeedbackProxy::LogAndEcecuteFailure(FString FuncName)
 		status.error_code(),
 		*InteractionID,
 		*FeedbackText,
-		ThumbsUp ? "True" : "False");
+		*ThumbsUpString);
 
 	failed();
 }
