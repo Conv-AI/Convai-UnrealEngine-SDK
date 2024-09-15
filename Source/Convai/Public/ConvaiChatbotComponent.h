@@ -39,7 +39,7 @@ class USoundWaveProcedural;
 class UConvaiGRPCGetResponseProxy;
 class UConvaiChatBotGetDetailsProxy;
 
-UCLASS(meta = (BlueprintSpawnableComponent), DisplayName = "Convai Chatbot")
+UCLASS(Blueprintable, BlueprintType, meta = (BlueprintSpawnableComponent), DisplayName = "Convai Chatbot")
 class CONVAI_API UConvaiChatbotComponent : public UConvaiAudioStreamer
 {
 	GENERATED_BODY()
