@@ -344,6 +344,7 @@ public:
 
 	//~ Begin UConvaiAudioStreamer Interface.
 	virtual bool CanUseLipSync() override;
+	virtual bool CanUseVision() override;
 	//~ End UConvaiAudioStreamer Interface.
 
 private:

@@ -7,6 +7,7 @@
 #include "ConvaiActionUtils.h"
 #include "ConvaiUtils.h"
 #include "LipSyncInterface.h"
+#include "VisionInterface.h"
 
 #include "Sound/SoundWaveProcedural.h"
 #include "Net/UnrealNetwork.h"
@@ -556,6 +557,26 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAuthKey, FStrin
 	}
 	RequireFaceData = RequireFaceData && VoiceResponse;
 
+	FConvaiGRPCVisionParams ConvaiGRPCVisionParams;
+	if (ConvaiVision && ConvaiVision->GetState() == EVisionState::Capturing)
+	{
+		bool bCaptureSuccess = ConvaiVision->GetCompressedData(ConvaiGRPCVisionParams.width, ConvaiGRPCVisionParams.height, ConvaiGRPCVisionParams.data);
+
+		// Attempt to capture compressed data if pre-compressed data isn't available
+		if (!bCaptureSuccess)
+		{
+			constexpr float CompressionQuality = 60.0f;
+			bCaptureSuccess = ConvaiVision->CaptureCompressed(ConvaiGRPCVisionParams.width, ConvaiGRPCVisionParams.height, ConvaiGRPCVisionParams.data, CompressionQuality);
+		}
+
+		// Fallback to raw data capture if compressed capture fails
+		if (!bCaptureSuccess)
+		{
+			ConvaiVision->CaptureRaw(ConvaiGRPCVisionParams.width, ConvaiGRPCVisionParams.height, ConvaiGRPCVisionParams.data);
+		}
+	}
+
+
 	// Create the request proxy
 	FConvaiGRPCGetResponseParams Params;
 	Params.UserQuery = UserText;
@@ -568,6 +589,7 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAuthKey, FStrin
 	Params.SessionID = SessionID;
 	Params.Environment = Environment;
 	Params.GenerateActions = GenerateActions;
+	Params.ConvaiGRPCVisionParams = ConvaiGRPCVisionParams;
 	Params.AuthKey = AuthKey;
 	Params.AuthHeader = AuthHeader;
 
@@ -1181,6 +1203,11 @@ void UConvaiChatbotComponent::BeginDestroy()
 bool UConvaiChatbotComponent::CanUseLipSync()
 {
 	return true;
+}
+
+bool UConvaiChatbotComponent::CanUseVision()
+{
+    return true;
 }
 
 UConvaiChatBotGetDetailsProxy* UConvaiChatbotComponent::ConvaiGetDetails()

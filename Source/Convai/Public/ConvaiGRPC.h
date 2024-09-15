@@ -34,6 +34,23 @@ DECLARE_DELEGATE_OneParam(FConvaiGRPCOnInteractionIDSignature, FString /*Interac
 DECLARE_DELEGATE(FConvaiGRPCOnEventSignature);
 
 USTRUCT()
+struct FConvaiGRPCVisionParams
+{
+	GENERATED_BODY()
+
+		int width;
+	int height;
+	TArray<uint8> data;
+
+	FConvaiGRPCVisionParams()
+		: width(0)
+		, height(0)
+		, data(TArray<uint8>())
+	{
+	}
+};
+
+USTRUCT()
 struct FConvaiGRPCGetResponseParams
 {
 	GENERATED_BODY()
@@ -57,6 +74,8 @@ struct FConvaiGRPCGetResponseParams
 	UConvaiEnvironment* Environment;
 
 	bool GenerateActions;
+
+	FConvaiGRPCVisionParams ConvaiGRPCVisionParams;
 
 	FString AuthKey;
 

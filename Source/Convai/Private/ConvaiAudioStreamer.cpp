@@ -6,6 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "LipSyncInterface.h"
+#include "VisionInterface.h"
 #include "Math/UnrealMathUtility.h"
 #include "ConvaiUtils.h"
 
@@ -416,6 +417,47 @@ bool UConvaiAudioStreamer::SupportsLipSync()
 	return ConvaiLipSync != nullptr;
 }
 
+IConvaiVisionInterface* UConvaiAudioStreamer::FindFirstVisionComponent()
+{
+	// Find the Vision component
+	auto VisionComponents = (GetOwner()->GetComponentsByInterface(UConvaiVisionInterface::StaticClass()));
+	if (VisionComponents.Num())
+	{
+		SetVisionComponent(VisionComponents[0]);
+	}
+	return ConvaiVision;
+}
+
+bool UConvaiAudioStreamer::SetVisionComponent(UActorComponent* VisionComponent)
+{
+	if (!CanUseVision())
+		return false;
+
+	// Find the Vision component
+	if (VisionComponent && VisionComponent->GetClass()->ImplementsInterface(UConvaiVisionInterface::StaticClass()))
+	{
+		ConvaiVision = Cast<IConvaiVisionInterface>(VisionComponent);
+		return true;
+	}
+	else
+	{
+		ConvaiVision = nullptr;
+		return false;
+	}
+}
+
+bool UConvaiAudioStreamer::SupportsVision()
+{
+	if (!CanUseVision())
+		return false;
+
+	if (ConvaiVision == nullptr)
+	{
+		FindFirstVisionComponent();
+	}
+	return ConvaiVision != nullptr;
+}
+
 void UConvaiAudioStreamer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -427,6 +469,9 @@ void UConvaiAudioStreamer::BeginPlay()
 
 	if (ConvaiLipSync == nullptr)
 		FindFirstLipSyncComponent();
+
+	if (ConvaiVision == nullptr)
+		FindFirstVisionComponent();
 }
 
 void UConvaiAudioStreamer::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -585,6 +630,11 @@ void UConvaiAudioStreamer::ResumeLipSync()
 }
 
 bool UConvaiAudioStreamer::CanUseLipSync()
+{
+	return false;
+}
+
+bool UConvaiAudioStreamer::CanUseVision()
 {
 	return false;
 }
