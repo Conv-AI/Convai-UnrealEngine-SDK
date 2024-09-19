@@ -429,13 +429,11 @@ class UConvaiDownloadImageProxy : public UOnlineBlueprintCallProxyBase
 	FDownloadImageHttpResponseCallbackSignature OnFailure;
 
 
-
-
-	/**
-	 *    Gets all character IDs created by the user.
-	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai Download Image", WorldContext = "WorldContextObject"), Category = "Convai|REST API")
-		static UConvaiDownloadImageProxy* CreateDownloadImageProxy(UObject* WorldContextObject, FString URL);
+	static UConvaiDownloadImageProxy* CreateDownloadImageProxy(UObject* WorldContextObject, FString URL);
+
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai Download Image using RPM Link", WorldContext = "WorldContextObject"), Category = "Convai|REST API")
+	static UConvaiDownloadImageProxy* CreateDownloadImageForRPMProxy(UObject* WorldContextObject, FString URL);
 
 	virtual void Activate() override;
 

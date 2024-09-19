@@ -76,7 +76,10 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	if (IsValidSequence(MainSequenceBuffer))
 	{
 		SequenceCriticalSection.Lock();
-		CurrentSequenceTimePassed += DeltaTime;
+
+		// Calculate time passed since ConvaiProcessLipSyncAdvanced was called
+		double CurrentTime = FPlatformTime::Seconds();
+		CurrentSequenceTimePassed = CurrentTime - StartTime;
 
 		if (CurrentSequenceTimePassed > MainSequenceBuffer.Duration)
 		{
@@ -84,6 +87,8 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 			SequenceCriticalSection.Unlock();
 			return;
 		}
+
+		bIsPlaying = true;
 
 		// Calculate frame duration and offsets
 		float FrameDuration = MainSequenceBuffer.Duration / MainSequenceBuffer.AnimationFrames.Num();
@@ -148,6 +153,7 @@ void UConvaiFaceSyncComponent::ConvaiProcessLipSyncAdvanced(uint8* InPCMData, ui
 	MainSequenceBuffer.AnimationFrames.Append(FaceSequence.AnimationFrames);
 	MainSequenceBuffer.Duration += FaceSequence.Duration;
 	MainSequenceBuffer.FrameRate = FaceSequence.FrameRate;
+	CalculateStartingTime();
 	SequenceCriticalSection.Unlock();
 
 	if (IsRecordingLipSync)
@@ -291,6 +297,17 @@ bool UConvaiFaceSyncComponent::IsValidSequence(const FAnimationSequence& Sequenc
 		return false;
 }
 
+bool UConvaiFaceSyncComponent::IsPlaying()
+{
+	return bIsPlaying;
+}
+
+void UConvaiFaceSyncComponent::CalculateStartingTime()
+{
+	if (!bIsPlaying)
+		StartTime = FPlatformTime::Seconds();
+}
+
 void UConvaiFaceSyncComponent::ClearMainSequence()
 {
 	SequenceCriticalSection.Lock();
@@ -314,6 +331,7 @@ TMap<FName, float> UConvaiFaceSyncComponent::InterpolateFrames(const TMap<FName,
 
 void UConvaiFaceSyncComponent::ConvaiStopLipSync()
 {
+	bIsPlaying = false;
 	CurrentSequenceTimePassed = 0;
 	ClearMainSequence();
 	SetCurrentFrametoZero();

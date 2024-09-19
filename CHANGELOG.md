@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 - Fixed issue where if an object is similar to a character name it would be picked up as the related object or character.
  
 
-# Release 3.2.1-Beta
+# Release 3.2.2-Beta
 - Fixed NPC2NPC crash when interrupting the character early on.
 
 # Release 3.2.1-Beta
