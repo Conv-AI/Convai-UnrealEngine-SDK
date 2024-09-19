@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.3.1
+- Fixed Narrative keys not being set properly.
+- Better lip synchornization using timestampes.
+- Added "Convai Download Image using RPM link" function.
+- Exposed Convai Player component for c++ use. 
+
 # Release 3.3.0
 - Added Linux Support.
 - Fixed issue where if an object is similar to a character name it would be picked up as the related object or character.

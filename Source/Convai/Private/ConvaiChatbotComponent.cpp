@@ -586,6 +586,7 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAuthKey, FStrin
 	Params.VoiceResponse = VoiceResponse;
 	Params.RequireFaceData = RequireFaceData;
 	Params.GeneratesVisemesAsBlendshapes = GeneratesVisemesAsBlendshapes;
+	Params.Narrative_Template_Keys = NarrativeTemplateKeys;
 	Params.SessionID = SessionID;
 	Params.Environment = Environment;
 	Params.GenerateActions = GenerateActions;
