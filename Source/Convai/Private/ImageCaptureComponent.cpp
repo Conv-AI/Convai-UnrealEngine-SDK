@@ -1,6 +1,7 @@
 #include "ImageCaptureComponent.h"
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 #include "Modules/ModuleManager.h"
 #include "Misc/FileHelper.h"
@@ -63,7 +64,11 @@ bool UConvaiSingleImageCaptureComponent::GetRawImageData(TArray<uint8>& OutData,
 	}
 
 	// Get the first mip level (highest resolution) from the captured texture
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 4
+	FTexture2DMipMap& Mip = CapturedImage->GetPlatformData()->Mips[0];
+#else
 	FTexture2DMipMap& Mip = CapturedImage->PlatformData->Mips[0];
+#endif
 	width = Mip.SizeX;
 	height = Mip.SizeY;
 
@@ -73,8 +78,13 @@ bool UConvaiSingleImageCaptureComponent::GetRawImageData(TArray<uint8>& OutData,
 	const int32 NumPixels = width * height;
 
 	// Check the pixel format and process accordingly
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 4
+	if (CapturedImage->GetPlatformData()->PixelFormat == EPixelFormat::PF_B8G8R8A8 ||
+		CapturedImage->GetPlatformData()->PixelFormat == EPixelFormat::PF_R8G8B8A8)
+#else
 	if (CapturedImage->PlatformData->PixelFormat == EPixelFormat::PF_B8G8R8A8 ||
 		CapturedImage->PlatformData->PixelFormat == EPixelFormat::PF_R8G8B8A8)
+#endif
 	{
 		// Prepare output array, 3 bytes per pixel (RGB)
 		OutData.SetNumUninitialized(NumPixels * 4);
@@ -103,7 +113,11 @@ bool UConvaiSingleImageCaptureComponent::GetRawImageData(TArray<uint8>& OutData,
 	else
 	{
 		// Unsupported pixel format, log error
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 4
+		LastErrorMessage = FString::Printf(TEXT("Unsupported pixel format: %d"), static_cast<int32>(CapturedImage->GetPlatformData()->PixelFormat));
+#else
 		LastErrorMessage = FString::Printf(TEXT("Unsupported pixel format: %d"), static_cast<int32>(CapturedImage->PlatformData->PixelFormat));
+#endif
 		LastErrorCode = 4;
 		Mip.BulkData.Unlock();
 		return false;
