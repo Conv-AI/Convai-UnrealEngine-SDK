@@ -55,8 +55,8 @@ struct FCaptureDeviceInfoBP
 };
 
 
-UCLASS(meta = (BlueprintSpawnableComponent), DisplayName = "Convai Player")
-class UConvaiPlayerComponent : public UConvaiAudioStreamer
+UCLASS(Blueprintable, BlueprintType, meta = (BlueprintSpawnableComponent), DisplayName = "Convai Player")
+class CONVAI_API UConvaiPlayerComponent : public UConvaiAudioStreamer
 {
 	GENERATED_BODY()
 
