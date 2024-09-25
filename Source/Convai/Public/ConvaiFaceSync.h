@@ -62,6 +62,11 @@ public:
 
 	bool IsValidSequence(const FAnimationSequence &Sequence);
 
+	bool IsPlaying();
+
+	// Record the current time if this is the first LipSync sequence to be received after silence
+	void CalculateStartingTime();
+
 	void ClearMainSequence();
 
 	TMap<FName, float> InterpolateFrames(const TMap<FName, float>& StartFrame, const TMap<FName, float>& EndFrame, float Alpha);
@@ -96,4 +101,8 @@ protected:
 	FCriticalSection RecordingCriticalSection;
 	bool Stopping;
 	bool IsRecordingLipSync;
+
+private:
+	double StartTime;
+	bool bIsPlaying;
 };
