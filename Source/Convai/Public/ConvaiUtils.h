@@ -148,6 +148,11 @@ public:
 	{
 		if ((API_Key.Len()))
 		{
+			if (API_Key[0] == TEXT(' ') || API_Key[API_Key.Len() - 1] == TEXT(' ')) 
+			{
+				UE_LOG(ConvaiFormValidationLog,Warning,TEXT("API Key contains space, please enter correct API Key"));
+				return false;
+			}
 			return true;
 		}
 		else
@@ -161,6 +166,11 @@ public:
 	{
 		if ((SessionID.Len()))
 		{
+			if (SessionID[0] == TEXT(' ') || SessionID[SessionID.Len() - 1] == TEXT(' ')) 
+			{
+				UE_LOG(ConvaiFormValidationLog, Warning, TEXT("Session ID contains space, please enter correct Session ID"));
+				return false;
+			}
 			return true;
 		}
 		else
@@ -174,6 +184,11 @@ public:
 	{
 		if ((CharacterID.Len()))
 		{
+			if (CharacterID[0] == TEXT(' ') || CharacterID[CharacterID.Len() - 1] == TEXT(' '))
+			{
+				UE_LOG(ConvaiFormValidationLog, Warning, TEXT("CharacterID Contains space, pleae enter correct Character ID"));
+				return false;
+			}
 			return true;
 		}
 		else
