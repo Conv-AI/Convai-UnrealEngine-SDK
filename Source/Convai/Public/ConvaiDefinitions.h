@@ -397,8 +397,6 @@ public:
 	FAnimationSequence AnimationSequence = FAnimationSequence();
 };
 
-
-
 USTRUCT()
 struct FConvaiEmotionState
 {
@@ -995,4 +993,78 @@ public:
 private:
 	mutable FCriticalSection Mutex;
 	DelegateType MyDelegate;
+};
+
+// Enum for Voice Types
+UENUM(BlueprintType)
+enum class EVoiceType : uint8
+{
+	AzureVoices           UMETA(DisplayName = "Azure Voices"),
+	ElevenLabsVoices      UMETA(DisplayName = "ElevenLabs Voices"),
+	GCPVoices             UMETA(DisplayName = "GCP Voices"),
+	ConvaiVoices          UMETA(DisplayName = "Convai Voices"),
+	OpenAIVoices          UMETA(DisplayName = "OpenAI Voices"),
+	ConvaiVoicesNew       UMETA(DisplayName = "Convai Voices (New)"),
+	ConvaiVoicesExperimental UMETA(DisplayName = "Convai Voices (Experimental)")
+};
+
+// Enum for Languages
+UENUM(BlueprintType)
+enum class ELanguageType : uint8
+{
+	Arabic               UMETA(DisplayName = "Arabic"),
+	ChineseCantonese     UMETA(DisplayName = "Chinese (Cantonese)"),
+	ChineseMandarin      UMETA(DisplayName = "Chinese (Mandarin)"),
+	Dutch                UMETA(DisplayName = "Dutch"),
+	DutchBelgium         UMETA(DisplayName = "Dutch (Belgium)"),
+	English              UMETA(DisplayName = "English"),
+	Finnish              UMETA(DisplayName = "Finnish"),
+	French               UMETA(DisplayName = "French"),
+	German               UMETA(DisplayName = "German"),
+	Hindi                UMETA(DisplayName = "Hindi"),
+	Italian              UMETA(DisplayName = "Italian"),
+	Japanese             UMETA(DisplayName = "Japanese"),
+	Korean               UMETA(DisplayName = "Korean"),
+	Polish               UMETA(DisplayName = "Polish"),
+	PortugueseBrazil     UMETA(DisplayName = "Portuguese (Brazil)"),
+	PortuguesePortugal   UMETA(DisplayName = "Portuguese (Portugal)"),
+	Russian              UMETA(DisplayName = "Russian"),
+	Spanish              UMETA(DisplayName = "Spanish"),
+	SpanishMexico        UMETA(DisplayName = "Spanish (Mexico)"),
+	SpanishUS            UMETA(DisplayName = "Spanish (US)"),
+	Swedish              UMETA(DisplayName = "Swedish"),
+	Turkish              UMETA(DisplayName = "Turkish"),
+	Vietnamese           UMETA(DisplayName = "Vietnamese")
+};
+
+// Enum for Gender
+UENUM(BlueprintType)
+enum class EGenderType : uint8
+{
+	Male    UMETA(DisplayName = "Male"),
+	Female  UMETA(DisplayName = "Female")
+};
+
+
+USTRUCT(BlueprintType)
+struct FVoiceLanguageStruct
+{
+	GENERATED_BODY()
+	
+	//UPROPERTY(BlueprintReadOnly)
+	FString VoiceType;
+
+	//UPROPERTY(BlueprintReadOnly)
+	FString VoiceName;
+
+	UPROPERTY(BlueprintReadOnly)
+	FString VoiceValue;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FString> LangCodes;
+
+	//UPROPERTY(BlueprintReadOnly)
+	FString Gender;
+
+	FVoiceLanguageStruct() {}
 };

@@ -1464,3 +1464,285 @@ void UConvaiDownloadImageProxy::success()
 void UConvaiDownloadImageProxy::finish()
 {
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+UConvaiGetAvailableVoicesProxy* UConvaiGetAvailableVoicesProxy::CreateGetAvailableVoicesProxy(EVoiceType VoiceType, ELanguageType LanguageType, EGenderType Gender)
+{
+	UConvaiGetAvailableVoicesProxy* Proxy = NewObject<UConvaiGetAvailableVoicesProxy>();
+	Proxy->URL = "https://api.convai.com/tts/get_available_voices";
+	Proxy->FilterVoiceType = VoiceType;
+	Proxy->FilterLanguageType = LanguageType;
+	Proxy->FilterGender = Gender;
+	return Proxy;
+}
+
+void UConvaiGetAvailableVoicesProxy::Activate()
+{
+	FHttpModule* Http = &FHttpModule::Get();
+	if (!Http)
+	{
+		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		failed();
+		return;
+	}
+
+	TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+	FString AuthKey = AuthHeaderAndKey.Value;
+	FString AuthHeader = AuthHeaderAndKey.Key;
+
+	// Form Validation
+	if (!UConvaiFormValidation::ValidateAuthKey(AuthKey))
+	{
+		failed();
+		return;
+	}
+
+	// Create the request
+	FHttpRequestRef Request = Http->CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &UConvaiGetAvailableVoicesProxy::onHttpRequestComplete);
+
+	// Set request fields
+	Request->SetURL(URL);
+	Request->SetVerb("GET");
+	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
+	Request->SetHeader(AuthHeader, AuthKey);
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	// Run the request
+	if (!Request->ProcessRequest()) failed();
+}
+
+void UConvaiGetAvailableVoicesProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful)
+{
+	if (!ResponsePtr)
+	{
+		if (bWasSuccessful)
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+		}
+		else
+		{
+			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+		}
+
+		failed();
+		return;
+	}
+	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
+	{
+		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
+		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+
+		failed();
+		return;
+	}
+
+	FString Response = ResponsePtr->GetContentAsString();
+
+	TArray<FVoiceLanguageStruct> OutVoices;
+	ParseAllVoiceData(Response, OutVoices);
+	AvailableVoices.AvailableVoices = FilterParsedVoices(FilterVoiceType, FilterLanguageType, FilterGender, OutVoices);
+	 
+	if (AvailableVoices.AvailableVoices.IsEmpty())
+	{
+		failed();
+	}
+
+	success();
+}
+
+void UConvaiGetAvailableVoicesProxy::failed()
+{
+	OnFailure.Broadcast(FAvailableVoices());
+}
+
+void UConvaiGetAvailableVoicesProxy::success()
+{
+	OnSuccess.Broadcast(AvailableVoices);
+}
+
+
+bool UConvaiGetAvailableVoicesProxy::ParseAllVoiceData(const FString& JsonString, TArray<FVoiceLanguageStruct>& OutVoices)
+{
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+	TSharedPtr<FJsonObject> JsonObject;
+
+	if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+	{
+		for (const auto& VoiceTypeEntry : JsonObject->Values)
+		{
+			FString VoiceType = VoiceTypeEntry.Key;
+			const TArray<TSharedPtr<FJsonValue>>* VoiceArray;
+
+			if (VoiceTypeEntry.Value->TryGetArray(VoiceArray))
+			{
+				for (const TSharedPtr<FJsonValue>& Value : *VoiceArray)
+				{
+					TSharedPtr<FJsonObject> VoiceObject = Value->AsObject();
+					if (VoiceObject.IsValid())
+					{
+						FVoiceLanguageStruct VoiceData;
+
+						if (ParseVoiceData(VoiceObject, VoiceData))
+						{
+							VoiceData.VoiceType = VoiceType;
+
+							OutVoices.Add(VoiceData);
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	return false;
+}
+
+bool UConvaiGetAvailableVoicesProxy::ParseVoiceData(TSharedPtr<FJsonObject> VoiceObject, FVoiceLanguageStruct& OutVoice)
+{
+	if (VoiceObject.IsValid())
+	{
+		for (const auto& VoiceEntry : VoiceObject->Values)
+		{
+			OutVoice.VoiceName = VoiceEntry.Key;
+
+			TSharedPtr<FJsonObject> VoiceDetails = VoiceEntry.Value->AsObject();
+			if (VoiceDetails.IsValid())
+			{
+				OutVoice.LangCodes.Empty();
+
+				const TArray<TSharedPtr<FJsonValue>>* LangCodesArray;
+				if (VoiceDetails->TryGetArrayField(TEXT("lang_codes"), LangCodesArray))
+				{
+					for (const TSharedPtr<FJsonValue>& LangValue : *LangCodesArray)
+					{
+						OutVoice.LangCodes.Add(LangValue->AsString());
+					}
+				}
+				VoiceDetails->TryGetStringField(TEXT("voice_value"), OutVoice.VoiceValue);
+				VoiceDetails->TryGetStringField(TEXT("gender"), OutVoice.Gender);
+			}
+		}
+		return true;
+	}
+
+	return false;
+}
+
+TMap<FString, FVoiceLanguageStruct> UConvaiGetAvailableVoicesProxy::FilterParsedVoices(EVoiceType VoiceType, ELanguageType LanguageType, EGenderType Gender, const TArray<FVoiceLanguageStruct>& AllVoices)
+{
+	TMap<FString, FVoiceLanguageStruct> FilteredVoices;
+
+	FString LanguagePrefix = GetLanguageCodeFromEnum(LanguageType);
+	FString VoiceTypeString = GetVoiceTypeFromEnum(VoiceType);
+	FString GenderTypeString = GetGenderFromEnum(Gender);
+
+	for (const FVoiceLanguageStruct& Voice : AllVoices)
+	{
+		FVoiceLanguageStruct Temp;
+		bool bShouldAdd = false;
+
+		// Filter voice type
+		if (Voice.VoiceType == VoiceTypeString)
+		{
+			// Filter Gender
+			if (Voice.Gender == GenderTypeString)
+			{
+				// Filter language code
+				for (const FString& LangCode : Voice.LangCodes)
+				{
+					if (LangCode.StartsWith(LanguagePrefix))
+					{
+						bShouldAdd = true;
+						Temp.LangCodes.Add(LangCode);
+					}
+				}
+			}
+		}
+
+		if (bShouldAdd)
+		{
+			Temp.VoiceValue = Voice.VoiceValue;
+			FilteredVoices.Add(Voice.VoiceName, Temp);
+		}
+	}
+
+	return FilteredVoices;
+}
+
+FString UConvaiGetAvailableVoicesProxy::GetLanguageCodeFromEnum(ELanguageType LanguageType)
+{
+	switch (LanguageType)
+	{
+	case ELanguageType::Arabic:                return "ar";
+	case ELanguageType::ChineseCantonese:      return "zh";
+	case ELanguageType::ChineseMandarin:       return "zh";
+	case ELanguageType::Dutch:                 return "nl";
+	case ELanguageType::DutchBelgium:          return "nl";
+	case ELanguageType::English:               return "en";
+	case ELanguageType::Finnish:               return "fi";
+	case ELanguageType::French:                return "fr";
+	case ELanguageType::German:                return "de";
+	case ELanguageType::Hindi:                 return "hi";
+	case ELanguageType::Italian:               return "it";
+	case ELanguageType::Japanese:              return "ja";
+	case ELanguageType::Korean:                return "ko";
+	case ELanguageType::Polish:                return "pl";
+	case ELanguageType::PortugueseBrazil:      return "pt";
+	case ELanguageType::PortuguesePortugal:    return "pt";
+	case ELanguageType::Russian:               return "ru";
+	case ELanguageType::Spanish:               return "es";
+	case ELanguageType::SpanishMexico:         return "es";
+	case ELanguageType::SpanishUS:             return "es";
+	case ELanguageType::Swedish:               return "sv";
+	case ELanguageType::Turkish:               return "tr";
+	case ELanguageType::Vietnamese:            return "vi";
+	default:                                   return "";
+	}
+}
+
+FString UConvaiGetAvailableVoicesProxy::GetVoiceTypeFromEnum(EVoiceType VoiceType)
+{
+	switch (VoiceType)
+	{
+	case EVoiceType::AzureVoices:
+		return TEXT("Azure Voices");
+	case EVoiceType::ElevenLabsVoices:
+		return TEXT("ElevenLabs Voices");
+	case EVoiceType::GCPVoices:
+		return TEXT("GCP Voices");
+	case EVoiceType::ConvaiVoices:
+		return TEXT("Convai Voices");
+	case EVoiceType::OpenAIVoices:
+		return TEXT("OpenAI Voices");
+	case EVoiceType::ConvaiVoicesNew:
+		return TEXT("Convai Voices (New)");
+	case EVoiceType::ConvaiVoicesExperimental:
+		return TEXT("Convai Voices (Experimental)");
+	default:
+		return TEXT("Unknown Voice Type");
+	}
+}
+
+FString UConvaiGetAvailableVoicesProxy::GetGenderFromEnum(EGenderType GenderType)
+{
+	switch (GenderType)
+	{
+	case EGenderType::Male: return "MALE";
+	case EGenderType::Female: return "FEMALE";
+	default: return "";
+	}
+}
