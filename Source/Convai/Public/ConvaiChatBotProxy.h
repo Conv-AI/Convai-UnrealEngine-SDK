@@ -504,9 +504,8 @@ public:
 
 private:
 	// Helper functions
-	bool ParseAllVoiceData(const FString& JsonString, TArray<FVoiceLanguageStruct>& OutVoices);
-	bool ParseVoiceData(TSharedPtr<FJsonObject> JsonObject, FVoiceLanguageStruct& OutVoice);
-	TMap<FString, FVoiceLanguageStruct> FilterParsedVoices(EVoiceType VoiceType, ELanguageType LanguageType, EGenderType Gender, const TArray<FVoiceLanguageStruct>& AllVoices);
+	bool ParseAllVoiceData(const FString& JsonString, TMap<FString, FVoiceLanguageStruct>& FilteredVoices);
+	bool ParseVoiceData(TSharedPtr<FJsonObject> JsonObject, FVoiceLanguageStruct& OutVoice);	
 	FString GetLanguageCodeFromEnum(ELanguageType LanguageType);
 	FString GetGenderFromEnum(EGenderType GenderType);
 	FString GetVoiceTypeFromEnum(EVoiceType VoiceType);

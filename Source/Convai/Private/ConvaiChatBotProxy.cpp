@@ -1548,16 +1548,19 @@ void UConvaiGetAvailableVoicesProxy::onHttpRequestComplete(FHttpRequestPtr Reque
 		failed();
 		return;
 	}
-
+	
 	FString Response = ResponsePtr->GetContentAsString();
+	
+	if (!ParseAllVoiceData(Response, AvailableVoices.AvailableVoices))
+	{
+		failed();
+		return;
+	}
 
-	TArray<FVoiceLanguageStruct> OutVoices;
-	ParseAllVoiceData(Response, OutVoices);
-	AvailableVoices.AvailableVoices = FilterParsedVoices(FilterVoiceType, FilterLanguageType, FilterGender, OutVoices);
-	 
 	if (AvailableVoices.AvailableVoices.IsEmpty())
 	{
 		failed();
+		return;
 	}
 
 	success();
@@ -1573,14 +1576,17 @@ void UConvaiGetAvailableVoicesProxy::success()
 	OnSuccess.Broadcast(AvailableVoices);
 }
 
-
-bool UConvaiGetAvailableVoicesProxy::ParseAllVoiceData(const FString& JsonString, TArray<FVoiceLanguageStruct>& OutVoices)
+bool UConvaiGetAvailableVoicesProxy::ParseAllVoiceData(const FString& JsonString, TMap<FString, FVoiceLanguageStruct>& FilteredVoices)
 {
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
 	TSharedPtr<FJsonObject> JsonObject;
 
 	if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 	{
+		FString LanguagePrefix = GetLanguageCodeFromEnum(FilterLanguageType);
+		FString VoiceTypeString = GetVoiceTypeFromEnum(FilterVoiceType);
+		FString GenderTypeString = GetGenderFromEnum(FilterGender);
+
 		for (const auto& VoiceTypeEntry : JsonObject->Values)
 		{
 			FString VoiceType = VoiceTypeEntry.Key;
@@ -1599,7 +1605,28 @@ bool UConvaiGetAvailableVoicesProxy::ParseAllVoiceData(const FString& JsonString
 						{
 							VoiceData.VoiceType = VoiceType;
 
-							OutVoices.Add(VoiceData);
+							// Apply the filters here directly
+							if (VoiceType == VoiceTypeString && VoiceData.Gender == GenderTypeString)
+							{
+								// Filter based on language code
+								FVoiceLanguageStruct FilteredVoiceData;
+								bool bShouldAdd = false;
+
+								for (const FString& LangCode : VoiceData.LangCodes)
+								{
+									if (LangCode.StartsWith(LanguagePrefix))
+									{
+										bShouldAdd = true;
+										FilteredVoiceData.LangCodes.Add(LangCode);
+									}
+								}
+
+								if (bShouldAdd)
+								{
+									FilteredVoiceData.VoiceValue = VoiceData.VoiceValue;
+									FilteredVoices.Add(VoiceData.VoiceName, FilteredVoiceData);
+								}
+							}
 						}
 					}
 				}
@@ -1640,47 +1667,6 @@ bool UConvaiGetAvailableVoicesProxy::ParseVoiceData(TSharedPtr<FJsonObject> Voic
 	}
 
 	return false;
-}
-
-TMap<FString, FVoiceLanguageStruct> UConvaiGetAvailableVoicesProxy::FilterParsedVoices(EVoiceType VoiceType, ELanguageType LanguageType, EGenderType Gender, const TArray<FVoiceLanguageStruct>& AllVoices)
-{
-	TMap<FString, FVoiceLanguageStruct> FilteredVoices;
-
-	FString LanguagePrefix = GetLanguageCodeFromEnum(LanguageType);
-	FString VoiceTypeString = GetVoiceTypeFromEnum(VoiceType);
-	FString GenderTypeString = GetGenderFromEnum(Gender);
-
-	for (const FVoiceLanguageStruct& Voice : AllVoices)
-	{
-		FVoiceLanguageStruct Temp;
-		bool bShouldAdd = false;
-
-		// Filter voice type
-		if (Voice.VoiceType == VoiceTypeString)
-		{
-			// Filter Gender
-			if (Voice.Gender == GenderTypeString)
-			{
-				// Filter language code
-				for (const FString& LangCode : Voice.LangCodes)
-				{
-					if (LangCode.StartsWith(LanguagePrefix))
-					{
-						bShouldAdd = true;
-						Temp.LangCodes.Add(LangCode);
-					}
-				}
-			}
-		}
-
-		if (bShouldAdd)
-		{
-			Temp.VoiceValue = Voice.VoiceValue;
-			FilteredVoices.Add(Voice.VoiceName, Temp);
-		}
-	}
-
-	return FilteredVoices;
 }
 
 FString UConvaiGetAvailableVoicesProxy::GetLanguageCodeFromEnum(ELanguageType LanguageType)
