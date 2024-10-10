@@ -1649,6 +1649,25 @@ bool UConvaiGetAvailableVoicesProxy::ParseVoiceData(TSharedPtr<FJsonObject> Voic
 			TSharedPtr<FJsonObject> VoiceDetails = VoiceEntry.Value->AsObject();
 			if (VoiceDetails.IsValid())
 			{
+				// Check for deployment env
+				const TArray<TSharedPtr<FJsonValue>>* Deployment_Env;
+				if (VoiceDetails->TryGetArrayField(TEXT("deployment_env"), Deployment_Env))
+				{
+					bool bInProd = false;
+					for (const TSharedPtr<FJsonValue>& It : *Deployment_Env)
+					{
+						if (It->AsString().MatchesWildcard(TEXT("PRODUCTION")))
+						{
+							bInProd = true;
+							break;
+						}
+					} 
+
+					if (!bInProd)
+						return false;
+				}
+
+
 				OutVoice.LangCodes.Empty();
 
 				const TArray<TSharedPtr<FJsonValue>>* LangCodesArray;
