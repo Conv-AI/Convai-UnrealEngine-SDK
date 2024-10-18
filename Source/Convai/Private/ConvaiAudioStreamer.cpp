@@ -108,8 +108,8 @@ bool UConvaiAudioStreamer::ShouldMuteGlobal()
 
 void UConvaiAudioStreamer::PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
 {
-	// TODO Mohamed: when we start streaming lipsync over network we should remove this contition UKismetSystemLibrary::IsServer(this)
-	if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() || !UKismetSystemLibrary::IsServer(this))
+	// if ReplicateVoiceToNetwork is true then just play the voice data right away to avoid the lipsync cutoff issue
+	if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() || ReplicateVoiceToNetwork)
 	{
 		PlayVoiceData(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
 		return;
@@ -520,6 +520,10 @@ void UConvaiAudioStreamer::DestroyOpus()
 
 void UConvaiAudioStreamer::PlayLipSyncWithPreGeneratedDataSynced(FAnimationSequence& FaceSequence)
 {
+	// Play the lipsync right away as a workaround for lipsync issue on multiplayer
+	if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() || ReplicateVoiceToNetwork)
+		PlayLipSyncWithPreGeneratedData(FaceSequence);
+
 	CurrentChunkFrameCounter++;
 
 	if (FaceSequence.AnimationFrames.Num() == 0)
