@@ -1,20 +1,20 @@
-/*
- *
- * Copyright 2015 gRPC authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+//
+//
+// Copyright 2015 gRPC authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//
 
 #ifndef GRPCPP_SERVER_H
 #define GRPCPP_SERVER_H
@@ -23,21 +23,19 @@
 #include <memory>
 #include <vector>
 
-#include <grpc/impl/codegen/port_platform.h>
-
 #include <grpc/compression.h>
 #include <grpc/support/atm.h>
+#include <grpc/support/port_platform.h>
 #include <grpcpp/channel.h>
 #include <grpcpp/completion_queue.h>
 #include <grpcpp/health_check_service_interface.h>
 #include <grpcpp/impl/call.h>
-#include <grpcpp/impl/codegen/client_interceptor.h>
-#include <grpcpp/impl/codegen/completion_queue.h>
-#include <grpcpp/impl/codegen/grpc_library.h>
-#include <grpcpp/impl/codegen/server_interface.h>
+#include <grpcpp/impl/grpc_library.h>
 #include <grpcpp/impl/rpc_service_method.h>
 #include <grpcpp/security/server_credentials.h>
+#include <grpcpp/server_interface.h>
 #include <grpcpp/support/channel_arguments.h>
+#include <grpcpp/support/client_interceptor.h>
 #include <grpcpp/support/config.h>
 #include <grpcpp/support/status.h>
 
@@ -56,15 +54,15 @@ class ExternalConnectionAcceptorImpl;
 ///
 /// Use a \a grpc::ServerBuilder to create, configure, and start
 /// \a Server instances.
-class Server : public ServerInterface, private GrpcLibraryCodegen {
+class Server : public ServerInterface, private internal::GrpcLibrary {
  public:
-  ~Server() override;
+  ~Server() ABSL_LOCKS_EXCLUDED(mu_) override;
 
   /// Block until the server shuts down.
   ///
   /// \warning The server must be either shutting down or some other thread must
   /// call \a Shutdown for this function to ever return.
-  void Wait() override;
+  void Wait() ABSL_LOCKS_EXCLUDED(mu_) override;
 
   /// Global callbacks are a set of hooks that are called when server
   /// events occur.  \a SetGlobalCallbacks method is used to register
@@ -184,7 +182,8 @@ class Server : public ServerInterface, private GrpcLibraryCodegen {
          std::vector<
              std::unique_ptr<experimental::ServerInterceptorFactoryInterface>>
              interceptor_creators = std::vector<std::unique_ptr<
-                 experimental::ServerInterceptorFactoryInterface>>());
+                 experimental::ServerInterceptorFactoryInterface>>(),
+         experimental::ServerMetricRecorder* server_metric_recorder = nullptr);
 
   /// Start the server.
   ///
@@ -196,12 +195,13 @@ class Server : public ServerInterface, private GrpcLibraryCodegen {
 
   grpc_server* server() override { return server_; }
 
- protected:
   /// NOTE: This method is not part of the public API for this class.
   void set_health_check_service(
       std::unique_ptr<HealthCheckServiceInterface> service) {
     health_check_service_ = std::move(service);
   }
+
+  ContextAllocator* context_allocator() { return context_allocator_.get(); }
 
   /// NOTE: This method is not part of the public API for this class.
   bool health_check_service_disabled() const {
@@ -235,51 +235,35 @@ class Server : public ServerInterface, private GrpcLibraryCodegen {
   /// service. The service must exist for the lifetime of the Server instance.
   void RegisterAsyncGenericService(AsyncGenericService* service) override;
 
-#ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
   /// Register a callback-based generic service. This call does not take
   /// ownership of theservice. The service must exist for the lifetime of the
   /// Server instance.
   void RegisterCallbackGenericService(CallbackGenericService* service) override;
-#else
-  /// NOTE: class experimental_registration_type is not part of the public API
-  /// of this class
-  /// TODO(vjpai): Move these contents to the public API of Server when
-  ///              they are no longer experimental
-  class experimental_registration_type final
-      : public experimental_registration_interface {
-   public:
-    explicit experimental_registration_type(Server* server) : server_(server) {}
-    void RegisterCallbackGenericService(
-        experimental::CallbackGenericService* service) override {
-      server_->RegisterCallbackGenericService(service);
-    }
 
-   private:
-    Server* server_;
-  };
-
-  /// TODO(vjpai): Mark this override when experimental type above is deleted
-  void RegisterCallbackGenericService(
-      experimental::CallbackGenericService* service);
-
-  /// NOTE: The function experimental_registration() is not stable public API.
-  /// It is a view to the experimental components of this class. It may be
-  /// changed or removed at any time.
-  experimental_registration_interface* experimental_registration() override {
-    return &experimental_registration_;
+  void RegisterContextAllocator(
+      std::unique_ptr<ContextAllocator> context_allocator) {
+    context_allocator_ = std::move(context_allocator);
   }
-#endif
 
   void PerformOpsOnCall(internal::CallOpSetInterface* ops,
                         internal::Call* call) override;
 
-  void ShutdownInternal(gpr_timespec deadline) override;
+  void ShutdownInternal(gpr_timespec deadline)
+      ABSL_LOCKS_EXCLUDED(mu_) override;
 
   int max_receive_message_size() const override {
     return max_receive_message_size_;
   }
 
-  CompletionQueue* CallbackCQ() override;
+  bool call_metric_recording_enabled() const override {
+    return call_metric_recording_enabled_;
+  }
+
+  experimental::ServerMetricRecorder* server_metric_recorder() const override {
+    return server_metric_recorder_;
+  }
+
+  CompletionQueue* CallbackCQ() ABSL_LOCKS_EXCLUDED(mu_) override;
 
   ServerInitializer* initializer();
 
@@ -287,8 +271,8 @@ class Server : public ServerInterface, private GrpcLibraryCodegen {
   // the ref count are the running state of the server (take a ref at start and
   // drop it at shutdown) and each running callback RPC.
   void Ref();
-  void UnrefWithPossibleNotify() /* LOCKS_EXCLUDED(mu_) */;
-  void UnrefAndWaitLocked() /* EXCLUSIVE_LOCKS_REQUIRED(mu_) */;
+  void UnrefWithPossibleNotify() ABSL_LOCKS_EXCLUDED(mu_);
+  void UnrefAndWaitLocked() ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_);
 
   std::vector<std::shared_ptr<internal::ExternalConnectionAcceptorImpl>>
       acceptors_;
@@ -313,19 +297,14 @@ class Server : public ServerInterface, private GrpcLibraryCodegen {
   /// the \a sync_server_cqs)
   std::vector<std::unique_ptr<SyncRequestThreadManager>> sync_req_mgrs_;
 
-#ifndef GRPC_CALLBACK_API_NONEXPERIMENTAL
-  // For registering experimental callback generic service; remove when that
-  // method longer experimental
-  experimental_registration_type experimental_registration_{this};
-#endif
-
   // Server status
   internal::Mutex mu_;
   bool started_;
-  bool shutdown_;
-  bool shutdown_notified_;  // Was notify called on the shutdown_cv_
+  bool shutdown_ ABSL_GUARDED_BY(mu_);
+  bool shutdown_notified_
+      ABSL_GUARDED_BY(mu_);  // Was notify called on the shutdown_cv_
   internal::CondVar shutdown_done_cv_;
-  bool shutdown_done_ = false;
+  bool shutdown_done_ ABSL_GUARDED_BY(mu_) = false;
   std::atomic_int shutdown_refs_outstanding_{1};
 
   internal::CondVar shutdown_cv_;
@@ -342,16 +321,14 @@ class Server : public ServerInterface, private GrpcLibraryCodegen {
 
   std::unique_ptr<ServerInitializer> server_initializer_;
 
+  std::unique_ptr<ContextAllocator> context_allocator_;
+
   std::unique_ptr<HealthCheckServiceInterface> health_check_service_;
   bool health_check_service_disabled_;
 
   // When appropriate, use a default callback generic service to handle
   // unimplemented methods
-#ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
   std::unique_ptr<CallbackGenericService> unimplemented_service_;
-#else
-  std::unique_ptr<experimental::CallbackGenericService> unimplemented_service_;
-#endif
 
   // A special handler for resource exhausted in sync case
   std::unique_ptr<internal::MethodHandler> resource_exhausted_handler_;
@@ -363,12 +340,18 @@ class Server : public ServerInterface, private GrpcLibraryCodegen {
   // with this server (if any). It is set on the first call to CallbackCQ().
   // It is _not owned_ by the server; ownership belongs with its internal
   // shutdown callback tag (invoked when the CQ is fully shutdown).
-  CompletionQueue* callback_cq_ /* GUARDED_BY(mu_) */ = nullptr;
+  std::atomic<CompletionQueue*> callback_cq_{nullptr};
 
   // List of CQs passed in by user that must be Shutdown only after Server is
   // Shutdown.  Even though this is only used with NDEBUG, instantiate it in all
   // cases since otherwise the size will be inconsistent.
   std::vector<CompletionQueue*> cq_list_;
+
+  // Whetner per-call load reporting is enabled.
+  bool call_metric_recording_enabled_ = false;
+
+  // Interface to read or update server-wide metrics. Optional.
+  experimental::ServerMetricRecorder* server_metric_recorder_ = nullptr;
 };
 
 }  // namespace grpc

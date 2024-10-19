@@ -17,18 +17,14 @@
 #ifndef GRPCPP_SECURITY_TLS_CERTIFICATE_PROVIDER_H
 #define GRPCPP_SECURITY_TLS_CERTIFICATE_PROVIDER_H
 
-#include <grpc/grpc_security_constants.h>
-#include <grpc/status.h>
-#include <grpc/support/log.h>
-#include <grpcpp/impl/codegen/grpc_library.h>
-#include <grpcpp/support/config.h>
-
 #include <memory>
 #include <vector>
 
-// TODO(yihuazhang): remove the forward declaration here and include
-// <grpc/grpc_security.h> directly once the insecure builds are cleaned up.
-typedef struct grpc_tls_certificate_provider grpc_tls_certificate_provider;
+#include <grpc/grpc_security.h>
+#include <grpc/grpc_security_constants.h>
+#include <grpc/status.h>
+#include <grpc/support/log.h>
+#include <grpcpp/support/config.h>
 
 namespace grpc {
 namespace experimental {
@@ -36,7 +32,7 @@ namespace experimental {
 // Interface for a class that handles the process to fetch credential data.
 // Implementations should be a wrapper class of an internal provider
 // implementation.
-class CertificateProviderInterface {
+class GRPCXX_DLL CertificateProviderInterface {
  public:
   virtual ~CertificateProviderInterface() = default;
   virtual grpc_tls_certificate_provider* c_provider() = 0;
@@ -45,7 +41,7 @@ class CertificateProviderInterface {
 // A struct that stores the credential data presented to the peer in handshake
 // to show local identity. The private_key and certificate_chain should always
 // match.
-struct IdentityKeyCertPair {
+struct GRPCXX_DLL IdentityKeyCertPair {
   std::string private_key;
   std::string certificate_chain;
 };
@@ -53,7 +49,8 @@ struct IdentityKeyCertPair {
 // A basic CertificateProviderInterface implementation that will load credential
 // data from static string during initialization. This provider will always
 // return the same cert data for all cert names, and reloading is not supported.
-class StaticDataCertificateProvider : public CertificateProviderInterface {
+class GRPCXX_DLL StaticDataCertificateProvider
+    : public CertificateProviderInterface {
  public:
   StaticDataCertificateProvider(
       const std::string& root_certificate,
@@ -88,7 +85,7 @@ class StaticDataCertificateProvider : public CertificateProviderInterface {
 //   then renaming the new directory to the original name of the old directory.
 //   2)  using a symlink for the directory. When need to change, put new
 //   credential data in a new directory, and change symlink.
-class FileWatcherCertificateProvider final
+class GRPCXX_DLL FileWatcherCertificateProvider final
     : public CertificateProviderInterface {
  public:
   // Constructor to get credential updates from root and identity file paths.
