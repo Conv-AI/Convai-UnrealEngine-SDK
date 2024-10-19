@@ -27,6 +27,8 @@ DEFINE_LOG_CATEGORY(ConvaiGRPCFeedBackLog);
 using ::service::GetResponseRequest_GetResponseConfig;
 using ::service::TriggerConfig;
 using ::service::ActionConfig;
+using ::service::VisionInput;
+using ::service::VisionInput_ImageData;
 using ::service::AudioConfig;
 using ::service::ActionConfig_Object;
 using ::service::ActionConfig_Character;
@@ -156,6 +158,10 @@ void UConvaiGRPCGetResponseProxy::Activate()
 	}
 
 	ReceivedFinish = false;
+
+	// Set long timeout for request
+	std::chrono::system_clock::time_point deadline = std::chrono::system_clock::now() + std::chrono::hours(1);
+	client_context.set_deadline(deadline);
 
 	// Initialize the stream
 	FScopeLock Lock(&GPRCInitSection);
@@ -440,17 +446,30 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 		(*narrative_template_keys_ProtoMap)[Key] = Value;
 	}
 
-	// Set the config object in the request object to be passed to the API
-	request.Clear();
-	request.set_allocated_get_response_config(getResponseConfig);
-
 #if ConvaiDebugMode
-	FString DebugString(request.DebugString().c_str());
+	FString DebugString(getResponseConfig->DebugString().c_str());
 	UE_LOG(ConvaiGRPCLog, Log, TEXT("request: %s | Character ID : %s | Session ID : %s"),
 		*DebugString,
 		*ConvaiGRPCGetResponseParams.CharID,
 		*ConvaiGRPCGetResponseParams.SessionID);
 #endif 
+
+
+	// Create Vision Configuration
+	if (ConvaiGRPCGetResponseParams.ConvaiGRPCVisionParams.data.Num() > 0)
+	{
+		VisionInput* vision_input = new VisionInput();;
+		VisionInput_ImageData* vision_input_image_data = new VisionInput_ImageData();
+		vision_input_image_data->set_width(ConvaiGRPCGetResponseParams.ConvaiGRPCVisionParams.width);
+		vision_input_image_data->set_height(ConvaiGRPCGetResponseParams.ConvaiGRPCVisionParams.height);
+		vision_input_image_data->set_data(ConvaiGRPCGetResponseParams.ConvaiGRPCVisionParams.data.GetData(), ConvaiGRPCGetResponseParams.ConvaiGRPCVisionParams.data.Num());
+		vision_input->set_allocated_image_data(vision_input_image_data);
+		getResponseConfig->set_allocated_vision_input(vision_input);
+	}
+
+	// Set the config object in the request object to be passed to the API
+	request.Clear();
+	request.set_allocated_get_response_config(getResponseConfig);
 
 
 	// Do a write task
