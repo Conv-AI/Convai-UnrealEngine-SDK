@@ -152,13 +152,18 @@ jobs:
             Write-Host "Starting project packaging for Unreal 5.4..."
 
             # Run the packaging process
-            & cmd.exe /c `
-            "$uat_path BuildCookRun `
-            -project=`"$test_project_path/TestProject.uproject`" `
+            & $uat_path BuildCookRun `
+            -project="$test_project_path/TestProject.uproject" `
             -noP4 -utf8output -platform=Win64 -clientconfig=Shipping -cook -stage -package -compressed -pak `
             -build -prereqs -distribution -archive `
-            -archivedirectory=`"$test_project_path/Windows`" "
+            -archivedirectory="$test_project_path/Windows"
             
+            # Check if the last command (RunUAT.bat) was successful
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "Packaging failed for UE_$version. Exit code: $LASTEXITCODE"
+                exit $LASTEXITCODE
+            }
+
             Write-Host "Project packaging completed successfully for Unreal 5.4"
           } catch {
             Write-Host "Project packaging failed for Unreal Engine 5.4. Error: $_"
@@ -192,9 +197,9 @@ jobs:
           release_name: "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
           files: |
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
-            E:/Output/${{ github.event.repository.name }}_Binaries/V5.3.zip
-            E:/Output/${{ github.event.repository.name }}_Binaries/V5.2.zip
-            E:/Output/${{ github.event.repository.name }}_Binaries/V5.1.zip
-            E:/Output/${{ github.event.repository.name }}_Binaries/V5.0.zip
+            # E:/Output/${{ github.event.repository.name }}_Binaries/V5.3.zip
+            # E:/Output/${{ github.event.repository.name }}_Binaries/V5.2.zip
+            # E:/Output/${{ github.event.repository.name }}_Binaries/V5.1.zip
+            # E:/Output/${{ github.event.repository.name }}_Binaries/V5.0.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
