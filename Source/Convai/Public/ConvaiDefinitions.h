@@ -1057,10 +1057,10 @@ struct FVoiceLanguageStruct
 	//UPROPERTY(BlueprintReadOnly)
 	FString VoiceName;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Language")
 	FString VoiceValue;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Language")
 	TArray<FString> LangCodes;
 
 	//UPROPERTY(BlueprintReadOnly)
