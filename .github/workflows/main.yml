@@ -1,0 +1,164 @@
+name: Build and Release Unreal Plugin
+
+on:
+  push:
+    branches:
+      - main
+      - MohamedEshmawy-patch-1
+  workflow_dispatch:
+
+jobs:
+  check-version:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Extract version from .uplugin
+        id: version
+        run: |
+          $plugin = Get-Content "ConvAI.uplugin" | ConvertFrom-Json
+          $plugin_version = $plugin.VersionName
+          echo "::set-output name=version_name::$plugin_version"
+        shell: powershell
+
+      - name: Check if release exists
+        id: check_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set the GitHub token for authentication
+        run: |
+          $release_name = "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
+          
+          # Check if the release exists using gh CLI
+          $latest_release = gh release list --limit 100 | Select-String $release_name
+
+          # If the release exists, exit
+          if ($latest_release) {
+            Write-Host "Release for $release_name already exists. Skipping."
+            exit 0
+          } else {
+            Write-Host "New release. Proceeding with the build."
+          }
+        shell: powershell
+
+  build-and-package:
+    needs: check-version
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Define paths
+        id: paths
+        run: |
+          $repo_name = "${{ github.event.repository.name }}"
+          $ue_root = "E:/Software"
+          $output_root = "E:/Output/${repo_name}_Binaries"
+          $plugin_path = "${{ github.workspace }}/ConvAI.uplugin"
+          echo "::set-output name=ue_root::$ue_root"
+          echo "::set-output name=output_root::$output_root"
+          echo "::set-output name=plugin_path::$plugin_path"
+        shell: powershell
+
+      - name: Build and package for Unreal versions 5.0 to 5.4
+        run: |
+          try {
+            $versions = @("5.0", "5.1", "5.2", "5.3", "5.4")
+            foreach ($version in $versions) {
+                $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_$version"
+                $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
+                
+                if (Test-Path $output_path) {
+                    Remove-Item -Recurse -Force -Path "$output_path/*"
+                } else {
+                    New-Item -Path $output_path -ItemType Directory
+                }
+      
+                Write-Host "Starting packaging for UE_$version..."
+                $uat_path = "$ue_version_path/Engine/Build/BatchFiles/RunUAT.bat"
+                Write-Host "Resolved UAT path: $uat_path"
+                
+                # Run the batch file using cmd.exe
+                & $uat_path BuildPlugin -Plugin="${{ steps.paths.outputs.plugin_path }}" -TargetPlatforms=Win64 -Package="$output_path" -Rocket -Marketplace
+                
+                # Check if the last command (RunUAT.bat) was successful
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Host "Packaging failed for UE_$version. Exit code: $LASTEXITCODE"
+                    exit $LASTEXITCODE
+                }
+      
+                Write-Host "Packaged for UE_$version at $output_path"
+            }
+          } catch {
+            Write-Host "Packaging failed for Unreal Engine version $version. Error: $_"
+            exit 1
+          }
+        shell: powershell
+        
+      - name: Copy plugin to TestProject and test with Unreal 5.4
+        run: |
+          try {
+            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_5.4"
+            $output_path = "${{ steps.paths.outputs.output_root }}/V5.4"
+            $test_project_path = "E:/Software/TestProject"
+            $plugin_folder = "$test_project_path/Plugins"
+
+            if (Test-Path $plugin_folder) {
+                Remove-Item -Recurse -Force $plugin_folder
+            }
+
+            New-Item -Path $plugin_folder -ItemType Directory
+
+            Copy-Item -Recurse -Force "$output_path/ConvAI" $plugin_folder
+            Write-Host "Copied the plugin to the TestProject."
+
+            Write-Host "Starting project packaging for Unreal 5.4..."
+
+            $ue_cmd = "$ue_version_path/Engine/Binaries/Win64/UnrealEditor-Cmd.exe"
+            Write-Host "Resolved UAT path: $ue_cmd"
+            & $ue_cmd "$test_project_path/TestProject.uproject" -run=Cook -TargetPlatform=Win64 -build
+            
+            # Run the batch file using cmd.exe
+            & $uat_path BuildPlugin -Plugin="${{ steps.paths.outputs.plugin_path }}" -TargetPlatforms=Win64 -Package="$output_path" -Rocket -Marketplace
+            
+
+
+            Write-Host "Plugin test completed successfully for Unreal 5.4"
+          } catch {
+            Write-Host "Project packaging failed for Unreal Engine 5.4. Error: $_"
+            exit 1
+          }
+        shell: powershell
+
+      - name: Zip Plugin for each version
+        run: |
+          try {
+            $versions = @("5.0", "5.1", "5.2", "5.3", "5.4")
+            foreach ($version in $versions) {
+                $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
+                Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip"
+                Write-Host "Zipped plugin for UE$version at $output_path.zip"
+            }
+          } catch {
+            Write-Host "Zipping failed. Error: $_"
+            exit 1
+          }
+        shell: powershell
+
+  compress-and-release:
+    needs: build-and-package
+    runs-on: self-hosted
+    steps:
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version_name }}
+          release_name: "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
+          files: |
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.3.zip
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.2.zip
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.1.zip
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.0.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
