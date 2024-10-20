@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.3.2
+- Added intermediate fix for audio being cutoff in multiplayer.
+- Added `ConvaiGetAvailableVoices` function.
+
 # Release 3.3.1
 - Fixed Narrative keys not being set properly.
 - Better lip synchornization using timestampes.
