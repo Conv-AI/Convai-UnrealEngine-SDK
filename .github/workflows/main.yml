@@ -96,7 +96,7 @@ jobs:
       - name: Build and package for Unreal versions 5.0 to 5.4
         run: |
           try {
-            $versions = @("5.4")
+            $versions = @()
             foreach ($version in $versions) {
                 $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_$version"
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version/Convai"
