@@ -107,39 +107,41 @@ jobs:
           }
         shell: powershell
 
-      - name: Test packaging for Android UE 5.4
+      - name: Test packaging for Android
         run: |
-          try {
-            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_5.4"
-            $output_path = "${{ steps.paths.outputs.output_root }}/V5.4"
-            $test_project_path = "E:/Software/TestProject"
-            $plugin_folder = "$test_project_path/Plugins"
-            if (Test-Path $plugin_folder) {
-                Remove-Item -Recurse -Force $plugin_folder
-            }
-            New-Item -Path $plugin_folder -ItemType Directory
-            Copy-Item -Recurse -Force "$output_path/Convai" $plugin_folder
-            Write-Host "Copied the plugin to the TestProject."
-            $uat_path = "$ue_version_path/Engine/Build/BatchFiles/RunUAT.bat"
-            Write-Host "Starting project packaging for Android..."
+          @echo off
+          setlocal
 
-            & $uat_path BuildCookRun `
-            -project="$test_project_path/TestProject.uproject" `
-            -noP4 -utf8output -platform=Android -targetplatform=Android -clientconfig=Shipping -cook -stage -package -compressed -pak `
-            -build -prereqs -distribution -archive `
-            -archivedirectory="$test_project_path/Android" `
+          set UE_PATH=${{ steps.paths.outputs.ue_root }}/UE_5.4/Engine/Build/BatchFiles/RunUAT.bat
+          set TEST_PROJECT_PATH=E:/Software/TestProject
+          set PLUGIN_FOLDER=%TEST_PROJECT_PATH%/Plugins
+
+          echo Cleaning old Plugins...
+          if exist "%PLUGIN_FOLDER%" (
+              rmdir /s /q "%PLUGIN_FOLDER%"
+          )
+
+          echo Recreating Plugins folder and copying the plugin...
+          mkdir "%PLUGIN_FOLDER%"
+          xcopy /E /I "%output_path%/Convai" "%PLUGIN_FOLDER%"
+
+          echo Starting project packaging for Android...
+
+          call "%UE_PATH%" BuildCookRun ^
+            -project="%TEST_PROJECT_PATH%/TestProject.uproject" ^
+            -noP4 -utf8output -platform=Android -targetplatform=Android -clientconfig=Shipping ^
+            -cook -stage -package -compressed -pak ^
+            -build -prereqs -distribution -archive ^
+            -archivedirectory="%TEST_PROJECT_PATH%/Android" ^
             -target=TestProject -ddc=InstalledDerivedDataBackendGraph -installed
 
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "Android packaging failed. Exit code: $LASTEXITCODE"
-                exit $LASTEXITCODE
-            }
-            Write-Host "Project packaging completed successfully for Android"
-          } catch {
-            Write-Host "Project packaging failed for Android. Error: $_"
-            exit 1
-          }
-        shell: powershell
+          if %errorlevel% neq 0 (
+              echo Android packaging failed with exit code %errorlevel%.
+              exit /b %errorlevel%
+          )
+
+          echo Android packaging completed successfully.
+        shell: cmd
 
 
       - name: Test packaging for Windows UE 5.4
