@@ -65,7 +65,7 @@ jobs:
           try {
             # Define paths
             $dependencies_dir = "E:/Dependencies"
-            $plugin_dir = "${{ github.workspace }}/ConvAI"
+            $plugin_dir = "${{ github.workspace }}"
             $content_zip = "$dependencies_dir/Content.zip"
             $thirdparty_zip = "$dependencies_dir/ThirdParty.zip"
             $plugin_content_dir = "$plugin_dir/Content"
