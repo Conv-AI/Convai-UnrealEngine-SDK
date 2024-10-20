@@ -66,7 +66,7 @@ jobs:
             $versions = @("5.0", "5.1", "5.2", "5.3", "5.4")
             foreach ($version in $versions) {
                 $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_$version"
-                $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
+                $output_path = "${{ steps.paths.outputs.output_root }}/V$version/Convai"
                 
                 if (Test-Path $output_path) {
                     Remove-Item -Recurse -Force -Path "$output_path/*"
@@ -109,7 +109,7 @@ jobs:
 
             New-Item -Path $plugin_folder -ItemType Directory
 
-            Copy-Item -Recurse -Force "$output_path/ConvAI" $plugin_folder
+            Copy-Item -Recurse -Force "$output_path/Convai" $plugin_folder
             Write-Host "Copied the plugin to the TestProject."
 
             Write-Host "Starting project packaging for Unreal 5.4..."
