@@ -131,7 +131,7 @@ jobs:
       - name: Copy plugin to TestProject and test with Unreal 5.4
         run: |
           try {
-            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE5.4"
+            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_5.4"
             $output_path = "${{ steps.paths.outputs.output_root }}/V5.4"
             $test_project_path = "E:/Software/TestProject"
             $plugin_folder = "$test_project_path/Plugins"
