@@ -25,16 +25,12 @@ jobs:
       - name: Check if release exists
         id: check_release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set the GitHub token for authentication
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $release_name = "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
-          
-          # Check if the release exists using gh CLI
           $latest_release = gh release list --limit 100 | Select-String $release_name
-
-          # If the release exists, exit
           if ($latest_release) {
-            Write-Host "Release for $release_name already exists. Skipping."
+            Write-Host "Release for $release_name already exists. Skipping build."
             exit 0
           } else {
             Write-Host "New release. Proceeding with the build."
@@ -63,29 +59,20 @@ jobs:
       - name: Extract and Copy Dependencies
         run: |
           try {
-            # Define paths
             $dependencies_dir = "E:/Dependencies"
             $plugin_dir = "${{ github.workspace }}"
             $content_zip = "$dependencies_dir/Content.zip"
             $thirdparty_zip = "$dependencies_dir/ThirdParty.zip"
             $plugin_content_dir = "$plugin_dir/Content"
             $plugin_thirdparty_dir = "$plugin_dir/Source/ThirdParty"
-
-            # Delete existing Content and ThirdParty folders in the plugin
             if (Test-Path $plugin_content_dir) {
-                Write-Host "Removing existing Content folder..."
                 Remove-Item -Recurse -Force $plugin_content_dir
             }
             if (Test-Path $plugin_thirdparty_dir) {
-                Write-Host "Removing existing ThirdParty folder..."
                 Remove-Item -Recurse -Force $plugin_thirdparty_dir
             }
-
-            # Extract Content.zip and ThirdParty.zip
-            Write-Host "Extracting Content.zip and ThirdParty.zip..."
             Expand-Archive -Path $content_zip -DestinationPath $plugin_dir
             Expand-Archive -Path $thirdparty_zip -DestinationPath "$plugin_dir/Source"
-
             Write-Host "Dependencies extracted and copied successfully."
           } catch {
             Write-Host "Failed to extract and copy dependencies. Error: $_"
@@ -100,26 +87,18 @@ jobs:
             foreach ($version in $versions) {
                 $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_$version"
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version/Convai"
-                
                 if (Test-Path $output_path) {
                     Remove-Item -Recurse -Force -Path "$output_path/*"
                 } else {
                     New-Item -Path $output_path -ItemType Directory
                 }
-      
                 Write-Host "Starting packaging for UE_$version..."
                 $uat_path = "$ue_version_path/Engine/Build/BatchFiles/RunUAT.bat"
-                Write-Host "Resolved UAT path: $uat_path"
-                
-                # Run the batch file using cmd.exe
                 & $uat_path BuildPlugin -Plugin="${{ steps.paths.outputs.plugin_path }}" -TargetPlatforms=Win64 -Package="$output_path" -Rocket -Marketplace
-                
-                # Check if the last command (RunUAT.bat) was successful
                 if ($LASTEXITCODE -ne 0) {
                     Write-Host "Packaging failed for UE_$version. Exit code: $LASTEXITCODE"
                     exit $LASTEXITCODE
                 }
-      
                 Write-Host "Packaged for UE_$version at $output_path"
             }
           } catch {
@@ -127,7 +106,7 @@ jobs:
             exit 1
           }
         shell: powershell
-        
+
       - name: Copy plugin to TestProject and test with Unreal 5.4
         run: |
           try {
@@ -135,35 +114,23 @@ jobs:
             $output_path = "${{ steps.paths.outputs.output_root }}/V5.4"
             $test_project_path = "E:/Software/TestProject"
             $plugin_folder = "$test_project_path/Plugins"
-
-            # Clean the Plugins folder if it exists
             if (Test-Path $plugin_folder) {
                 Remove-Item -Recurse -Force $plugin_folder
             }
-
-            # Recreate Plugins folder and copy the new plugin
             New-Item -Path $plugin_folder -ItemType Directory
             Copy-Item -Recurse -Force "$output_path/Convai" $plugin_folder
             Write-Host "Copied the plugin to the TestProject."
-
-            # Set Unreal Engine UAT path
             $uat_path = "$ue_version_path/Engine/Build/BatchFiles/RunUAT.bat"
-
             Write-Host "Starting project packaging for Unreal 5.4..."
-
-            # Run the packaging process
             & $uat_path BuildCookRun `
             -project="$test_project_path/TestProject.uproject" `
             -noP4 -utf8output -platform=Win64 -clientconfig=Shipping -cook -stage -package -compressed -pak `
             -build -prereqs -distribution -archive `
             -archivedirectory="$test_project_path/Windows"
-            
-            # Check if the last command (RunUAT.bat) was successful
             if ($LASTEXITCODE -ne 0) {
                 Write-Host "Packaging failed for UE_$version. Exit code: $LASTEXITCODE"
                 exit $LASTEXITCODE
             }
-
             Write-Host "Project packaging completed successfully for Unreal 5.4"
           } catch {
             Write-Host "Project packaging failed for Unreal Engine 5.4. Error: $_"
@@ -171,10 +138,41 @@ jobs:
           }
         shell: powershell
 
+      - name: Test packaging for Android
+        run: |
+          try {
+            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_5.4"
+            $output_path = "${{ steps.paths.outputs.output_root }}/V5.4"
+            $test_project_path = "E:/Software/TestProject"
+            $plugin_folder = "$test_project_path/Plugins"
+            if (Test-Path $plugin_folder) {
+                Remove-Item -Recurse -Force $plugin_folder
+            }
+            New-Item -Path $plugin_folder -ItemType Directory
+            Copy-Item -Recurse -Force "$output_path/Convai" $plugin_folder
+            Write-Host "Copied the plugin to the TestProject."
+            $uat_path = "$ue_version_path/Engine/Build/BatchFiles/RunUAT.bat"
+            Write-Host "Starting project packaging for Android..."
+            & $uat_path BuildCookRun `
+            -project="$test_project_path/TestProject.uproject" `
+            -noP4 -utf8output -platform=Android -clientconfig=Shipping -cook -stage -package -compressed -pak `
+            -build -prereqs -distribution -archive `
+            -archivedirectory="$test_project_path/Android"
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "Android packaging failed. Exit code: $LASTEXITCODE"
+                exit $LASTEXITCODE
+            }
+            Write-Host "Project packaging completed successfully for Android"
+          } catch {
+            Write-Host "Project packaging failed for Android. Error: $_"
+            exit 1
+          }
+        shell: powershell
+
       - name: Zip Plugin for each version
         run: |
           try {
-            $versions = @("5.0", "5.1", "5.2", "5.3", "5.4")
+            $versions = @("5.4")
             foreach ($version in $versions) {
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
                 Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip"
@@ -190,16 +188,23 @@ jobs:
     needs: build-and-package
     runs-on: self-hosted
     steps:
-      - name: Create GitHub Release
+      - name: Extract release notes
+        id: extract_notes
+        run: |
+          $version = "${{ steps.version.outputs.version_name }}"
+          $changelog = Get-Content "CHANGELOG.md"
+          $notes = $changelog -split "\r?\n" | Select-String -Pattern "^# Release $version" -Context 0,10 | ForEach-Object { $_.Context.PostContext }
+          $notes = $notes -join "`n"
+          echo "::set-output name=release_notes::$notes"
+        shell: powershell
+
+      - name: Update GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.version_name }}
           release_name: "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
+          body: ${{ steps.extract_notes.outputs.release_notes }}
           files: |
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
-            # E:/Output/${{ github.event.repository.name }}_Binaries/V5.3.zip
-            # E:/Output/${{ github.event.repository.name }}_Binaries/V5.2.zip
-            # E:/Output/${{ github.event.repository.name }}_Binaries/V5.1.zip
-            # E:/Output/${{ github.event.repository.name }}_Binaries/V5.0.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
