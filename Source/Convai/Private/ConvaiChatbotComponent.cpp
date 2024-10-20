@@ -21,6 +21,7 @@ DEFINE_LOG_CATEGORY(ConvaiChatbotComponentLog);
 UConvaiChatbotComponent::UConvaiChatbotComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.TickInterval = 1 / 15;
 	//SetIsReplicated(true);
 	InterruptVoiceFadeOutDuration = 1.0;
 	LastPlayerName = FString("Unknown");
@@ -406,6 +407,36 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 
 
 	Start_GRPC_Request(UseOverrideAuthKey, OverrideAuthKey, OverrideAuthHeader);
+}
+
+void UConvaiChatbotComponent::FinishGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent)
+{
+	if (!HasOnGoingGetResponseStream())
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent::FinishGetResponseStream Trying to finish a non-existent stream | Character ID : %s | Session ID : %s"),
+			*CharacterID,
+			*SessionID);
+		return;
+	}
+
+	if (!CanWriteToGetResponseStream())
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent::FinishGetResponseStream stream is no longer writable | Character ID : %s | Session ID : %s"),
+			*CharacterID,
+			*SessionID);
+		return;
+	}
+
+	if (CurrentConvaiPlayerComponent != InConvaiPlayerComponent)
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent::FinishGetResponseStream Trying to finish using a player that did not start the stream | Character ID : %s | Session ID : %s"),
+			*CharacterID,
+			*SessionID);
+		return;
+	}
+
+	ConvaiGRPCGetResponseProxy->FinishWriting();
+	ClearTimeOutTimer();
 }
 
 void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateOnNetwork)
@@ -1089,7 +1120,7 @@ bool UConvaiChatbotComponent::CheckTokenValidity()
 
 void UConvaiChatbotComponent::OnPlayerTimeOut()
 {
-	TimeOutTimerHandle.Invalidate();
+	ClearTimeOutTimer();
 	CurrentConvaiPlayerComponent = nullptr;
 	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Player timed out | Character ID : %s | Session ID : %s"),
 		*CharacterID,
@@ -1103,6 +1134,29 @@ void UConvaiChatbotComponent::ClearTimeOutTimer()
 		GetWorld()->GetTimerManager().ClearTimer(TimeOutTimerHandle);
 		TimeOutTimerHandle.Invalidate();
 	}
+}
+
+bool UConvaiChatbotComponent::HasOnGoingGetResponseStream()
+{
+	return IsValid(ConvaiGRPCGetResponseProxy) && !ConvaiGRPCGetResponseProxy->IsStreamFinished();
+}
+
+bool UConvaiChatbotComponent::CanWriteToGetResponseStream()
+{
+	return IsValid(ConvaiGRPCGetResponseProxy) && HasOnGoingGetResponseStream() && ConvaiGRPCGetResponseProxy->CanWriteToStream();
+}
+
+bool UConvaiChatbotComponent::ConsumeMicStreamIntoBuffer()
+{
+	if (!IsValid(CurrentConvaiPlayerComponent))
+		return false;
+
+	// Consume the mic stream into our buffer
+	bool Successful = false;
+	PlayerInpuAudioBuffer.Empty(PlayerInpuAudioBuffer.Max()); // Empty the buffer but keep its memory allocation intact
+	Successful = CurrentConvaiPlayerComponent->ConsumeStreamingBuffer(PlayerInpuAudioBuffer);
+
+	return Successful;
 }
 
 void UConvaiChatbotComponent::BeginPlay()
@@ -1133,57 +1187,25 @@ void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!IsValid(ConvaiGRPCGetResponseProxy) || !StreamInProgress)
+	if (!CanWriteToGetResponseStream())
+	{
+		ClearTimeOutTimer();
 		return;
-
-	bool ThisIsTheLastWrite = false;
-
-	// CheckTokenValidity() checks if player has stopped sending audio
-	if ((!CheckTokenValidity() && StreamInProgress))
-	{
-		// UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("ConvaiChatbotComponentTick:: ThisIsTheLastWrite"));
-		StreamInProgress = false;
-		ThisIsTheLastWrite = true;
 	}
 
-	bool Successful = false;
-	if (IsValid(CurrentConvaiPlayerComponent) && !ThisIsTheLastWrite)
-	{
-		// Consume the mic stream into our buffer
-		PlayerInpuAudioBuffer.Empty(PlayerInpuAudioBuffer.Max()); // Empty the buffer but keep its memory allocation intact
-		Successful = CurrentConvaiPlayerComponent->ConsumeStreamingBuffer(PlayerInpuAudioBuffer);
-	}
-	else
-	{
-		// Finish the stream
-		StreamInProgress = false;
-		ThisIsTheLastWrite = true;
-		// UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("ConvaiChatbotComponentTick:: Finish the stream"));
-	}
+	bool Successful = ConsumeMicStreamIntoBuffer();
+	if (Successful)
+		ConvaiGRPCGetResponseProxy->WriteAudioDataToSend(PlayerInpuAudioBuffer.GetData(), PlayerInpuAudioBuffer.Num());
 
-	if (Successful) // If there is mic data to send
+	if (!Successful)
 	{
-		// UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("ConvaiChatbotComponentTick:: Succesful consumption of %d bytes"), PlayerInpuAudioBuffer.Num());
-		ConvaiGRPCGetResponseProxy->WriteAudioDataToSend(PlayerInpuAudioBuffer.GetData(), PlayerInpuAudioBuffer.Num(), ThisIsTheLastWrite);
-	}
-	if (ThisIsTheLastWrite) // If there is no data to send, and we do not expect more mic data to send  
-	{
-		// UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("ConvaiChatbotComponentTick:: FinishWriting"));
-		ConvaiGRPCGetResponseProxy->FinishWriting();
-	}
-
-	if (!Successful && !ThisIsTheLastWrite) // If there is no data to send, but we expect the mic data to come in the near future
-	{
-		// We did not receive audio from player although the player did not explicitly end sending the audio
 		// Start the time out timer if we did not start yet
 		if (!TimeOutTimerHandle.IsValid())
 		{
 			GetWorld()->GetTimerManager().SetTimer(TimeOutTimerHandle, this, &UConvaiChatbotComponent::OnPlayerTimeOut, ConvaiConstants::PlayerTimeOut / 1000, false);
 		}
 	}
-
-	// Make sure the time out timer is cleared on a successful read or that we have finished reading from the mic
-	if (Successful || !StreamInProgress)
+	else	// Make sure the time out timer is cleared on a successful read or that we have finished reading from the mic
 	{
 		ClearTimeOutTimer();
 	}

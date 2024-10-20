@@ -143,13 +143,23 @@ public:
 
 	void Activate();
 
-	void WriteAudioDataToSend(uint8* Buffer, uint32 Length, bool LastWrite);
+	void WriteAudioDataToSend(uint8* Buffer, uint32 Length);
 
 	void FinishWriting();
 
 	//~ Begin UObject Interface.
 	virtual void BeginDestroy() override;
 	//~ End UObject Interface.
+
+	bool IsStreamFinished()
+	{
+		return ReceivedFinish;
+	}
+
+	bool CanWriteToStream()
+	{
+		return !IsStreamFinished() && !LastWriteReceived;
+	}
 
 private:
 
@@ -228,6 +238,11 @@ private:
 
 	FThreadSafeBool ReceivedFinish;
 	FThreadSafeBool CalledFinish;
+	FThreadSafeBool ReceivedFinalResponse;
+
+	// Retry reading counters
+	int RetryCount = 0;
+	int MaxRetries = 3;
 
 	int TotalLipSyncResponsesReceived = 0;
 };

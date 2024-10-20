@@ -68,6 +68,10 @@ class CONVAI_API UConvaiPlayerComponent : public UConvaiAudioStreamer
 
 	bool Init();
 
+	//~ Begin ActorComponent Interface.
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	//~ End ActorComponent Interface.
+
 public:
 
 	UPROPERTY(EditAnywhere, Category = "Convai", Replicated, BlueprintSetter = SetPlayerName)
@@ -273,7 +277,10 @@ private:
 	TRingBuffer<uint8> VoiceCaptureRingBuffer;
 
 	UPROPERTY()
-	UConvaiAudioCaptureComponent* AudioCaptureComponent;
+	UConvaiAudioCaptureComponent* AudioCaptureComponent = nullptr;
+
+	UPROPERTY()
+	UConvaiChatbotComponent* CurrentConvaiChatbotComponent = nullptr;
 
 	void UpdateVoiceCapture(float DeltaTime);
 	void StartVoiceChunkCapture(float ExpectedRecordingTime = 0.01);

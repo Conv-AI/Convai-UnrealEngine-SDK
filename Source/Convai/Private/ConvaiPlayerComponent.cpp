@@ -393,6 +393,17 @@ void UConvaiPlayerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	UpdateVoiceCapture(DeltaTime);
 }
 
+void UConvaiPlayerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (IsRecording)
+		FinishRecording();
+
+	if (IsStreaming)
+		FinishTalking();
+
+	Super::EndPlay(EndPlayReason);
+}
+
 bool UConvaiPlayerComponent::IsPixelStreamingEnabledAndAllowed()
 {
 	return UsePixelStreamingMicInput && PixelStreamingAudioComponent.IsValid();
@@ -645,6 +656,7 @@ void UConvaiPlayerComponent::StartTalking(
 	{
 		bool UseOverrideAuthKey = false;
 		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, false, UseOverrideAuthKey, FString(""), FString(""), Token);
+		CurrentConvaiChatbotComponent = ConvaiChatbotComponent;
 	}
 }
 
@@ -668,6 +680,17 @@ void UConvaiPlayerComponent::FinishTalking()
 	{
 		// Invalidate the token by generating a new one
 		GenerateNewToken();
+
+		if (IsValid(CurrentConvaiChatbotComponent))
+		{
+			UE_LOG(ConvaiPlayerLog, Log, TEXT("FinishTalking calling FinishGetResponseStream"));
+			CurrentConvaiChatbotComponent->FinishGetResponseStream(this);
+			CurrentConvaiChatbotComponent = nullptr;
+		}
+		else
+		{
+			UE_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking failed to call FinishGetResponseStream"));
+		}
 	}
 
 	UE_LOG(ConvaiPlayerLog, Log, TEXT("Finished Talking"));
@@ -713,6 +736,7 @@ void UConvaiPlayerComponent::StartTalkingServer_Implementation(
 		}
 		bool UseOverrideAuthKey = !UseServerAPI_Key;
 		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, true, UseOverrideAuthKey, ClientAuthKey, AuthHeader, Token);
+		CurrentConvaiChatbotComponent = ConvaiChatbotComponent;
 	}
 }
 
@@ -720,6 +744,17 @@ void UConvaiPlayerComponent::FinishTalkingServer_Implementation()
 {
 	// Invalidate the token by generating a new one
 	GenerateNewToken();
+
+	if (IsValid(CurrentConvaiChatbotComponent))
+	{
+		UE_LOG(ConvaiPlayerLog, Log, TEXT("FinishTalking calling FinishGetResponseStream"));
+		CurrentConvaiChatbotComponent->FinishGetResponseStream(this);
+		CurrentConvaiChatbotComponent = nullptr;
+	}
+	else
+	{
+		UE_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking failed to call FinishGetResponseStream"));
+	}
 }
 
 void UConvaiPlayerComponent::SendText(UConvaiChatbotComponent* ConvaiChatbotComponent, FString Text, UConvaiEnvironment* Environment, bool GenerateActions, bool VoiceResponse, bool RunOnServer, bool UseServerAPI_Key)
@@ -767,6 +802,8 @@ void UConvaiPlayerComponent::SendText(UConvaiChatbotComponent* ConvaiChatbotComp
 
 		// Invalidate the token by generating a new one
 		GenerateNewToken();
+
+		CurrentConvaiChatbotComponent = ConvaiChatbotComponent;
 	}
 }
 
@@ -808,6 +845,8 @@ void UConvaiPlayerComponent::SendTextServer_Implementation(
 
 	// Invalidate the token by generating a new one
 	GenerateNewToken();
+
+	CurrentConvaiChatbotComponent = ConvaiChatbotComponent;
 }
 
 bool UConvaiPlayerComponent::ShouldMuteLocal()
