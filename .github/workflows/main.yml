@@ -31,6 +31,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install GitHub CLI
+        run: |
+          Invoke-WebRequest -Uri https://github.com/cli/cli/releases/download/v2.34.0/gh_2.34.0_windows_amd64.msi -OutFile gh_installer.msi
+          Start-Process msiexec.exe -ArgumentList '/i gh_installer.msi /quiet /norestart' -Wait
+        shell: powershell
+
       - name: Check if release exists
         id: check_release
         env:
