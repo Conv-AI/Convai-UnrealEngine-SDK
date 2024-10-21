@@ -107,7 +107,38 @@ jobs:
           }
         shell: powershell
 
-      - name: Test packaging for Android
+      - name: Test packaging for Windows UE 5.4
+        run: |
+          try {
+            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_5.4"
+            $output_path = "${{ steps.paths.outputs.output_root }}/V5.4"
+            $test_project_path = "E:/Software/TestProject"
+            $plugin_folder = "$test_project_path/Plugins"
+            if (Test-Path $plugin_folder) {
+                Remove-Item -Recurse -Force $plugin_folder
+            }
+            New-Item -Path $plugin_folder -ItemType Directory
+            Copy-Item -Recurse -Force "$output_path/Convai" $plugin_folder
+            Write-Host "Copied the plugin to the TestProject."
+            $uat_path = "$ue_version_path/Engine/Build/BatchFiles/RunUAT.bat"
+            Write-Host "Starting project packaging for Unreal 5.4..."
+            & $uat_path BuildCookRun `
+            -project="$test_project_path/TestProject.uproject" `
+            -noP4 -utf8output -platform=Win64 -clientconfig=Shipping -cook -stage -package -compressed -pak `
+            -build -prereqs -distribution -archive `
+            -archivedirectory="$test_project_path/Windows"
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "Packaging failed for UE_$version. Exit code: $LASTEXITCODE"
+                exit $LASTEXITCODE
+            }
+            Write-Host "Project packaging completed successfully for Unreal 5.4"
+          } catch {
+            Write-Host "Project packaging failed for Unreal Engine 5.4. Error: $_"
+            exit 1
+          }
+        shell: powershell
+
+      - name: Test packaging for Android UE 5.4
         run: |
           @echo off
           setlocal
@@ -142,38 +173,6 @@ jobs:
 
           echo Android packaging completed successfully.
         shell: cmd
-
-
-      - name: Test packaging for Windows UE 5.4
-        run: |
-          try {
-            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_5.4"
-            $output_path = "${{ steps.paths.outputs.output_root }}/V5.4"
-            $test_project_path = "E:/Software/TestProject"
-            $plugin_folder = "$test_project_path/Plugins"
-            if (Test-Path $plugin_folder) {
-                Remove-Item -Recurse -Force $plugin_folder
-            }
-            New-Item -Path $plugin_folder -ItemType Directory
-            Copy-Item -Recurse -Force "$output_path/Convai" $plugin_folder
-            Write-Host "Copied the plugin to the TestProject."
-            $uat_path = "$ue_version_path/Engine/Build/BatchFiles/RunUAT.bat"
-            Write-Host "Starting project packaging for Unreal 5.4..."
-            & $uat_path BuildCookRun `
-            -project="$test_project_path/TestProject.uproject" `
-            -noP4 -utf8output -platform=Win64 -clientconfig=Shipping -cook -stage -package -compressed -pak `
-            -build -prereqs -distribution -archive `
-            -archivedirectory="$test_project_path/Windows"
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "Packaging failed for UE_$version. Exit code: $LASTEXITCODE"
-                exit $LASTEXITCODE
-            }
-            Write-Host "Project packaging completed successfully for Unreal 5.4"
-          } catch {
-            Write-Host "Project packaging failed for Unreal Engine 5.4. Error: $_"
-            exit 1
-          }
-        shell: powershell
 
       - name: Zip Plugin for each version
         run: |
