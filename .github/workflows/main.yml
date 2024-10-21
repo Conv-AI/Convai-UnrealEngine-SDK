@@ -147,15 +147,6 @@ jobs:
           set TEST_PROJECT_PATH=E:/Software/TestProject
           set PLUGIN_FOLDER=%TEST_PROJECT_PATH%/Plugins
 
-          echo Cleaning old Plugins...
-          if exist "%PLUGIN_FOLDER%" (
-              rmdir /s /q "%PLUGIN_FOLDER%"
-          )
-
-          echo Recreating Plugins folder and copying the plugin...
-          mkdir "%PLUGIN_FOLDER%"
-          xcopy /E /I "%output_path%/Convai" "%PLUGIN_FOLDER%"
-
           echo Starting project packaging for Android...
 
           call "%UE_PATH%" BuildCookRun ^
