@@ -198,6 +198,7 @@ jobs:
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           $version = "${{ steps.version.outputs.version_name }}"
+          if (-not $version) { Write-Host "Version is empty!"; exit 1 }
           git tag $version
           git push origin $version
         shell: powershell
@@ -205,6 +206,7 @@ jobs:
       - name: Confirm Git tag exists
         run: |
           $version = "${{ steps.version.outputs.version_name }}"
+          if (-not $version) { Write-Host "Version is empty!"; exit 1 }
           git fetch --tags
           git show-ref --tags | Select-String $version
         shell: powershell
