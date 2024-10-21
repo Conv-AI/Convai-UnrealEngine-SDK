@@ -56,8 +56,50 @@ jobs:
             Write-Host "New release. Proceeding with the build."
           }
         shell: powershell
-        
+
   build-and-package:
+    needs: check-version
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Define paths
+        id: paths
+        run: |
+          $repo_name = "${{ github.event.repository.name }}"
+          $ue_root = "E:/Software"
+          $output_root = "E:/Output/${repo_name}_Binaries"
+          $plugin_path = "${{ github.workspace }}/ConvAI.uplugin"
+          echo "::set-output name=ue_root::$ue_root"
+          echo "::set-output name=output_root::$output_root"
+          echo "::set-output name=plugin_path::$plugin_path"
+        shell: powershell
+
+      - name: Extract and Copy Dependencies
+        run: |
+          try {
+            $dependencies_dir = "E:/Dependencies"
+            $plugin_dir = "${{ github.workspace }}"
+            $content_zip = "$dependencies_dir/Content.zip"
+            $thirdparty_zip = "$dependencies_dir/ThirdParty.zip"
+            $plugin_content_dir = "$plugin_dir/Content"
+            $plugin_thirdparty_dir = "$plugin_dir/Source/ThirdParty"
+            # if (Test-Path $plugin_content_dir) {
+            #     Remove-Item -Recurse -Force $plugin_content_dir
+            # }
+            # if (Test-Path $plugin_thirdparty_dir) {
+            #     Remove-Item -Recurse -Force $plugin_thirdparty_dir
+            # }
+            # Expand-Archive -Path $content_zip -DestinationPath $plugin_dir
+            # Expand-Archive -Path $thirdparty_zip -DestinationPath "$plugin_dir/Source"
+            Write-Host "Dependencies extracted and copied successfully."
+          } catch {
+            Write-Host "Failed to extract and copy dependencies. Error: $_"
+            exit 1
+          }
+        shell: powershell
+
       - name: Build and package for Unreal versions 5.0 to 5.4
         run: |
           try {
