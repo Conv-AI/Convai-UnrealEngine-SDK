@@ -65,14 +65,14 @@ jobs:
             $thirdparty_zip = "$dependencies_dir/ThirdParty.zip"
             $plugin_content_dir = "$plugin_dir/Content"
             $plugin_thirdparty_dir = "$plugin_dir/Source/ThirdParty"
-            if (Test-Path $plugin_content_dir) {
-                Remove-Item -Recurse -Force $plugin_content_dir
-            }
-            if (Test-Path $plugin_thirdparty_dir) {
-                Remove-Item -Recurse -Force $plugin_thirdparty_dir
-            }
-            Expand-Archive -Path $content_zip -DestinationPath $plugin_dir
-            Expand-Archive -Path $thirdparty_zip -DestinationPath "$plugin_dir/Source"
+            # if (Test-Path $plugin_content_dir) {
+            #     Remove-Item -Recurse -Force $plugin_content_dir
+            # }
+            # if (Test-Path $plugin_thirdparty_dir) {
+            #     Remove-Item -Recurse -Force $plugin_thirdparty_dir
+            # }
+            # Expand-Archive -Path $content_zip -DestinationPath $plugin_dir
+            # Expand-Archive -Path $thirdparty_zip -DestinationPath "$plugin_dir/Source"
             Write-Host "Dependencies extracted and copied successfully."
           } catch {
             Write-Host "Failed to extract and copy dependencies. Error: $_"
@@ -200,6 +200,13 @@ jobs:
           $version = "${{ steps.version.outputs.version_name }}"
           git tag $version
           git push origin $version
+        shell: powershell
+
+      - name: Confirm Git tag exists
+        run: |
+          $version = "${{ steps.version.outputs.version_name }}"
+          git fetch --tags
+          git show-ref --tags | Select-String $version
         shell: powershell
 
       - name: Update GitHub Release
