@@ -206,7 +206,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.version_name }}
-          release_name: "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
+          name: "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
           body: ${{ steps.extract_notes.outputs.release_notes }}
           files: |
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
