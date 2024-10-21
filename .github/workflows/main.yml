@@ -52,49 +52,40 @@ jobs:
           }
         shell: powershell
 
-  build-and-package:
-    needs: check-version
+  check-version:
+    needs: checkout-code
     runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Define paths
-        id: paths
+      - name: Check if release exists using GitHub API
+        id: check_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $repo_name = "${{ github.event.repository.name }}"
-          $ue_root = "E:/Software"
-          $output_root = "E:/Output/${repo_name}_Binaries"
-          $plugin_path = "${{ github.workspace }}/ConvAI.uplugin"
-          echo "::set-output name=ue_root::$ue_root"
-          echo "::set-output name=output_root::$output_root"
-          echo "::set-output name=plugin_path::$plugin_path"
-        shell: powershell
+          $version = "${{ needs.checkout-code.outputs.version_name }}"
+          $release_name = "Convai Unreal Engine SDK Version $version"
+          $url = "https://api.github.com/repos/${{ github.repository }}/releases?access_token=${{ secrets.GITHUB_TOKEN }}"
+          $releases = Invoke-RestMethod -Uri $url -Headers @{ Authorization = "Bearer $env:GH_TOKEN" }
+          $release_exists = $false
+          
+          foreach ($release in $releases) {
+            if ($release.name -eq $release_name) {
+              $release_exists = $true
+              break
+            }
+          }
 
-      - name: Extract and Copy Dependencies
-        run: |
-          try {
-            $dependencies_dir = "E:/Dependencies"
-            $plugin_dir = "${{ github.workspace }}"
-            $content_zip = "$dependencies_dir/Content.zip"
-            $thirdparty_zip = "$dependencies_dir/ThirdParty.zip"
-            $plugin_content_dir = "$plugin_dir/Content"
-            $plugin_thirdparty_dir = "$plugin_dir/Source/ThirdParty"
-            # if (Test-Path $plugin_content_dir) {
-            #     Remove-Item -Recurse -Force $plugin_content_dir
-            # }
-            # if (Test-Path $plugin_thirdparty_dir) {
-            #     Remove-Item -Recurse -Force $plugin_thirdparty_dir
-            # }
-            # Expand-Archive -Path $content_zip -DestinationPath $plugin_dir
-            # Expand-Archive -Path $thirdparty_zip -DestinationPath "$plugin_dir/Source"
-            Write-Host "Dependencies extracted and copied successfully."
-          } catch {
-            Write-Host "Failed to extract and copy dependencies. Error: $_"
-            exit 1
+          if ($release_exists) {
+            Write-Host "Release for $release_name already exists. Skipping build."
+            exit 0
+          } else {
+            Write-Host "New release. Proceeding with the build."
           }
         shell: powershell
 
+  build-and-package:
       - name: Build and package for Unreal versions 5.0 to 5.4
         run: |
           try {
