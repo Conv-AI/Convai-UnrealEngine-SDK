@@ -458,7 +458,7 @@ struct FAvailableVoices
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Language")
 	TMap<FString, FVoiceLanguageStruct> AvailableVoices;
 
 	FAvailableVoices()
