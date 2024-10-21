@@ -170,7 +170,7 @@ jobs:
             $versions = @("5.4")
             foreach ($version in $versions) {
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
-                Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip"
+                Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip" -Force
                 Write-Host "Zipped plugin for UE$version at $output_path.zip"
             }
           } catch {
