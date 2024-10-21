@@ -200,7 +200,9 @@ jobs:
         shell: powershell
 
   compress-and-release:
-    needs: build-and-package
+  needs: 
+    - checkout-code
+    - build-and-package
     runs-on: self-hosted
     steps:
       - name: Extract release notes
