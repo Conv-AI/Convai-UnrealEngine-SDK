@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.4.0
+- Fixed multiple connection issues.
+
 # Release 3.3.2
 - Added intermediate fix for audio being cutoff in multiplayer.
 - Added `ConvaiGetAvailableVoices` function.
