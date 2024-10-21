@@ -8,26 +8,35 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-version:
-    runs-on: windows-latest
+  checkout-code:
+    runs-on: self-hosted
+    outputs:
+      version_name: ${{ steps.extract_version.outputs.version_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Extract version from .uplugin
-        id: version
+        id: extract_version
         run: |
           $plugin = Get-Content "ConvAI.uplugin" | ConvertFrom-Json
           $plugin_version = $plugin.VersionName
           echo "::set-output name=version_name::$plugin_version"
         shell: powershell
 
+  check-version:
+    needs: checkout-code
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Check if release exists
         id: check_release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $release_name = "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
+          $release_name = "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
           $latest_release = gh release list --limit 100 | Select-String $release_name
           if ($latest_release) {
             Write-Host "Release for $release_name already exists. Skipping build."
@@ -186,7 +195,7 @@ jobs:
       - name: Extract release notes
         id: extract_notes
         run: |
-          $version = "${{ steps.version.outputs.version_name }}"
+          $version = "${{ needs.checkout-code.outputs.version_name }}"
           $changelog = Get-Content "CHANGELOG.md"
           $notes = $changelog -split "\r?\n" | Select-String -Pattern "^# Release $version" -Context 0,10 | ForEach-Object { $_.Context.PostContext }
           $notes = $notes -join "`n"
@@ -197,7 +206,7 @@ jobs:
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          $version = "${{ steps.version.outputs.version_name }}"
+          $version = "${{ needs.checkout-code.outputs.version_name }}"
           if (-not $version) { Write-Host "Version is empty!"; exit 1 }
           git tag $version
           git push origin $version
@@ -205,7 +214,7 @@ jobs:
 
       - name: Confirm Git tag exists
         run: |
-          $version = "${{ steps.version.outputs.version_name }}"
+          $version = "${{ needs.checkout-code.outputs.version_name }}"
           if (-not $version) { Write-Host "Version is empty!"; exit 1 }
           git fetch --tags
           git show-ref --tags | Select-String $version
@@ -214,8 +223,8 @@ jobs:
       - name: Update GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.version.outputs.version_name }}
-          name: "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
+          tag_name: ${{ needs.checkout-code.outputs.version_name }}
+          name: "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
           body: ${{ steps.extract_notes.outputs.release_notes }}
           files: |
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
