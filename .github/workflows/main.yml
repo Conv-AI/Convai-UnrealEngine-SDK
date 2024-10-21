@@ -180,35 +180,35 @@ jobs:
           }
         shell: powershell
 
-compress-and-release:
-  needs: build-and-package
-  runs-on: self-hosted
-  steps:
-    - name: Extract release notes
-      id: extract_notes
-      run: |
-        $version = "${{ steps.version.outputs.version_name }}"
-        $changelog = Get-Content "CHANGELOG.md"
-        $notes = $changelog -split "\r?\n" | Select-String -Pattern "^# Release $version" -Context 0,10 | ForEach-Object { $_.Context.PostContext }
-        $notes = $notes -join "`n"
-        echo "::set-output name=release_notes::$notes"
-      shell: powershell
+  compress-and-release:
+    needs: build-and-package
+    runs-on: self-hosted
+    steps:
+      - name: Extract release notes
+        id: extract_notes
+        run: |
+          $version = "${{ steps.version.outputs.version_name }}"
+          $changelog = Get-Content "CHANGELOG.md"
+          $notes = $changelog -split "\r?\n" | Select-String -Pattern "^# Release $version" -Context 0,10 | ForEach-Object { $_.Context.PostContext }
+          $notes = $notes -join "`n"
+          echo "::set-output name=release_notes::$notes"
+        shell: powershell
 
-    - name: Create Git tag
-      run: |
-        git config user.name "GitHub Action"
-        git config user.email "action@github.com"
-        git tag ${{ steps.version.outputs.version_name }}
-        git push origin ${{ steps.version.outputs.version_name }}
-      shell: bash
+      - name: Create Git tag
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git tag ${{ steps.version.outputs.version_name }}
+          git push origin ${{ steps.version.outputs.version_name }}
+        shell: bash
 
-    - name: Update GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ steps.version.outputs.version_name }}
-        release_name: "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
-        body: ${{ steps.extract_notes.outputs.release_notes }}
-        files: |
-          E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version_name }}
+          release_name: "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
+          body: ${{ steps.extract_notes.outputs.release_notes }}
+          files: |
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
