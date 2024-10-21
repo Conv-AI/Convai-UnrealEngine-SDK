@@ -140,30 +140,29 @@ jobs:
 
       - name: Test packaging for Android UE 5.4
         run: |
-          @echo off
-          setlocal
+          $UE_PATH = "${{ steps.paths.outputs.ue_root }}/UE_5.4/Engine/Build/BatchFiles/RunUAT.bat"
+          $TEST_PROJECT_PATH = "E:/Software/TestProject"
+          $PLUGIN_FOLDER = "$TEST_PROJECT_PATH/Plugins"
 
-          set UE_PATH=${{ steps.paths.outputs.ue_root }}/UE_5.4/Engine/Build/BatchFiles/RunUAT.bat
-          set TEST_PROJECT_PATH=E:/Software/TestProject
-          set PLUGIN_FOLDER=%TEST_PROJECT_PATH%/Plugins
+          Write-Host "Starting project packaging for Android..."
 
-          echo Starting project packaging for Android...
-
-          # call "%UE_PATH%" BuildCookRun ^
-          #   -project="%TEST_PROJECT_PATH%/TestProject.uproject" ^
-          #   -noP4 -utf8output -platform=Android -targetplatform=Android -clientconfig=Shipping ^
-          #   -cook -stage -package -compressed -pak ^
-          #   -build -prereqs -distribution -archive ^
-          #   -archivedirectory="%TEST_PROJECT_PATH%/Android" ^
+          # The below commands are commented out for now, using PowerShell-style comments
+          # & "$UE_PATH" BuildCookRun `
+          #   -project="$TEST_PROJECT_PATH/TestProject.uproject" `
+          #   -noP4 -utf8output -platform=Android -targetplatform=Android -clientconfig=Shipping `
+          #   -cook -stage -package -compressed -pak `
+          #   -build -prereqs -distribution -archive `
+          #   -archivedirectory="$TEST_PROJECT_PATH/Android" `
           #   -target=TestProject -ddc=InstalledDerivedDataBackendGraph -installed
 
-          if %errorlevel% neq 0 (
-              echo Android packaging failed with exit code %errorlevel%.
-              exit /b %errorlevel%
-          )
+          if ($LASTEXITCODE -ne 0) {
+              Write-Host "Android packaging failed with exit code $LASTEXITCODE."
+              exit $LASTEXITCODE
+          }
 
-          echo Android packaging completed successfully.
-        shell: cmd
+          Write-Host "Android packaging completed successfully."
+        shell: powershell
+
 
       - name: Zip Plugin for each version
         run: |
