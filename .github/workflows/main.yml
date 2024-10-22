@@ -24,59 +24,48 @@ jobs:
           echo "::set-output name=version_name::$plugin_version"
         shell: powershell
 
-  check-version:
-    needs: checkout-code
-    runs-on: self-hosted
-    outputs:
-      release_exists: ${{ steps.check_release.outputs.release_exists }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+check-version:
+  needs: checkout-code
+  runs-on: self-hosted
+  outputs:
+    release_exists: ${{ steps.check_release.outputs.release_exists }}  # Capture the output
+  steps:
+    - name: Check if release exists using GitHub API
+      id: check_release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Check if release exists
+        $release_exists = $false
 
-      - name: Check if release exists using GitHub API
-        id: check_release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Log version passed as environment variable
-          Write-Host "Version passed from GitHub Actions: ${{ needs.checkout-code.outputs.version_name }}"
+        # Construct release name
+        $release_name = "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
 
-          # Construct release name using the version
-          $release_name = "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
+        # Fetch releases
+        $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers @{ Authorization = "Bearer $env:GH_TOKEN" }
 
-          # Log the constructed release name for debugging
-          Write-Host "Constructed release name: $release_name"
+        # Check if release already exists
+        foreach ($release in $releases) {
+            if ($release.name -eq $release_name) {
+                $release_exists = $true
+                break
+            }
+        }
 
-          # Set the GitHub API URL for releases
-          $url = "https://api.github.com/repos/${{ github.repository }}/releases?access_token=${{ secrets.GITHUB_TOKEN }}"
-          Write-Host "Fetching releases from URL: $url"
-
-          # Fetch the releases
-          $releases = Invoke-RestMethod -Uri $url -Headers @{ Authorization = "Bearer $env:GH_TOKEN" }
-
-          # Initialize release existence flag
-          $release_exists = $false
-
-          # Check if release already exists
-          foreach ($release in $releases) {
-              if ($release.name -eq $release_name) {
-                  $release_exists = $true
-                  break
-              }
-          }
-
-          if ($release_exists) {
-              Write-Host "Release for $release_name already exists. Skipping build."
-              exit 0
-          } else {
-              Write-Host "New release $release_name. Proceeding with the build."
-          }
-        shell: powershell
+        # Set output using the new $GITHUB_OUTPUT file
+        if ($release_exists) {
+            Write-Host "Release for $release_name already exists."
+            echo "release_exists=true" >> $GITHUB_OUTPUT
+        } else {
+            Write-Host "New release $release_name. Proceeding with the build."
+            echo "release_exists=false" >> $GITHUB_OUTPUT
+        }
+      shell: powershell
 
   build-and-package:
     needs: check-version
     runs-on: self-hosted
-    if: steps.check-version.outputs.release_exists == 'false'
+    if: needs.check-version.outputs.release_exists == 'false'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -219,7 +208,7 @@ jobs:
   compress-and-release:
     needs: [checkout-code, build-and-package]
     runs-on: self-hosted
-    if: steps.check-version.outputs.release_exists == 'false'
+    if: needs.check-version.outputs.release_exists == 'false'
     steps:
       - name: Extract release notes
         id: extract_notes
