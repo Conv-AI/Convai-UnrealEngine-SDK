@@ -1,8 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-# Release 3.4.0
+# Release 3.4.0-beta
 - Fixed multiple connection issues.
+- Can now play custom montages over MetaHuman Face animation.
 
 # Release 3.3.2
 - Added intermediate fix for audio being cutoff in multiplayer.
