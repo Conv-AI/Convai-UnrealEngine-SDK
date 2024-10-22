@@ -28,16 +28,13 @@ jobs:
     needs: checkout-code
     runs-on: self-hosted
     outputs:
-      release_exists: ${{ steps.check_release.outputs.release_exists }}  # Capture the output
+      release_exists: ${{ steps.check_release.outputs.release_exists }}  # Define job output based on step output
     steps:
       - name: Check if release exists using GitHub API
         id: check_release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Check if release exists
-          $release_exists = $false
-
           # Construct release name
           $release_name = "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
 
@@ -45,6 +42,7 @@ jobs:
           $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers @{ Authorization = "Bearer $env:GH_TOKEN" }
 
           # Check if release already exists
+          $release_exists = $false
           foreach ($release in $releases) {
               if ($release.name -eq $release_name) {
                   $release_exists = $true
@@ -52,21 +50,21 @@ jobs:
               }
           }
 
-          # Set output using the new $GITHUB_OUTPUT file
+          # Set step output
           if ($release_exists) {
-              Write-Host "Release for $release_name already exists."
-              echo "release_exists=true" >> $GITHUB_OUTPUT
+              echo "::set-output name=release_exists::true"
           } else {
-              Write-Host "New release $release_name. Proceeding with the build."
-              echo "release_exists=false" >> $GITHUB_OUTPUT
-          }
+              echo "::set-output name=release_exists::false"
         shell: powershell
 
   build-and-package:
     needs: check-version
     runs-on: self-hosted
-    if: needs.check-version.outputs.release_exists == 'false'
+    if: always()
     steps:
+      - name: Debug output
+        run: echo "Release exists output: ${{ needs.check-version.outputs.release_exists }}"
+
       - name: Checkout code
         uses: actions/checkout@v2
 
