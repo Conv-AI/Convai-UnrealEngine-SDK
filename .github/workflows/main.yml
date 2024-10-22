@@ -24,43 +24,43 @@ jobs:
           echo "::set-output name=version_name::$plugin_version"
         shell: powershell
 
-check-version:
-  needs: checkout-code
-  runs-on: self-hosted
-  outputs:
-    release_exists: ${{ steps.check_release.outputs.release_exists }}  # Capture the output
-  steps:
-    - name: Check if release exists using GitHub API
-      id: check_release
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        # Check if release exists
-        $release_exists = $false
+  check-version:
+    needs: checkout-code
+    runs-on: self-hosted
+    outputs:
+      release_exists: ${{ steps.check_release.outputs.release_exists }}  # Capture the output
+    steps:
+      - name: Check if release exists using GitHub API
+        id: check_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if release exists
+          $release_exists = $false
 
-        # Construct release name
-        $release_name = "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
+          # Construct release name
+          $release_name = "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
 
-        # Fetch releases
-        $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers @{ Authorization = "Bearer $env:GH_TOKEN" }
+          # Fetch releases
+          $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers @{ Authorization = "Bearer $env:GH_TOKEN" }
 
-        # Check if release already exists
-        foreach ($release in $releases) {
-            if ($release.name -eq $release_name) {
-                $release_exists = $true
-                break
-            }
-        }
+          # Check if release already exists
+          foreach ($release in $releases) {
+              if ($release.name -eq $release_name) {
+                  $release_exists = $true
+                  break
+              }
+          }
 
-        # Set output using the new $GITHUB_OUTPUT file
-        if ($release_exists) {
-            Write-Host "Release for $release_name already exists."
-            echo "release_exists=true" >> $GITHUB_OUTPUT
-        } else {
-            Write-Host "New release $release_name. Proceeding with the build."
-            echo "release_exists=false" >> $GITHUB_OUTPUT
-        }
-      shell: powershell
+          # Set output using the new $GITHUB_OUTPUT file
+          if ($release_exists) {
+              Write-Host "Release for $release_name already exists."
+              echo "release_exists=true" >> $GITHUB_OUTPUT
+          } else {
+              Write-Host "New release $release_name. Proceeding with the build."
+              echo "release_exists=false" >> $GITHUB_OUTPUT
+          }
+        shell: powershell
 
   build-and-package:
     needs: check-version
