@@ -63,7 +63,8 @@ jobs:
     if: always()
     steps:
       - name: Debug output
-        run: echo "Release exists output: ${{ needs.check-version.outputs.release_exists }}"
+        run: |
+          echo "Release exists output: ${{ needs.check-version.outputs.release_exists }}"
 
       - name: Checkout code
         uses: actions/checkout@v2
