@@ -61,7 +61,7 @@ jobs:
   build-and-package:
     needs: check-version
     runs-on: self-hosted
-    if: always()
+    if: needs.check-version.outputs.release_exists == 'false'
     steps:
       - name: Debug output
         run: |
