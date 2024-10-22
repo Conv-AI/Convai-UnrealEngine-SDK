@@ -22,6 +22,7 @@ DECLARE_LOG_CATEGORY_EXTERN(ConvaiAudioStreamerLog, Log, All);
 class USoundWaveProcedural;
 class IConvaiLipSyncInterface;
 class IConvaiLipSyncExtendedInterface;
+class IConvaiVisionInterface;
 
 
 /**
@@ -555,6 +556,15 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|LipSync")
 	bool SupportsLipSync();
 
+	IConvaiVisionInterface* FindFirstVisionComponent();
+
+	UFUNCTION(BlueprintCallable, Category = "Convai|Vision")
+	bool SetVisionComponent(UActorComponent* VisionComponent);
+
+	/** Returns true, if an Vision Component was available and attached to the character */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Convai|Vision")
+	bool SupportsVision();
+
 	bool ReplicateVoiceToNetwork;
 
 public:
@@ -581,6 +591,7 @@ public:
  
 	IConvaiLipSyncInterface* ConvaiLipSync;
 	IConvaiLipSyncExtendedInterface* ConvaiLipSyncExtended;
+	IConvaiVisionInterface* ConvaiVision;
 
 	void PlayLipSyncWithPreGeneratedDataSynced(FAnimationSequence& FaceSequence);
 
@@ -595,6 +606,8 @@ public:
 	void ResumeLipSync();
 
 	virtual bool CanUseLipSync();
+
+	virtual bool CanUseVision();
 
 	void OnVisemesReadyCallback();
 

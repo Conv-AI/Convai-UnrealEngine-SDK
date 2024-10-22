@@ -6,6 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "LipSyncInterface.h"
+#include "VisionInterface.h"
 #include "Math/UnrealMathUtility.h"
 #include "ConvaiUtils.h"
 
@@ -107,8 +108,8 @@ bool UConvaiAudioStreamer::ShouldMuteGlobal()
 
 void UConvaiAudioStreamer::PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
 {
-	// TODO Mohamed: when we start streaming lipsync over network we should remove this contition UKismetSystemLibrary::IsServer(this)
-	if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() || !UKismetSystemLibrary::IsServer(this))
+	// if ReplicateVoiceToNetwork is true then just play the voice data right away to avoid the lipsync cutoff issue
+	if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() || ReplicateVoiceToNetwork)
 	{
 		PlayVoiceData(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
 		return;
@@ -416,6 +417,47 @@ bool UConvaiAudioStreamer::SupportsLipSync()
 	return ConvaiLipSync != nullptr;
 }
 
+IConvaiVisionInterface* UConvaiAudioStreamer::FindFirstVisionComponent()
+{
+	// Find the Vision component
+	auto VisionComponents = (GetOwner()->GetComponentsByInterface(UConvaiVisionInterface::StaticClass()));
+	if (VisionComponents.Num())
+	{
+		SetVisionComponent(VisionComponents[0]);
+	}
+	return ConvaiVision;
+}
+
+bool UConvaiAudioStreamer::SetVisionComponent(UActorComponent* VisionComponent)
+{
+	if (!CanUseVision())
+		return false;
+
+	// Find the Vision component
+	if (VisionComponent && VisionComponent->GetClass()->ImplementsInterface(UConvaiVisionInterface::StaticClass()))
+	{
+		ConvaiVision = Cast<IConvaiVisionInterface>(VisionComponent);
+		return true;
+	}
+	else
+	{
+		ConvaiVision = nullptr;
+		return false;
+	}
+}
+
+bool UConvaiAudioStreamer::SupportsVision()
+{
+	if (!CanUseVision())
+		return false;
+
+	if (ConvaiVision == nullptr)
+	{
+		FindFirstVisionComponent();
+	}
+	return ConvaiVision != nullptr;
+}
+
 void UConvaiAudioStreamer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -427,6 +469,9 @@ void UConvaiAudioStreamer::BeginPlay()
 
 	if (ConvaiLipSync == nullptr)
 		FindFirstLipSyncComponent();
+
+	if (ConvaiVision == nullptr)
+		FindFirstVisionComponent();
 }
 
 void UConvaiAudioStreamer::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -475,6 +520,10 @@ void UConvaiAudioStreamer::DestroyOpus()
 
 void UConvaiAudioStreamer::PlayLipSyncWithPreGeneratedDataSynced(FAnimationSequence& FaceSequence)
 {
+	// Play the lipsync right away as a workaround for lipsync issue on multiplayer
+	if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() || ReplicateVoiceToNetwork)
+		PlayLipSyncWithPreGeneratedData(FaceSequence);
+
 	CurrentChunkFrameCounter++;
 
 	if (FaceSequence.AnimationFrames.Num() == 0)
@@ -585,6 +634,11 @@ void UConvaiAudioStreamer::ResumeLipSync()
 }
 
 bool UConvaiAudioStreamer::CanUseLipSync()
+{
+	return false;
+}
+
+bool UConvaiAudioStreamer::CanUseVision()
 {
 	return false;
 }

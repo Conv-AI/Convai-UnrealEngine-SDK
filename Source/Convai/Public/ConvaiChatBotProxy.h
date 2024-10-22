@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "Http.h"
+#include "ConvaiDefinitions.h"
 #include "ConvaiChatBotProxy.generated.h"
 
 
@@ -367,9 +368,6 @@ class UConvaiChatBotGetCharsProxy : public UOnlineBlueprintCallProxyBase
 	UPROPERTY(BlueprintAssignable)
 	FBotGetCharsHttpResponseCallbackSignature OnFailure;
 
-
-
-
 	/**
 	 *    Gets all character IDs created by the user.
 	 */
@@ -391,8 +389,6 @@ class UConvaiChatBotGetCharsProxy : public UOnlineBlueprintCallProxyBase
 	void finish();
 
 	FString URL;
-
-
 
 	// Outputs
 	TArray<FString> CharIDs;
@@ -452,3 +448,65 @@ class UConvaiDownloadImageProxy : public UOnlineBlueprintCallProxyBase
 	TWeakObjectPtr<UWorld> WorldPtr;
 };
 
+
+
+
+
+
+USTRUCT(BlueprintType)
+struct FAvailableVoices
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly, category = "Convai|Language")
+	TMap<FString, FVoiceLanguageStruct> AvailableVoices;
+
+	FAvailableVoices()
+	{}
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGetAvailableVoicesCallbackSignature, const FAvailableVoices&, AvailableVoices);
+
+UCLASS()
+class UConvaiGetAvailableVoicesProxy : public UOnlineBlueprintCallProxyBase
+{
+	GENERATED_BODY()
+
+public:
+	// Called when there is a successful http response
+	UPROPERTY(BlueprintAssignable)
+	FGetAvailableVoicesCallbackSignature OnSuccess;
+
+	// Called when there is an unsuccessful http response
+	UPROPERTY(BlueprintAssignable)
+	FGetAvailableVoicesCallbackSignature OnFailure;
+
+	/**
+	 *    Gets all available voices.
+	 */
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai Get Available Voices"), Category = "Convai|REST API")
+	static UConvaiGetAvailableVoicesProxy* CreateGetAvailableVoicesProxy(EVoiceType VoiceType, ELanguageType LanguageType, EGenderType Gender);
+
+	virtual void Activate() override;
+
+	void onHttpRequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bWasSuccessful);
+
+	void failed();
+	void success();
+
+	FString URL;
+	EVoiceType FilterVoiceType;
+	ELanguageType FilterLanguageType;
+	EGenderType FilterGender;
+
+	// Output
+	FAvailableVoices AvailableVoices;
+
+private:
+	// Helper functions
+	bool ParseAllVoiceData(const FString& JsonString, TMap<FString, FVoiceLanguageStruct>& FilteredVoices);
+	bool ParseVoiceData(TSharedPtr<FJsonObject> JsonObject, FVoiceLanguageStruct& OutVoice);	
+	FString GetLanguageCodeFromEnum(ELanguageType LanguageType);
+	FString GetGenderFromEnum(EGenderType GenderType);
+	FString GetVoiceTypeFromEnum(EVoiceType VoiceType);
+};
