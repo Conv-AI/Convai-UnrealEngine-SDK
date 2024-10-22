@@ -37,10 +37,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Log version passed as environment variable
-          Write-Host "Version passed from GitHub Actions: $env:VERSION"
+          Write-Host "Version passed from GitHub Actions: ${{ needs.checkout-code.outputs.version_name }}"
 
           # Construct release name using the version
-          $release_name = "Convai Unreal Engine SDK Version $env:VERSION"
+          $release_name = "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
 
           # Log the constructed release name for debugging
           Write-Host "Constructed release name: $release_name"
