@@ -36,24 +36,38 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $version = "${{ needs.checkout-code.outputs.version_name }}"
-          $release_name = "Convai Unreal Engine SDK Version $version"
+          # Log version passed as environment variable
+          Write-Host "Version passed from GitHub Actions: $env:VERSION"
+
+          # Construct release name using the version
+          $release_name = "Convai Unreal Engine SDK Version $env:VERSION"
+
+          # Log the constructed release name for debugging
+          Write-Host "Constructed release name: $release_name"
+
+          # Set the GitHub API URL for releases
           $url = "https://api.github.com/repos/${{ github.repository }}/releases?access_token=${{ secrets.GITHUB_TOKEN }}"
+          Write-Host "Fetching releases from URL: $url"
+
+          # Fetch the releases
           $releases = Invoke-RestMethod -Uri $url -Headers @{ Authorization = "Bearer $env:GH_TOKEN" }
+
+          # Initialize release existence flag
           $release_exists = $false
-          
+
+          # Check if release already exists
           foreach ($release in $releases) {
-            if ($release.name -eq $release_name) {
-              $release_exists = $true
-              break
-            }
+              if ($release.name -eq $release_name) {
+                  $release_exists = $true
+                  break
+              }
           }
 
           if ($release_exists) {
-            Write-Host "Release for $release_name already exists. Skipping build."
-            exit 0
+              Write-Host "Release for $release_name already exists. Skipping build."
+              exit 0
           } else {
-            Write-Host "New release. Proceeding with the build."
+              Write-Host "New release $release_name. Proceeding with the build."
           }
         shell: powershell
 
