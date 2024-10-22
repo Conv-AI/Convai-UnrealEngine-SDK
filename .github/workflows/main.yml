@@ -76,7 +76,7 @@ jobs:
   build-and-package:
     needs: check-version
     runs-on: self-hosted
-    if: needs.check-version.outputs.release_exists == 'false'
+    if: steps.check-version.outputs.release_exists == 'false'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -219,7 +219,7 @@ jobs:
   compress-and-release:
     needs: [checkout-code, build-and-package]
     runs-on: self-hosted
-    if: needs.check-version.outputs.release_exists == 'false'
+    if: steps.check-version.outputs.release_exists == 'false'
     steps:
       - name: Extract release notes
         id: extract_notes
