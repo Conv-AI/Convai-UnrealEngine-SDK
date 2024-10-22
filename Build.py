@@ -97,8 +97,8 @@ def main(ue_directory, repo_directory = None, extra_flags = ""):
     #     shutil.rmtree(output_dir)
 
     # Download and unzip new Content and ThirdParty directories
-    download_and_unzip('1-sWOJ8amM425eoZDhnZ_1FEVdhXajI7L', content_dir)
-    download_and_unzip('1qqrJXv62dz9MOsL9fMbL-E_RT5DhwB97', thirdparty_dir)
+    download_and_unzip('1CE8J24bkLCdhUiY3kVYgJYB-3cANlaEq', content_dir)
+    download_and_unzip('19slSAWhl9B_Uw92WAvL7FI_RTsKhd787', thirdparty_dir)
 
     # Build the plugin
     output_directory = os.path.join(repo_directory, "Output", os.path.basename(repo_directory))
