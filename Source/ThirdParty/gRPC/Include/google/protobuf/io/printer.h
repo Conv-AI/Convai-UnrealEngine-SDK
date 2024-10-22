@@ -767,7 +767,7 @@ class PROTOBUF_EXPORT Printer {
       annotation_lookups_;
 
   // If set, we invoke this when we do a label substitution. This can be used to
-  // verify consistency of the generated code while we generate it.
+  // verify_ consistency of the generated code while we generate it.
   absl::AnyInvocable<void(absl::string_view, SourceLocation)>
       substitution_listener_;
 

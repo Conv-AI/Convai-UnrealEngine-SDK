@@ -1073,13 +1073,13 @@ TEST_F(CodedStreamTest, Trim) {
   EXPECT_EQ(0, coded_output.ByteCount());
 
   // Write a single byte to the coded stream, ensure the cord stream has been
-  // advanced, and then verify Trim() does the right thing.
+  // advanced, and then verify_ Trim() does the right thing.
   const char kTestData[] = "abcdef";
   coded_output.WriteRaw(kTestData, 1);
   coded_output.Trim();
   EXPECT_EQ(1, coded_output.ByteCount());
 
-  // Write some more data to the coded stream, Trim() it, and verify
+  // Write some more data to the coded stream, Trim() it, and verify_
   // everything behaves as expected.
   coded_output.WriteRaw(kTestData, sizeof(kTestData));
   coded_output.Trim();

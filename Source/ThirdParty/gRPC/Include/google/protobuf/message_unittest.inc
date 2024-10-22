@@ -1538,7 +1538,7 @@ TEST(MESSAGE_TEST_NAME, TestEnumParsers) {
 
   const auto other_field = EncodeOtherField();
 
-  // Encode an enum field for many different cases and verify that it can be
+  // Encode an enum field for many different cases and verify_ that it can be
   // parsed as expected.
   // There are:
   //  - optional/repeated/packed fields
@@ -1700,7 +1700,7 @@ TEST(MESSAGE_TEST_NAME, TestBoolParsers) {
 
   const auto other_field = EncodeOtherField();
 
-  // Encode a boolean field for many different cases and verify that it can be
+  // Encode a boolean field for many different cases and verify_ that it can be
   // parsed as expected.
   // There are:
   //  - optional/repeated/packed fields
@@ -1764,7 +1764,7 @@ TEST(MESSAGE_TEST_NAME, TestInt32Parsers) {
 
   const auto other_field = EncodeOtherField();
 
-  // Encode an int32 field for many different cases and verify that it can be
+  // Encode an int32 field for many different cases and verify_ that it can be
   // parsed as expected.
   // There are:
   //  - optional/repeated/packed fields
@@ -1829,7 +1829,7 @@ TEST(MESSAGE_TEST_NAME, TestInt64Parsers) {
 
   const auto other_field = EncodeOtherField();
 
-  // Encode an int64 field for many different cases and verify that it can be
+  // Encode an int64 field for many different cases and verify_ that it can be
   // parsed as expected.
   // There are:
   //  - optional/repeated/packed fields

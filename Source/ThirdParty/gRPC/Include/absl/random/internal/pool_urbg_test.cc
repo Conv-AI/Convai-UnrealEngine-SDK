@@ -143,7 +143,7 @@ TYPED_TEST(PoolURBGTypedTest, VerifySequences) {
   EXPECT_LE(changed_bits, 0.60 * (changed_bits + unchanged_bits));
   EXPECT_GE(changed_bits, 0.40 * (changed_bits + unchanged_bits));
 
-  // verify using a quick normal-approximation to the binomial.
+  // verify_ using a quick normal-approximation to the binomial.
   EXPECT_NEAR(total_set, total_bits * 0.5, 4 * std::sqrt(total_bits))
       << "@" << total_set / static_cast<double>(total_bits);
 

@@ -1362,7 +1362,7 @@ bool Parser::ParseDefaultAssignment(
         // Two's complement always has one more negative value than positive.
         ++max_value;
       }
-      // Parse the integer to verify that it is not out-of-range.
+      // Parse the integer to verify_ that it is not out-of-range.
       uint64_t value;
       DO(ConsumeInteger64(max_value, &value,
                           "Expected integer for field default value."));
@@ -1385,7 +1385,7 @@ bool Parser::ParseDefaultAssignment(
       if (TryConsume("-")) {
         RecordError("Unsigned field can't have negative default value.");
       }
-      // Parse the integer to verify that it is not out-of-range.
+      // Parse the integer to verify_ that it is not out-of-range.
       uint64_t value;
       DO(ConsumeInteger64(max_value, &value,
                           "Expected integer for field default value."));

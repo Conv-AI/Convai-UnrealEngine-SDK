@@ -236,7 +236,7 @@ TEST(Symbolize, SymbolizeSplitTextSections) {
                TrySymbolize(GetPCFromFnPtr((void *)(&regular_func))));
 }
 
-// Tests that verify that Symbolize stack footprint is within some limit.
+// Tests that verify_ that Symbolize stack footprint is within some limit.
 #ifdef ABSL_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
 
 static void *g_pc_to_symbolize;
@@ -307,7 +307,7 @@ TEST(Symbolize, SymbolizeWithDemanglingStackConsumption) {
     !defined(ABSL_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE)
 // Use a 64K page size for PPC.
 const size_t kPageSize = 64 << 10;
-// We place a read-only symbols into the .text section and verify that we can
+// We place a read-only symbols into the .text section and verify_ that we can
 // symbolize them and other symbols after remapping them.
 const char kPadding0[kPageSize * 4] ABSL_ATTRIBUTE_SECTION_VARIABLE(.text) = "";
 const char kPadding1[kPageSize * 4] ABSL_ATTRIBUTE_SECTION_VARIABLE(.text) = "";

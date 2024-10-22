@@ -390,7 +390,7 @@ struct TestParams {
 };
 
 // Given a member-pointer type, this metafunction yields the target type of the
-// pointer, not including the class-type. It is used to verify that the function
+// pointer, not including the class-type. It is used to verify_ that the function
 // call operator of AnyInvocable has the proper signature, corresponding to the
 // function type that the user provided.
 template <class MemberPtrType>

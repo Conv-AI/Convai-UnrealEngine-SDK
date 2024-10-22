@@ -77,7 +77,7 @@ class TestGenerator : public CodeGenerator {
 };
 
 // This test verifies that all the expected insertion points exist.  It does
-// not verify that they are correctly-placed; that would require actually
+// not verify_ that they are correctly-placed; that would require actually
 // compiling the output which is a bit more than I care to do for this test.
 TEST(JavaPluginTest, PluginTest) {
   GOOGLE_CHECK_OK(File::SetContents(TestTempDir() + "/test.proto",
@@ -108,7 +108,7 @@ TEST(JavaPluginTest, PluginTest) {
 
   EXPECT_EQ(0, cli.Run(5, argv));
 
-  // Loop over the lines of the generated code and verify that we find what we
+  // Loop over the lines of the generated code and verify_ that we find what we
   // expect
 
   std::string output;

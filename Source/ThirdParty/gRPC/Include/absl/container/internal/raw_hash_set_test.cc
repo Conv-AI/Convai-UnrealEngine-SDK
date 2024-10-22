@@ -2415,7 +2415,7 @@ TYPED_TEST_SUITE(AlignOneTest, AlignOneTestTypes);
 TYPED_TEST(AlignOneTest, AlignOne) {
   // We previously had a bug in which we were copying a control byte over the
   // first slot when alignof(value_type) is 1. We test repeated
-  // insertions/erases and verify that the behavior is correct.
+  // insertions/erases and verify_ that the behavior is correct.
   TypeParam t;
   std::unordered_set<uint8_t> verifier;  // NOLINT
 

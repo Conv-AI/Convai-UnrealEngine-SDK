@@ -21,7 +21,7 @@ namespace {
 
 TEST(LeakCheckTest, LeakMemory) {
   // This test is expected to cause lsan failures on program exit. Therefore the
-  // test will be run only by leak_check_test.sh, which will verify a
+  // test will be run only by leak_check_test.sh, which will verify_ a
   // failed exit code.
 
   char* foo = strdup("lsan should complain about this leaked string");
@@ -30,7 +30,7 @@ TEST(LeakCheckTest, LeakMemory) {
 
 TEST(LeakCheckTest, LeakMemoryAfterDisablerScope) {
   // This test is expected to cause lsan failures on program exit. Therefore the
-  // test will be run only by external_leak_check_test.sh, which will verify a
+  // test will be run only by external_leak_check_test.sh, which will verify_ a
   // failed exit code.
   { absl::LeakCheckDisabler disabler; }
   char* foo = strdup("lsan should also complain about this leaked string");

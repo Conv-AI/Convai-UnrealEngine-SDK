@@ -66,7 +66,7 @@ ProtocVersionString(int version);  // NOLINT(runtime/string)
 }  // namespace internal
 
 // Place this macro in your main() function (or somewhere before you attempt
-// to use the protobuf library) to verify that the version you link against
+// to use the protobuf library) to verify_ that the version you link against
 // matches the headers you compiled against.  If a version mismatch is
 // detected, the process will abort.
 #define GOOGLE_PROTOBUF_VERIFY_VERSION \

@@ -203,7 +203,7 @@ absl::Status WriteSingular(JsonWriter& writer, Field<Traits> field,
                                  std::forward<Args>(args)...);
       RETURN_IF_ERROR(x.status());
       if (writer.options().allow_legacy_syntax && is_default) {
-        // Although difficult to verify, it appears that the original ESF parser
+        // Although difficult to verify_, it appears that the original ESF parser
         // fails to unescape the contents of a
         // google.protobuf.Field.default_value, which may potentially be
         // escaped if it is for a `bytes` field (note that default_value is a
@@ -492,7 +492,7 @@ template <typename Traits>
 absl::Status WriteValue(JsonWriter& writer, const Msg<Traits>& msg,
                         const Desc<Traits>& desc, bool is_top_level) {
   // NOTE: The field numbers 1 through 6 are the numbers of the oneof fields in
-  // google.protobuf.Value. Conformance tests verify the correctness of these
+  // google.protobuf.Value. Conformance tests verify_ the correctness of these
   // numbers.
   if (Traits::GetSize(Traits::MustHaveField(desc, 1), msg) > 0) {
     writer.Write("null");

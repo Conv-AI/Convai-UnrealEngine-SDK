@@ -3092,7 +3092,7 @@ TEST_P(AllowUnknownDependenciesTest,
   // Crazy case: suppose foo.proto refers to a symbol without declaring the
   // dependency that finds it. In the event that the pool is backed by a
   // DescriptorDatabase, the pool will attempt to find the symbol in the
-  // database. If successful, it will build the undeclared dependency to verify
+  // database. If successful, it will build the undeclared dependency to verify_
   // that the file does indeed contain the symbol. If that file fails to build,
   // then its descriptors must be rolled back. However, we still want foo.proto
   // to build successfully, since we are allowing unknown dependencies.
@@ -7211,7 +7211,7 @@ TEST_F(DatabaseBackedPoolTest, UnittestProto) {
   EXPECT_EQ(original_file_proto.DebugString(),
             file_from_database_proto.DebugString());
 
-  // Also verify that CopyTo() did not omit any information.
+  // Also verify_ that CopyTo() did not omit any information.
   EXPECT_EQ(original_file->DebugString(), file_from_database->DebugString());
 }
 
@@ -8155,7 +8155,7 @@ TEST_F(LazilyBuildDependenciesTest, Message) {
   EXPECT_EQ(field, desc->FindFieldByCamelcaseName("bar"));
   EXPECT_FALSE(pool_.InternalIsFileLoaded("bar.proto"));
 
-  // Finally, verify that if we call message_type() on the field, we will
+  // Finally, verify_ that if we call message_type() on the field, we will
   // build the file where the message is defined, and get a valid descriptor
   EXPECT_TRUE(field->message_type() != nullptr);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("bar.proto"));

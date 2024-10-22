@@ -1280,7 +1280,7 @@ TEST(Time, PrevTransitionNYC) {
 
 TEST(Time, AbslStringify) {
   // FormatTime is already well tested, so just use one test case here to
-  // verify that StrFormat("%v", t) works as expected.
+  // verify_ that StrFormat("%v", t) works as expected.
   absl::Time t = absl::Now();
   EXPECT_EQ(absl::StrFormat("%v", t), absl::FormatTime(t));
 }

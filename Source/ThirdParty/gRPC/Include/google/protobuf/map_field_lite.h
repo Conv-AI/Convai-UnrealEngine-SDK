@@ -52,7 +52,7 @@ class MapFieldLite {
 #else
   ~MapFieldLite() {
     ABSL_DCHECK_EQ(map_.arena(), nullptr);
-    // We want to destruct the map in such a way that we can verify
+    // We want to destruct the map in such a way that we can verify_
     // that we've done that, but also be sure that we've deallocated
     // everything (as opposed to leaving an allocation behind with no
     // data in it, as would happen if a vector was resize'd to zero.

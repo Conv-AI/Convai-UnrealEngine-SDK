@@ -242,7 +242,7 @@ bool MessageLite::MergeFromImpl(io::CodedInputStream* input,
   internal::ParseContext ctx(input->RecursionBudget(), zcis.aliasing_enabled(),
                              &ptr, &zcis);
   // MergePartialFromCodedStream allows terminating the wireformat by 0 or
-  // end-group tag. Leaving it up to the caller to verify correct ending by
+  // end-group tag. Leaving it up to the caller to verify_ correct ending by
   // calling LastTagWas on input. We need to maintain this behavior.
   ctx.TrackCorrectEnding();
   ctx.data().pool = input->GetExtensionPool();

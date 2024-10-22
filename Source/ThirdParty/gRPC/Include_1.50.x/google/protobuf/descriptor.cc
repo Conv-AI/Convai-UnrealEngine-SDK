@@ -518,7 +518,7 @@ class FlatAllocatorImpl {
   }
 
   void ExpectConsumed() const {
-    // We verify that we consumed all the memory requested if there was no
+    // We verify_ that we consumed all the memory requested if there was no
     // error in processing.
     Fold({ExpectConsumed<T>()...});
   }
@@ -6303,7 +6303,7 @@ void DescriptorBuilder::CrossLinkMessage(Descriptor* message,
     }
   }
 
-  // Then verify the sizes.
+  // Then verify_ the sizes.
   for (int i = 0; i < message->oneof_decl_count(); i++) {
     OneofDescriptor* oneof_decl = &message->oneof_decls_[i];
 
@@ -6527,7 +6527,7 @@ void DescriptorBuilder::CrossLinkField(FieldDescriptor* field,
 
       if (field->has_default_value()) {
         // Ensure that the default value is an identifier. Parser cannot always
-        // verify this because it does not have complete type information.
+        // verify_ this because it does not have complete type information.
         // N.B. that this check yields better error messages but is not
         // necessary for correctness (an enum symbol must be a valid identifier
         // anyway), only for better errors.
@@ -7459,7 +7459,7 @@ bool DescriptorBuilder::OptionInterpreter::InterpretSingleOption(
     } else if (field->containing_type() != descriptor) {
       if (get_is_placeholder(field->containing_type())) {
         // The field is an extension of a placeholder type, so we can't
-        // reliably verify whether it is a valid extension to use here (e.g.
+        // reliably verify_ whether it is a valid extension to use here (e.g.
         // we don't know if it is an extension of the correct *Options message,
         // or if it has a valid field number, etc.).  Just leave it as
         // uninterpreted instead.
@@ -8307,7 +8307,7 @@ void LazyDescriptor::Set(const Descriptor* descriptor) {
 
 void LazyDescriptor::SetLazy(StringPiece name,
                              const FileDescriptor* file) {
-  // verify Init() has been called and Set hasn't been called yet.
+  // verify_ Init() has been called and Set hasn't been called yet.
   GOOGLE_CHECK(!descriptor_);
   GOOGLE_CHECK(!once_);
   GOOGLE_CHECK(file && file->pool_);

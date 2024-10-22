@@ -47,7 +47,7 @@ int NaiveParse(const char* p, int32_t& res) {
   return ++len;
 }
 
-// A naive, easy to verify implementation for test purposes.
+// A naive, easy to verify_ implementation for test purposes.
 int NaiveParse(const char* p, int64_t& res) {
   int len = 0;
   auto r = ToInt64(*p);
@@ -59,7 +59,7 @@ int NaiveParse(const char* p, int64_t& res) {
   return ++len;
 }
 
-// A naive, easy to verify implementation for test purposes.
+// A naive, easy to verify_ implementation for test purposes.
 int NaiveSerialize(char* p, uint64_t value) {
   int n = 0;
   while (value > 127) {

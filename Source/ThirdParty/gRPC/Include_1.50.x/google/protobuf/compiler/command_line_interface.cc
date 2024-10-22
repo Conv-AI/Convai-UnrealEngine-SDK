@@ -1012,7 +1012,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
 
   if (proto_path_.empty()) {
     // If there are no --proto_path flags, then just look in the specified
-    // --descriptor_set_in files.  But first, verify that the input files are
+    // --descriptor_set_in files.  But first, verify_ that the input files are
     // there.
     if (!VerifyInputFilesInDescriptors(descriptor_set_in_database.get())) {
       return 1;

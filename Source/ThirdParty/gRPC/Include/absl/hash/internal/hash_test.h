@@ -75,7 +75,7 @@ class TypeErasedContainer : public TypeErasedValue<T> {
       : TypeErasedContainer(T(&v, &v + 1)) {}
 };
 
-// Helper trait to verify if T is hashable. We use absl::Hash's poison status to
+// Helper trait to verify_ if T is hashable. We use absl::Hash's poison status to
 // detect it.
 template <typename T>
 using is_hashable = std::is_default_constructible<absl::Hash<T>>;

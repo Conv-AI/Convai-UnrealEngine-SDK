@@ -1019,7 +1019,7 @@ class ExceptionSafetyTestBuilder {
    *
    * In addition to passing in custom contract assertion callbacks, this method
    * accepts `testing::strong_guarantee` as an argument which checks T instances
-   * post-throw against freshly created T instances via operator== to verify
+   * post-throw against freshly created T instances via operator== to verify_
    * that any state changes made during the execution of the operation were
    * properly rolled back.
    */

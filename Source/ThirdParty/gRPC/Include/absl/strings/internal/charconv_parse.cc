@@ -38,7 +38,7 @@ namespace {
 // representation in the target float.  Our algorithm requires at least 3 bits
 // of headway, but 19 decimal digits give a little more than that.
 //
-// The following static assertions verify the above comments:
+// The following static assertions verify_ the above comments:
 constexpr int kDecimalMantissaDigitsMax = 19;
 
 static_assert(std::numeric_limits<uint64_t>::digits10 ==

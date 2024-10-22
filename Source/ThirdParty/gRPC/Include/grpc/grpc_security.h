@@ -905,7 +905,7 @@ GRPCAPI void grpc_tls_credentials_options_set_identity_cert_name(
 /**
  * EXPERIMENTAL API - Subject to change
  *
- * Sets the options of whether to request and/or verify client certs. This shall
+ * Sets the options of whether to request and/or verify_ client certs. This shall
  * only be called on the server side.
  */
 GRPCAPI void grpc_tls_credentials_options_set_cert_request_type(
@@ -928,7 +928,7 @@ GRPCAPI void grpc_tls_credentials_options_set_crl_directory(
 /**
  * EXPERIMENTAL API - Subject to change
  *
- * Sets the options of whether to verify server certs on the client side.
+ * Sets the options of whether to verify_ server certs on the client side.
  * Passing in a non-zero value indicates verifying the certs.
  */
 GRPCAPI void grpc_tls_credentials_options_set_verify_server_cert(
@@ -956,7 +956,7 @@ GRPCAPI void grpc_tls_credentials_options_set_send_client_ca_list(
  *
  * The read-only request information exposed in a verification call.
  * Callers should not directly manage the ownership of it. We will make sure it
- * is always available inside verify() or cancel() call, and will destroy the
+ * is always available inside verify_() or cancel() call, and will destroy the
  * object at the end of custom verification.
  */
 typedef struct grpc_tls_custom_verification_check_request {
@@ -996,9 +996,9 @@ typedef struct grpc_tls_custom_verification_check_request {
 /**
  * EXPERIMENTAL API - Subject to change
  *
- * A callback function provided by gRPC as a parameter of the |verify| function
- * in grpc_tls_certificate_verifier_external. If |verify| is expected to be run
- * asynchronously, the implementer of |verify| will need to invoke this callback
+ * A callback function provided by gRPC as a parameter of the |verify_| function
+ * in grpc_tls_certificate_verifier_external. If |verify_| is expected to be run
+ * asynchronously, the implementer of |verify_| will need to invoke this callback
  * with |callback_arg| and proper verification status at the end to bring the
  * control back to gRPC C core.
  */
@@ -1031,7 +1031,7 @@ typedef struct grpc_tls_certificate_verifier_external {
    * - If expected to be processed asynchronously, the implementer should return
    *   false immediately, and then in the asynchronous thread invoke |callback|
    *   with the verification result. The implementer MUST NOT invoke the async
-   *   |callback| in the same thread before |verify| returns, otherwise it can
+   *   |callback| in the same thread before |verify_| returns, otherwise it can
    *   lead to deadlocks.
    *
    * user_data: any argument that is passed in the user_data of
@@ -1051,10 +1051,10 @@ typedef struct grpc_tls_certificate_verifier_external {
    *                     should only be used if the verification check is done
    *                     synchronously. the implementation must allocate the
    *                     error string via gpr_malloc() or gpr_strdup().
-   * return: return 0 if |verify| is expected to be executed asynchronously,
+   * return: return 0 if |verify_| is expected to be executed asynchronously,
    *         otherwise return a non-zero value.
    */
-  int (*verify)(void* user_data,
+  int (*verify_)(void* user_data,
                 grpc_tls_custom_verification_check_request* request,
                 grpc_tls_on_custom_verification_check_done_cb callback,
                 void* callback_arg, grpc_status_code* sync_status,
@@ -1071,7 +1071,7 @@ typedef struct grpc_tls_certificate_verifier_external {
    *            grpc_tls_certificate_verifier_external during construction time
    *            can be retrieved later here.
    * request: request information exposed to the function implementer. It will
-   *          be the same request object that was passed to verify(), and it
+   *          be the same request object that was passed to verify_(), and it
    *          tells the cancel() which request to cancel.
    */
   void (*cancel)(void* user_data,
@@ -1138,9 +1138,9 @@ void grpc_tls_certificate_verifier_release(
  * EXPERIMENTAL API - Subject to change
  *
  * Sets the verifier in options. The |options| will implicitly take a new ref to
- * the |verifier|. If not set on the client side, we will verify server's
+ * the |verifier|. If not set on the client side, we will verify_ server's
  * certificates, and check the default hostname. If not set on the server side,
- * we will verify client's certificates.
+ * we will verify_ client's certificates.
  */
 void grpc_tls_credentials_options_set_certificate_verifier(
     grpc_tls_credentials_options* options,
@@ -1153,7 +1153,7 @@ void grpc_tls_credentials_options_set_certificate_verifier(
  * basis. This is usually used in a combination with virtual hosting at the
  * client side, where each individual call on a channel can have a different
  * host associated with it.
- * This check is intended to verify that the host specified for the individual
+ * This check is intended to verify_ that the host specified for the individual
  * call is covered by the cert that the peer presented.
  * The default is a non-zero value, which indicates performing such checks.
  */

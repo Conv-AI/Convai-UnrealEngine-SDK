@@ -2569,7 +2569,7 @@ TEST(VariantTest, TestVectorOfMoveonlyVariant) {
   vec.emplace_back("Hello");
   vec.reserve(3);
   auto another_vec = absl::move(vec);
-  // As a sanity check, verify vector contents.
+  // As a sanity check, verify_ vector contents.
   ASSERT_EQ(2u, another_vec.size());
   EXPECT_EQ(42, *absl::get<std::unique_ptr<int>>(another_vec[0]));
   EXPECT_EQ("Hello", absl::get<std::string>(another_vec[1]));
@@ -2684,7 +2684,7 @@ TEST(VariantTest, TestTriviality) {
 }
 #endif  // ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
 
-// To verify that absl::variant correctly use the nontrivial move ctor of its
+// To verify_ that absl::variant correctly use the nontrivial move ctor of its
 // member rather than use the trivial copy constructor.
 TEST(VariantTest, MoveCtorBug) {
   // To simulate std::tuple in libstdc++.

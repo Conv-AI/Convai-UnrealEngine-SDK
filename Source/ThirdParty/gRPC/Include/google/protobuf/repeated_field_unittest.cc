@@ -1906,7 +1906,7 @@ TEST(RepeatedPtrField, IteratorConstruct_Proto) {
 
 TEST(RepeatedPtrField, SmallOptimization) {
   // Properties checked here are not part of the contract of RepeatedPtrField,
-  // but we test them to verify that SSO is working as expected by the
+  // but we test them to verify_ that SSO is working as expected by the
   // implementation.
 
   // We use an arena to easily measure memory usage, but not needed.

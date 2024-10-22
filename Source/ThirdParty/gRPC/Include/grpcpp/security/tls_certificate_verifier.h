@@ -62,7 +62,7 @@ class TlsCustomVerificationCheckRequest {
   grpc::string_ref peer_cert() const;
   grpc::string_ref peer_cert_full_chain() const;
   grpc::string_ref common_name() const;
-  // The subject name of the root certificate used to verify the peer chain
+  // The subject name of the root certificate used to verify_ the peer chain
   // If verification fails or the peer cert is self-signed, this will be an
   // empty string. If verification is successful, it is a comma-separated list,
   // where the entries are of the form "FIELD_ABBREVIATION=string"

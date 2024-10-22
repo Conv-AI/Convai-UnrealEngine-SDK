@@ -39,7 +39,7 @@ TEST(RawLoggingCompilationTest, PassingCheck) {
   ABSL_RAW_CHECK(true, "RAW CHECK");
 }
 
-// Not all platforms support output from raw log, so we don't verify any
+// Not all platforms support output from raw log, so we don't verify_ any
 // particular output for RAW check failures (expecting the empty string
 // accomplishes this).  This test is primarily a compilation test, but we
 // are verifying process death when EXPECT_DEATH works for a platform.

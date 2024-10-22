@@ -152,7 +152,7 @@ TEST(ReadSeedMaterialFromURBG, NullPtrVectorArgument) {
 TEST(MixSequenceIntoSeedMaterial, AvalancheEffectTestOneBitLong) {
   std::vector<uint32_t> seed_material = {1, 2, 3, 4, 5, 6, 7, 8};
 
-  // For every 32-bit number with exactly one bit set, verify the avalanche
+  // For every 32-bit number with exactly one bit set, verify_ the avalanche
   // effect holds.  In order to reduce flakiness of tests, accept values
   // anywhere in the range of 30%-70%.
   for (uint32_t v = 1; v != 0; v <<= 1) {
@@ -177,7 +177,7 @@ TEST(MixSequenceIntoSeedMaterial, AvalancheEffectTestOneBitLong) {
 TEST(MixSequenceIntoSeedMaterial, AvalancheEffectTestOneBitShort) {
   std::vector<uint32_t> seed_material = {1};
 
-  // For every 32-bit number with exactly one bit set, verify the avalanche
+  // For every 32-bit number with exactly one bit set, verify_ the avalanche
   // effect holds.  In order to reduce flakiness of tests, accept values
   // anywhere in the range of 30%-70%.
   for (uint32_t v = 1; v != 0; v <<= 1) {

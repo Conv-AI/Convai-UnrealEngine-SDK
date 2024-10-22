@@ -960,7 +960,7 @@ TYPED_TEST(LiteTest, AllLite43) {
 }
 
 // Verify that we can successfully parse fields of various types within oneof
-// fields. We also verify that we can parse the same data twice into the same
+// fields. We also verify_ that we can parse the same data twice into the same
 // message.
 TYPED_TEST(LiteTest, AllLite44) {
   // Int32

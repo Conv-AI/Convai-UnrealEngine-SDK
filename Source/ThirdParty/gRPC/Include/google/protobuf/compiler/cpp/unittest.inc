@@ -212,7 +212,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, MutableStringDefault) {
 
   // Note that the first time we call mutable_foo(), we get a newly-allocated
   // string, but if we clear it and call it again, we get the same object again.
-  // We should verify that it has its default value in both cases.
+  // We should verify_ that it has its default value in both cases.
   message.set_default_string("blah");
   message.Clear();
 
@@ -480,7 +480,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, ADLSwap) {
   UNITTEST::TestAllTypes message1, message2;
   TestUtil::SetAllFields(&message1);
 
-  // Note the address of one of the repeated fields, to verify it was swapped
+  // Note the address of one of the repeated fields, to verify_ it was swapped
   // rather than copied.
   const int32_t* addr = &message1.repeated_int32().Get(0);
 #ifdef PROTOBUF_FORCE_COPY_IN_SWAP

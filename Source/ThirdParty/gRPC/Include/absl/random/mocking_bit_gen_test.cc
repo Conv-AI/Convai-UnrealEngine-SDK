@@ -360,7 +360,7 @@ TEST(MockingBitGen, NiceMock) {
 }
 
 TEST(MockingBitGen, NaggyMock) {
-  // This is difficult to test, as only the output matters, so just verify
+  // This is difficult to test, as only the output matters, so just verify_
   // that ON_CALL can be installed. Anything else requires log inspection.
   ::testing::NaggyMock<absl::MockingBitGen> gen;
 

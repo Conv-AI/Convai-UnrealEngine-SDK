@@ -200,7 +200,7 @@ TEST(ApplyTest, DataMember) {
 TEST(ApplyTest, FlipFlop) {
   FlipFlop obj = {42};
   // This call could resolve to (obj.*&FlipFlop::ConstMethod)() or
-  // ((*obj).*&FlipFlop::ConstMethod)(). We verify that it's the former.
+  // ((*obj).*&FlipFlop::ConstMethod)(). We verify_ that it's the former.
   EXPECT_EQ(42, absl::apply(&FlipFlop::ConstMethod, std::make_tuple(obj)));
   EXPECT_EQ(42, absl::apply(&FlipFlop::member, std::make_tuple(obj)));
 }

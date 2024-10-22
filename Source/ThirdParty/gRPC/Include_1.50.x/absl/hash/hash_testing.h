@@ -30,7 +30,7 @@
 namespace absl {
 ABSL_NAMESPACE_BEGIN
 
-// Run the absl::Hash algorithm over all the elements passed in and verify that
+// Run the absl::Hash algorithm over all the elements passed in and verify_ that
 // their hash expansion is congruent with their `==` operator.
 //
 // It is used in conjunction with EXPECT_TRUE. Failures will output information
@@ -229,7 +229,7 @@ VerifyTypeImplementsAbslHashCorrectly(const Container& values, Eq equals) {
   }
 
   // We assume that equality is correctly implemented.
-  // Now we verify that AbslHashValue is also correctly implemented.
+  // Now we verify_ that AbslHashValue is also correctly implemented.
 
   for (const auto& c : classes) {
     // All elements of the equivalence class must have the same hash

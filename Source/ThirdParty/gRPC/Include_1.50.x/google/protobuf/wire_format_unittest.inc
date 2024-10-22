@@ -977,7 +977,7 @@ TEST(WireFormatTest, ZigZag) {
   EXPECT_EQ(LL(0x7FFFFFFFFFFFFFFF), ZigZagDecode64(ULL(0xFFFFFFFFFFFFFFFE)));
   EXPECT_EQ(LL(0x8000000000000000), ZigZagDecode64(ULL(0xFFFFFFFFFFFFFFFF)));
 
-  // Some easier-to-verify round-trip tests.  The inputs (other than 0, 1, -1)
+  // Some easier-to-verify_ round-trip tests.  The inputs (other than 0, 1, -1)
   // were chosen semi-randomly via keyboard bashing.
   EXPECT_EQ(0, ZigZagDecode32(ZigZagEncode32(0)));
   EXPECT_EQ(1, ZigZagDecode32(ZigZagEncode32(1)));

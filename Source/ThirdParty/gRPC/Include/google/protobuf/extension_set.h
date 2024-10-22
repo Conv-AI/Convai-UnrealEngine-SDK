@@ -1403,7 +1403,7 @@ class MessageTypeTraits {
   }
 };
 
-// Used by WireFormatVerify to extract the verify function from the registry.
+// Used by WireFormatVerify to extract the verify_ function from the registry.
 LazyEagerVerifyFnType FindExtensionLazyEagerVerifyFn(
     const MessageLite* extendee, int number);
 

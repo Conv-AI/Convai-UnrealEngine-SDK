@@ -1936,7 +1936,7 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
   typedef FileOptions OptionsType;
 
   bool is_placeholder_;
-  // Indicates the FileDescriptor is completed building. Used to verify
+  // Indicates the FileDescriptor is completed building. Used to verify_
   // that type accessor functions that can possibly build a dependent file
   // aren't called during the process of building the file.
   bool finished_building_;
@@ -2836,7 +2836,7 @@ struct FieldRangeImpl {
 // be -fno-rtti friendly. Without RTTI, MergeFrom() and CopyFrom() will fallback
 // to the reflection based method, which requires the Descriptor. However, while
 // building the descriptors, this causes deadlock. We also must disable lazy
-// parsing because that uses reflection to verify consistency.
+// parsing because that uses reflection to verify_ consistency.
 bool ParseNoReflection(absl::string_view from, google::protobuf::MessageLite& to);
 
 // The context for these functions under `cpp` is "for the C++ implementation".

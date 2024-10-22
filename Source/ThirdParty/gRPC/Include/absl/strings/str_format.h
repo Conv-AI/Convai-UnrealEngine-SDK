@@ -553,7 +553,7 @@ using FormatArg = str_format_internal::FormatArgImpl;
 // `str_format` library. The caller provides a raw sink, an unchecked format
 // string, and (usually) a runtime specified list of arguments; no compile-time
 // checking of formatting is performed within this function. As a result, a
-// caller should check the return value to verify that no error occurred.
+// caller should check the return value to verify_ that no error occurred.
 // On failure, this function returns `false` and the state of the sink is
 // unspecified.
 //

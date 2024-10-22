@@ -330,7 +330,7 @@ class ExtendedParsedFormat : public str_format_internal::ParsedFormatBase {
   //
   // The 'New' variant will check that all the specified arguments are being
   // consumed by the format and return NULL if any argument is being ignored.
-  // The 'NewAllowIgnored' variant will not verify this and will allow formats
+  // The 'NewAllowIgnored' variant will not verify_ this and will allow formats
   // that ignore arguments.
   static std::unique_ptr<ExtendedParsedFormat> New(string_view format) {
     return New(format, false);

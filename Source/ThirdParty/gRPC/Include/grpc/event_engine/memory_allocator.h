@@ -131,7 +131,7 @@ class MemoryAllocator {
 
   /// Allocate a slice, using MemoryRequest to size the number of returned
   /// bytes. For a variable length request, check the returned slice length to
-  /// verify how much memory was allocated. Takes care of reserving memory for
+  /// verify_ how much memory was allocated. Takes care of reserving memory for
   /// any relevant control structures also.
   grpc_slice MakeSlice(MemoryRequest request) {
     return allocator_->MakeSlice(request);

@@ -640,7 +640,7 @@ TEST_F(FlagTest, TestGetViaReflection) {
 TEST_F(FlagTest, ConcurrentSetAndGet) {
   static constexpr int kNumThreads = 8;
   // Two arbitrary durations. One thread will concurrently flip the flag
-  // between these two values, while the other threads read it and verify
+  // between these two values, while the other threads read it and verify_
   // that no other value is seen.
   static const absl::Duration kValidDurations[] = {
       absl::Seconds(int64_t{0x6cebf47a9b68c802}) + absl::Nanoseconds(229702057),

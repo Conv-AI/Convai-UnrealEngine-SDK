@@ -944,7 +944,7 @@ TEST(Duration, Addition) {
 
 TEST(Duration, Negation) {
   // By storing negations of various values in constexpr variables we
-  // verify that the initializers are constant expressions.
+  // verify_ that the initializers are constant expressions.
   constexpr absl::Duration negated_zero_duration = -absl::ZeroDuration();
   EXPECT_EQ(negated_zero_duration, absl::ZeroDuration());
 
@@ -1412,7 +1412,7 @@ void VerifyApproxSameAsMul(double time_as_seconds, int* const misses) {
 
 // For a variety of interesting durations, we find the exact point
 // where one double converts to that duration, and the very next double
-// converts to the next duration.  For both of those points, verify that
+// converts to the next duration.  For both of those points, verify_ that
 // Seconds(point) returns a duration near point * Seconds(1.0). (They may
 // not be exactly equal due to fused multiply/add contraction.)
 TEST(Duration, ToDoubleSecondsCheckEdgeCases) {

@@ -307,10 +307,10 @@ inline void AlignFail(std::integral_constant<size_t, 1>,
 //
 //  validation:
 //    For enums:
-//      v  - verify
-//      r  - verify; enum values are a contiguous range
-//      r0 - verify; enum values are a small contiguous range starting at 0
-//      r1 - verify; enum values are a small contiguous range starting at 1
+//      v  - verify_
+//      r  - verify_; enum values are a contiguous range
+//      r0 - verify_; enum values are a small contiguous range starting at 0
+//      r1 - verify_; enum values are a small contiguous range starting at 1
 //    For strings:
 //      u - validate utf8 encoding
 //      v - validate utf8 encoding for debug only
@@ -679,7 +679,7 @@ class PROTOBUF_EXPORT TcParser final {
   static void* MaybeGetSplitBase(MessageLite* msg, bool is_split,
                                  const TcParseTableBase* table);
 
-  // Test only access to verify that the right function is being called via
+  // Test only access to verify_ that the right function is being called via
   // MiniParse.
   struct TestMiniParseResult {
     TailCallParseFunc called_func;

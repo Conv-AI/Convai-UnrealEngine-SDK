@@ -1163,7 +1163,7 @@ TEST(ArenaTest, RepeatedFieldOnArena) {
   {
     internal::NoHeapChecker no_heap;
 
-    // Fill some repeated fields on the arena to test for leaks. Also verify no
+    // Fill some repeated fields on the arena to test for leaks. Also verify_ no
     // memory allocations.
     RepeatedField<int32_t> repeated_int32(&arena);
     RepeatedPtrField<TestAllTypes> repeated_message(&arena);

@@ -679,7 +679,7 @@ inline void TestUtil::ExpectClear(const UNITTEST::TestAllTypes& message) {
 inline void TestUtil::ExpectRepeatedFieldsModified(
     const UNITTEST::TestAllTypes& message) {
   // ModifyRepeatedFields only sets the second repeated element of each
-  // field.  In addition to verifying this, we also verify that the first
+  // field.  In addition to verifying this, we also verify_ that the first
   // element and size were *not* modified.
   ASSERT_EQ(2, message.repeated_int32_size());
   ASSERT_EQ(2, message.repeated_int64_size());
@@ -738,7 +738,7 @@ inline void TestUtil::ExpectRepeatedFieldsModified(
   EXPECT_EQ(UNITTEST_IMPORT::IMPORT_BAR, message.repeated_import_enum(0));
 
 
-  // Actually verify the second (modified) elements now.
+  // Actually verify_ the second (modified) elements now.
   EXPECT_EQ(501, message.repeated_int32(1));
   EXPECT_EQ(502, message.repeated_int64(1));
   EXPECT_EQ(503, message.repeated_uint32(1));
@@ -1657,7 +1657,7 @@ inline void TestUtil::ExpectExtensionsClear(
 inline void TestUtil::ExpectRepeatedExtensionsModified(
     const UNITTEST::TestAllExtensions& message) {
   // ModifyRepeatedFields only sets the second repeated element of each
-  // field.  In addition to verifying this, we also verify that the first
+  // field.  In addition to verifying this, we also verify_ that the first
   // element and size were *not* modified.
   ASSERT_EQ(2, message.ExtensionSize(UNITTEST::repeated_int32_extension));
   ASSERT_EQ(2, message.ExtensionSize(UNITTEST::repeated_int64_extension));
@@ -1738,7 +1738,7 @@ inline void TestUtil::ExpectRepeatedExtensionsModified(
             message.GetExtension(UNITTEST::repeated_string_piece_extension, 0));
   EXPECT_EQ("225", message.GetExtension(UNITTEST::repeated_cord_extension, 0));
 
-  // Actually verify the second (modified) elements now.
+  // Actually verify_ the second (modified) elements now.
   EXPECT_EQ(501, message.GetExtension(UNITTEST::repeated_int32_extension, 1));
   EXPECT_EQ(502, message.GetExtension(UNITTEST::repeated_int64_extension, 1));
   EXPECT_EQ(503, message.GetExtension(UNITTEST::repeated_uint32_extension, 1));

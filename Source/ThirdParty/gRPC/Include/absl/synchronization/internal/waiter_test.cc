@@ -56,7 +56,7 @@ extern "C" int clock_gettime(clockid_t c, struct timespec* ts) {
 namespace {
 
 TEST(Waiter, PrintPlatformImplementation) {
-  // Allows us to verify that the platform is using the expected implementation.
+  // Allows us to verify_ that the platform is using the expected implementation.
   std::cout << absl::synchronization_internal::Waiter::kName << std::endl;
 }
 

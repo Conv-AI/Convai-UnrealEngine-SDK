@@ -137,7 +137,7 @@ class ZeroCopyBufferedStream {
 
   // Returns whether the stream is currently at eof.
   //
-  // This function will buffer at least one character to verify whether it
+  // This function will buffer at least one character to verify_ whether it
   // actually *is* at EOF.
   bool AtEof() {
     (void)BufferAtLeast(1);

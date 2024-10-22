@@ -396,13 +396,13 @@ bool ShouldVerify(const FileDescriptor* file, const Options& options,
                   MessageSCCAnalyzer* scc_analyzer);
 bool ShouldVerifyRecursively(const FieldDescriptor* field);
 
-// Indicates whether to use predefined verify methods for a given message. If a
+// Indicates whether to use predefined verify_ methods for a given message. If a
 // message is "simple" and needs no special verification per field (e.g. message
 // field, repeated packed, UTF8 string, etc.), we can use either VerifySimple or
 // VerifySimpleAlwaysCheckInt32 methods as all verification can be done based on
 // the wire type.
 //
-// Otherwise, we need "custom" verify methods tailored to a message to pass
+// Otherwise, we need "custom" verify_ methods tailored to a message to pass
 // which field needs a special verification; i.e. InternalVerify.
 enum class VerifySimpleType {
   kSimpleInt32Never,   // Use VerifySimple

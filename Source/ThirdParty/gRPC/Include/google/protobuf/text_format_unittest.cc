@@ -524,7 +524,7 @@ TEST_F(TextFormatTest, PrintDeeplyNestedUnknownMessage) {
     }
   }
 
-  // Parse the data and verify that we can print it without overflowing the
+  // Parse the data and verify_ that we can print it without overflowing the
   // stack.
   unittest::TestEmptyMessage message;
   ASSERT_TRUE(message.ParseFromString(serialized));

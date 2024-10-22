@@ -1,4 +1,4 @@
-#if defined(_WIN32) || defined(__ANDROID__)
+#if defined(_WIN32)
 #if defined(_MSC_VER)
         #pragma warning (disable:4018) // 'expression' : signed/unsigned mismatch
         #pragma warning (disable:4065) // switch statement contains 'default' but no 'case' labels

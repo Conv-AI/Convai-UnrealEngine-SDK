@@ -191,14 +191,14 @@ void ExtensionGenerator::GenerateRegistration(io::Printer* p) {
       break;
     case FieldDescriptor::CPPTYPE_MESSAGE: {
       const bool should_verify =
-          // Only verify msgs.
+          // Only verify_ msgs.
           descriptor_->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE &&
-          // Options say to verify.
+          // Options say to verify_.
           ShouldVerify(descriptor_->message_type(), options_, scc_analyzer_) &&
           ShouldVerify(descriptor_->containing_type(), options_, scc_analyzer_);
       const auto message_type = FieldMessageTypeName(descriptor_, options_);
       auto v = p->WithVars(
-          {{"verify", should_verify
+          {{"verify_", should_verify
                           ? absl::StrCat("&", message_type, "::InternalVerify")
                           : "nullptr"},
            {"message_type", message_type},
@@ -232,14 +232,14 @@ void ExtensionGenerator::GenerateRegistration(io::Printer* p) {
                   $number$, $field_type$, $repeated$, $packed$,
                   ::_pbi::GetPrototypeForWeakDescriptor(&$extension_table$,
                                                         $extension_index$),
-                  $verify$, ::_pbi::LazyAnnotation::$lazy$),
+                  $verify_$, ::_pbi::LazyAnnotation::$lazy$),
             )cc");
       } else {
         p->Emit(R"cc(
           ::_pbi::ExtensionSet::RegisterMessageExtension(
               &$extendee$::default_instance(), $number$, $field_type$,
               $repeated$, $packed$, &$message_type$::default_instance(),
-              $verify$, ::_pbi::LazyAnnotation::$lazy$),
+              $verify_$, ::_pbi::LazyAnnotation::$lazy$),
         )cc");
       }
       break;

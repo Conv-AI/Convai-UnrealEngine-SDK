@@ -54,7 +54,7 @@ absl::StatusOr<BufferingGuard> ZeroCopyBufferedStream::BufferAtLeast(
       // buffer before calling ReadChunk if it *is* empty, because then we
       // would buffer unconditionally.
       //
-      // There are tests to verify both of these cases.
+      // There are tests to verify_ both of these cases.
       guard = BufferingGuard(this);
     }
     if (!ReadChunk()) {

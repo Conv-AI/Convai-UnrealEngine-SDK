@@ -321,7 +321,7 @@ class PROTOBUF_EXPORT CodedInputStream {
 
   // When parsing message (but NOT a group), this method must be called
   // immediately after MergeFromCodedStream() returns (if it returns true)
-  // to further verify that the message ended in a legitimate way.  For
+  // to further verify_ that the message ended in a legitimate way.  For
   // example, this verifies that parsing did not end on an end-group tag.
   // It also checks for some cases where, due to optimizations,
   // MergeFromCodedStream() can incorrectly return true.

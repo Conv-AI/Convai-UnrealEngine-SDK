@@ -99,7 +99,7 @@ class TlsCredentialsOptions {
   // basis. This is usually used in a combination with virtual hosting at the
   // client side, where each individual call on a channel can have a different
   // host associated with it.
-  // This check is intended to verify that the host specified for the individual
+  // This check is intended to verify_ that the host specified for the individual
   // call is covered by the cert that the peer presented.
   // We will perform such checks by default. This should be disabled if
   // verifiers other than the host name verifier is used.

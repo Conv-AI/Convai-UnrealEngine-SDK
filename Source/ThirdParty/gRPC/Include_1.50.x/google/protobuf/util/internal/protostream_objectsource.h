@@ -155,7 +155,7 @@ class PROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
       const google::protobuf::Field* field, StringPiece name,
       uint32_t list_tag, ObjectWriter* ow) const;
 
-  // Looks up a field and verify its consistency with wire type in tag.
+  // Looks up a field and verify_ its consistency with wire type in tag.
   const google::protobuf::Field* FindAndVerifyField(
       const google::protobuf::Type& type, uint32_t tag) const;
 

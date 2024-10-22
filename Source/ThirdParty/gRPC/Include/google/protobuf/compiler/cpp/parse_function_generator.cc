@@ -549,7 +549,7 @@ void ParseFunctionGenerator::GenerateTailCallTable(io::Printer* printer) {
                                       ShouldSplit(aux_entry.field, options_))},
                         {"strict",
                          utf8_check == internal::cpp::Utf8CheckMode::kStrict},
-                        {"verify",
+                        {"verify_",
                          utf8_check == internal::cpp::Utf8CheckMode::kVerify},
                         {"validate", validated_enum},
                         {"key_wire", map_key->type()},
@@ -558,7 +558,7 @@ void ParseFunctionGenerator::GenerateTailCallTable(io::Printer* printer) {
                     R"cc(
                       {::_pbi::TcParser::GetMapAuxInfo<
                           decltype($classname$().$field$)>(
-                          $strict$, $verify$, $validate$, $key_wire$,
+                          $strict$, $verify_$, $validate$, $key_wire$,
                           $value_wire$)},
                     )cc");
                 break;

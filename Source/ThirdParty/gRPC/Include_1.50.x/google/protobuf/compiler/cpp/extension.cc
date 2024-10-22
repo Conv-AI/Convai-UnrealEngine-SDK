@@ -96,9 +96,9 @@ ExtensionGenerator::ExtensionGenerator(const FieldDescriptor* descriptor,
   variables_["number"] = StrCat(descriptor_->number());
 
   bool add_verify_fn =
-      // Only verify msgs.
+      // Only verify_ msgs.
       descriptor_->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE &&
-      // Options say to verify.
+      // Options say to verify_.
       ShouldVerify(descriptor_->message_type(), options_, scc_analyzer_) &&
       ShouldVerify(descriptor_->containing_type(), options_, scc_analyzer_);
 

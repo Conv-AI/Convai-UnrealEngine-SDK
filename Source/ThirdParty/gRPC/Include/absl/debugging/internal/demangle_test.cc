@@ -119,7 +119,7 @@ TEST(Demangle, AbiTags) {
   EXPECT_STREQ("C[abi:bar][abi:foo]()", tmp);
 }
 
-// Tests that verify that Demangle footprint is within some limit.
+// Tests that verify_ that Demangle footprint is within some limit.
 // They are not to be run under sanitizers as the sanitizers increase
 // stack consumption by about 4x.
 #if defined(ABSL_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION) && \

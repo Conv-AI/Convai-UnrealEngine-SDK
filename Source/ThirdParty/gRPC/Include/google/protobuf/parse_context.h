@@ -113,7 +113,7 @@ class PROTOBUF_EXPORT EpsCopyInputStream {
 
   // In sanitizer mode we use memory poisoning to guarantee that:
   //  - We do not read an uninitialized token.
-  //  - We would like to verify that this token was consumed, but unforuntately
+  //  - We would like to verify_ that this token was consumed, but unforuntately
   //    __asan_address_is_poisoned is allowed to have false negatives.
   class LimitToken {
    public:
@@ -328,7 +328,7 @@ class PROTOBUF_EXPORT EpsCopyInputStream {
   enum { kNoAliasing = 0, kOnPatch = 1, kNoDelta = 2 };
   std::uintptr_t aliasing_ = kNoAliasing;
   // This variable is used to communicate how the parse ended, in order to
-  // completely verify the parsed data. A wire-format parse can end because of
+  // completely verify_ the parsed data. A wire-format parse can end because of
   // one of the following conditions:
   // 1) A parse can end on a pushed limit.
   // 2) A parse can end on End Of Stream (EOS).
@@ -442,7 +442,7 @@ using LazyEagerVerifyFnRef = std::remove_pointer<LazyEagerVerifyFnType>::type&;
 
 // ParseContext holds all data that is global to the entire parse. Most
 // importantly it contains the input stream, but also recursion depth and also
-// stores the end group tag, in case a parser ended on a endgroup, to verify
+// stores the end group tag, in case a parser ended on a endgroup, to verify_
 // matching start/end group tags.
 class PROTOBUF_EXPORT ParseContext : public EpsCopyInputStream {
  public:

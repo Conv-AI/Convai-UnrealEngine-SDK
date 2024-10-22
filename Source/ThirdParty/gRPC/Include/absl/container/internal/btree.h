@@ -45,8 +45,6 @@
 #ifndef ABSL_CONTAINER_INTERNAL_BTREE_H_
 #define ABSL_CONTAINER_INTERNAL_BTREE_H_
 
-#undef verify
-
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -194,7 +192,7 @@ struct BtreeTestOnlyCheckedCompareOptOutBase {};
 // greater<string_view>, less<absl::Cord>, and greater<absl::Cord>.
 // (2) Adapt the comparator to diagnose cases of non-strict-weak-ordering (see
 // https://en.cppreference.com/w/cpp/named_req/Compare) in debug mode. Whenever
-// a comparison is made, we will make assertions to verify that the comparator
+// a comparison is made, we will make assertions to verify_ that the comparator
 // is valid.
 template <typename Compare, typename Key>
 struct key_compare_adapter {
@@ -1577,7 +1575,7 @@ class btree {
   }
 
   // Verifies the structure of the btree.
-  void verify() const;
+  void verify_() const;
 
   // Size routines.
   size_type size() const { return size_; }
@@ -2602,7 +2600,7 @@ void btree<P>::swap(btree &other) {
 }
 
 template <typename P>
-void btree<P>::verify() const {
+void btree<P>::verify_() const {
   assert(root() != nullptr);
   assert(leftmost() != nullptr);
   assert(rightmost() != nullptr);

@@ -388,7 +388,7 @@ DiskSourceTree::DiskFileToVirtualFile(absl::string_view disk_file,
     return NO_MAPPING;
   }
 
-  // Iterate through all mappings with higher precedence and verify that none
+  // Iterate through all mappings with higher precedence and verify_ that none
   // of them map this file to some other existing file.
   for (int i = 0; i < mapping_index; i++) {
     if (ApplyMapping(*virtual_file, mappings_[i].virtual_path,

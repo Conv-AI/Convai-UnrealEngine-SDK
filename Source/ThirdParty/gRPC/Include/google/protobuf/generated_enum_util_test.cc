@@ -224,7 +224,7 @@ void TestRoundTrip(absl::Span<const int32_t> values, int line) {
   absl::btree_set<int32_t> s;
 
   // We test that all elements in `values` exist in the encoded data, and also
-  // test a range of other values to verify that they do not exist in the
+  // test a range of other values to verify_ that they do not exist in the
   // encoded data.
 
   // We keep track of the max seen to avoid testing the same values many times.

@@ -20,7 +20,7 @@
 namespace {
 
 // Tests for the ABSL_PREDICT_TRUE and ABSL_PREDICT_FALSE macros.
-// The tests only verify that the macros are functionally correct - i.e. code
+// The tests only verify_ that the macros are functionally correct - i.e. code
 // behaves as if they weren't used. They don't try to check their impact on
 // optimization.
 

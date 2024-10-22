@@ -58,7 +58,7 @@
 //     Message* foo = new Foo;
 //     const Descriptor* descriptor = foo->GetDescriptor();
 //
-//     // Get the descriptors for the fields we're interested in and verify
+//     // Get the descriptors for the fields we're interested in and verify_
 //     // their types.
 //     const FieldDescriptor* text_field = descriptor->FindFieldByName("text");
 //     assert(text_field != nullptr);

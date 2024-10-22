@@ -1215,9 +1215,9 @@ void MessageGenerator::GenerateFieldAccessorDefinitions(io::Printer* p) {
   p->Emit("// $classname$\n\n");
 
   for (auto field : FieldRange(descriptor_)) {
-    // We use a print listener to verify that the field generators properly add
+    // We use a print listener to verify_ that the field generators properly add
     // the right annotations. This is only a verification step aimed to prevent
-    // bugs where we have lack of test coverage. Note that this will verify the
+    // bugs where we have lack of test coverage. Note that this will verify_ the
     // annotations even when the particular feature is not on because we look at
     // the substitution variables, not the substitution result.
     // The check is a state machine that verifies that every substitution for

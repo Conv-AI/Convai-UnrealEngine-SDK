@@ -1383,7 +1383,7 @@ TEST(ExtensionSetTest, Proto3PackedDynamicExtensions) {
   MessageOptions message_options;
   ASSERT_TRUE(message_options.ParseFromCodedStream(&coded_stream));
 
-  // Finally, serialize the proto again and verify that the repeated option has
+  // Finally, serialize the proto again and verify_ that the repeated option has
   // been correctly serialized in packed form.
   std::string reserialized_options;
   ASSERT_TRUE(message_options.SerializeToString(&reserialized_options));

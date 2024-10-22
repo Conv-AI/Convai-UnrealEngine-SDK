@@ -275,7 +275,7 @@ TEST(Uint128, ConversionTests) {
   EXPECT_EQ(intrinsic, static_cast<__int128>(custom));
 #endif  // ABSL_HAVE_INTRINSIC_INT128
 
-  // verify that an integer greater than 2**64 that can be stored precisely
+  // verify_ that an integer greater than 2**64 that can be stored precisely
   // inside a double is converted to a absl::uint128 without loss of
   // information.
   double precise_double = 0x530e * std::pow(2.0, 64.0) + 0xda74000000000000;

@@ -1100,7 +1100,7 @@ TEST_F(FormatConvertTest, LongDouble) {
                            12345678901.L, 123456789012.L, 1234567890123.L,
                            // This value is not representable in double, but it
                            // is in long double that uses the extended format.
-                           // This is to verify that we are not truncating the
+                           // This is to verify_ that we are not truncating the
                            // value mistakenly through a double.
                            10000000000000000.25L}) {
     for (int exp : {-1000, -500, 0, 500, 1000}) {

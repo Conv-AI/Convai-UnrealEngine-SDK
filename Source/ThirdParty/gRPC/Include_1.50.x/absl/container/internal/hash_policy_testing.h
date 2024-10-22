@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// Utilities to help tests verify that hash tables properly handle stateful
+// Utilities to help tests verify_ that hash tables properly handle stateful
 // allocators and hash functions.
 
 #ifndef ABSL_CONTAINER_INTERNAL_HASH_POLICY_TESTING_H_

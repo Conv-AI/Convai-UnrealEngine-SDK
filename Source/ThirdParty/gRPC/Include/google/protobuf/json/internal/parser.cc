@@ -1043,7 +1043,7 @@ absl::Status ParseValue(JsonLexer& lex, const Desc<Traits>& desc,
   auto kind = lex.PeekKind();
   RETURN_IF_ERROR(kind.status());
   // NOTE: The field numbers 1 through 6 are the numbers of the oneof fields
-  // in google.protobuf.Value. Conformance tests verify the correctness of
+  // in google.protobuf.Value. Conformance tests verify_ the correctness of
   // these numbers.
   switch (*kind) {
     case JsonLexer::kNull: {

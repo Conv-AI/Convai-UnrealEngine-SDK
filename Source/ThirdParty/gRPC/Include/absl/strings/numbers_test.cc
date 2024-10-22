@@ -898,7 +898,7 @@ TEST(stringtest, safe_strto32_base) {
 }
 
 TEST(stringtest, safe_strto32_range) {
-  // These tests verify underflow/overflow behaviour.
+  // These tests verify_ underflow/overflow behaviour.
   int32_t value;
   EXPECT_FALSE(safe_strto32_base("2147483648", &value, 10));
   EXPECT_EQ(std::numeric_limits<int32_t>::max(), value);
@@ -911,7 +911,7 @@ TEST(stringtest, safe_strto32_range) {
 }
 
 TEST(stringtest, safe_strto64_range) {
-  // These tests verify underflow/overflow behaviour.
+  // These tests verify_ underflow/overflow behaviour.
   int64_t value;
   EXPECT_FALSE(safe_strto64_base("9223372036854775808", &value, 10));
   EXPECT_EQ(std::numeric_limits<int64_t>::max(), value);
@@ -924,7 +924,7 @@ TEST(stringtest, safe_strto64_range) {
 }
 
 TEST(stringtest, safe_strto32_leading_substring) {
-  // These tests verify this comment in numbers.h:
+  // These tests verify_ this comment in numbers.h:
   // On error, returns false, and sets *value to: [...]
   //   conversion of leading substring if available ("123@@@" -> 123)
   //   0 if no leading substring available
@@ -946,7 +946,7 @@ TEST(stringtest, safe_strto32_leading_substring) {
 }
 
 TEST(stringtest, safe_strto64_leading_substring) {
-  // These tests verify this comment in numbers.h:
+  // These tests verify_ this comment in numbers.h:
   // On error, returns false, and sets *value to: [...]
   //   conversion of leading substring if available ("123@@@" -> 123)
   //   0 if no leading substring available

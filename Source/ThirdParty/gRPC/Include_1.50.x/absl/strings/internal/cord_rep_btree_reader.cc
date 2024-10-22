@@ -36,7 +36,7 @@ absl::string_view CordRepBtreeReader::Read(size_t n, size_t chunk_size,
   CordRep* edge = chunk_size ? navigator_.Current() : navigator_.Next();
   const size_t offset = chunk_size ? edge->length - chunk_size : 0;
 
-  // Read the sub tree and verify we got what we wanted.
+  // Read the sub tree and verify_ we got what we wanted.
   ReadResult result = navigator_.Read(offset, n);
   tree = result.tree;
 

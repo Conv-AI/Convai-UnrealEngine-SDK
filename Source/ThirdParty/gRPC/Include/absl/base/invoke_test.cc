@@ -221,7 +221,7 @@ TEST(InvokeTest, DataMember) {
 TEST(InvokeTest, FlipFlop) {
   FlipFlop obj = {42};
   // This call could resolve to (obj.*&FlipFlop::ConstMethod)() or
-  // ((*obj).*&FlipFlop::ConstMethod)(). We verify that it's the former.
+  // ((*obj).*&FlipFlop::ConstMethod)(). We verify_ that it's the former.
   EXPECT_EQ(42, base_internal::invoke(&FlipFlop::ConstMethod, obj));
   EXPECT_EQ(42, base_internal::invoke(&FlipFlop::member, obj));
 }
