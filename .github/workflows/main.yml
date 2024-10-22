@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - staging
+      - beta
   workflow_dispatch:
 
 jobs:
