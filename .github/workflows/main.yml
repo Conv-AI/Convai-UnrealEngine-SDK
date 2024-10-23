@@ -121,7 +121,7 @@ jobs:
                 }
                 Write-Host "Starting packaging for UE_$version..."
                 $uat_path = "$ue_version_path/Engine/Build/BatchFiles/RunUAT.bat"
-                & $uat_path BuildPlugin -Plugin="${{ steps.paths.outputs.plugin_path }}" -TargetPlatforms=Win64 -Package="$output_path" -Rocket -Marketplace
+                & $uat_path BuildPlugin -Plugin="${{ steps.paths.outputs.plugin_path }}" -Package="$output_path" -Rocket -Marketplace
                 if ($LASTEXITCODE -ne 0) {
                     Write-Host "Packaging failed for UE_$version. Exit code: $LASTEXITCODE"
                     exit $LASTEXITCODE
