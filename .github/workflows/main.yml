@@ -5,43 +5,68 @@ on:
     branches:
       - main
       - staging
-      - beta
   workflow_dispatch:
 
 jobs:
-  check-version:
-    runs-on: windows-latest
+  checkout-code:
+    runs-on: self-hosted
+    outputs:
+      version_name: ${{ steps.extract_version.outputs.version_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Extract version from .uplugin
-        id: version
+        id: extract_version
         run: |
           $plugin = Get-Content "ConvAI.uplugin" | ConvertFrom-Json
           $plugin_version = $plugin.VersionName
           echo "::set-output name=version_name::$plugin_version"
         shell: powershell
 
-      - name: Check if release exists
+  check-version:
+    needs: checkout-code
+    runs-on: self-hosted
+    outputs:
+      release_exists: ${{ steps.check_release.outputs.release_exists }}  # Define job output based on step output
+    steps:
+      - name: Check if release exists using GitHub API
         id: check_release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $release_name = "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
-          $latest_release = gh release list --limit 100 | Select-String $release_name
-          if ($latest_release) {
-            Write-Host "Release for $release_name already exists. Skipping build."
-            exit 0
+          # Construct release name
+          $release_name = "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
+
+          # Fetch releases
+          $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers @{ Authorization = "Bearer $env:GH_TOKEN" }
+
+          # Check if release already exists
+          $release_exists = $false
+          foreach ($release in $releases) {
+              if ($release.name -eq $release_name) {
+                  $release_exists = $true
+                  break
+              }
+          }
+
+          # Set step output
+          if ($release_exists) {
+              echo "::set-output name=release_exists::true"
           } else {
-            Write-Host "New release. Proceeding with the build."
+              echo "::set-output name=release_exists::false"
           }
         shell: powershell
 
   build-and-package:
     needs: check-version
     runs-on: self-hosted
+    if: needs.check-version.outputs.release_exists == 'false'
     steps:
+      - name: Debug output
+        run: |
+          echo "Release exists output: ${{ needs.check-version.outputs.release_exists }}"
+
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -81,10 +106,10 @@ jobs:
           }
         shell: powershell
 
-      - name: Build and package for Unreal versions 5.0 to 5.4
+      - name: Build and package for Unreal versions 5.1 to 5.4
         run: |
           try {
-            $versions = @()
+            $versions = @("5.4","5.3","5.2","5.1")
             foreach ($version in $versions) {
                 $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_$version"
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version/Convai"
@@ -107,34 +132,6 @@ jobs:
             exit 1
           }
         shell: powershell
-
-      - name: Test packaging for Android
-        run: |
-          @echo off
-          setlocal
-
-          set UE_PATH=${{ steps.paths.outputs.ue_root }}/UE_5.4/Engine/Build/BatchFiles/RunUAT.bat
-          set TEST_PROJECT_PATH=E:/Software/TestProject
-          set PLUGIN_FOLDER=%TEST_PROJECT_PATH%/Plugins
-
-          echo Starting project packaging for Android...
-
-          call "%UE_PATH%" BuildCookRun ^
-            -project="%TEST_PROJECT_PATH%/TestProject.uproject" ^
-            -noP4 -utf8output -platform=Android -targetplatform=Android -clientconfig=Shipping ^
-            -cook -stage -package -compressed -pak ^
-            -build -prereqs -distribution -archive ^
-            -archivedirectory="%TEST_PROJECT_PATH%/Android" ^
-            -target=TestProject -ddc=InstalledDerivedDataBackendGraph -installed
-
-          if %errorlevel% neq 0 (
-              echo Android packaging failed with exit code %errorlevel%.
-              exit /b %errorlevel%
-          )
-
-          echo Android packaging completed successfully.
-        shell: cmd
-
 
       - name: Test packaging for Windows UE 5.4
         run: |
@@ -167,13 +164,39 @@ jobs:
           }
         shell: powershell
 
+      - name: Test packaging for Android UE 5.4
+        run: |
+          $UE_PATH = "${{ steps.paths.outputs.ue_root }}/UE_5.4/Engine/Build/BatchFiles/RunUAT.bat"
+          $TEST_PROJECT_PATH = "E:/Software/TestProject"
+          $PLUGIN_FOLDER = "$TEST_PROJECT_PATH/Plugins"
+
+          Write-Host "Starting project packaging for Android..."
+
+          # The below commands are commented out for now, using PowerShell-style comments
+          & "$UE_PATH" BuildCookRun `
+            -project="$TEST_PROJECT_PATH/TestProject.uproject" `
+            -noP4 -utf8output -platform=Android -targetplatform=Android -clientconfig=Shipping `
+            -cook -stage -package -compressed -pak `
+            -build -prereqs -distribution -archive `
+            -archivedirectory="$TEST_PROJECT_PATH/Android" `
+            -target=TestProject -ddc=InstalledDerivedDataBackendGraph -installed
+
+          if ($LASTEXITCODE -ne 0) {
+              Write-Host "Android packaging failed with exit code $LASTEXITCODE."
+              exit $LASTEXITCODE
+          }
+
+          Write-Host "Android packaging completed successfully."
+        shell: powershell
+
+
       - name: Zip Plugin for each version
         run: |
           try {
-            $versions = @("5.4")
+            $versions = @("5.4","5.3","5.2","5.1")
             foreach ($version in $versions) {
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
-                Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip"
+                Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip" -Force
                 Write-Host "Zipped plugin for UE$version at $output_path.zip"
             }
           } catch {
@@ -183,26 +206,48 @@ jobs:
         shell: powershell
 
   compress-and-release:
-    needs: build-and-package
+    needs: [checkout-code, build-and-package]
     runs-on: self-hosted
+    if: needs.check-version.outputs.release_exists == 'false'
     steps:
       - name: Extract release notes
         id: extract_notes
         run: |
-          $version = "${{ steps.version.outputs.version_name }}"
+          $version = "${{ needs.checkout-code.outputs.version_name }}"
           $changelog = Get-Content "CHANGELOG.md"
           $notes = $changelog -split "\r?\n" | Select-String -Pattern "^# Release $version" -Context 0,10 | ForEach-Object { $_.Context.PostContext }
           $notes = $notes -join "`n"
           echo "::set-output name=release_notes::$notes"
         shell: powershell
 
+      - name: Create Git tag
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          $version = "${{ needs.checkout-code.outputs.version_name }}"
+          if (-not $version) { Write-Host "Version is empty!"; exit 1 }
+          git tag $version
+          git push origin $version
+        shell: powershell
+
+      - name: Confirm Git tag exists
+        run: |
+          $version = "${{ needs.checkout-code.outputs.version_name }}"
+          if (-not $version) { Write-Host "Version is empty!"; exit 1 }
+          git fetch --tags
+          git show-ref --tags | Select-String $version
+        shell: powershell
+
       - name: Update GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.version.outputs.version_name }}
-          release_name: "Convai Unreal Engine SDK Version ${{ steps.version.outputs.version_name }}"
+          tag_name: ${{ needs.checkout-code.outputs.version_name }}
+          name: "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
           body: ${{ steps.extract_notes.outputs.release_notes }}
           files: |
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.3.zip
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.2.zip
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.1.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
