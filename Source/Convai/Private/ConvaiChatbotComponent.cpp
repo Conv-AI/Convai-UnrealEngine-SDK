@@ -63,7 +63,7 @@ bool UConvaiChatbotComponent::IsProcessing()
 
 bool UConvaiChatbotComponent::IsListening()
 {
-	return (StreamInProgress);
+	return CanWriteToGetResponseStream();
 }
 
 bool UConvaiChatbotComponent::GetIsTalking()
