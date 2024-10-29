@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.4.1-beta
+- Fixed IsListening() was not properly returning the character state.
+
 # Release 3.4.0-beta
 - Fixed multiple connection issues.
 - Can now play custom montages over MetaHuman Face animation.
