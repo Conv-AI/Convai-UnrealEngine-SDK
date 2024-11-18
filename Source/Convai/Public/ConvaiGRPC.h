@@ -158,7 +158,7 @@ public:
 
 	bool CanWriteToStream()
 	{
-		return !IsStreamFinished() && !LastWriteReceived;
+		return !IsStreamFinished() && !LastWriteReceived && !FinishedWritingToStream;
 	}
 
 private:
@@ -205,6 +205,8 @@ private:
 	bool StreamInProgress = false;
 
 	bool FailAlreadyExecuted = false;
+
+	bool FinishedWritingToStream = false;
 
 	std::unique_ptr<service::ConvaiService::Stub> stub_;
 

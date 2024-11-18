@@ -10,7 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/GameInstance.h"
 #include "Engine/Engine.h"
-// #include <chrono>   
+#include "HAL/PlatformProcess.h"
 #include <string>
 #include "Engine/EngineTypes.h"
 
@@ -187,7 +187,7 @@ void UConvaiGRPCGetResponseProxy::WriteAudioDataToSend(uint8* Buffer, uint32 Len
 		// Reset
 		InformOnDataReceived = false;
 
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("WriteAudioDataToSend:: Informing On Data Received"));
+		//UE_LOG(ConvaiGRPCLog, Log, TEXT("WriteAudioDataToSend:: Informing On Data Received"));
 
 		// Inform of new data to send
 		OnStreamWrite(true);
@@ -564,11 +564,12 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 				*ConvaiGRPCGetResponseParams.CharID,
 				*ConvaiGRPCGetResponseParams.SessionID);
 				stream_handler->WritesDone((void*)&OnStreamWriteDoneDelegate); UE_LOG(ConvaiGRPCLog, Log, TEXT("On Stream Write Done Writing"));
+				FinishedWritingToStream = true;
 			}
 			else
 			{
 				// Let us know when new data is available
-				InformOnDataReceived = true; UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWrite: Awaiting audio data"));
+				InformOnDataReceived = true; // UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWrite: Awaiting audio data"));
 			}
 
 			// Do not proceed
@@ -597,15 +598,16 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 			*ConvaiGRPCGetResponseParams.CharID,
 			*ConvaiGRPCGetResponseParams.SessionID);
 		stream_handler->WriteLast(request, grpc::WriteOptions(), (void*)&OnStreamWriteDoneDelegate);
+		FinishedWritingToStream = true;
 	}
 	else
 	{
 		// Do a normal send of the data
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("Calling Stream Write | LastWriteReceived : %s | AudioBuffer.Num() : %d | Character ID : %s | Session ID : %s"),
-			(LastWriteReceived ? TEXT("True") : TEXT("False")),
-			AudioBuffer.Num(),
-			*ConvaiGRPCGetResponseParams.CharID,
-			*ConvaiGRPCGetResponseParams.SessionID);
+		//UE_LOG(ConvaiGRPCLog, Log, TEXT("Calling Stream Write | LastWriteReceived : %s | AudioBuffer.Num() : %d | Character ID : %s | Session ID : %s"),
+		//	(LastWriteReceived ? TEXT("True") : TEXT("False")),
+		//	AudioBuffer.Num(),
+		//	*ConvaiGRPCGetResponseParams.CharID,
+		//	*ConvaiGRPCGetResponseParams.SessionID);
 		stream_handler->Write(request, (void*)&OnStreamWriteDelegate);
 	}
 
@@ -639,37 +641,35 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		return;
 	}
 
+	if (ReceivedFinish)
+		return;
+
 	// Error handling
 	if (!ok || !status.ok()) {
 		// Log the error details
-		UE_LOG(ConvaiGRPCLog, Log,
-			TEXT("OnStreamRead - Received non-ok response: ok:%s Status.ok:%s | Error message:%s | Code:%i | LastWriteReceived:%s | InformOnDataReceived:%s | AudioBuffer.Num():%d | Character ID:%s | Session ID:%s"),
-			*FString(ok ? "True" : "False"),
-			*FString(status.ok() ? "Ok" : "Not Ok"),
-			*FString(status.error_message().c_str()),
-			status.error_code(),
-			(LastWriteReceived ? TEXT("True") : TEXT("False")),
-			(InformOnDataReceived ? TEXT("True") : TEXT("False")),
-			AudioBuffer.Num(),
-			*ConvaiGRPCGetResponseParams.CharID,
-			*ConvaiGRPCGetResponseParams.SessionID);
-
-		// Check if we have already received the final response, then close the stream
-		if (ReceivedFinalResponse) {
-			CallFinish();
-			return;
-		}
+		//UE_LOG(ConvaiGRPCLog, Log,
+		//	TEXT("OnStreamRead - Received non-ok response: ok:%s Status.ok:%s | Error message:%s | Code:%i | LastWriteReceived:%s | InformOnDataReceived:%s | AudioBuffer.Num():%d | Character ID:%s | Session ID:%s"),
+		//	*FString(ok ? "True" : "False"),
+		//	*FString(status.ok() ? "Ok" : "Not Ok"),
+		//	*FString(status.error_message().c_str()),
+		//	status.error_code(),
+		//	(LastWriteReceived ? TEXT("True") : TEXT("False")),
+		//	(InformOnDataReceived ? TEXT("True") : TEXT("False")),
+		//	AudioBuffer.Num(),
+		//	*ConvaiGRPCGetResponseParams.CharID,
+		//	*ConvaiGRPCGetResponseParams.SessionID);
 
 		// Retry logic: increment the retry counter
 		RetryCount++;
 		if (RetryCount >= MaxRetries) {
-			UE_LOG(ConvaiGRPCLog, Warning, TEXT("Exceeded maximum retries. Closing stream."));
-			CallFinish();  // Close the stream after 3 failed attempts
+			UE_LOG(ConvaiGRPCLog, Log, TEXT("No more data to read after 3 attempts. Calling Finish..."));
+			CallFinish();  // Close the stream after 3 attempts
 			return;
 		}
 
 		// Otherwise, initiate another read to continue the stream (retrying)
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("Retrying OnStreamRead... Attempt %d of %d"), RetryCount, MaxRetries);
+		//UE_LOG(ConvaiGRPCLog, Log, TEXT("Retrying OnStreamRead... Attempt %d of %d"), RetryCount, MaxRetries);
+		FPlatformProcess::Sleep(0.1f);
 		stream_handler->Read(reply.get(), (void*)&OnStreamReadDelegate);
 		return;
 	}
@@ -949,16 +949,8 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 	}
 
 	// Initiate another read task
-	if (!ReceivedFinish && !ReceivedFinalResponse)
-	{
-		reply->Clear();
-		stream_handler->Read(reply.get(), (void*)&OnStreamReadDelegate);
-	}
-
-	if (ReceivedFinalResponse)
-	{
-		CallFinish();
-	}
+	reply->Clear();
+	stream_handler->Read(reply.get(), (void*)&OnStreamReadDelegate);
 }
 
 void UConvaiGRPCGetResponseProxy::OnStreamFinish(bool ok)

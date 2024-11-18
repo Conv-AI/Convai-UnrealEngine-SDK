@@ -5,6 +5,7 @@
 #include "Engine/Engine.h"
 #include "Async/Async.h"
 #include "../Convai.h"
+#include "HAL/PlatformProcess.h"
 
 THIRD_PARTY_INCLUDES_START
 // grpc includes
@@ -202,6 +203,7 @@ uint32 FgRPCClient::Run()
 
     // Block until the next result is available in the completion queue "cq
 	while (bIsRunning && cq_.Next(&got_tag, &ok)) {
+		FPlatformProcess::Sleep(0.0001f);
 		if (got_tag)
 		{
 			FgRPC_Delegate* gRPC_Delegate = static_cast<FgRPC_Delegate*>(got_tag);
@@ -219,6 +221,7 @@ uint32 FgRPCClient::Run()
 		{
 			UE_LOG(ConvaiSubsystemLog, Log, TEXT("Bad got_tag"));
 		}
+
     }
 	UE_LOG(ConvaiSubsystemLog, Log, TEXT("End Run"));
 
