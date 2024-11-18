@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.4.2-beta
+- Fixed player time out warning message when using text.
+- Increased gRPC connection robustness by adding small delays and read retries.
+
 # Release 3.4.1-beta
 - Fixed IsListening() was not properly returning the character state.
 
