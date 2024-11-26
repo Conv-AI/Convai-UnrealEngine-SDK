@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.5.0
+- UE5.5 support
+
 # Release 3.4.2-beta
 - Fixed player time out warning message when using text.
 - Increased gRPC connection robustness by adding small delays and read retries.
