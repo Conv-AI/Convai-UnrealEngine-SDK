@@ -1181,7 +1181,7 @@ void ParseFunctionGenerator::GenerateStrings(Formatter& format,
         parser_name);
   }
   // It is intentionally placed before VerifyUTF8 because it doesn't make sense
-  // to verify UTF8 when we already know parsing failed.
+  // to verify_ UTF8 when we already know parsing failed.
   format("CHK_(ptr);\n");
   if (!check_utf8) return;  // return if this is a bytes field
   auto level = GetUtf8CheckMode(field, options_);

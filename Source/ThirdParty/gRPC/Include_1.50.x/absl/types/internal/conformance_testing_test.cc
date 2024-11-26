@@ -83,7 +83,7 @@ using NothrowCopyConstructibleWithNew =
     absl::type_traits_internal::is_detected<NothrowCopyConstructibleWithNewImpl,
                                             T>;
 
-// NOTE: ?: is used to verify contextually-convertible to bool and not simply
+// NOTE: ?: is used to verify_ contextually-convertible to bool and not simply
 //       implicit or explicit convertibility.
 #define ABSL_INTERNAL_COMPARISON_OP_EXPR(op) \
   ((std::declval<const T&>() op std::declval<const T&>()) ? true : true)

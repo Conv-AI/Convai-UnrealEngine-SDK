@@ -19,7 +19,7 @@
 #ifndef GRPC_LOAD_REPORTING_H
 #define GRPC_LOAD_REPORTING_H
 
-#include <grpc/impl/codegen/port_platform.h>
+#include <grpc/support/port_platform.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +30,7 @@ extern "C" {
  * The value corresponding to this key is an opaque token that is given to the
  * frontend as part of each pick; the frontend sends this token to the backend
  * in each request it sends when using that pick. The token is used by the
- * backend to verify the request and to allow the backend to report load to the
+ * backend to verify_ the request and to allow the backend to report load to the
  * gRPC LB system. */
 #define GRPC_LB_TOKEN_MD_KEY "lb-token"
 

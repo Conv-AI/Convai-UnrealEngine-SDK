@@ -609,7 +609,7 @@ class LayoutImpl<std::tuple<Elements...>, absl::index_sequence<SizeSeq...>,
   // Requires: `p` is aligned to `Alignment()`.
   template <class Char, size_t N = NumOffsets - 1, EnableIf<N == 0> = 0>
   void PoisonPadding(const Char* p) const {
-    Pointer<0>(p);  // verify the requirements on `Char` and `p`
+    Pointer<0>(p);  // verify_ the requirements on `Char` and `p`
   }
 
   template <class Char, size_t N = NumOffsets - 1, EnableIf<N != 0> = 0>

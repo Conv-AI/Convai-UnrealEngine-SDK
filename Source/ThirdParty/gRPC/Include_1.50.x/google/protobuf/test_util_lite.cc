@@ -545,7 +545,7 @@ void TestUtilLite::ExpectClear(const unittest::TestAllTypesLite& message) {
 void TestUtilLite::ExpectRepeatedFieldsModified(
     const unittest::TestAllTypesLite& message) {
   // ModifyRepeatedFields only sets the second repeated element of each
-  // field.  In addition to verifying this, we also verify that the first
+  // field.  In addition to verifying this, we also verify_ that the first
   // element and size were *not* modified.
   ASSERT_EQ(2, message.repeated_int32_size());
   ASSERT_EQ(2, message.repeated_int64_size());
@@ -600,7 +600,7 @@ void TestUtilLite::ExpectRepeatedFieldsModified(
   EXPECT_EQ(unittest_import::IMPORT_LITE_BAR, message.repeated_import_enum(0));
 
 
-  // Actually verify the second (modified) elements now.
+  // Actually verify_ the second (modified) elements now.
   EXPECT_EQ(501, message.repeated_int32(1));
   EXPECT_EQ(502, message.repeated_int64(1));
   EXPECT_EQ(503, message.repeated_uint32(1));
@@ -787,7 +787,7 @@ void TestUtilLite::ExpectPackedFieldsModified(
   EXPECT_EQ(612, message.packed_double(0));
   EXPECT_EQ(true, message.packed_bool(0));
   EXPECT_EQ(unittest::FOREIGN_LITE_BAR, message.packed_enum(0));
-  // Actually verify the second (modified) elements now.
+  // Actually verify_ the second (modified) elements now.
   EXPECT_EQ(801, message.packed_int32(1));
   EXPECT_EQ(802, message.packed_int64(1));
   EXPECT_EQ(803, message.packed_uint32(1));
@@ -1591,7 +1591,7 @@ void TestUtilLite::ExpectExtensionsClear(
 void TestUtilLite::ExpectRepeatedExtensionsModified(
     const unittest::TestAllExtensionsLite& message) {
   // ModifyRepeatedFields only sets the second repeated element of each
-  // field.  In addition to verifying this, we also verify that the first
+  // field.  In addition to verifying this, we also verify_ that the first
   // element and size were *not* modified.
   ASSERT_EQ(2, message.ExtensionSize(unittest::repeated_int32_extension_lite));
   ASSERT_EQ(2, message.ExtensionSize(unittest::repeated_int64_extension_lite));
@@ -1691,7 +1691,7 @@ void TestUtilLite::ExpectRepeatedExtensionsModified(
       message.GetExtension(unittest::repeated_import_enum_extension_lite, 0));
 
 
-  // Actually verify the second (modified) elements now.
+  // Actually verify_ the second (modified) elements now.
   EXPECT_EQ(501,
             message.GetExtension(unittest::repeated_int32_extension_lite, 1));
   EXPECT_EQ(502,
@@ -1956,7 +1956,7 @@ void TestUtilLite::ExpectPackedExtensionsModified(
   EXPECT_EQ(unittest::FOREIGN_LITE_BAR,
             message.GetExtension(unittest::packed_enum_extension_lite, 0));
 
-  // Actually verify the second (modified) elements now.
+  // Actually verify_ the second (modified) elements now.
   EXPECT_EQ(801,
             message.GetExtension(unittest::packed_int32_extension_lite, 1));
   EXPECT_EQ(802,

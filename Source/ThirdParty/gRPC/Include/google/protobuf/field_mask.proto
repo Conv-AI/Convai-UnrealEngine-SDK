@@ -32,11 +32,11 @@ syntax = "proto3";
 
 package google.protobuf;
 
-option csharp_namespace = "Google.Protobuf.WellKnownTypes";
 option java_package = "com.google.protobuf";
 option java_outer_classname = "FieldMaskProto";
 option java_multiple_files = true;
 option objc_class_prefix = "GPB";
+option csharp_namespace = "Google.Protobuf.WellKnownTypes";
 option go_package = "google.golang.org/protobuf/types/known/fieldmaskpb";
 option cc_enable_arenas = true;
 
@@ -237,7 +237,7 @@ option cc_enable_arenas = true;
 // ## Field Mask Verification
 //
 // The implementation of any API method which has a FieldMask type field in the
-// request should verify the included field paths, and return an
+// request should verify_ the included field paths, and return an
 // `INVALID_ARGUMENT` error if any path is unmappable.
 message FieldMask {
   // The set of field mask paths.

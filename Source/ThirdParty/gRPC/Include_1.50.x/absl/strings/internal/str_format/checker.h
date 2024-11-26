@@ -160,7 +160,7 @@ class ConvParser {
   }
 
   // Consume the width.
-  // If it is '*', we verify that it matches `args_`. `error_` is set if it
+  // If it is '*', we verify_ that it matches `args_`. `error_` is set if it
   // doesn't match.
   constexpr ConvParser ParseWidth() const {
     return IsDigit(GetChar(format_, 0))
@@ -175,7 +175,7 @@ class ConvParser {
   }
 
   // Consume the precision.
-  // If it is '*', we verify that it matches `args_`. `error_` is set if it
+  // If it is '*', we verify_ that it matches `args_`. `error_` is set if it
   // doesn't match.
   constexpr ConvParser ParsePrecision() const {
     return GetChar(format_, 0) != '.'
@@ -194,7 +194,7 @@ class ConvParser {
     return SetFormat(ConsumeAnyOf(format_, "lLhjztq"));
   }
 
-  // Consume the conversion character and verify that it matches `args_`.
+  // Consume the conversion character and verify_ that it matches `args_`.
   // `error_` is set if it doesn't match.
   constexpr ConvParser ParseConversion() const {
     return is_positional_

@@ -32,7 +32,7 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 //
-// Test program to verify that GzipOutputStream is compatible with command line
+// Test program to verify_ that GzipOutputStream is compatible with command line
 // gzip or java.util.zip.GzipOutputStream
 //
 // Reads data on standard input and writes compressed gzip stream to standard

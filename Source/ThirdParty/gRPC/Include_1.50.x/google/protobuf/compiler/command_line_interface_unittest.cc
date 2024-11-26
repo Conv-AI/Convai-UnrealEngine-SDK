@@ -2311,7 +2311,7 @@ TEST_F(CommandLineInterfaceTest, HelpText) {
 }
 
 TEST_F(CommandLineInterfaceTest, GccFormatErrors) {
-  // Test --error_format=gcc (which is the default, but we want to verify
+  // Test --error_format=gcc (which is the default, but we want to verify_
   // that it can be set explicitly).
 
   CreateTempFile("foo.proto",

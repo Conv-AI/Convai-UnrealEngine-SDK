@@ -237,7 +237,7 @@ option cc_enable_arenas = true;
 // ## Field Mask Verification
 //
 // The implementation of any API method which has a FieldMask type field in the
-// request should verify the included field paths, and return an
+// request should verify_ the included field paths, and return an
 // `INVALID_ARGUMENT` error if any path is unmappable.
 message FieldMask {
   // The set of field mask paths.

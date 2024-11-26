@@ -261,7 +261,7 @@ TEST_F(JsonUtilTest, TestPrintProto2EnumAsIntWithDefaultValue) {
 }
 
 TEST_F(JsonUtilTest, ParseMessage) {
-  // Some random message but good enough to verify that the parsing wrapper
+  // Some random message but good enough to verify_ that the parsing wrapper
   // functions are working properly.
   std::string input =
       "{\n"

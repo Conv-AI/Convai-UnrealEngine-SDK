@@ -1,39 +1,16 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
 //
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are
-// met:
-//
-//     * Redistributions of source code must retain the above copyright
-// notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above
-// copyright notice, this list of conditions and the following disclaimer
-// in the documentation and/or other materials provided with the
-// distribution.
-//     * Neither the name of Google Inc. nor the names of its
-// contributors may be used to endorse or promote products derived from
-// this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file or at
+// https://developers.google.com/open-source/licenses/bsd
 
 #ifndef GOOGLE_PROTOBUF_EXTENSION_SET_INL_H__
 #define GOOGLE_PROTOBUF_EXTENSION_SET_INL_H__
 
-#include <google/protobuf/parse_context.h>
-#include <google/protobuf/extension_set.h>
-#include <google/protobuf/metadata_lite.h>
+#include "google/protobuf/extension_set.h"
+#include "google/protobuf/metadata_lite.h"
+#include "google/protobuf/parse_context.h"
 
 namespace google {
 namespace protobuf {
@@ -76,14 +53,14 @@ const char* ExtensionSet::ParseFieldWithExtensionInfo(
       case WireFormatLite::TYPE_BYTES:
       case WireFormatLite::TYPE_GROUP:
       case WireFormatLite::TYPE_MESSAGE:
-        GOOGLE_LOG(FATAL) << "Non-primitive types can't be packed.";
+        ABSL_LOG(FATAL) << "Non-primitive types can't be packed.";
         break;
     }
   } else {
     switch (extension.type) {
 #define HANDLE_VARINT_TYPE(UPPERCASE, CPP_CAMELCASE)                        \
   case WireFormatLite::TYPE_##UPPERCASE: {                                  \
-    uint64 value;                                                           \
+    uint64_t value;                                                         \
     ptr = VarintParse(ptr, &value);                                         \
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);                                    \
     if (extension.is_repeated) {                                            \
@@ -103,7 +80,7 @@ const char* ExtensionSet::ParseFieldWithExtensionInfo(
 #undef HANDLE_VARINT_TYPE
 #define HANDLE_SVARINT_TYPE(UPPERCASE, CPP_CAMELCASE, SIZE)                 \
   case WireFormatLite::TYPE_##UPPERCASE: {                                  \
-    uint64 val;                                                             \
+    uint64_t val;                                                           \
     ptr = VarintParse(ptr, &val);                                           \
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);                                    \
     auto value = WireFormatLite::ZigZagDecode##SIZE(val);                   \
@@ -132,23 +109,23 @@ const char* ExtensionSet::ParseFieldWithExtensionInfo(
     }                                                                       \
   } break
 
-      HANDLE_FIXED_TYPE(FIXED32, UInt32, uint32);
-      HANDLE_FIXED_TYPE(FIXED64, UInt64, uint64);
-      HANDLE_FIXED_TYPE(SFIXED32, Int32, int32);
-      HANDLE_FIXED_TYPE(SFIXED64, Int64, int64);
+      HANDLE_FIXED_TYPE(FIXED32, UInt32, uint32_t);
+      HANDLE_FIXED_TYPE(FIXED64, UInt64, uint64_t);
+      HANDLE_FIXED_TYPE(SFIXED32, Int32, int32_t);
+      HANDLE_FIXED_TYPE(SFIXED64, Int64, int64_t);
       HANDLE_FIXED_TYPE(FLOAT, Float, float);
       HANDLE_FIXED_TYPE(DOUBLE, Double, double);
 #undef HANDLE_FIXED_TYPE
 
       case WireFormatLite::TYPE_ENUM: {
-        uint64 val;
-        ptr = VarintParse(ptr, &val);
+        uint64_t tmp;
+        ptr = VarintParse(ptr, &tmp);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        int value = val;
+        int value = tmp;
 
         if (!extension.enum_validity_check.func(
                 extension.enum_validity_check.arg, value)) {
-          WriteVarint(number, val, metadata->mutable_unknown_fields<T>());
+          WriteVarint(number, value, metadata->mutable_unknown_fields<T>());
         } else if (extension.is_repeated) {
           AddEnum(number, WireFormatLite::TYPE_ENUM, extension.is_packed, value,
                   extension.descriptor);
@@ -181,7 +158,7 @@ const char* ExtensionSet::ParseFieldWithExtensionInfo(
                 : MutableMessage(number, WireFormatLite::TYPE_GROUP,
                                  *extension.message_info.prototype,
                                  extension.descriptor);
-        uint32 tag = (number << 3) + WireFormatLite::WIRETYPE_START_GROUP;
+        uint32_t tag = (number << 3) + WireFormatLite::WIRETYPE_START_GROUP;
         return ctx->ParseGroup(value, ptr, tag);
       }
 
@@ -203,22 +180,29 @@ const char* ExtensionSet::ParseFieldWithExtensionInfo(
 
 template <typename Msg, typename T>
 const char* ExtensionSet::ParseMessageSetItemTmpl(
-    const char* ptr, const Msg* containing_type,
-    internal::InternalMetadata* metadata, internal::ParseContext* ctx) {
+    const char* ptr, const Msg* extendee, internal::InternalMetadata* metadata,
+    internal::ParseContext* ctx) {
   std::string payload;
-  uint32 type_id = 0;
-  bool payload_read = false;
+  uint32_t type_id = 0;
+  enum class State { kNoTag, kHasType, kHasPayload, kDone };
+  State state = State::kNoTag;
+
   while (!ctx->Done(&ptr)) {
-    uint32 tag = static_cast<uint8>(*ptr++);
+    uint32_t tag = static_cast<uint8_t>(*ptr++);
     if (tag == WireFormatLite::kMessageSetTypeIdTag) {
-      uint64 tmp;
+      uint64_t tmp;
       ptr = ParseBigVarint(ptr, &tmp);
-      GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-      type_id = tmp;
-      if (payload_read) {
+      // We should fail parsing if type id is 0 after cast to uint32.
+      GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr &&
+                                     static_cast<uint32_t>(tmp) != 0);
+      if (state == State::kNoTag) {
+        type_id = static_cast<uint32_t>(tmp);
+        state = State::kHasType;
+      } else if (state == State::kHasPayload) {
+        type_id = static_cast<uint32_t>(tmp);
         ExtensionInfo extension;
         bool was_packed_on_wire;
-        if (!FindExtension(2, type_id, containing_type, ctx, &extension,
+        if (!FindExtension(2, type_id, extendee, ctx, &extension,
                            &was_packed_on_wire)) {
           WriteLengthDelimited(type_id, payload,
                                metadata->mutable_unknown_fields<T>());
@@ -234,27 +218,30 @@ const char* ExtensionSet::ParseMessageSetItemTmpl(
 
           const char* p;
           // We can't use regular parse from string as we have to track
-          // proper recursion depth and descriptor pools.
-          ParseContext tmp_ctx(ctx->depth(), false, &p, payload);
-          tmp_ctx.data().pool = ctx->data().pool;
-          tmp_ctx.data().factory = ctx->data().factory;
+          // proper recursion depth and descriptor pools. Spawn a new
+          // ParseContext inheriting those attributes.
+          ParseContext tmp_ctx(ParseContext::kSpawn, *ctx, &p, payload);
           GOOGLE_PROTOBUF_PARSER_ASSERT(value->_InternalParse(p, &tmp_ctx) &&
                                          tmp_ctx.EndedAtLimit());
         }
-        type_id = 0;
+        state = State::kDone;
       }
     } else if (tag == WireFormatLite::kMessageSetMessageTag) {
-      if (type_id != 0) {
-        ptr = ParseFieldMaybeLazily(static_cast<uint64>(type_id) * 8 + 2, ptr,
-                                    containing_type, metadata, ctx);
+      if (state == State::kHasType) {
+        ptr = ParseFieldMaybeLazily(static_cast<uint64_t>(type_id) * 8 + 2, ptr,
+                                    extendee, metadata, ctx);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        type_id = 0;
+        state = State::kDone;
       } else {
-        int32 size = ReadSize(&ptr);
+        std::string tmp;
+        int32_t size = ReadSize(&ptr);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ptr = ctx->ReadString(ptr, size, &payload);
+        ptr = ctx->ReadString(ptr, size, &tmp);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        payload_read = true;
+        if (state == State::kNoTag) {
+          payload = std::move(tmp);
+          state = State::kHasPayload;
+        }
       }
     } else {
       ptr = ReadTag(ptr - 1, &tag);
@@ -262,7 +249,7 @@ const char* ExtensionSet::ParseMessageSetItemTmpl(
         ctx->SetLastTag(tag);
         return ptr;
       }
-      ptr = ParseField(tag, ptr, containing_type, metadata, ctx);
+      ptr = ParseField(tag, ptr, extendee, metadata, ctx);
       GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     }
   }

@@ -168,7 +168,7 @@ class TestGenerator : public CodeGenerator {
 };
 
 // This test verifies that all the expected insertion points exist.  It does
-// not verify that they are correctly-placed; that would require actually
+// not verify_ that they are correctly-placed; that would require actually
 // compiling the output which is a bit more than I care to do for this test.
 TEST(CppPluginTest, PluginTest) {
   GOOGLE_CHECK_OK(File::SetContents(TestTempDir() + "/test.proto",

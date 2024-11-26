@@ -91,14 +91,14 @@ class TlsCredentialsOptions {
   // basis. This is usually used in a combination with virtual hosting at the
   // client side, where each individual call on a channel can have a different
   // host associated with it.
-  // This check is intended to verify that the host specified for the individual
+  // This check is intended to verify_ that the host specified for the individual
   // call is covered by the cert that the peer presented.
   // We will perform such checks by default. This should be disabled if
   // verifiers other than the host name verifier is used.
   void set_check_call_host(bool check_call_host);
 
   // TODO(zhenlian): This is an experimental API is likely to change in the
-  // future. Before de-experiementalizing, verify the API is up to date.
+  // future. Before de-experiementalizing, verify_ the API is up to date.
   // If set, gRPC will read all hashed x.509 CRL files in the directory and
   // enforce the CRL files on all TLS handshakes. Only supported for OpenSSL
   // version > 1.1.

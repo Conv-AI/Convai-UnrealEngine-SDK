@@ -102,7 +102,7 @@ TEST(PythonPluginTest, ImportTest) {
                         "test1.proto"};
   ASSERT_EQ(0, cli.Run(5, argv));
 
-  // Loop over the lines of the generated code and verify that we find an
+  // Loop over the lines of the generated code and verify_ that we find an
   // ordinary Python import but do not find the string "importlib".
   std::string output;
   GOOGLE_CHECK_OK(File::GetContents(TestTempDir() + "/test1_pb2.py", &output,

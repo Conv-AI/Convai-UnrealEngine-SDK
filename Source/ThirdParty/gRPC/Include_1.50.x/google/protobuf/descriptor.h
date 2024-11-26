@@ -1644,7 +1644,7 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
   typedef FileOptions OptionsType;
 
   bool is_placeholder_;
-  // Indicates the FileDescriptor is completed building. Used to verify
+  // Indicates the FileDescriptor is completed building. Used to verify_
   // that type accessor functions that can possibly build a dependent file
   // aren't called during the process of building the file.
   bool finished_building_;

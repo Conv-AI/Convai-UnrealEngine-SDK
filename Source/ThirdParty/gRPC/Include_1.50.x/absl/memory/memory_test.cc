@@ -33,7 +33,7 @@ namespace {
 using ::testing::ElementsAre;
 using ::testing::Return;
 
-// This class creates observable behavior to verify that a destructor has
+// This class creates observable behavior to verify_ that a destructor has
 // been called, via the instance_count variable.
 class DestructorVerifier {
  public:

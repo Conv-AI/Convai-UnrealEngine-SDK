@@ -412,7 +412,7 @@ template <typename EnumType, EnumType enum_value0, EnumType enum_value1,
           typename MapMessage>
 void MapTestUtilImpl::ExpectMapFieldsModified(const MapMessage& message) {
   // ModifyMapFields only sets the second element of each field.  In addition to
-  // verifying this, we also verify that the first element and size were *not*
+  // verifying this, we also verify_ that the first element and size were *not*
   // modified.
   EXPECT_EQ(2, message.map_int32_int32().size());
   EXPECT_EQ(2, message.map_int64_int64().size());
@@ -450,7 +450,7 @@ void MapTestUtilImpl::ExpectMapFieldsModified(const MapMessage& message) {
   EXPECT_EQ(enum_value0, message.map_int32_enum().at(0));
   EXPECT_EQ(0, message.map_int32_foreign_message().at(0).c());
 
-  // Actually verify the second (modified) elements now.
+  // Actually verify_ the second (modified) elements now.
   EXPECT_EQ(2, message.map_int32_int32().at(1));
   EXPECT_EQ(2, message.map_int64_int64().at(1));
   EXPECT_EQ(2, message.map_uint32_uint32().at(1));

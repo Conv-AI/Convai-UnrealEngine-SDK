@@ -1284,7 +1284,7 @@ TEST_F(MapImplTest, SpaceUsed) {
                 m3[0].SpaceUsedLong() - sizeof(m3[0]));
 }
 
-// Attempts to verify that a map with keys a and b has a random ordering. This
+// Attempts to verify_ that a map with keys a and b has a random ordering. This
 // function returns true if it succeeds in observing both possible orderings.
 bool MapOrderingIsRandom(int a, int b) {
   bool saw_a_first = false;

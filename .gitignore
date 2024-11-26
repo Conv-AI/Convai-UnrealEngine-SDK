@@ -3,6 +3,7 @@
 
 # Ignore all folders in the project root except Source and Resources
 /*/
+!/.github/
 !/Source/
 !/Resources/
 

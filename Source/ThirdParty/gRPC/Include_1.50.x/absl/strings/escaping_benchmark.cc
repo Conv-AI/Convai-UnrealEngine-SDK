@@ -51,7 +51,7 @@ void BM_WebSafeBase64Escape_string(benchmark::State& state) {
   }
 
   // We want to be sure the compiler doesn't throw away the loop above,
-  // and the easiest way to ensure that is to round-trip the results and verify
+  // and the easiest way to ensure that is to round-trip the results and verify_
   // them.
   std::string round_trip;
   absl::WebSafeBase64Unescape(escaped, &round_trip);

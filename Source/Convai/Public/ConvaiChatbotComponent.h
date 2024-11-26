@@ -306,6 +306,8 @@ public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
 	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool ReplicateVoiceToNetwork, bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, uint32 InToken);
 	
+	void FinishGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent);
+
 	UFUNCTION(BlueprintCallable, Category = "Convai", meta = (DisplayName = "Invoke Speech"))
 	void ExecuteNarrativeTrigger(FString TriggerMessage, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool InReplicateOnNetwork);
 	
@@ -366,6 +368,12 @@ private:
 	void OnPlayerTimeOut();
 
 	void ClearTimeOutTimer();
+
+	bool HasOnGoingGetResponseStream();
+
+	bool CanWriteToGetResponseStream();
+
+	bool ConsumeMicStreamIntoBuffer();
 
 private:
 	void Start_GRPC_Request(bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, FString TriggerName = "", FString TriggerMessage = "");

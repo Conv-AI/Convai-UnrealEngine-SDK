@@ -1,25 +1,29 @@
-/*
- *
- * Copyright 2015 gRPC authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+//
+//
+// Copyright 2015 gRPC authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//
 
 #ifndef GRPCPP_IMPL_CODEGEN_CONFIG_PROTOBUF_H
 #define GRPCPP_IMPL_CODEGEN_CONFIG_PROTOBUF_H
 
+// IWYU pragma: private
+
 #define GRPC_OPEN_SOURCE_PROTO
+
+#define GRPC_PROTOBUF_CORD_SUPPORT_ENABLED
 
 #ifndef GRPC_CUSTOM_MESSAGE
 #ifdef GRPC_USE_PROTO_LITE
@@ -36,8 +40,14 @@
 #ifndef GRPC_CUSTOM_DESCRIPTOR
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
+#if GOOGLE_PROTOBUF_VERSION >= 4025000
+#define GRPC_PROTOBUF_EDITION_SUPPORT
+#endif
 #define GRPC_CUSTOM_DESCRIPTOR ::google::protobuf::Descriptor
 #define GRPC_CUSTOM_DESCRIPTORPOOL ::google::protobuf::DescriptorPool
+#ifdef GRPC_PROTOBUF_EDITION_SUPPORT
+#define GRPC_CUSTOM_EDITION ::google::protobuf::Edition
+#endif
 #define GRPC_CUSTOM_FIELDDESCRIPTOR ::google::protobuf::FieldDescriptor
 #define GRPC_CUSTOM_FILEDESCRIPTOR ::google::protobuf::FileDescriptor
 #define GRPC_CUSTOM_FILEDESCRIPTORPROTO ::google::protobuf::FileDescriptorProto
@@ -66,8 +76,10 @@
 #ifndef GRPC_CUSTOM_JSONUTIL
 #include <google/protobuf/util/json_util.h>
 #include <google/protobuf/util/type_resolver_util.h>
+
+#include "absl/status/status.h"
 #define GRPC_CUSTOM_JSONUTIL ::google::protobuf::util
-#define GRPC_CUSTOM_UTIL_STATUS ::google::protobuf::util::Status
+#define GRPC_CUSTOM_UTIL_STATUS ::absl::Status
 #endif
 
 namespace grpc {
@@ -79,6 +91,9 @@ typedef GRPC_CUSTOM_MESSAGELITE MessageLite;
 typedef GRPC_CUSTOM_DESCRIPTOR Descriptor;
 typedef GRPC_CUSTOM_DESCRIPTORPOOL DescriptorPool;
 typedef GRPC_CUSTOM_DESCRIPTORDATABASE DescriptorDatabase;
+#ifdef GRPC_PROTOBUF_EDITION_SUPPORT
+typedef GRPC_CUSTOM_EDITION Edition;
+#endif
 typedef GRPC_CUSTOM_FIELDDESCRIPTOR FieldDescriptor;
 typedef GRPC_CUSTOM_FILEDESCRIPTOR FileDescriptor;
 typedef GRPC_CUSTOM_FILEDESCRIPTORPROTO FileDescriptorProto;

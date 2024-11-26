@@ -298,7 +298,7 @@ class PROTOBUF_EXPORT MessageLite {
   //
   // It is the responsibility of the caller to call input->LastTagWas()
   // (for groups) or input->ConsumedEntireMessage() (for non-groups) after
-  // this returns to verify that the message's end was delimited correctly.
+  // this returns to verify_ that the message's end was delimited correctly.
   //
   // ParseFromCodedStream() is implemented as Clear() followed by
   // MergeFromCodedStream().

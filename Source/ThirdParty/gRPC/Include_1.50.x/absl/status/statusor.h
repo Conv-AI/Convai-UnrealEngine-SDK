@@ -535,7 +535,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
   //
   // REQUIRES: `this->ok() == true`, otherwise the behavior is undefined.
   //
-  // Use `this->ok()` to verify that there is a current value within the
+  // Use `this->ok()` to verify_ that there is a current value within the
   // `absl::StatusOr<T>`. Alternatively, see the `value()` member function for a
   // similar API that guarantees crashing or throwing an exception if there is
   // no current value.
@@ -550,7 +550,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
   //
   // REQUIRES: `this->ok() == true`, otherwise the behavior is undefined.
   //
-  // Use `this->ok()` to verify that there is a current value.
+  // Use `this->ok()` to verify_ that there is a current value.
   const T* operator->() const ABSL_ATTRIBUTE_LIFETIME_BOUND;
   T* operator->() ABSL_ATTRIBUTE_LIFETIME_BOUND;
 

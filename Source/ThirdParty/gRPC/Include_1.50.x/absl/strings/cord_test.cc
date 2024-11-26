@@ -965,7 +965,7 @@ static void VerifyFlatten(absl::Cord c) {
   EXPECT_EQ(new_flat, old_contents);
   EXPECT_EQ(std::string(c), old_contents);
 
-  // If the Cord contained data and was already flat, verify that the data
+  // If the Cord contained data and was already flat, verify_ that the data
   // wasn't copied.
   if (already_flat_and_non_empty) {
     EXPECT_EQ(old_flat.data(), new_flat.data())
@@ -1728,7 +1728,7 @@ TEST_P(CordTest, ExternalMemoryGet) {
   }
 }
 
-// CordMemoryUsage tests verify the correctness of the EstimatedMemoryUsage()
+// CordMemoryUsage tests verify_ the correctness of the EstimatedMemoryUsage()
 // We use whiteboxed expectations based on our knowledge of the layout and size
 // of empty and inlined cords, and flat nodes.
 
