@@ -29,6 +29,17 @@
 				"Android",
 				"Mac"
 			]
+		},
+		{
+			"Name": "ConvaiEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit",
+			"PlatformAllowList": [
+				"Linux",
+				"Win64",
+				"Android",
+				"Mac"
+			]
 		}
 	],
 	"Plugins": [
