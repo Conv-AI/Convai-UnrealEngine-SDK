@@ -31,6 +31,7 @@ public class ConvaiEditor : ModuleRules
 				"InputCore",
 				"UMG",
 				"Convai",
+				"UMGEditor"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -45,6 +46,9 @@ public class ConvaiEditor : ModuleRules
                 "LevelEditor",
                 "Blutility", 
 				"EditorScriptingUtilities",
+				"PropertyEditor",
+                "DeveloperSettings",
+				"Convai",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
