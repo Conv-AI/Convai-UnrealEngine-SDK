@@ -3,7 +3,9 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Http.h"
+#include "Interfaces/IHttpResponse.h" 
 #include "Net/OnlineBlueprintCallProxyBase.h"
+#include "Dom/JsonObject.h" 
 #include "ConvaiAPIBase.generated.h"
 
 
