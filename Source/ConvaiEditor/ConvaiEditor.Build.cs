@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2022 Convai Inc. All Rights Reserved.
 
 using UnrealBuildTool;
 
@@ -26,6 +26,10 @@ public class ConvaiEditor : ModuleRules
 			new string[]
 			{
 				"Core",
+				"CoreUObject",
+				"Engine",
+				"InputCore",
+				"UMG",
 				"Convai",
 				// ... add other public dependencies that you statically link with here ...
 			}
@@ -35,10 +39,12 @@ public class ConvaiEditor : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
-				"Engine",
 				"Slate",
 				"SlateCore",
+                "UnrealEd",
+                "LevelEditor",
+                "Blutility", 
+				"EditorScriptingUtilities",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
