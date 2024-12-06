@@ -43,9 +43,7 @@ TSharedRef<IDetailCustomization> FConvaiEditorSettingsCustomization::MakeInstanc
 
 void FConvaiEditorSettingsCustomization::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 {
-    //IDetailCategoryBuilder& Category = DetailBuilder.EditCategory("Convai Editor");
-
-    IDetailCategoryBuilder& SubCategory = DetailBuilder.EditCategory("Convai API|Long Term Memory", FText::FromString("Long Term Memory"));
+    IDetailCategoryBuilder& SubCategory = DetailBuilder.EditCategory(TEXT("Long Term Memory"), FText::FromString("Long Term Memory"));
 
 
     // Add a compact button to the category
@@ -54,15 +52,15 @@ void FConvaiEditorSettingsCustomization::CustomizeDetails(IDetailLayoutBuilder& 
         [
             SNew(SHorizontalBox)
                 + SHorizontalBox::Slot()
-                .HAlign(HAlign_Left) // Align button to the left
-                .VAlign(VAlign_Center) // Vertically center the button
-                .AutoWidth() // Adjust width to the content
+                .HAlign(HAlign_Left) 
+                .VAlign(VAlign_Center) 
+                .AutoWidth() 
                 [
                     SNew(SButton)
-                        .Text(FText::FromString("Spawn Editor Tab"))
-                        .HAlign(HAlign_Center) // Center the text in the button
-                        .VAlign(VAlign_Center) // Vertically align the text
-                        .ContentPadding(FMargin(8.0f, 2.0f)) // Compact padding: Horizontal=8, Vertical=2
+                        .Text(FText::FromString("Manage Speaker ID"))
+                        .HAlign(HAlign_Center) 
+                        .VAlign(VAlign_Center)
+                        .ContentPadding(FMargin(8.0f, 2.0f)) 
                         .OnClicked(this, &FConvaiEditorSettingsCustomization::OnSpawnTabClicked)
                 ]
         ];
