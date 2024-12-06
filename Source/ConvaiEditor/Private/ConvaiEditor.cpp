@@ -43,8 +43,15 @@ TSharedRef<IDetailCustomization> FConvaiEditorSettingsCustomization::MakeInstanc
 
 void FConvaiEditorSettingsCustomization::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 {
-    IDetailCategoryBuilder& SubCategory = DetailBuilder.EditCategory(TEXT("Long Term Memory"), FText::FromString("Long Term Memory"));
+    IDetailCategoryBuilder& ParentCategory = DetailBuilder.EditCategory(TEXT("Convai API"), FText::FromString("Convai API"));
 
+    ParentCategory.AddCustomRow(FText::FromString(""))
+        .WholeRowWidget
+        [
+            SNew(SHorizontalBox)
+        ];
+
+    IDetailCategoryBuilder& SubCategory = DetailBuilder.EditCategory(TEXT("Long Term Memory"), FText::FromString("Long Term Memory"));
 
     // Add a compact button to the category
     SubCategory.AddCustomRow(FText::FromString("Spawn Tab"))
