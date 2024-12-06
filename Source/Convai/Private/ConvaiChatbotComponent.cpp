@@ -624,6 +624,8 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAuthKey, FStrin
 	Params.ConvaiGRPCVisionParams = ConvaiGRPCVisionParams;
 	Params.AuthKey = AuthKey;
 	Params.AuthHeader = AuthHeader;
+	Params.DynamicConfigInfo = DynamicConfigInfo;
+	Params.SpeakerID = SpeakerID;
 
 	ConvaiGRPCGetResponseProxy = UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(this, Params);
 

@@ -83,6 +83,10 @@ struct FConvaiGRPCGetResponseParams
 
 	TMap<FString, FString> Narrative_Template_Keys;
 
+	FString DynamicConfigInfo;
+
+	FString SpeakerID;
+
 	FConvaiGRPCGetResponseParams()
 		: UserQuery(TEXT(""))
 		, TriggerName(TEXT(""))
@@ -96,6 +100,8 @@ struct FConvaiGRPCGetResponseParams
 		, GenerateActions(false)
 		, AuthKey(TEXT(""))
 		, AuthHeader(TEXT(""))
+		, DynamicConfigInfo(TEXT(""))
+		, SpeakerID(TEXT(""))
 	{
 	}
 };

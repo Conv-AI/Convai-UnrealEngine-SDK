@@ -147,6 +147,19 @@ public:
 	TMap<FString, FString> NarrativeTemplateKeys;
 
 	/**
+	 *   Extra information that can be passed to the character, can contain any important data that the chracter needs to know about without the 
+	 *   need of player interaction or narrative triggers, e.g. Inventory items, Player health, key information to solve a puzzle, time of day, etc...
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai")
+	FString DynamicConfigInfo;
+
+	/**
+	 *   Speaker ID used for long term memory (LTM)
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai")
+	FString SpeakerID;
+
+	/**
 	 *    Reset the conversation with the character and remove previous memory, this is the same as setting the session ID property to -1.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Convai")
