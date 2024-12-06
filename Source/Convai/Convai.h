@@ -46,7 +46,7 @@ public:
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
 	FString ExtraParams;
 
-	UPROPERTY(Config, EditAnywhere, Category = "Long Term Memory")
+	UPROPERTY(Config, VisibleAnywhere, Category = "Long Term Memory")
 	TArray<FConvaiSpeakerInfo> SpeakerIDs;
 };
 
