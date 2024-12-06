@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+#include "Public/ConvaiDefinitions.h"
 #include "Convai.generated.h"
 
 UCLASS(config = Engine, defaultconfig)
@@ -44,6 +45,9 @@ public:
 	/* Extra Parameters (Used for debugging) */
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
 	FString ExtraParams;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Long Term Memory")
+	TArray<FConvaiSpeakerInfo> SpeakerIDs;
 };
 
 
