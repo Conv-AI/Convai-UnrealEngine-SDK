@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "RestAPI/ConvaiAPIBase.h"
 #include "ConvaiDefinitions.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "ConvaiLTMProxy.generated.h"
 
 struct FConvaiSpeakerInfo;
