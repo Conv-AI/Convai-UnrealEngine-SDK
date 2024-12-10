@@ -156,7 +156,7 @@ public:
 	/**
 	 *   Speaker ID used for long term memory (LTM)
 	 */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai")
+	UPROPERTY(BlueprintReadOnly, Category = "Convai")
 	FString SpeakerID;
 
 	/**
@@ -317,7 +317,7 @@ public:
 
 public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
-	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool ReplicateVoiceToNetwork, bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, uint32 InToken);
+	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool ReplicateVoiceToNetwork, bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, uint32 InToken, FString InSpeakerID);
 	
 	void FinishGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent);
 

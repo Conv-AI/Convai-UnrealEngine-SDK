@@ -343,7 +343,7 @@ bool UConvaiChatbotComponent::PlayRecordedVoice(USoundWave* RecordedVoice)
 	return true;
 }
 
-void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, uint32 InToken)
+void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, uint32 InToken, FString InSpeakerID)
 {
 	if (!IsValid(InConvaiPlayerComponent))
 	{
@@ -395,6 +395,7 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	Token = InToken;
 	CurrentConvaiPlayerComponent = InConvaiPlayerComponent;
 	LastPlayerName = CurrentConvaiPlayerComponent->PlayerName;
+	SpeakerID = InSpeakerID;
 
 	if (!TextInput)
 	{
