@@ -645,6 +645,9 @@ void UConvaiPlayerComponent::StartTalking(
 
 	FString ClientAuthKey = UseServerAPI_Key ? FString("") : AuthKey;
 
+	// Ensure that the local version of the chatbot component has the ReplicateVoiceToNetwork set properly
+	ConvaiChatbotComponent->ReplicateVoiceToNetwork = RunOnServer;
+
 	if (RunOnServer)
 	{
 		if (IsValid(Environment))
@@ -787,6 +790,9 @@ void UConvaiPlayerComponent::SendText(UConvaiChatbotComponent* ConvaiChatbotComp
 	FString AuthHeader = AuthHeaderAndKey.Key;
 
 	FString ClientAuthKey = UseServerAPI_Key ? FString("") : AuthKey;
+
+	// Ensure that the local version of the chatbot component has the ReplicateVoiceToNetwork set properly
+	ConvaiChatbotComponent->ReplicateVoiceToNetwork = RunOnServer;
 
 	if (RunOnServer)
 	{

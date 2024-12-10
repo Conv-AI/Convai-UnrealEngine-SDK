@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.5.1
+- Added Long Term Memory V0.
+- Fixed voice not being sent to clients on Multiplayer.
+- Added Dynamic Environment Info.
+
 # Release 3.5.0
 - UE5.5 support
 
