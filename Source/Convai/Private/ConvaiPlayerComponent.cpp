@@ -150,6 +150,21 @@ void UConvaiPlayerComponent::SetPlayerNameServer_Implementation(const FString& N
 	PlayerName = NewPlayerName;
 }
 
+void UConvaiPlayerComponent::SetSpeakerID(FString NewSpeakerID)
+{
+	SpeakerID = NewSpeakerID;
+
+	if (GetIsReplicated())
+	{
+		SetSpeakerIDServer(SpeakerID);
+	}
+}
+
+void UConvaiPlayerComponent::SetSpeakerIDServer_Implementation(const FString& NewSpeakerID)
+{
+	SpeakerID = NewSpeakerID;
+}
+
 bool UConvaiPlayerComponent::GetDefaultCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo)
 {
 	if (!IsValid(AudioCaptureComponent))
@@ -658,7 +673,7 @@ void UConvaiPlayerComponent::StartTalking(
 	else
 	{
 		bool UseOverrideAuthKey = false;
-		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, false, UseOverrideAuthKey, FString(""), FString(""), Token);
+		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, false, UseOverrideAuthKey, FString(""), FString(""), Token, SpeakerID);
 		CurrentConvaiChatbotComponent = ConvaiChatbotComponent;
 	}
 }
@@ -738,7 +753,7 @@ void UConvaiPlayerComponent::StartTalkingServer_Implementation(
 			Environment->MainCharacter = MainCharacter;
 		}
 		bool UseOverrideAuthKey = !UseServerAPI_Key;
-		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, true, UseOverrideAuthKey, ClientAuthKey, AuthHeader, Token);
+		ConvaiChatbotComponent->StartGetResponseStream(this, FString(""), Environment, GenerateActions, VoiceResponse, true, UseOverrideAuthKey, ClientAuthKey, AuthHeader, Token, SpeakerID);
 		CurrentConvaiChatbotComponent = ConvaiChatbotComponent;
 	}
 }
@@ -804,7 +819,7 @@ void UConvaiPlayerComponent::SendText(UConvaiChatbotComponent* ConvaiChatbotComp
 	else
 	{
 		bool UseOverrideAuthKey = false;
-		ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, false, UseOverrideAuthKey, FString(""), FString(""), Token);
+		ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, false, UseOverrideAuthKey, FString(""), FString(""), Token, SpeakerID);
 
 		// Invalidate the token by generating a new one
 		GenerateNewToken();
@@ -847,7 +862,7 @@ void UConvaiPlayerComponent::SendTextServer_Implementation(
 	Environment->MainCharacter = MainCharacter;
 
 	bool UseOverrideAuthKey = !UseServerAPI_Key;
-	ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, true, UseOverrideAuthKey, ClientAuthKey, AuthHeader, Token);
+	ConvaiChatbotComponent->StartGetResponseStream(this, Text, Environment, GenerateActions, VoiceResponse, true, UseOverrideAuthKey, ClientAuthKey, AuthHeader, Token, SpeakerID);
 
 	// Invalidate the token by generating a new one
 	GenerateNewToken();
