@@ -151,7 +151,7 @@ public:
 	 *   need of player interaction or narrative triggers, e.g. Inventory items, Player health, key information to solve a puzzle, time of day, etc...
 	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai")
-	FString DynamicConfigInfo;
+	FString DynamicEnvironmentInfo;
 
 	/**
 	 *   Speaker ID used for long term memory (LTM)

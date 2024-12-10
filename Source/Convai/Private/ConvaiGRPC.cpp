@@ -455,7 +455,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	// Create Dynamic Info Configuration
 	DynamicInfoConfig* dynamic_info_config = new DynamicInfoConfig();
-	dynamic_info_config->set_text(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.DynamicConfigInfo));
+	dynamic_info_config->set_text(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.DynamicEnvironmentInfo));
 	getResponseConfig->set_allocated_dynamic_info_config(dynamic_info_config);
 
 	// Set Speaker ID

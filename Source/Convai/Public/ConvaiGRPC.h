@@ -83,7 +83,7 @@ struct FConvaiGRPCGetResponseParams
 
 	TMap<FString, FString> Narrative_Template_Keys;
 
-	FString DynamicConfigInfo;
+	FString DynamicEnvironmentInfo;
 
 	FString SpeakerID;
 
@@ -100,7 +100,7 @@ struct FConvaiGRPCGetResponseParams
 		, GenerateActions(false)
 		, AuthKey(TEXT(""))
 		, AuthHeader(TEXT(""))
-		, DynamicConfigInfo(TEXT(""))
+		, DynamicEnvironmentInfo(TEXT(""))
 		, SpeakerID(TEXT(""))
 	{
 	}
