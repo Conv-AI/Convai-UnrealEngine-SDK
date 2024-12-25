@@ -812,67 +812,41 @@ void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, boo
 
 void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal)
 {
+	if (!IsInGameThread())
+	{
+		AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal]
+			{
+				onResponseDataReceived(ReceivedText, ReceivedAudio, SampleRate, IsFinal);
+			});
+		return;
+	}
+
+
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		if (IsInGameThread())
-		{
-			Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
-		}
-		else
-		{
-			AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, IsFinal]
-				{
-					Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
-				});
-		}
-		
+		Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
 	}
 
 	float ReceieivedAudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
 
-			if (VoiceResponse && ReceivedAudio.Num() > 0)
-			{
-				AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1); // Should be called in the game thread
-
-				//FString BasePath = TEXT("F:/Work/Convai/UE_Animation_Dev/TestRecordedAudioChunks");
-				//FString Timestamp = FDateTime::Now().ToString();
-				//Timestamp.ReplaceInline(TEXT(":"), TEXT("_"));
-				//FString FileName = FString::Printf(TEXT("Audio_%s.wav"), *Timestamp);
-				//FString FullPath = FPaths::Combine(*BasePath, *FileName);
-
-				//TArray<uint8> OutWaveFileData;
-				//UConvaiUtils::PCMDataToWav(ReceivedAudio, OutWaveFileData, 1, SampleRate);
-				//UConvaiUtils::SaveByteArrayAsFile(FullPath, OutWaveFileData);
-
-				if (IsRecordingAudio)
-				{
-					RecordedAudio.Append(ReceivedAudio);
-					RecordedAudioSampleRate = SampleRate;
-				}
-			}
-
-
-
-	if (IsInGameThread())
+	if (VoiceResponse && ReceivedAudio.Num() > 0)
 	{
-		// Send text and audio duration to blueprint event
-		OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+		AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1); // Should be called in the game thread
 
-		// Run the deprecated event
-		OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+		if (IsRecordingAudio)
+		{
+			RecordedAudio.Append(ReceivedAudio);
+			RecordedAudioSampleRate = SampleRate;
+		}
 	}
-	else
-	{
-		AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal, ReceieivedAudioDuration]
-			{
-				// Send text and audio duration to blueprint event
-				OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
 
-				// Run the deprecated event
-				OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
-			});
-	}
+	// Send text and audio duration to blueprint event
+	OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+
+	// Run the deprecated event
+	OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+
 
 	if (ReceieivedAudioDuration > 0)
 	{

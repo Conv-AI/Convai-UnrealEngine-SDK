@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.5.2
+- Fixed rare crash when new voice data starts to play when the character is already finishing its current sentence.
+
 # Release 3.5.1
 - Added Long Term Memory V0.
 - Fixed voice not being sent to clients on Multiplayer.
