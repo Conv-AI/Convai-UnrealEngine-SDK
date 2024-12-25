@@ -11,6 +11,8 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiBaseHttpLogs, Log, All);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStringHttpResponseCallbackSignature, FString, ResponseString);
+
 namespace ConvaiHttpConstants
 {
 	static const TCHAR* GET = TEXT("GET");

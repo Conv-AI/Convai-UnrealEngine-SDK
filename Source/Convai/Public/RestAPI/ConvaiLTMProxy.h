@@ -12,7 +12,6 @@ struct FConvaiSpeakerInfo;
 
 DECLARE_LOG_CATEGORY_EXTERN(LTMHttpLogs, Log, All);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStringHttpResponseCallbackSignature, FString, ResponseString);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpeakerIDListHttpResponseCallbackSignature, const TArray<FConvaiSpeakerInfo>&, SpeakerIDs);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpeakerIDHttpResponseCallbackSignature, const FConvaiSpeakerInfo&, SpeakerID);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLTMStatusHttpResponseCallbackSignature, bool, Status);
