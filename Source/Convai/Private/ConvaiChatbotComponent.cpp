@@ -221,52 +221,76 @@ bool UConvaiChatbotComponent::StartFirstAction()
 
 bool UConvaiChatbotComponent::TriggerNamedBlueprintAction(const FString& ActionName, FConvaiResultAction ConvaiActionStruct)
 {
-	if (AActor* Owner = GetOwner())
+	if (!ActionName.IsEmpty())
 	{
-		UFunction* Function = Owner->FindFunction(FName(*ActionName));
-
-		if (Function)
+		// Check the owning actor first
+		if (AActor* Owner = GetOwner())
 		{
-			// Check the function signature
-			bool bCanCall = false;
-			TFieldIterator<FStructProperty> PropIt(Function);
-			if (PropIt)
+			if (TryCallFunction(Owner, ActionName, ConvaiActionStruct))
 			{
-				FStructProperty* StructProp = *PropIt;
-				if (StructProp->GetClass() == FStructProperty::StaticClass())
-				{
-					//FStructProperty* StructProp = Cast<FStructProperty>(ParamProp);
-					if (StructProp && StructProp->Struct == FConvaiResultAction::StaticStruct())
-					{
-						bCanCall = true;
-					}
-				}
-			}
-			else
-			{
-				bCanCall = true; // No parameters
-			}
-
-			if (bCanCall)
-			{
-				Owner->ProcessEvent(Function, PropIt ? &ConvaiActionStruct : nullptr);
 				return true;
 			}
-			else
-			{
-				UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Found a function/event with the same name of action: %s.\
-					 However, could not run due to mismatched parameter type. Make sure the function/event has no input parameters or take a parameter of type \"ConvaiResultAction\""), *ActionName);
-			}
 		}
-		else
+
+		// Fallback to self (BP_ConvaiChatbotComponent)
+		if (TryCallFunction(this, ActionName, ConvaiActionStruct))
 		{
-			//UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("TriggerNamedBlueprintAction: Could not find an event or function with action name: %s"), *ActionName);
+			return true;
+		}
+
+		// Log an error if the function is not found in both places
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Could not find a valid function '%s' on the owning actor or the component (self)."), *ActionName);
+	}
+	else
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Provided action name is empty."));
+	}
+
+	return false;
+}
+
+bool UConvaiChatbotComponent::TryCallFunction(UObject* Object, const FString& ActionName, FConvaiResultAction& ConvaiResultAction) const
+{
+	if (!Object)
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TryCallFunction: Null object provided."));
+		return false;
+	}
+
+	UFunction* Function = Object->FindFunction(FName(*ActionName));
+	if (!Function)
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Verbose, TEXT("TryCallFunction: Function '%s' not found on '%s'."), *ActionName, *Object->GetName());
+		return false;
+	}
+
+	// Check function parameters (if any)
+	bool bCanCall = false;
+	if (UProperty* FirstParam = Function->PropertyLink)
+	{
+		if (const FStructProperty* StructProp = CastField<FStructProperty>(FirstParam))
+		{
+			if (StructProp->Struct == FConvaiResultAction::StaticStruct())
+			{
+				bCanCall = true;
+			}
 		}
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Could not find pointer to owner"));
+		bCanCall = true; // No parameters
 	}
+
+	if (bCanCall)
+	{
+		Object->ProcessEvent(Function, Function->PropertyLink ? &ConvaiResultAction : nullptr);
+		return true;
+	}
+	else
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TryCallFunction: Function '%s' found on '%s' but has incompatible parameters. Ensure it accepts 'FConvaiResultAction' or has no parameters."), *ActionName, *Object->GetName());
+	}
+
 	return false;
 }
 
