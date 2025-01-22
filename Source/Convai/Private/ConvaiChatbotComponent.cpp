@@ -249,7 +249,7 @@ bool UConvaiChatbotComponent::TriggerNamedBlueprintAction(const FString& ActionN
 	return false;
 }
 
-bool UConvaiChatbotComponent::TryCallFunction(UObject* Object, const FString& ActionName, FConvaiResultAction& ConvaiResultAction) const
+bool UConvaiChatbotComponent::TryCallFunction(UObject* Object, const FString& FunctionName, FConvaiResultAction& ConvaiResultAction) const
 {
 	if (!Object)
 	{
@@ -257,10 +257,10 @@ bool UConvaiChatbotComponent::TryCallFunction(UObject* Object, const FString& Ac
 		return false;
 	}
 
-	UFunction* Function = Object->FindFunction(FName(*ActionName));
+	UFunction* Function = Object->FindFunction(FName(*FunctionName));
 	if (!Function)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Verbose, TEXT("TryCallFunction: Function '%s' not found on '%s'."), *ActionName, *Object->GetName());
+		UE_LOG(ConvaiChatbotComponentLog, Verbose, TEXT("TryCallFunction: Function '%s' not found on '%s'."), *FunctionName, *Object->GetName());
 		return false;
 	}
 
@@ -288,7 +288,7 @@ bool UConvaiChatbotComponent::TryCallFunction(UObject* Object, const FString& Ac
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TryCallFunction: Function '%s' found on '%s' but has incompatible parameters. Ensure it accepts 'FConvaiResultAction' or has no parameters."), *ActionName, *Object->GetName());
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TryCallFunction: Function '%s' found on '%s' but has incompatible parameters. Ensure it accepts 'FConvaiResultAction' or has no parameters."), *FunctionName, *Object->GetName());
 	}
 
 	return false;
