@@ -240,7 +240,7 @@ public:
 	 */
 	UFUNCTION()
 	bool StartFirstAction();
-
+	
 	/**
 	 * Triggers a specified Blueprint event or function on the owning actor based on the given action name and parameters.
 	 *
@@ -251,7 +251,8 @@ public:
 	 *
 	 */
 	bool TriggerNamedBlueprintAction(const FString& ActionName, FConvaiResultAction ConvaiActionStruct);
-
+	bool TryCallFunction(UObject* Object, const FString& FunctionName, FConvaiResultAction& ConvaiResultAction) const;
+	
 	UFUNCTION(BlueprintCallable, Category = "Convai|Emotion")
 	void ForceSetEmotion(EBasicEmotions BasicEmotion, EEmotionIntensity Intensity, bool ResetOtherEmotions = false);
 
