@@ -2,8 +2,12 @@
 
 
 #include "ConvaiEditorUtils.h"
+
+#include "EditorUtilityLibrary.h"
 #include "../Convai.h"
 #include "ISettingsModule.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "EditorScriptingUtilities/Public/EditorAssetLibrary.h"
 
 void UConvaiEditorUtils::ConvaiAddSpeakerID(const FConvaiSpeakerInfo& Speaker)
 {
@@ -74,5 +78,18 @@ void UConvaiEditorUtils::RefreshConvaiSettings()
             LOCTEXT("RuntimeSettingsDescription", "Configure Convai settings"),
             Settings);
     }
+}
+
+TArray<UObject*> UConvaiEditorUtils::BeginTransactionAndGetSelectedAssets(const FString& Context, const FText& Description)
+{
+    UKismetSystemLibrary::BeginTransaction(Context, Description, nullptr);
+    return UEditorUtilityLibrary::GetSelectedAssets();
+}
+
+void UConvaiEditorUtils::SaveLoadedAssetAndEndTransaction(const TArray<UObject*>& LoadedAssets)
+{
+    UEditorAssetLibrary::CheckoutLoadedAssets(LoadedAssets);
+    UEditorAssetLibrary::SaveLoadedAssets(LoadedAssets);
+    UKismetSystemLibrary::EndTransaction();
 }
 #undef LOCTEXT_NAMESPACE

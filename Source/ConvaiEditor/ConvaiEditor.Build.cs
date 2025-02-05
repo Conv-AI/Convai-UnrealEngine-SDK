@@ -31,7 +31,8 @@ public class ConvaiEditor : ModuleRules
 				"InputCore",
 				"UMG",
 				"Convai",
-				"UMGEditor"
+				"UMGEditor",
+				"Blutility", 
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -44,7 +45,6 @@ public class ConvaiEditor : ModuleRules
 				"SlateCore",
                 "UnrealEd",
                 "LevelEditor",
-                "Blutility", 
 				"EditorScriptingUtilities",
 				"PropertyEditor",
                 "DeveloperSettings",
