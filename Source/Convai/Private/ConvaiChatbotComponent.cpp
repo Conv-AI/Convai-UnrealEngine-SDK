@@ -266,7 +266,7 @@ bool UConvaiChatbotComponent::TryCallFunction(UObject* Object, const FString& Fu
 
 	// Check function parameters (if any)
 	bool bCanCall = false;
-	if (UProperty* FirstParam = Function->PropertyLink)
+	if (FProperty* FirstParam = Function->PropertyLink)
 	{
 		if (const FStructProperty* StructProp = CastField<FStructProperty>(FirstParam))
 		{
