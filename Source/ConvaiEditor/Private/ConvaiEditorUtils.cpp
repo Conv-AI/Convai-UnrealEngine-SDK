@@ -7,7 +7,7 @@
 #include "../Convai.h"
 #include "ISettingsModule.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "EditorScriptingUtilities/Public/EditorAssetLibrary.h"
+#include "EditorAssetLibrary.h"
 
 void UConvaiEditorUtils::ConvaiAddSpeakerID(const FConvaiSpeakerInfo& Speaker)
 {
