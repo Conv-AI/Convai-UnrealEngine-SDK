@@ -13,7 +13,7 @@ UConvaiCreateSpeakerID* UConvaiCreateSpeakerID::ConvaiCreateSpeakerIDProxy(FStri
     return Proxy;
 }
 
-bool UConvaiCreateSpeakerID::ConfigureRequest(TSharedRef<IHttpRequest> Request, const TCHAR* Verb)
+bool UConvaiCreateSpeakerID::ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb)
 {
     if (!Super::ConfigureRequest(Request, ConvaiHttpConstants::POST))
     {
@@ -73,7 +73,7 @@ UConvaiListSpeakerID* UConvaiListSpeakerID::ConvaiListSpeakerIDProxy()
     return Proxy;
 }
 
-bool UConvaiListSpeakerID::ConfigureRequest(TSharedRef<IHttpRequest> Request, const TCHAR* Verb)
+bool UConvaiListSpeakerID::ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb)
 {
     if (!Super::ConfigureRequest(Request, ConvaiHttpConstants::POST))
     {
@@ -117,7 +117,7 @@ UConvaiDeleteSpeakerID* UConvaiDeleteSpeakerID::ConvaiDeleteSpeakerIDProxy(FStri
     return Proxy;
 }
 
-bool UConvaiDeleteSpeakerID::ConfigureRequest(TSharedRef<IHttpRequest> Request, const TCHAR* Verb)
+bool UConvaiDeleteSpeakerID::ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb)
 {
     if (!Super::ConfigureRequest(Request, ConvaiHttpConstants::POST))
     {
@@ -164,7 +164,7 @@ UConvaiGetLTMStatus* UConvaiGetLTMStatus::ConvaiGetLTMStatusProxy(FString Charac
     return Proxy;
 }
 
-bool UConvaiGetLTMStatus::ConfigureRequest(TSharedRef<IHttpRequest> Request, const TCHAR* Verb)
+bool UConvaiGetLTMStatus::ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb)
 {
     if (!Super::ConfigureRequest(Request, ConvaiHttpConstants::POST))
     {
@@ -222,7 +222,7 @@ UConvaiSetLTMStatus* UConvaiSetLTMStatus::ConvaiSetLTMStatusProxy(FString Charac
     return Proxy;
 }
 
-bool UConvaiSetLTMStatus::ConfigureRequest(TSharedRef<IHttpRequest> Request, const TCHAR* Verb)
+bool UConvaiSetLTMStatus::ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb)
 {
     if (!Super::ConfigureRequest(Request, ConvaiHttpConstants::POST))
     {

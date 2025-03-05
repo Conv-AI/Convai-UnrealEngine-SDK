@@ -1,13 +1,14 @@
 
 #include "RestAPI/ConvaiAPIBase.h"
+#include "ConvaihttpModule.h"
 #include "ConvaiUtils.h"
 
 DEFINE_LOG_CATEGORY(ConvaiBaseHttpLogs);
 
-// Base api proxy
+
 void UConvaiAPIBaseProxy::Activate()
 {
-    TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
+    TSharedRef<IConvaihttpRequest> Request = FConvaihttpModule::Get().CreateRequest(); 
 
     if (!ConfigureRequest(Request, TEXT("")))
     {
@@ -23,7 +24,7 @@ void UConvaiAPIBaseProxy::Activate()
     }
 }
 
-bool UConvaiAPIBaseProxy::ConfigureRequest(TSharedRef<IHttpRequest> Request, const TCHAR* Verb)
+bool UConvaiAPIBaseProxy::ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb)
 {
     if (!UConvaiFormValidation::ValidateInputText(URL) || !UConvaiFormValidation::ValidateInputText(Verb))
     {
@@ -60,8 +61,7 @@ bool UConvaiAPIBaseProxy::ConfigureRequest(TSharedRef<IHttpRequest> Request, con
         return true;
     }
 
-
-    TArray<uint8> DataToSend;
+    TArray64<uint8> DataToSend;
     FString Boundary = TEXT("ConvaiPluginFormBoundary") + FString::FromInt(FDateTime::Now().GetTicks());
     if (AddContentToRequest(DataToSend, Boundary))
     {
@@ -81,7 +81,7 @@ bool UConvaiAPIBaseProxy::ConfigureRequest(TSharedRef<IHttpRequest> Request, con
     return true;
 }
 
-void UConvaiAPIBaseProxy::OnHttpRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void UConvaiAPIBaseProxy::OnHttpRequestComplete(FConvaihttpRequestPtr Request, FConvaihttpResponsePtr Response, bool bWasSuccessful)
 {
     if (!Response)
     {

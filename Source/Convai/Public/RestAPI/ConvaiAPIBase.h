@@ -2,10 +2,10 @@
 
 #pragma once
 #include "CoreMinimal.h"
-#include "Http.h"
-#include "Interfaces/IHttpResponse.h" 
 #include "Net/OnlineBlueprintCallProxyBase.h"
-#include "Dom/JsonObject.h" 
+#include "Dom/JsonObject.h"
+#include "Interfaces/IConvaihttpRequest.h"
+#include "Interfaces/IConvaihttpResponse.h"
 #include "ConvaiAPIBase.generated.h"
 
 
@@ -31,12 +31,13 @@ public:
 	virtual void Activate() override;
 
 protected:
-	/*IHttp interface*/
-	virtual void OnHttpRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-	/*END IHttp interface*/
 
-	virtual bool ConfigureRequest(TSharedRef<IHttpRequest> Request, const TCHAR* Verb);
-	virtual bool AddContentToRequest(TArray<uint8>& DataToSend, const FString& Boundary) { return false; }
+	/*IHttp interface*/
+	virtual void OnHttpRequestComplete(FConvaihttpRequestPtr Request, FConvaihttpResponsePtr Response, bool bWasSuccessful);
+	/*END IHttp interface*/
+	
+	virtual bool ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb);
+	virtual bool AddContentToRequest(TArray64<uint8>& DataToSend, const FString& Boundary) { return false; }
 	virtual bool AddContentToRequestAsString(TSharedPtr<FJsonObject>& ObjectToSend) { return false; }
 	virtual void HandleSuccess();
 	virtual void HandleFailure();
@@ -44,7 +45,7 @@ protected:
 public:
 	FString URL;
 	FString ResponseString;
-	TArray<uint8> ResponseData;
+	TArray64<uint8> ResponseData; 
 };
 
 //--------------------------------------------------------------------------------------------------
