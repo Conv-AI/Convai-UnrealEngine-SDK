@@ -5,6 +5,11 @@
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "Dom/JsonObject.h"
 
+#ifdef USE_CONVAI_HTTP
+#else
+#define USE_CONVAI_HTTP 0
+#endif
+
 #if USE_CONVAI_HTTP
 // Use ConvaiHttp module
 	#include "ConvaiHttpModule.h"
