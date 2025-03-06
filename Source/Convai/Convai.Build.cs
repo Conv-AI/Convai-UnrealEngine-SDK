@@ -73,15 +73,27 @@ public class Convai : ModuleRules
             PrivateIncludePaths.Add("Convai/Private/Mac");
         }
 
+        /* Use ConvaiHTTP plugin*/
+        const bool bEnableConvaiHTTP = true;
+        PublicDefinitions.AddRange(new string[] { "USE_CONVAI_HTTP=0" + (bEnableConvaiHTTP ? "1" : "0")});
+        
+        if (bEnableConvaiHTTP)
+        {
+            PublicDependencyModuleNames.AddRange(new string[] { "CONVAIHTTP", "HTTP" });
+        }
+        else
+        {
+            PublicDependencyModuleNames.AddRange(new string[] { "HTTP" });
+        }
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" , "HTTP", "CONVAIHTTP", "Json", "JsonUtilities", "AudioMixer", "AudioCaptureCore", "AudioCapture", "Voice", "SignalProcessing", "libOpus", "OpenSSL", "zlib", "SSL" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" , "Json", "JsonUtilities", "AudioMixer", "AudioCaptureCore", "AudioCapture", "Voice", "SignalProcessing", "libOpus", "OpenSSL", "zlib", "SSL" });
         PrivateDependencyModuleNames.AddRange(new string[] {"Projects"});
         PublicDefinitions.AddRange(new string[] { "ConvaiDebugMode=1", "GOOGLE_PROTOBUF_NO_RTTI", "GPR_FORBID_UNREACHABLE_CODE", "GRPC_ALLOW_EXCEPTIONS=0" });
 
         // Target Platform Specific Settings
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
-            bUsePrecompiled = true;
+            //bUsePrecompiled = true;
         }
 
         if (Target.Platform == UnrealTargetPlatform.Android)

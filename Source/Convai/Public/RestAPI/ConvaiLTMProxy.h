@@ -35,8 +35,8 @@ public:
 	static UConvaiCreateSpeakerID* ConvaiCreateSpeakerIDProxy(FString SpeakerName);
 
 protected:
-	virtual bool ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb) override;
-	virtual bool AddContentToRequest(TArray64<uint8>& DataToSend, const FString& Boundary)  override { return false; }
+	virtual bool ConfigureRequest(TSharedRef<CONVAI_HTTP_REQUEST_INTERFACE> Request, const TCHAR* Verb) override;
+	virtual bool AddContentToRequest(CONVAI_HTTP_PAYLOAD_ARRAY_TYPE& DataToSend, const FString& Boundary)  override { return false; }
 	virtual bool AddContentToRequestAsString(TSharedPtr<FJsonObject>& ObjectToSend) override;
 	virtual void HandleSuccess() override;
 	virtual void HandleFailure() override;
@@ -66,8 +66,8 @@ public:
 	static UConvaiListSpeakerID* ConvaiListSpeakerIDProxy();
 
 protected:
-	virtual bool ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb) override;
-	virtual bool AddContentToRequest(TArray64<uint8>& DataToSend, const FString& Boundary)  override { return false; }
+	virtual bool ConfigureRequest(TSharedRef<CONVAI_HTTP_REQUEST_INTERFACE> Request, const TCHAR* Verb) override;
+	virtual bool AddContentToRequest(CONVAI_HTTP_PAYLOAD_ARRAY_TYPE& DataToSend, const FString& Boundary)  override { return false; }
 	virtual bool AddContentToRequestAsString(TSharedPtr<FJsonObject>& ObjectToSend) override { return false; }
 	virtual void HandleSuccess() override;
 	virtual void HandleFailure() override;
@@ -96,8 +96,8 @@ public:
 	static UConvaiDeleteSpeakerID* ConvaiDeleteSpeakerIDProxy(FString SpeakerID);
 
 protected:
-	virtual bool ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb) override;
-	virtual bool AddContentToRequest(TArray64<uint8>& DataToSend, const FString& Boundary)  override { return false; }
+	virtual bool ConfigureRequest(TSharedRef<CONVAI_HTTP_REQUEST_INTERFACE> Request, const TCHAR* Verb) override;
+	virtual bool AddContentToRequest(CONVAI_HTTP_PAYLOAD_ARRAY_TYPE& DataToSend, const FString& Boundary)  override { return false; }
 	virtual bool AddContentToRequestAsString(TSharedPtr<FJsonObject>& ObjectToSend) override;
 	virtual void HandleSuccess() override;
 	virtual void HandleFailure() override;
@@ -128,8 +128,8 @@ public:
 	static UConvaiGetLTMStatus* ConvaiGetLTMStatusProxy(FString CharacterID);
 
 protected:
-	virtual bool ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb) override;
-	virtual bool AddContentToRequest(TArray64<uint8>& DataToSend, const FString& Boundary)  override { return false; }
+	virtual bool ConfigureRequest(TSharedRef<CONVAI_HTTP_REQUEST_INTERFACE> Request, const TCHAR* Verb) override;
+	virtual bool AddContentToRequest(CONVAI_HTTP_PAYLOAD_ARRAY_TYPE& DataToSend, const FString& Boundary)  override { return false; }
 	virtual bool AddContentToRequestAsString(TSharedPtr<FJsonObject>& ObjectToSend) override;
 	virtual void HandleSuccess() override;
 	virtual void HandleFailure() override;
@@ -160,8 +160,8 @@ public:
 	static UConvaiSetLTMStatus* ConvaiSetLTMStatusProxy(FString CharacterID, bool bEnable);
 
 protected:
-	virtual bool ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb) override;
-	virtual bool AddContentToRequest(TArray64<uint8>& DataToSend, const FString& Boundary)  override { return false; }
+	virtual bool ConfigureRequest(TSharedRef<CONVAI_HTTP_REQUEST_INTERFACE> Request, const TCHAR* Verb) override;
+	virtual bool AddContentToRequest(CONVAI_HTTP_PAYLOAD_ARRAY_TYPE& DataToSend, const FString& Boundary)  override { return false; }
 	virtual bool AddContentToRequestAsString(TSharedPtr<FJsonObject>& ObjectToSend) override;
 	virtual void HandleSuccess() override;
 	virtual void HandleFailure() override;

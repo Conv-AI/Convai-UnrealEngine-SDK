@@ -4,8 +4,33 @@
 #include "CoreMinimal.h"
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "Dom/JsonObject.h"
-#include "Interfaces/IConvaihttpRequest.h"
-#include "Interfaces/IConvaihttpResponse.h"
+
+#if USE_CONVAI_HTTP
+// Use ConvaiHttp module
+	#include "ConvaiHttpModule.h"
+	#include "Interfaces/IConvaihttpRequest.h"
+	#include "Interfaces/IConvaihttpResponse.h"
+	#define CONVAI_HTTP_MODULE FConvaihttpModule
+	#define CONVAI_HTTP_REQUEST_INTERFACE IConvaihttpRequest
+	#define CONVAI_HTTP_RESPONSE_INTERFACE IConvaihttpResponse
+	#define CONVAI_HTTP_REQUEST_PTR FConvaihttpRequestPtr
+	#define CONVAI_HTTP_RESPONSE_PTR FConvaihttpResponsePtr
+	#define CONVAI_HTTP_PAYLOAD_ARRAY_TYPE TArray64<uint8>
+	#define CONVAI_HTTP_DOWN_PROGRESS_TYPE uint64
+#else
+// Use HTTP module
+	#include "HttpModule.h"
+	#include "Interfaces/IHttpRequest.h"
+	#include "Interfaces/IHttpResponse.h"
+	#define CONVAI_HTTP_MODULE FHttpModule
+	#define CONVAI_HTTP_REQUEST_INTERFACE IHttpRequest
+	#define CONVAI_HTTP_RESPONSE_INTERFACE IHttpResponse
+	#define CONVAI_HTTP_REQUEST_PTR FHttpRequestPtr
+	#define CONVAI_HTTP_RESPONSE_PTR FHttpResponsePtr
+	#define CONVAI_HTTP_PAYLOAD_ARRAY_TYPE TArray<uint8>
+	#define CONVAI_HTTP_DOWN_PROGRESS_TYPE int32
+#endif
+
 #include "ConvaiAPIBase.generated.h"
 
 
@@ -33,11 +58,11 @@ public:
 protected:
 
 	/*IHttp interface*/
-	virtual void OnHttpRequestComplete(FConvaihttpRequestPtr Request, FConvaihttpResponsePtr Response, bool bWasSuccessful);
+	virtual void OnHttpRequestComplete(CONVAI_HTTP_REQUEST_PTR Request, CONVAI_HTTP_RESPONSE_PTR Response, bool bWasSuccessful);
 	/*END IHttp interface*/
 	
-	virtual bool ConfigureRequest(TSharedRef<IConvaihttpRequest> Request, const TCHAR* Verb);
-	virtual bool AddContentToRequest(TArray64<uint8>& DataToSend, const FString& Boundary) { return false; }
+	virtual bool ConfigureRequest(TSharedRef<CONVAI_HTTP_REQUEST_INTERFACE> Request, const TCHAR* Verb);
+	virtual bool AddContentToRequest(CONVAI_HTTP_PAYLOAD_ARRAY_TYPE& DataToSend, const FString& Boundary) { return false; }
 	virtual bool AddContentToRequestAsString(TSharedPtr<FJsonObject>& ObjectToSend) { return false; }
 	virtual void HandleSuccess();
 	virtual void HandleFailure();
@@ -45,7 +70,7 @@ protected:
 public:
 	FString URL;
 	FString ResponseString;
-	TArray64<uint8> ResponseData; 
+	CONVAI_HTTP_PAYLOAD_ARRAY_TYPE ResponseData; 
 };
 
 //--------------------------------------------------------------------------------------------------
