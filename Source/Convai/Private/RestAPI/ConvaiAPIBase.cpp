@@ -64,6 +64,13 @@ bool UConvaiAPIBaseProxy::ConfigureRequest(TSharedRef<CONVAI_HTTP_REQUEST_INTERF
     FString Boundary = TEXT("ConvaiPluginFormBoundary") + FString::FromInt(FDateTime::Now().GetTicks());
     if (AddContentToRequest(DataToSend, Boundary))
     {
+        if (FString(Verb).Equals(ConvaiHttpConstants::PUT))
+        {
+            Request->SetHeader(TEXT("Content-Type"), TEXT("application/octet-stream"));
+            Request->SetContent(DataToSend);
+            return true;
+        }
+        
         Request->SetHeader(TEXT("Content-Type"), FString::Printf(TEXT("multipart/form-data; boundary=----%s"), *Boundary));
 
         // Add closing boundary
@@ -118,3 +125,43 @@ void UConvaiAPIBaseProxy::HandleFailure()
     RemoveFromRoot();
 }
 // END Base api proxy
+
+
+
+
+
+
+bool UConvaiAPITokenInBodyProxy::AddContentToRequest(CONVAI_HTTP_PAYLOAD_ARRAY_TYPE& DataToSend, const FString& Boundary)
+{
+    TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+    FString AuthKey = AuthHeaderAndKey.Value;
+    FString AuthHeader = AuthHeaderAndKey.Key;
+
+    if (!UConvaiFormValidation::ValidateAuthKey(AuthKey))
+    {
+        HandleFailure();
+        return false;
+    }
+
+    FString ExpIdField = FString::Printf(TEXT("\r\n------%s\r\nContent-Disposition: form-data; name=\"experience_session_id\"\r\n\r\n%s"), *Boundary, *AuthKey);
+    DataToSend.Append((uint8*)TCHAR_TO_UTF8(*ExpIdField), ExpIdField.Len());
+
+    return true;
+}
+
+bool UConvaiAPITokenInBodyProxy::AddContentToRequestAsString(TSharedPtr<FJsonObject>& ObjectToSend)
+{
+    TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+    FString AuthKey = AuthHeaderAndKey.Value;
+    FString AuthHeader = AuthHeaderAndKey.Key;
+
+    if (!UConvaiFormValidation::ValidateAuthKey(AuthKey))
+    {
+        HandleFailure();
+        return false;
+    }
+
+    ObjectToSend->SetStringField(TEXT("experience_session_id"), AuthKey);
+
+    return true;
+}

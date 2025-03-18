@@ -47,6 +47,7 @@ namespace ConvaiHttpConstants
 {
 	static const TCHAR* GET = TEXT("GET");
 	static const TCHAR* POST = TEXT("POST");
+	static const TCHAR* PUT = TEXT("PUT");
 }
 
 //-------------------------------------------Base API class-----------------------------------------
@@ -79,3 +80,16 @@ public:
 };
 
 //--------------------------------------------------------------------------------------------------
+
+
+/** Base class for all the Convai Asset manager API calls */
+UCLASS()
+class CONVAI_API UConvaiAPITokenInBodyProxy : public UConvaiAPIBaseProxy
+{
+	GENERATED_BODY()
+
+protected:
+	virtual bool AddContentToRequest(CONVAI_HTTP_PAYLOAD_ARRAY_TYPE& DataToSend, const FString& Boundary) override;
+	virtual bool AddContentToRequestAsString(TSharedPtr<FJsonObject>& ObjectToSend) override;
+};
+
