@@ -74,7 +74,7 @@ public class Convai : ModuleRules
         }
 
         /* Use ConvaiHTTP plugin*/
-        const bool bEnableConvaiHTTP = true;
+        const bool bEnableConvaiHTTP = false;
         PublicDefinitions.AddRange(new string[] { "USE_CONVAI_HTTP=0" + (bEnableConvaiHTTP ? "1" : "0")});
         
         if (bEnableConvaiHTTP)
@@ -93,7 +93,7 @@ public class Convai : ModuleRules
         // Target Platform Specific Settings
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
-            //bUsePrecompiled = true;
+            bUsePrecompiled = true;
         }
 
         if (Target.Platform == UnrealTargetPlatform.Android)
