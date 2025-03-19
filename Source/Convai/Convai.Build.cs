@@ -14,14 +14,14 @@ public class Convai : ModuleRules
     private static ConvaiPlatform ConvaiPlatformInstance;
 
     private string ModulePath
-    {
-        get { return ModuleDirectory; }
-    }
+	{
+		get { return ModuleDirectory; }
+	}
 
-    private string ThirdPartyPath
-    {
-        get { return Path.GetFullPath(Path.Combine(ModulePath, "../ThirdParty/")); }
-    }
+	private string ThirdPartyPath
+	{
+		get { return Path.GetFullPath(Path.Combine(ModulePath, "../ThirdParty/")); }
+	}
 
     private ConvaiPlatform GetConvaiPlatformInstance(ReadOnlyTargetRules Target)
     {
@@ -85,7 +85,7 @@ public class Convai : ModuleRules
             PublicDependencyModuleNames.AddRange(new string[] { "HTTP" });
         }
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" , "Json", "JsonUtilities", "AudioMixer", "AudioCaptureCore", "AudioCapture", "Voice", "SignalProcessing", "libOpus", "OpenSSL", "zlib", "SSL" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Json", "JsonUtilities", "AudioMixer", "AudioCaptureCore", "AudioCapture", "Voice", "SignalProcessing", "libOpus", "OpenSSL", "zlib", "SSL" });
         PrivateDependencyModuleNames.AddRange(new string[] {"Projects"});
         PublicDefinitions.AddRange(new string[] { "ConvaiDebugMode=1", "GOOGLE_PROTOBUF_NO_RTTI", "GPR_FORBID_UNREACHABLE_CODE", "GRPC_ALLOW_EXCEPTIONS=0" });
 
@@ -135,7 +135,7 @@ public abstract class ConvaiPlatform
         }
     }
     public abstract string LibrariesPath { get; }
-    public abstract Liststring Architectures();
+    public abstract List<string> Architectures();
     public abstract string LibraryPrefixName { get; }
     public abstract string LibraryPostfixName { get; }
 }
@@ -143,7 +143,7 @@ public abstract class ConvaiPlatform
 public class ConvaiPlatform_Win64 : ConvaiPlatform
 {
     public override string LibrariesPath { get { return "win64/"; } }
-    public override Liststring Architectures() { return new Liststring { "" }; }
+    public override List<string> Architectures() { return new List<string> { "" }; }
     public override string LibraryPrefixName { get { return ""; } }
     public override string LibraryPostfixName { get { return ".lib"; } }
 }
@@ -151,7 +151,7 @@ public class ConvaiPlatform_Win64 : ConvaiPlatform
 public class ConvaiPlatform_Android : ConvaiPlatform
 {
     public override string LibrariesPath { get { return "android/"; } }
-    public override Liststring Architectures() { return new Liststring { "armeabi-v7a/", "arm64-v8a/", "x86_64/" }; }
+    public override List<string> Architectures() { return new List<string> { "armeabi-v7a/", "arm64-v8a/", "x86_64/" }; }
     public override string LibraryPrefixName { get { return "lib"; } }
     public override string LibraryPostfixName { get { return ".a"; } }
 }
@@ -159,7 +159,7 @@ public class ConvaiPlatform_Android : ConvaiPlatform
 public class ConvaiPlatform_Mac : ConvaiPlatform
 {
    public override string LibrariesPath { get { return "mac/"; } }
-   public override Liststring Architectures() { return new Liststring { "" }; }
+   public override List<string> Architectures() { return new List<string> { "" }; }
    public override string LibraryPrefixName { get { return "lib"; } }
    public override string LibraryPostfixName { get { return ".a"; } }
 }
@@ -168,7 +168,7 @@ public class ConvaiPlatform_Mac : ConvaiPlatform
 public class ConvaiPlatform_Linux : ConvaiPlatform
 {
    public override string LibrariesPath { get { return "linux/"; } }
-   public override Liststring Architectures() { return new Liststring { "" }; }
+   public override List<string> Architectures() { return new List<string> { "" }; }
    public override string LibraryPrefixName { get { return "lib"; } }
    public override string LibraryPostfixName { get { return ".a"; } }
 }
@@ -176,7 +176,7 @@ public class ConvaiPlatform_Linux : ConvaiPlatform
 //public class ConvaiPlatform_PS5 : ConvaiPlatform
 //{
 //    public override string LibrariesPath { get { return "ps5/"; } }
-//    public override Liststring Architectures() { return new Liststring { "" }; }
+//    public override List<string> Architectures() { return new List<string> { "" }; }
 //    public override string LibraryPrefixName { get { return "lib"; } }
 //    public override string LibraryPostfixName { get { return ".a"; } }
 //}
@@ -188,7 +188,7 @@ public class ConvaiPlatform_Linux : ConvaiPlatform
 //        return "";
 //    }
 //    public override string LibrariesPath { get { return "ios/"; } }
-//    public override Liststring Architectures() { return new Liststring { "" }; }
+//    public override List<string> Architectures() { return new List<string> { "" }; }
 //    public override string LibraryPrefixName { get { return "lib"; } }
 //    public override string LibraryPostfixName { get { return ".a"; } }
 //}
