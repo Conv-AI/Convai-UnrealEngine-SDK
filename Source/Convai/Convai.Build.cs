@@ -75,7 +75,6 @@ public class Convai : ModuleRules
 
         const bool bEnableConvaiHTTP = false;
         PublicDefinitions.AddRange(new string[] { "USE_CONVAI_HTTP=0" + (bEnableConvaiHTTP ? "1" : "0")});
-        
         if (bEnableConvaiHTTP)
         {
             PublicDependencyModuleNames.AddRange(new string[] { "CONVAIHTTP", "HTTP" });
