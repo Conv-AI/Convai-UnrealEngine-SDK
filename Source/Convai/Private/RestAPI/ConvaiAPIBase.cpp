@@ -133,9 +133,9 @@ void UConvaiAPIBaseProxy::HandleFailure()
 
 bool UConvaiAPITokenInBodyProxy::AddContentToRequest(CONVAI_HTTP_PAYLOAD_ARRAY_TYPE& DataToSend, const FString& Boundary)
 {
-    TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
-    FString AuthKey = AuthHeaderAndKey.Value;
-    FString AuthHeader = AuthHeaderAndKey.Key;
+    const TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+    const FString AuthKey = AuthHeaderAndKey.Value;
+    const FString AuthHeader = AuthHeaderAndKey.Key;
 
     if (!UConvaiFormValidation::ValidateAuthKey(AuthKey))
     {
@@ -143,17 +143,20 @@ bool UConvaiAPITokenInBodyProxy::AddContentToRequest(CONVAI_HTTP_PAYLOAD_ARRAY_T
         return false;
     }
 
-    FString ExpIdField = FString::Printf(TEXT("\r\n------%s\r\nContent-Disposition: form-data; name=\"experience_session_id\"\r\n\r\n%s"), *Boundary, *AuthKey);
-    DataToSend.Append((uint8*)TCHAR_TO_UTF8(*ExpIdField), ExpIdField.Len());
+    if (AuthHeader == ConvaiConstants::Auth_Token_Header)
+    {
+        const FString ExpIdField = FString::Printf(TEXT("\r\n------%s\r\nContent-Disposition: form-data; name=\"experience_session_id\"\r\n\r\n%s"), *Boundary, *AuthKey);
+        DataToSend.Append((uint8*)TCHAR_TO_UTF8(*ExpIdField), ExpIdField.Len());
+    }
 
     return true;
 }
 
 bool UConvaiAPITokenInBodyProxy::AddContentToRequestAsString(TSharedPtr<FJsonObject>& ObjectToSend)
 {
-    TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
-    FString AuthKey = AuthHeaderAndKey.Value;
-    FString AuthHeader = AuthHeaderAndKey.Key;
+    const TPair<FString, FString> AuthHeaderAndKey = UConvaiUtils::GetAuthHeaderAndKey();
+    const FString AuthKey = AuthHeaderAndKey.Value;
+    const FString AuthHeader = AuthHeaderAndKey.Key;
 
     if (!UConvaiFormValidation::ValidateAuthKey(AuthKey))
     {
@@ -161,7 +164,10 @@ bool UConvaiAPITokenInBodyProxy::AddContentToRequestAsString(TSharedPtr<FJsonObj
         return false;
     }
 
-    ObjectToSend->SetStringField(TEXT("experience_session_id"), AuthKey);
+    if (AuthHeader == ConvaiConstants::Auth_Token_Header)
+    {
+        ObjectToSend->SetStringField(TEXT("experience_session_id"), AuthKey);
+    }
 
     return true;
 }
