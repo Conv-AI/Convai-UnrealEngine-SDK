@@ -1068,3 +1068,22 @@ struct FVoiceLanguageStruct
 
 	FVoiceLanguageStruct() {}
 };
+
+
+// LTM
+USTRUCT(BlueprintType)
+struct FConvaiSpeakerInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speaker Info")
+	FString SpeakerID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speaker Info")
+	FString Name;
+
+	FConvaiSpeakerInfo()
+		: SpeakerID(TEXT("")), Name(TEXT(""))
+	{
+	}
+};

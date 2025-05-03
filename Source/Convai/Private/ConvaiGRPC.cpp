@@ -34,6 +34,7 @@ using ::service::ActionConfig_Object;
 using ::service::ActionConfig_Character;
 using ::service::GetResponseRequest_GetResponseData;
 using ::service::FaceModel;
+using ::service::DynamicInfoConfig;
 
 using ::service::FeedbackRequest;
 using ::service::FeedbackRequest_Feedback;
@@ -451,6 +452,14 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 		std::string Value = TCHAR_TO_UTF8(*Elem.Value);
 		(*narrative_template_keys_ProtoMap)[Key] = Value;
 	}
+
+	// Create Dynamic Info Configuration
+	DynamicInfoConfig* dynamic_info_config = new DynamicInfoConfig();
+	dynamic_info_config->set_text(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.DynamicEnvironmentInfo));
+	getResponseConfig->set_allocated_dynamic_info_config(dynamic_info_config);
+
+	// Set Speaker ID
+	getResponseConfig->set_speaker_id(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.SpeakerID));
 
 #if ConvaiDebugMode
 	FString DebugString(getResponseConfig->DebugString().c_str());

@@ -73,8 +73,18 @@ public class Convai : ModuleRules
             PrivateIncludePaths.Add("Convai/Private/Mac");
         }
 
+        const bool bEnableConvaiHTTP = false;
+        PublicDefinitions.AddRange(new string[] { "USE_CONVAI_HTTP=0" + (bEnableConvaiHTTP ? "1" : "0")});
+        if (bEnableConvaiHTTP)
+        {
+            PublicDependencyModuleNames.AddRange(new string[] { "CONVAIHTTP", "HTTP" });
+        }
+        else
+        {
+            PublicDependencyModuleNames.AddRange(new string[] { "HTTP" });
+        }
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" , "HTTP", "Json", "JsonUtilities", "AudioMixer", "AudioCaptureCore", "AudioCapture", "Voice", "SignalProcessing", "libOpus", "OpenSSL", "zlib", "SSL" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Json", "JsonUtilities", "AudioMixer", "AudioCaptureCore", "AudioCapture", "Voice", "SignalProcessing", "libOpus", "OpenSSL", "zlib", "SSL" });
         PrivateDependencyModuleNames.AddRange(new string[] {"Projects"});
         PublicDefinitions.AddRange(new string[] { "ConvaiDebugMode=1", "GOOGLE_PROTOBUF_NO_RTTI", "GPR_FORBID_UNREACHABLE_CODE", "GRPC_ALLOW_EXCEPTIONS=0" });
 
@@ -89,15 +99,14 @@ public class Convai : ModuleRules
             PublicDependencyModuleNames.AddRange(new string[] { "ApplicationCore", "AndroidPermission" });
             string BuildPath = Utils.MakePathRelativeTo(ModuleDirectory, Target.RelativeEnginePath);
             AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(BuildPath, "Convai_AndroidAPL.xml"));
-            PublicDefinitions.AddRange(new string[] { "__NDK_MAJOR=21" });
         }
 
-        if (Target.Platform == UnrealTargetPlatform.Mac || Target.Platform == UnrealTargetPlatform.IOS || Target.Platform == UnrealTargetPlatform.Linux || Target.Platform == UnrealTargetPlatform.Android)
+        if (Target.Platform == UnrealTargetPlatform.Mac || Target.Platform == UnrealTargetPlatform.IOS || Target.Platform == UnrealTargetPlatform.Linux)
         {
             PublicDefinitions.AddRange(new string[] { "GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE=0", "GOOGLE_PROTOBUF_USE_UNALIGNED=0", "PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0" });
             PrivateIncludePaths.AddRange(new string[] { Path.Combine(ThirdPartyPath, "gRPC", "Include_1.50.x") });
         }
-        else 
+        else
         {
             PrivateIncludePaths.AddRange(new string[] { Path.Combine(ThirdPartyPath, "gRPC", "Include") });
         }

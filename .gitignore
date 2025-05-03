@@ -6,7 +6,7 @@
 !/.github/
 !/Source/
 !/Resources/
-
+!/Content/
 # Ignore intermediate build files
 Binaries/
 Intermediate/
@@ -15,7 +15,8 @@ Intermediate/
 *.generated.h
 
 # Ignore asset files (Unreal uses a binary format, which doesn't work well with Git)
-*.uasset
+#*.uasset
+Content/Widgets/Fonts/
 *.umap
 
 # Ignore log files

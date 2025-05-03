@@ -1,6 +1,22 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.5.3-beta
+- Improved LipSync accuracy and synchornization.
+- Fixed Voice cutting off for Elevenlab voices.
+- Fixed PixelStreaming compatability.
+
+# Release 3.5.2
+- Fixed rare crash when new voice data starts to play when the character is already finishing its current sentence.
+
+# Release 3.5.1
+- Added Long Term Memory V0.
+- Fixed voice not being sent to clients on Multiplayer.
+- Added Dynamic Environment Info.
+
+# Release 3.5.0
+- UE5.5 support
+
 # Release 3.4.2-beta
 - Fixed player time out warning message when using text.
 - Increased gRPC connection robustness by adding small delays and read retries.

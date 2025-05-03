@@ -107,10 +107,10 @@ jobs:
           }
         shell: powershell
 
-      - name: Build and package for Unreal versions 5.1 to 5.4
+      - name: Build and package for Unreal versions 5.1 to 5.5
         run: |
           try {
-            $versions = @("5.4","5.3","5.2","5.1")
+            $versions = @("5.5", "5.4","5.3","5.2","5.1")
             foreach ($version in $versions) {
                 $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_$version"
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version/Convai"
@@ -134,11 +134,11 @@ jobs:
           }
         shell: powershell
 
-      - name: Test packaging for Windows UE 5.4
+      - name: Test packaging for Windows UE 5.5
         run: |
           try {
-            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_5.4"
-            $output_path = "${{ steps.paths.outputs.output_root }}/V5.4"
+            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_5.5"
+            $output_path = "${{ steps.paths.outputs.output_root }}/V5.5"
             $test_project_path = "E:/Software/TestProject"
             $plugin_folder = "$test_project_path/Plugins"
             if (Test-Path $plugin_folder) {
@@ -148,7 +148,7 @@ jobs:
             Copy-Item -Recurse -Force "$output_path/Convai" $plugin_folder
             Write-Host "Copied the plugin to the TestProject."
             $uat_path = "$ue_version_path/Engine/Build/BatchFiles/RunUAT.bat"
-            Write-Host "Starting project packaging for Unreal 5.4..."
+            Write-Host "Starting project packaging for Unreal 5.5..."
             & $uat_path BuildCookRun `
             -project="$test_project_path/TestProject.uproject" `
             -noP4 -utf8output -platform=Win64 -clientconfig=Shipping -cook -stage -package -compressed -pak `
@@ -158,16 +158,16 @@ jobs:
                 Write-Host "Packaging failed for UE_$version. Exit code: $LASTEXITCODE"
                 exit $LASTEXITCODE
             }
-            Write-Host "Project packaging completed successfully for Unreal 5.4"
+            Write-Host "Project packaging completed successfully for Unreal 5.5"
           } catch {
-            Write-Host "Project packaging failed for Unreal Engine 5.4. Error: $_"
+            Write-Host "Project packaging failed for Unreal Engine 5.5. Error: $_"
             exit 1
           }
         shell: powershell
 
-      - name: Test packaging for Android UE 5.4
+      - name: Test packaging for Android UE 5.5
         run: |
-          $UE_PATH = "${{ steps.paths.outputs.ue_root }}/UE_5.4/Engine/Build/BatchFiles/RunUAT.bat"
+          $UE_PATH = "${{ steps.paths.outputs.ue_root }}/UE_5.5/Engine/Build/BatchFiles/RunUAT.bat"
           $TEST_PROJECT_PATH = "E:/Software/TestProject"
           $PLUGIN_FOLDER = "$TEST_PROJECT_PATH/Plugins"
 
@@ -194,7 +194,7 @@ jobs:
       - name: Zip Plugin for each version
         run: |
           try {
-            $versions = @("5.4","5.3","5.2","5.1")
+            $versions = @("5.5","5.4","5.3","5.2","5.1")
             foreach ($version in $versions) {
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
                 Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip" -Force
@@ -246,6 +246,7 @@ jobs:
           name: "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
           body: ${{ steps.extract_notes.outputs.release_notes }}
           files: |
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.5.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.3.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.2.zip

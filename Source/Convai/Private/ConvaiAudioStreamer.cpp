@@ -108,26 +108,39 @@ bool UConvaiAudioStreamer::ShouldMuteGlobal()
 
 void UConvaiAudioStreamer::PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
 {
-	// if ReplicateVoiceToNetwork is true then just play the voice data right away to avoid the lipsync cutoff issue
-	if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() || ReplicateVoiceToNetwork)
-	{
-		PlayVoiceData(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
-		return;
-	}
-
-	if (ContainsHeaderData)
-	{
-		VoiceDataSize -= 44;
-	}
-
-	float AudioDuration = UConvaiUtils::CalculateAudioDuration(VoiceDataSize, NumChannels, SampleRate, 2);
-	ConvaiAudioChunk AudioChunk = ConvaiAudioChunk(TArray<uint8>(VoiceData, VoiceDataSize), AudioDuration, NumChannels, SampleRate, 2);
-	DataBuffer.Enqueue(AudioChunk);
-
-	UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceSynced: Added Audio Chunk - Audio Duration: %f"), AudioDuration);
-
-	//if (!IsTalking)
-	//	PauseLipSync();
+    // Do not play incoming audio on the client instance if muted
+    if ((ShouldMuteLocal() && GetOwner()->HasLocalNetOwner()) || ShouldMuteGlobal())
+    {
+        return;
+    }
+    
+    // If we don't need lipsync synchronization, just play the voice directly
+    if (!bIsSyncingAudioAndLipSync)
+    {
+        // Calculate audio duration
+        uint32 PCM_DataSize = VoiceDataSize;
+        if (ContainsHeaderData)
+        {
+            // Parse WAV header
+            FWaveModInfo WaveInfo;
+            if (WaveInfo.ReadWaveInfo(VoiceData, VoiceDataSize))
+            {
+                PCM_DataSize = *WaveInfo.pWaveDataSize;
+            }
+        }
+        
+        float AudioDuration = UConvaiUtils::CalculateAudioDuration(PCM_DataSize, NumChannels, SampleRate, 2);
+        
+        // Update tracking variables
+        TotalPlayingDuration += AudioDuration;
+        
+        // Play the voice directly
+        PlayVoiceData(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
+        return;
+    }
+    
+    // Otherwise, handle the audio through our state machine
+    HandleAudioReceived(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
 }
 
 void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
@@ -252,22 +265,34 @@ void UConvaiAudioStreamer::ForcePlayVoice(USoundWave* VoiceToPlay)
 }
 
 void UConvaiAudioStreamer::StopVoice()
-{
-	DataBuffer.Empty();
-	CurrentChunkDuration = 0;
-	CurrentChunkLipSyncFrameRate = 0;
-	LastFrameIndex = -1;
-	CurrentChunkFrameCounter = 0;
+{    
+    // Clear audio and lipsync buffers
+    AudioBuffer.Reset();
+    LipSyncBuffer.Reset();
 
-	if (!IsTalking && DataBuffer.IsEmpty())
-		return;
-	if (SoundWaveProcedural)
-		SoundWaveProcedural->ResetAudio();
-	
-	bIsQueuingLipsync = true;
-	StopLipSync();
-	onAudioFinished();
-	ClearAudioFinishedTimer();
+    // Reset tracking variables
+    TotalPlayingDuration = 0.0f;
+    TotalBufferedDuration = 0.0f;
+    
+    // Transition to Stopped state
+    TransitionToState(EAudioLipSyncState::Stopped);
+
+    // If we're not talking and buffers are empty, nothing to do
+    if (!IsTalking)
+        return;
+        
+    // Reset audio playback
+    if (SoundWaveProcedural)
+        SoundWaveProcedural->ResetAudio();
+    
+    // Reset lipsync state
+    StopLipSync();
+    
+    // Notify that audio has finished
+    onAudioFinished();
+    
+    // Clear any pending timers
+    ClearAudioFinishedTimer();
 }
 
 void UConvaiAudioStreamer::PauseVoice()
@@ -294,7 +319,7 @@ void UConvaiAudioStreamer::ResumeVoice()
 
 void UConvaiAudioStreamer::StopVoiceWithFade(float InVoiceFadeOutDuration)
 {
-	if (!IsTalking && DataBuffer.IsEmpty())
+	if (!IsTalking && AudioBuffer.IsEmpty() && LipSyncBuffer.IsEmpty())
 		return;
 
 	if (!IsValid(GetWorld()))
@@ -395,12 +420,23 @@ bool UConvaiAudioStreamer::SetLipSyncComponent(UActorComponent* LipSyncComponent
 		ConvaiLipSync = Cast<IConvaiLipSyncInterface>(LipSyncComponent);
 		ConvaiLipSyncExtended = Cast<IConvaiLipSyncExtendedInterface>(LipSyncComponent);
 		ConvaiLipSync->OnVisemesDataReady.BindUObject(this, &UConvaiAudioStreamer::OnVisemesReadyCallback);
+		
+		// Update bIsSyncingAudioAndLipSync based on the new component
+		bIsSyncingAudioAndLipSync = SupportsLipSync() && 
+								   ConvaiLipSyncExtended != nullptr && 
+								   ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() && 
+								   !ReplicateVoiceToNetwork;
+		
 		return true;
 	}
 	else
 	{
 		ConvaiLipSync = nullptr;
 		ConvaiLipSyncExtended = nullptr;
+		
+		// Update bIsSyncingAudioAndLipSync
+		bIsSyncingAudioAndLipSync = false;
+		
 		return false;
 	}
 }
@@ -461,6 +497,25 @@ bool UConvaiAudioStreamer::SupportsVision()
 void UConvaiAudioStreamer::BeginPlay()
 {
 	Super::BeginPlay();
+
+    // Initialize state
+    CurrentState = EAudioLipSyncState::Stopped;
+    
+    // Initialize tracking variables
+    TotalPlayingDuration = 0.0f;
+    TotalBufferedDuration = 0.0f;
+    bIsSyncingAudioAndLipSync = false;
+    
+    // Initialize configuration parameters
+
+	// Minimum buffer duration in seconds
+	MinBufferDuration = UConvaiSettingsUtils::GetParamValueAsFloat("MinBufferDuration", MinBufferDuration) ? MinBufferDuration : 0.7f;
+	MinBufferDuration = MinBufferDuration < 0 ? 0 : MinBufferDuration;
+    	
+	// Ratio of lipsync to audio duration required
+	AudioLipSyncRatio = UConvaiSettingsUtils::GetParamValueAsFloat("AudioLipSyncRatio", AudioLipSyncRatio) ? AudioLipSyncRatio : 0.5f;
+	AudioLipSyncRatio = VoiceTimeFactor < 0.5 ? 0.5 : AudioLipSyncRatio;
+
 	// Initialize the audio component
 	bAutoActivate = true;
 	bAlwaysPlay = true;
@@ -472,6 +527,361 @@ void UConvaiAudioStreamer::BeginPlay()
 
 	if (ConvaiVision == nullptr)
 		FindFirstVisionComponent();
+}
+
+void UConvaiAudioStreamer::TransitionToState(EAudioLipSyncState NewState)
+{
+    if (CurrentState == NewState)
+        return;
+        
+    // Use a simpler logging approach that doesn't require UEnum reflection
+    const TCHAR* CurrentStateStr = nullptr;
+    const TCHAR* NewStateStr = nullptr;
+    
+    switch (CurrentState)
+    {
+        case EAudioLipSyncState::Stopped: CurrentStateStr = TEXT("Stopped"); break;
+        case EAudioLipSyncState::Playing: CurrentStateStr = TEXT("Playing"); break;
+        case EAudioLipSyncState::WaitingOnLipSync: CurrentStateStr = TEXT("WaitingOnLipSync"); break;
+        case EAudioLipSyncState::WaitingOnAudio: CurrentStateStr = TEXT("WaitingOnAudio"); break;
+    }
+    
+    switch (NewState)
+    {
+        case EAudioLipSyncState::Stopped: NewStateStr = TEXT("Stopped"); break;
+        case EAudioLipSyncState::Playing: NewStateStr = TEXT("Playing"); break;
+        case EAudioLipSyncState::WaitingOnLipSync: NewStateStr = TEXT("WaitingOnLipSync"); break;
+        case EAudioLipSyncState::WaitingOnAudio: NewStateStr = TEXT("WaitingOnAudio"); break;
+    }
+    
+    UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("State transition: %s -> %s"), 
+        CurrentStateStr, NewStateStr);
+        
+    CurrentState = NewState;
+    
+    // Handle state entry actions
+    switch (CurrentState)
+    {
+        case EAudioLipSyncState::Stopped:
+            // Clear buffers when stopping
+            AudioBuffer.Reset();
+            LipSyncBuffer.Reset();
+            break;
+            
+        case EAudioLipSyncState::Playing:
+            // Nothing special on entry to Playing state
+            break;
+            
+        case EAudioLipSyncState::WaitingOnLipSync:
+            // Nothing special on entry to WaitingOnLipSync state
+            break;
+            
+        case EAudioLipSyncState::WaitingOnAudio:
+            // Nothing special on entry to WaitingOnAudio state
+            break;
+    }
+}
+
+// Handle received audio data
+void UConvaiAudioStreamer::HandleAudioReceived(uint8* AudioData, uint32 AudioDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
+{
+    // Calculate audio duration
+    uint32 PCM_DataSize = AudioDataSize;
+    if (ContainsHeaderData)
+    {
+        // Parse WAV header
+        FWaveModInfo WaveInfo;
+        if (WaveInfo.ReadWaveInfo(AudioData, AudioDataSize))
+        {
+            PCM_DataSize = *WaveInfo.pWaveDataSize;
+        }
+    }
+    
+    float AudioDuration = UConvaiUtils::CalculateAudioDuration(PCM_DataSize, NumChannels, SampleRate, 2);
+    
+    // Add to buffer
+    if (AudioBuffer.IsEmpty())
+    {
+        AudioBuffer.Data.Append(AudioData, AudioDataSize);
+        AudioBuffer.Duration = AudioDuration;
+        AudioBuffer.SampleRate = SampleRate;
+        AudioBuffer.NumChannels = NumChannels;
+    }
+    else
+    {
+        AudioBuffer.Data.Append(AudioData, AudioDataSize);
+        AudioBuffer.Duration += AudioDuration;
+    }
+    
+    // Update buffered duration
+    TotalBufferedDuration = AudioBuffer.Duration;
+    
+    // Handle based on current state
+    switch (CurrentState)
+    {
+        case EAudioLipSyncState::Stopped:
+        case EAudioLipSyncState::Playing:
+            if (HasSufficientLipSync())
+            {
+                TryPlayBufferedContent();
+            }
+            else
+            {
+                TransitionToState(EAudioLipSyncState::WaitingOnLipSync);
+            }
+            break;
+            
+        case EAudioLipSyncState::WaitingOnLipSync:
+            // Just buffer, waiting for lipsync
+            break;
+            
+        case EAudioLipSyncState::WaitingOnAudio:
+            if (HasSufficientAudio())
+            {
+                TryPlayBufferedContent();
+            }
+            break;
+    }
+}
+
+// Handle received lipsync data
+void UConvaiAudioStreamer::HandleLipSyncReceived(FAnimationSequence& FaceSequence)
+{
+    // Add to buffer
+    LipSyncBuffer.AddSequence(FaceSequence);
+    
+    // Handle based on current state
+    switch (CurrentState)
+    {
+        case EAudioLipSyncState::Stopped:
+        case EAudioLipSyncState::Playing:
+            if (HasSufficientAudio())
+            {
+                TryPlayBufferedContent();
+            }
+            else
+            {
+                TransitionToState(EAudioLipSyncState::WaitingOnAudio);
+            }
+            break;
+            
+        case EAudioLipSyncState::WaitingOnLipSync:
+            if (HasSufficientLipSync())
+            {
+                TryPlayBufferedContent();
+            }
+            break;
+            
+        case EAudioLipSyncState::WaitingOnAudio:
+            // Just buffer, waiting for audio
+            break;
+    }
+}
+
+// Check if we have sufficient lipsync data
+bool UConvaiAudioStreamer::HasSufficientLipSync()
+{
+    if (LipSyncBuffer.IsEmpty())
+        return false;
+        
+    if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData())
+        return true;
+        
+    float AudioDuration = AudioBuffer.GetTotalDuration();
+    float LipSyncDuration = LipSyncBuffer.GetTotalDuration();
+    
+    return LipSyncDuration >= MinBufferDuration || LipSyncDuration >= AudioDuration * AudioLipSyncRatio;
+}
+
+// Check if we have sufficient audio data
+bool UConvaiAudioStreamer::HasSufficientAudio() const
+{
+    if (AudioBuffer.IsEmpty())
+        return false;
+        
+    // Get audio duration
+    float AudioDuration = AudioBuffer.GetTotalDuration();
+    
+    // If we're not syncing audio and lipsync, just check against minimum buffer duration
+    if (!bIsSyncingAudioAndLipSync)
+    {
+        return AudioDuration >= 0;
+    }
+    
+    // Otherwise, check against both minimum duration and lipsync duration
+    float LipSyncDuration = LipSyncBuffer.GetTotalDuration();
+    
+    return AudioDuration >= MinBufferDuration || AudioDuration >= LipSyncDuration;
+}
+
+// Try to play buffered content
+bool UConvaiAudioStreamer::TryPlayBufferedContent()
+{
+    if (AudioBuffer.IsEmpty() || (SupportsLipSync() && ConvaiLipSyncExtended && 
+        ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() && LipSyncBuffer.IsEmpty()))
+    {
+        return false;
+    }
+    
+    // Calculate how much we can play
+    float PlayDuration = FMath::Min(AudioBuffer.GetTotalDuration(), LipSyncBuffer.GetTotalDuration());
+    if (PlayDuration <= 0.0f)
+        return false;
+        
+    // Play the content
+    PlayBufferedContent(PlayDuration);
+    
+    // Transition to Playing state
+    TransitionToState(EAudioLipSyncState::Playing);
+    
+    return true;
+}
+
+// Play buffered content up to the specified duration
+void UConvaiAudioStreamer::PlayBufferedContent(float Duration)
+{
+    // Update tracking variables
+    TotalPlayingDuration += Duration;
+    TotalBufferedDuration -= Duration;
+    
+    // Play audio
+    if (!AudioBuffer.IsEmpty())
+    {
+        // Calculate how many bytes to play based on sample rate, channels, and bytes per sample
+        uint32 BytesToPlay = AudioBuffer.Data.Num();
+        
+        if (Duration < AudioBuffer.Duration)
+        {
+            // Calculate samples to play based on duration
+            uint32 SampleRate = AudioBuffer.SampleRate;
+            uint32 NumChannels = AudioBuffer.NumChannels;
+            uint32 BytesPerSample = 2; // Assuming 16-bit PCM (2 bytes per sample)
+            
+            // Calculate total samples to play (per channel)
+            uint32 SamplesToPlay = FMath::FloorToInt(Duration * SampleRate);
+            
+            // Calculate total bytes to play (all channels)
+            BytesToPlay = SamplesToPlay * NumChannels * BytesPerSample;
+            
+            // Ensure we don't exceed the buffer size
+            BytesToPlay = FMath::Min(BytesToPlay, (uint32)AudioBuffer.Data.Num());
+            
+            // Ensure we're aligned to a sample boundary
+            BytesToPlay = (BytesToPlay / (NumChannels * BytesPerSample)) * (NumChannels * BytesPerSample);
+        }
+        
+        // Play the audio
+        PlayVoiceData(AudioBuffer.Data.GetData(), BytesToPlay, false, 
+            AudioBuffer.SampleRate, AudioBuffer.NumChannels);
+            
+        // Remove played data from buffer
+        if (BytesToPlay == AudioBuffer.Data.Num())
+        {
+            AudioBuffer.Reset();
+        }
+        else
+        {
+            AudioBuffer.Data.RemoveAt(0, BytesToPlay);
+            
+            // Recalculate the remaining duration based on the actual bytes removed
+            float PlayedDuration = (float)BytesToPlay / (AudioBuffer.SampleRate * AudioBuffer.NumChannels * 2);
+            AudioBuffer.Duration -= PlayedDuration;
+        }
+    }
+    
+    // Play lipsync
+    if (!LipSyncBuffer.IsEmpty() && SupportsLipSync())
+    {
+        float RemainingDuration = Duration;
+        float TotalPlayedLipSyncDuration = 0.0f;
+        TArray<FAnimationSequence> SequencesToPlay;
+        
+        // First, collect complete sequences that fit within our duration
+        for (int32 i = 0; i < LipSyncBuffer.Sequences.Num() && RemainingDuration > 0.0f; ++i)
+        {
+            const FAnimationSequence& Sequence = LipSyncBuffer.Sequences[i];
+            
+            if (Sequence.Duration <= RemainingDuration)
+            {
+                // This sequence fits completely
+                SequencesToPlay.Add(Sequence);
+                RemainingDuration -= Sequence.Duration;
+                TotalPlayedLipSyncDuration += Sequence.Duration;
+            }
+            else
+            {
+                // This sequence is too long - we need to split it
+                FAnimationSequence PartialSequence;
+                PartialSequence.FrameRate = Sequence.FrameRate;
+                
+                // Calculate how many frames we can include
+                float FrameDuration = 1.0f / Sequence.FrameRate;
+                int32 FramesToInclude = FMath::FloorToInt(RemainingDuration / FrameDuration);
+                
+                if (FramesToInclude > 0)
+                {
+                    // Copy the frames we can include
+                    for (int32 j = 0; j < FramesToInclude && j < Sequence.AnimationFrames.Num(); ++j)
+                    {
+                        PartialSequence.AnimationFrames.Add(Sequence.AnimationFrames[j]);
+                    }
+                    
+                    // Calculate actual duration of partial sequence
+                    PartialSequence.Duration = FramesToInclude * FrameDuration;
+                    
+                    // Add to play list
+                    SequencesToPlay.Add(PartialSequence);
+                    TotalPlayedLipSyncDuration += PartialSequence.Duration;
+                    
+                    // Create remainder sequence for the buffer
+                    FAnimationSequence RemainderSequence;
+                    RemainderSequence.FrameRate = Sequence.FrameRate;
+                    
+                    // Copy the remaining frames
+                    for (int32 j = FramesToInclude; j < Sequence.AnimationFrames.Num(); ++j)
+                    {
+                        RemainderSequence.AnimationFrames.Add(Sequence.AnimationFrames[j]);
+                    }
+                    
+                    // Calculate duration of remainder
+                    RemainderSequence.Duration = Sequence.Duration - PartialSequence.Duration;
+                    
+                    // Replace the original sequence with the remainder
+                    LipSyncBuffer.Sequences[i] = RemainderSequence;
+                }
+                
+                // We've used all our duration
+                RemainingDuration = 0.0f;
+                break;
+            }
+        }
+        
+        // Play all the sequences we collected
+        for (const FAnimationSequence& Sequence : SequencesToPlay)
+        {
+            PlayLipSyncWithPreGeneratedData(Sequence);
+        }
+        
+        // Remove completely played sequences from buffer
+        int32 SequencesToRemove = 0;
+        for (int32 i = 0; i < LipSyncBuffer.Sequences.Num(); ++i)
+        {
+            if (i < SequencesToPlay.Num() && LipSyncBuffer.Sequences[i].Duration == SequencesToPlay[i].Duration)
+            {
+                SequencesToRemove++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        
+        if (SequencesToRemove > 0)
+        {
+            LipSyncBuffer.Sequences.RemoveAt(0, SequencesToRemove);
+            LipSyncBuffer.TotalDuration -= TotalPlayedLipSyncDuration;
+        }
+    }
 }
 
 void UConvaiAudioStreamer::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -520,67 +930,15 @@ void UConvaiAudioStreamer::DestroyOpus()
 
 void UConvaiAudioStreamer::PlayLipSyncWithPreGeneratedDataSynced(FAnimationSequence& FaceSequence)
 {
-	// Play the lipsync right away as a workaround for lipsync issue on multiplayer
-	if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() || ReplicateVoiceToNetwork)
-		PlayLipSyncWithPreGeneratedData(FaceSequence);
-
-	CurrentChunkFrameCounter++;
-
-	if (FaceSequence.AnimationFrames.Num() == 0)
-		return;
-
-
-	int32 CurrentFrameIndex = FaceSequence.AnimationFrames[0].FrameIndex;
-
-	if (DetectNewLipSyncChunk(CurrentChunkFrameCounter, CurrentChunkDuration, CurrentChunkLipSyncFrameRate) && DataBuffer.NumAudioChunks > DataBuffer.NumLipSyncChunks)
-	{
-		DataBuffer.EnqueueLipSync(FaceSequence, true);
-		int CurrentLipSyncChunkIndex = DataBuffer.NumLipSyncChunks - 1;
-
-		CurrentChunkDuration = DataBuffer.ChunkDurations[CurrentLipSyncChunkIndex];
-		CurrentChunkLipSyncFrameRate = FaceSequence.FrameRate;
-		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("PlayLipSyncWithPreGeneratedDataSynced: Detected New LipSync Chunk ChunkDuration: %f ChunkLipSyncFrameRate: %f FrameIndex:%d ChunkFrameCounter: %d ExpectedFrameCount:%f ChunkFrameCounter: %d"), CurrentChunkDuration, CurrentChunkLipSyncFrameRate, CurrentFrameIndex, CurrentChunkFrameCounter, CurrentChunkLipSyncFrameRate * CurrentChunkDuration, CurrentChunkFrameCounter);
-		CurrentChunkFrameCounter = 1;
-		return;
-	}
-	else if (DetectNewLipSyncChunk(CurrentChunkFrameCounter, CurrentChunkDuration, CurrentChunkLipSyncFrameRate) && DataBuffer.NumAudioChunks <= DataBuffer.NumLipSyncChunks)
-	{
-		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("PlayLipSyncWithPreGeneratedDataSynced: Failed to detect New LipSync Chunk due to insufficent audio chunks NumAudioChunks: %d NumLipSyncChunks: %d FrameIndex:%d ChunkFrameCounter: %d ExpectedFrameCount:%f ChunkFrameCounter: %d"), DataBuffer.NumAudioChunks, DataBuffer.NumLipSyncChunks, CurrentFrameIndex, CurrentChunkFrameCounter, CurrentChunkLipSyncFrameRate * CurrentChunkDuration, CurrentChunkFrameCounter);
-	}
-
-
-	if (IsTalking && DataBuffer.NumLipSyncChunks > 0)
-	{
-		DataBuffer.EnqueueLipSync(FaceSequence, false);
-		PlayAvailableAudioAndLipSync();
-	}
-	else if (IsTalking && DataBuffer.NumLipSyncChunks == 0)
-	{
-		PlayLipSyncWithPreGeneratedData(FaceSequence);
-	}
-	else if (bIsPaused || !IsTalking)
-	{
-		if (DataBuffer.NumLipSyncChunks == 0)
-		{
-			UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("PlayLipSyncWithPreGeneratedDataSynced: Detected LipSync Frame coming late - ChunkDuration: %f ChunkLipSyncFrameRate: %f FrameIndex:%d ChunkFrameCounter: %d ExpectedFrameCount:%f ChunkFrameCounter: %d"), CurrentChunkDuration, CurrentChunkLipSyncFrameRate, CurrentFrameIndex, CurrentChunkFrameCounter, CurrentChunkLipSyncFrameRate * CurrentChunkDuration, CurrentChunkFrameCounter);
-			return; // Lipsync came late - skip it
-		}
-
-		if (DataBuffer.IsEmptyLipSync())
-		{
-			UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("PlayLipSyncWithPreGeneratedDataSynced: Trying to Enqueue while DataBuffer.IsEmptyLipSync() - IsTalking = %s - bIsPaused = %s"), IsTalking ? TEXT("true") : TEXT("false"), bIsPaused ? TEXT("true") : TEXT("false"));
-		}
-
-		DataBuffer.EnqueueLipSync(FaceSequence, false);
-
-		if (HasSufficentLipsyncFrames())
-		{
-			UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("PlayLipSyncWithPreGeneratedDataSynced: Resuming Voice and Lipsync"));
-			PlayNextAudioInQueue();
-			PlayNextLipSyncInQueue();
-			ResumeVoice();
-		}
-	}
+    // If we don't need lipsync synchronization, just play the lipsync directly
+    if (!bIsSyncingAudioAndLipSync)
+    {
+        PlayLipSyncWithPreGeneratedData(FaceSequence);
+        return;
+    }
+    
+    // Otherwise, handle the lipsync through our state machine
+    HandleLipSyncReceived(FaceSequence);
 }
 
 void UConvaiAudioStreamer::PlayLipSyncWithPreGeneratedData(FAnimationSequence FaceSequence)
@@ -646,15 +1004,6 @@ bool UConvaiAudioStreamer::CanUseVision()
 void UConvaiAudioStreamer::OnVisemesReadyCallback()
 {
 	OnVisemesReady.Broadcast();
-}
-
-bool UConvaiAudioStreamer::DetectNewLipSyncChunk(int32 InFrameCount, float InChunkDuration, int32 FrameRate)
-{
-	if (InChunkDuration <= 0 || FrameRate <= 0)
-		return true;
-
-	int32 ExpectedNumFrames = InChunkDuration * FrameRate;
-	return InFrameCount > ExpectedNumFrames;
 }
 
 void UConvaiAudioStreamer::OnLipSyncTimeOut()
@@ -760,6 +1109,32 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 	}
 }
 
+float UConvaiAudioStreamer::GetRemainingContentDuration()
+{
+    // If we're not talking, return 0
+    if (!IsTalking)
+        return 0.0f;
+    
+    // Calculate buffered durations
+    float BufferedAudioDuration = AudioBuffer.IsEmpty() ? 0.0f : AudioBuffer.Duration;
+    float BufferedLipSyncDuration = LipSyncBuffer.IsEmpty() ? 0.0f : LipSyncBuffer.TotalDuration;
+    
+    // Check if we have sufficient audio
+    if (!HasSufficientAudio())
+        return 0.0f;
+    
+    // If we need synced lipsync, also check if we have sufficient lipsync
+    if (bIsSyncingAudioAndLipSync && !HasSufficientLipSync())
+        return 0.0f;
+    
+    // For audio-only playback, return audio duration
+    if (!bIsSyncingAudioAndLipSync)
+        return BufferedAudioDuration;
+    
+    // For synced playback, return the minimum of audio and lipsync duration
+    return FMath::Min(BufferedAudioDuration, BufferedLipSyncDuration);
+}
+
 void UConvaiAudioStreamer::onAudioStarted()
 {
 	AsyncTask(ENamedThreads::GameThread, [this] {
@@ -770,168 +1145,40 @@ void UConvaiAudioStreamer::onAudioStarted()
 
 void UConvaiAudioStreamer::onAudioFinished()
 {
-	UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("onAudioFinished"));
-
-	if (!DataBuffer.IsEmpty())
-	{
-		//AsyncTask(ENamedThreads::GameThread, [this] {
-			if (HasSufficentLipsyncFrames()) // returns true if the lipsync component is not available
-			{
-				UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("onAudioFinished: Resuming Voice and Lipsync"));
-				IsTalking = true; // put IsTalking to true to prevent triggering of the OnStartedTalking Trigger
-				PlayAvailableAudioAndLipSync();
-				//PlayNextAudioInQueue();
-				//PlayNextLipSyncInQueue();
-				ResumeVoice();
-
-				return;
-			}
-			else
-			{
-				UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("onAudioFinished: Pausing Voice and Lipsync"));
-				PauseVoice();
-				StopLipSync();
-			}
-		//});
-	}
-
-	AsyncTask(ENamedThreads::GameThread, [this] {
-		OnFinishedTalking.Broadcast();
-	});
-	IsTalking = false;
+    UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("onAudioFinished"));
+    
+    // Update tracking variables
+    TotalPlayingDuration = 0.0f;
+    
+    // Check if we have more content to play
+    if (!AudioBuffer.IsEmpty() || !LipSyncBuffer.IsEmpty())
+    {
+        if (TryPlayBufferedContent())
+        {
+            return;
+        }
+        else if (!AudioBuffer.IsEmpty())
+        {
+            TransitionToState(EAudioLipSyncState::WaitingOnLipSync);
+        }
+        else if (!LipSyncBuffer.IsEmpty())
+        {
+            TransitionToState(EAudioLipSyncState::WaitingOnAudio);
+        }
+    }
+    else
+    {
+        // No more content, transition to Stopped
+        TransitionToState(EAudioLipSyncState::Stopped);
+    }
+    
+    // Broadcast that audio has finished
+    AsyncTask(ENamedThreads::GameThread, [this] {
+        OnFinishedTalking.Broadcast();
+    });
+    
+    IsTalking = false;
 }
-
-bool UConvaiAudioStreamer::PlayNextAudioInQueue()
-{
-	if (DataBuffer.IsEmpty())
-		return false;
-	ConvaiAudioChunk NextAudioChunk;
-	DataBuffer.Dequeue(NextAudioChunk);
-	PlayVoiceData(NextAudioChunk.AudioData.GetData(), NextAudioChunk.AudioData.Num(), false, NextAudioChunk.SampleRate, NextAudioChunk.NumChannels);
-	UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("PlayNextAudioInQueue - Duration: %f - Chunks Remaining: %d"), NextAudioChunk.AudioDuration, DataBuffer.NumAudioChunks);
-	return true;
-}
-
-bool UConvaiAudioStreamer::PlayNextLipSyncInQueue()
-{
-	if (DataBuffer.IsEmptyLipSync())
-		return false;
-	FAnimationSequence NextLipSyncChunk;
-	DataBuffer.DequeueLipSync(NextLipSyncChunk);
-	PlayLipSyncWithPreGeneratedData(NextLipSyncChunk);
-	UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("PlayNextLipSyncInQueue - Duration: %f - Chunks Remaining: %d"), NextLipSyncChunk.Duration, DataBuffer.NumLipSyncChunks);
-	return true;
-}
-
-bool UConvaiAudioStreamer::PlayAvailableAudioAndLipSync()
-{
-	if (DataBuffer.IsEmpty() || DataBuffer.IsEmptyLipSync())
-		return false;
-
-	TArray<uint8> MergedVoiceData;
-	uint32 NumChannels;
-	uint32 SampleRate;
-	float AudioDuration = 0;
-	int AudioChunks = 0;
-
-	FAnimationSequence MergedLipSyncData;
-	int LipSyncChunks = 0;
-
-	while (HasSufficentLipsyncFrames() && !DataBuffer.IsEmpty())
-	{
-
-		ConvaiAudioChunk NextAudioChunk;
-		if (DataBuffer.Dequeue(NextAudioChunk))
-		{
-			MergedVoiceData.Append(NextAudioChunk.AudioData);
-			NumChannels = NextAudioChunk.NumChannels;
-			SampleRate = NextAudioChunk.SampleRate;
-			AudioDuration += NextAudioChunk.AudioDuration;
-			AudioChunks++;
-		}
-		FAnimationSequence NextLipSyncChunk;
-		if (DataBuffer.DequeueLipSync(NextLipSyncChunk))
-		{
-			MergedLipSyncData.FrameRate = NextLipSyncChunk.FrameRate;
-			MergedLipSyncData.Duration += NextLipSyncChunk.Duration;
-			MergedLipSyncData.AnimationFrames.Append(NextLipSyncChunk.AnimationFrames);
-			LipSyncChunks++;
-		}
-	}
-
-	if (MergedVoiceData.Num() == 0 && MergedLipSyncData.AnimationFrames.Num() == 0)
-	{
-		return false;
-	}
-	else
-	{
-		PlayVoiceData(MergedVoiceData.GetData(), MergedVoiceData.Num(), false, SampleRate, NumChannels);
-		PlayLipSyncWithPreGeneratedData(MergedLipSyncData);
-		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Play Available Audio and LipSync - Audio Duration: %f - Audio Chunks: %d - LipSync Duration: %f - LipSync Chunks: %d - Audio Chunks Remaining: %d - LipSync Chunks Remaining: %d"), AudioDuration, AudioChunks, MergedLipSyncData.Duration, LipSyncChunks, DataBuffer.NumAudioChunks, DataBuffer.NumLipSyncChunks);
-		return true;
-	}
-}
-
-bool UConvaiAudioStreamer::HasSufficentLipsyncFrames()
-{
-	float Dummy;
-	return HasSufficentLipsyncFrames(Dummy);
-}
-
-bool UConvaiAudioStreamer::HasSufficentLipsyncFrames(float& InSyncTimeRemaining)
-{
-	//float NextChunkAudioTime = 0;
-	//if (auto Chunk = DataBuffer.Peek())
-	//{
-	//	NextChunkAudioTime = Chunk->AudioDuration;
-	//}
-
-	float RemainingVoiceTime = DataBuffer.TotalBufferedAudioDuration;
-
-	if (ConvaiLipSync)
-	{
-		if (ConvaiLipSyncExtended)
-		{
-			float RemainingLipSyncTime = DataBuffer.TotalBufferedLipSyncDuration;
-
-			//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("HasSufficentLipsyncFrames: TotalBufferedAudioDuration:%f TotalBufferedLipSyncDuration:%f, RemainingVoiceTime:%f, NumAudioChunks: %d, NumLipSyncChunks: %d"), DataBuffer.TotalBufferedAudioDuration, DataBuffer.TotalBufferedLipSyncDuration, RemainingVoiceTime, DataBuffer.NumAudioChunks, DataBuffer.NumLipSyncChunks);
-
-			if (LipSyncThresholdSecs < 0)
-			{
-				LipSyncThresholdSecs = UConvaiSettingsUtils::GetParamValueAsFloat("LipSyncThresholdSecs", LipSyncThresholdSecs) ? LipSyncThresholdSecs : 0.7f;
-				LipSyncThresholdSecs = LipSyncThresholdSecs < 0 ? 0 : LipSyncThresholdSecs;
-			}
-			if (VoiceTimeFactor < 0)
-			{
-				VoiceTimeFactor = UConvaiSettingsUtils::GetParamValueAsFloat("VoiceTimeFactor", VoiceTimeFactor) ? VoiceTimeFactor : 0.5f;
-				VoiceTimeFactor = VoiceTimeFactor < 0 ? 0 : VoiceTimeFactor;
-			}
-
-
-			if (RemainingLipSyncTime > LipSyncThresholdSecs || (RemainingLipSyncTime >= RemainingVoiceTime * VoiceTimeFactor))
-			{
-				if (DataBuffer.LastLipSyncChunkDuration > LipSyncThresholdSecs || DataBuffer.LastLipSyncChunkDuration >= DataBuffer.LastAudioChunkDuration * VoiceTimeFactor)
-				{
-					InSyncTimeRemaining = DataBuffer.TotalBufferedLipSyncDuration;
-				}
-				else
-				{
-					InSyncTimeRemaining = DataBuffer.TotalBufferedLipSyncDuration - DataBuffer.LastLipSyncChunkDuration;
-				}
-				return true;
-			}
-			else
-			{
-				InSyncTimeRemaining = 0;
-				return false;
-			}
-		}
-	}
-
-	InSyncTimeRemaining = RemainingVoiceTime;
-	return true;
-}
-
 
 bool UConvaiAudioStreamer::InitEncoder(int32 InSampleRate, int32 InNumChannels, EAudioEncodeHint EncodeHint)
 {

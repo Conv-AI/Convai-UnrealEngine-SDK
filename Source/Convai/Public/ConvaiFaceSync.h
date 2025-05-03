@@ -65,7 +65,7 @@ public:
 	bool IsPlaying();
 
 	// Record the current time if this is the first LipSync sequence to be received after silence
-	void CalculateStartingTime();
+	virtual void CalculateStartingTime();
 
 	void ClearMainSequence();
 
@@ -101,8 +101,6 @@ protected:
 	FCriticalSection RecordingCriticalSection;
 	bool Stopping;
 	bool IsRecordingLipSync;
-
-private:
 	double StartTime;
 	bool bIsPlaying;
 };

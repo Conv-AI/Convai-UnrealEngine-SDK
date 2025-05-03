@@ -147,6 +147,19 @@ public:
 	TMap<FString, FString> NarrativeTemplateKeys;
 
 	/**
+	 *   Extra information that can be passed to the character, can contain any important data that the chracter needs to know about without the 
+	 *   need of player interaction or narrative triggers, e.g. Inventory items, Player health, key information to solve a puzzle, time of day, etc...
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Convai")
+	FString DynamicEnvironmentInfo;
+
+	/**
+	 *   Speaker ID used for long term memory (LTM)
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "Convai")
+	FString SpeakerID;
+
+	/**
 	 *    Reset the conversation with the character and remove previous memory, this is the same as setting the session ID property to -1.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Convai")
@@ -227,7 +240,7 @@ public:
 	 */
 	UFUNCTION()
 	bool StartFirstAction();
-
+	
 	/**
 	 * Triggers a specified Blueprint event or function on the owning actor based on the given action name and parameters.
 	 *
@@ -238,7 +251,8 @@ public:
 	 *
 	 */
 	bool TriggerNamedBlueprintAction(const FString& ActionName, FConvaiResultAction ConvaiActionStruct);
-
+	bool TryCallFunction(UObject* Object, const FString& FunctionName, FConvaiResultAction& ConvaiResultAction) const;
+	
 	UFUNCTION(BlueprintCallable, Category = "Convai|Emotion")
 	void ForceSetEmotion(EBasicEmotions BasicEmotion, EEmotionIntensity Intensity, bool ResetOtherEmotions = false);
 
@@ -304,7 +318,7 @@ public:
 
 public:
 	//UFUNCTION(BlueprintCallable, DisplayName = "Begin Transmission")
-	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool ReplicateVoiceToNetwork, bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, uint32 InToken);
+	void StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool ReplicateVoiceToNetwork, bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, uint32 InToken, FString InSpeakerID);
 	
 	void FinishGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent);
 

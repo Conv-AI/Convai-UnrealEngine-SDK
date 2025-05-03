@@ -86,6 +86,21 @@ public:
 	UFUNCTION(Server, Reliable, Category = "Convai|Network")
 	void SetPlayerNameServer(const FString& NewPlayerName);
 
+	/**
+	 *   Speaker ID used for long term memory (LTM)
+	 */
+	UPROPERTY(EditAnywhere, Category = "Convai", Replicated, BlueprintSetter = SetSpeakerID)
+	FString SpeakerID;
+
+	/**
+	 *    Sets a new Speaker ID
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Convai")
+	void SetSpeakerID(FString NewSpeakerID);
+
+	UFUNCTION(Server, Reliable, Category = "Convai|Network")
+	void SetSpeakerIDServer(const FString& NewSpeakerID);
+
 	UFUNCTION(BlueprintCallable, Category = "Convai|Microphone")
 	bool GetDefaultCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo);
 

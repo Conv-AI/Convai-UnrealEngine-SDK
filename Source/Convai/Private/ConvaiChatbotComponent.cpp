@@ -55,7 +55,7 @@ bool UConvaiChatbotComponent::IsProcessing()
 {
 	if (IsValid(ConvaiGRPCGetResponseProxy) && !ReceivedFinalData)
 		return true;
-	else if (!GetIsTalking() && !DataBuffer.IsEmpty())
+	else if (!GetIsTalking() && !AudioBuffer.IsEmpty())
 		return true;
 	else
 		return false;
@@ -77,7 +77,7 @@ float UConvaiChatbotComponent::GetTalkingTimeElapsed()
 	if (IsValid(GetWorld()))
 	{
 		// TODO: Reset DataBuffer.TotalAudioDurationElapsed after response is complete
-		TimeElapsed = DataBuffer.TotalAudioDurationElapsed + GetWorld()->GetTimerManager().GetTimerElapsed(AudioFinishedTimerHandle);
+		TimeElapsed = GetWorld()->GetTimerManager().GetTimerElapsed(AudioFinishedTimerHandle);
 	}
 
 	return TimeElapsed;
@@ -90,9 +90,8 @@ float UConvaiChatbotComponent::GetTalkingTimeRemaining()
 	{
 		TimeRemaing = GetWorld()->GetTimerManager().GetTimerRemaining(AudioFinishedTimerHandle);
 		TimeRemaing = TimeRemaing < 0 ? 0 : TimeRemaing;
-		float InSyncTimeRemaining = 0;
-		HasSufficentLipsyncFrames(InSyncTimeRemaining); // Takes into consideration the lipsync time
-		TimeRemaing += InSyncTimeRemaining;
+		float BufferedInSyncTimeRemaining = GetRemainingContentDuration();
+		TimeRemaing += BufferedInSyncTimeRemaining;
 	}
 	return TimeRemaing;
 }
@@ -221,52 +220,76 @@ bool UConvaiChatbotComponent::StartFirstAction()
 
 bool UConvaiChatbotComponent::TriggerNamedBlueprintAction(const FString& ActionName, FConvaiResultAction ConvaiActionStruct)
 {
-	if (AActor* Owner = GetOwner())
+	if (!ActionName.IsEmpty())
 	{
-		UFunction* Function = Owner->FindFunction(FName(*ActionName));
-
-		if (Function)
+		// Check the owning actor first
+		if (AActor* Owner = GetOwner())
 		{
-			// Check the function signature
-			bool bCanCall = false;
-			TFieldIterator<FStructProperty> PropIt(Function);
-			if (PropIt)
+			if (TryCallFunction(Owner, ActionName, ConvaiActionStruct))
 			{
-				FStructProperty* StructProp = *PropIt;
-				if (StructProp->GetClass() == FStructProperty::StaticClass())
-				{
-					//FStructProperty* StructProp = Cast<FStructProperty>(ParamProp);
-					if (StructProp && StructProp->Struct == FConvaiResultAction::StaticStruct())
-					{
-						bCanCall = true;
-					}
-				}
-			}
-			else
-			{
-				bCanCall = true; // No parameters
-			}
-
-			if (bCanCall)
-			{
-				Owner->ProcessEvent(Function, PropIt ? &ConvaiActionStruct : nullptr);
 				return true;
 			}
-			else
-			{
-				UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Found a function/event with the same name of action: %s.\
-					 However, could not run due to mismatched parameter type. Make sure the function/event has no input parameters or take a parameter of type \"ConvaiResultAction\""), *ActionName);
-			}
 		}
-		else
+
+		// Fallback to self (BP_ConvaiChatbotComponent)
+		if (TryCallFunction(this, ActionName, ConvaiActionStruct))
 		{
-			//UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("TriggerNamedBlueprintAction: Could not find an event or function with action name: %s"), *ActionName);
+			return true;
+		}
+
+		// Log an error if the function is not found in both places
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Could not find a valid function '%s' on the owning actor or the component (self)."), *ActionName);
+	}
+	else
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Provided action name is empty."));
+	}
+
+	return false;
+}
+
+bool UConvaiChatbotComponent::TryCallFunction(UObject* Object, const FString& FunctionName, FConvaiResultAction& ConvaiResultAction) const
+{
+	if (!Object)
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TryCallFunction: Null object provided."));
+		return false;
+	}
+
+	UFunction* Function = Object->FindFunction(FName(*FunctionName));
+	if (!Function)
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Verbose, TEXT("TryCallFunction: Function '%s' not found on '%s'."), *FunctionName, *Object->GetName());
+		return false;
+	}
+
+	// Check function parameters (if any)
+	bool bCanCall = false;
+	if (FProperty* FirstParam = Function->PropertyLink)
+	{
+		if (const FStructProperty* StructProp = CastField<FStructProperty>(FirstParam))
+		{
+			if (StructProp->Struct == FConvaiResultAction::StaticStruct())
+			{
+				bCanCall = true;
+			}
 		}
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Could not find pointer to owner"));
+		bCanCall = true; // No parameters
 	}
+
+	if (bCanCall)
+	{
+		Object->ProcessEvent(Function, Function->PropertyLink ? &ConvaiResultAction : nullptr);
+		return true;
+	}
+	else
+	{
+		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TryCallFunction: Function '%s' found on '%s' but has incompatible parameters. Ensure it accepts 'FConvaiResultAction' or has no parameters."), *FunctionName, *Object->GetName());
+	}
+
 	return false;
 }
 
@@ -343,7 +366,7 @@ bool UConvaiChatbotComponent::PlayRecordedVoice(USoundWave* RecordedVoice)
 	return true;
 }
 
-void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, uint32 InToken)
+void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InConvaiPlayerComponent, FString InputText, UConvaiEnvironment* InEnvironment, bool InGenerateActions, bool InVoiceResponse, bool RunOnServer, bool UseOverrideAuthKey, FString OverrideAuthKey, FString OverrideAuthHeader, uint32 InToken, FString InSpeakerID)
 {
 	if (!IsValid(InConvaiPlayerComponent))
 	{
@@ -395,6 +418,7 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	Token = InToken;
 	CurrentConvaiPlayerComponent = InConvaiPlayerComponent;
 	LastPlayerName = CurrentConvaiPlayerComponent->PlayerName;
+	SpeakerID = InSpeakerID;
 
 	if (!TextInput)
 	{
@@ -624,6 +648,8 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAuthKey, FStrin
 	Params.ConvaiGRPCVisionParams = ConvaiGRPCVisionParams;
 	Params.AuthKey = AuthKey;
 	Params.AuthHeader = AuthHeader;
+	Params.DynamicEnvironmentInfo = DynamicEnvironmentInfo;
+	Params.SpeakerID = SpeakerID;
 
 	ConvaiGRPCGetResponseProxy = UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetResponseProxy(this, Params);
 
@@ -809,67 +835,41 @@ void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, boo
 
 void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal)
 {
+	if (!IsInGameThread())
+	{
+		AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal]
+			{
+				onResponseDataReceived(ReceivedText, ReceivedAudio, SampleRate, IsFinal);
+			});
+		return;
+	}
+
+
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		if (IsInGameThread())
-		{
-			Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
-		}
-		else
-		{
-			AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, IsFinal]
-				{
-					Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
-				});
-		}
-		
+		Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
 	}
 
 	float ReceieivedAudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
 
-			if (VoiceResponse && ReceivedAudio.Num() > 0)
-			{
-				AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1); // Should be called in the game thread
-
-				//FString BasePath = TEXT("F:/Work/Convai/UE_Animation_Dev/TestRecordedAudioChunks");
-				//FString Timestamp = FDateTime::Now().ToString();
-				//Timestamp.ReplaceInline(TEXT(":"), TEXT("_"));
-				//FString FileName = FString::Printf(TEXT("Audio_%s.wav"), *Timestamp);
-				//FString FullPath = FPaths::Combine(*BasePath, *FileName);
-
-				//TArray<uint8> OutWaveFileData;
-				//UConvaiUtils::PCMDataToWav(ReceivedAudio, OutWaveFileData, 1, SampleRate);
-				//UConvaiUtils::SaveByteArrayAsFile(FullPath, OutWaveFileData);
-
-				if (IsRecordingAudio)
-				{
-					RecordedAudio.Append(ReceivedAudio);
-					RecordedAudioSampleRate = SampleRate;
-				}
-			}
-
-
-
-	if (IsInGameThread())
+	if (VoiceResponse && ReceivedAudio.Num() > 0)
 	{
-		// Send text and audio duration to blueprint event
-		OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+		AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1); // Should be called in the game thread
 
-		// Run the deprecated event
-		OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+		if (IsRecordingAudio)
+		{
+			RecordedAudio.Append(ReceivedAudio);
+			RecordedAudioSampleRate = SampleRate;
+		}
 	}
-	else
-	{
-		AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal, ReceieivedAudioDuration]
-			{
-				// Send text and audio duration to blueprint event
-				OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
 
-				// Run the deprecated event
-				OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
-			});
-	}
+	// Send text and audio duration to blueprint event
+	OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+
+	// Run the deprecated event
+	OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+
 
 	if (ReceieivedAudioDuration > 0)
 	{
