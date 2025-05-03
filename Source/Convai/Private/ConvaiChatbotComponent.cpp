@@ -55,7 +55,7 @@ bool UConvaiChatbotComponent::IsProcessing()
 {
 	if (IsValid(ConvaiGRPCGetResponseProxy) && !ReceivedFinalData)
 		return true;
-	else if (!GetIsTalking() && !DataBuffer.IsEmpty())
+	else if (!GetIsTalking() && !AudioBuffer.IsEmpty())
 		return true;
 	else
 		return false;
@@ -77,7 +77,7 @@ float UConvaiChatbotComponent::GetTalkingTimeElapsed()
 	if (IsValid(GetWorld()))
 	{
 		// TODO: Reset DataBuffer.TotalAudioDurationElapsed after response is complete
-		TimeElapsed = DataBuffer.TotalAudioDurationElapsed + GetWorld()->GetTimerManager().GetTimerElapsed(AudioFinishedTimerHandle);
+		TimeElapsed = GetWorld()->GetTimerManager().GetTimerElapsed(AudioFinishedTimerHandle);
 	}
 
 	return TimeElapsed;
@@ -90,9 +90,8 @@ float UConvaiChatbotComponent::GetTalkingTimeRemaining()
 	{
 		TimeRemaing = GetWorld()->GetTimerManager().GetTimerRemaining(AudioFinishedTimerHandle);
 		TimeRemaing = TimeRemaing < 0 ? 0 : TimeRemaing;
-		float InSyncTimeRemaining = 0;
-		HasSufficentLipsyncFrames(InSyncTimeRemaining); // Takes into consideration the lipsync time
-		TimeRemaing += InSyncTimeRemaining;
+		float BufferedInSyncTimeRemaining = GetRemainingContentDuration();
+		TimeRemaing += BufferedInSyncTimeRemaining;
 	}
 	return TimeRemaing;
 }
