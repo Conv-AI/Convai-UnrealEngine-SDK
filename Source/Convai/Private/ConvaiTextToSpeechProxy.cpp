@@ -6,6 +6,7 @@
 #include "Sound/SoundWave.h"
 #include "Engine.h"
 #include "JsonObjectConverter.h"
+#include "RestAPI/ConvaiURL.h"
 
 #include "../Convai.h"
 
@@ -40,7 +41,8 @@ UConvaiTextToSpeechProxy* UConvaiTextToSpeechProxy::CreateTextToSpeechQueryProxy
 {
 	UConvaiTextToSpeechProxy* Proxy = NewObject<UConvaiTextToSpeechProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/tts";
+	Proxy->URL = UConvaiURL::GetFullURL(TEXT("tts"), false);
+	
 	Proxy->Transcript = Transcript;
 	Proxy->VoiceStr = Voice;
 	//Proxy->VoiceStr = FString(TTS_Voice_Type_str[uint8(Voice)]);

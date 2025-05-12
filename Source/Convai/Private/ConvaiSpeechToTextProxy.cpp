@@ -11,13 +11,20 @@
 #include "JsonObjectConverter.h"
 #include "../Convai.h"
 
+namespace
+{	
+	static FString TextToSpeechURL() { return UConvaiURL::GetFullURL(TEXT("tts"), false); }
+	static FString SpeechToTextURL() { return UConvaiURL::GetFullURL(TEXT("stt/"), false); }
+}
+
+
 DEFINE_LOG_CATEGORY(ConvaiS2THttpLog);
 
 UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromFileNameQueryProxy(UObject* WorldContextObject, FString filename)
 {
 	UConvaiSpeechToTextProxy* Proxy = NewObject<UConvaiSpeechToTextProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/stt/";
+	Proxy->URL = SpeechToTextURL();
 
 	if (!FPaths::FileExists(filename))
 	{
@@ -44,7 +51,7 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromSoundWa
 {
 	UConvaiSpeechToTextProxy* Proxy = NewObject<UConvaiSpeechToTextProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/stt/";
+	Proxy->URL = SpeechToTextURL();
 
 	if (SoundWave == nullptr)
 	{
@@ -90,7 +97,7 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromArrayQu
 {
 	UConvaiSpeechToTextProxy* Proxy = NewObject<UConvaiSpeechToTextProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://te-apis.convai.com/asr";
+	Proxy->URL = SpeechToTextURL();
 	Proxy->Payload = Payload;
 	Proxy->bStereo = true;
 	return Proxy;

@@ -20,7 +20,7 @@
 #if PLATFORM_LINUX
 	#include "Linux/LinuxPlatformFile.h"
 #else
-	#include "HAL/PlatformFilemanager.h"
+	#include "HAL/PlatformFileManager.h"
 #endif
 #include "Engine/GameInstance.h"
 #include "ConvaiSubsystem.h"
@@ -1177,3 +1177,60 @@ USoundWave* UConvaiUtils::ReadWavFileAsSoundWave(const FString & FilePath)
 
 	return NewSoundWave;
 }
+
+bool UCommandLineUtils::IsCommandLineFlagPresent(const FString& Flag)
+{
+    // Check if the flag is present as a standalone flag (e.g., -fullscreen)
+    if (FParse::Param(FCommandLine::Get(), *Flag))
+    {
+        return true;
+    }
+
+    // Check if the flag is present as a flag with a value (e.g., -port=12345)
+    FString DummyString;
+    if (FParse::Value(FCommandLine::Get(), *(Flag + "="), DummyString))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+int32 UCommandLineUtils::GetCommandLineFlagValueAsInt(const FString& Flag, int32 DefaultValue)
+{
+	int32 Value = DefaultValue;
+
+	// Check for the "-Flag=" and get its value as an integer
+	if (FParse::Value(FCommandLine::Get(), *(Flag + "="), Value))
+	{
+		return Value;
+	}
+
+	return DefaultValue; // Return default if not found
+}
+
+FString UCommandLineUtils::GetCommandLineFlagValueAsString(const FString& Flag, const FString& DefaultValue)
+{
+	FString Value;
+
+	// Check for the "-Flag=" and get its value as a string
+	if (FParse::Value(FCommandLine::Get(), *(Flag + "="), Value))
+	{
+		Value.TrimStartInline();
+		Value.TrimEndInline();
+		if (!Value.IsEmpty())
+		{
+			return Value;
+		}
+	}
+
+	return DefaultValue; // Return default if not found or empty
+}
+
+FString UCommandLineUtils::GetCommandLineFlagValueAsStringNoDefault(const FString& Flag)
+{
+	FString BaseUrl = FString();
+	FParse::Value(FCommandLine::Get(), *Flag, BaseUrl);    
+	return BaseUrl;
+}
+

@@ -152,7 +152,7 @@ public:
 		}
 		else
 		{
-			UE_LOG(ConvaiFormValidationLog, Warning, TEXT("Empty API Key, please add it in Edit->Project Settings->Convai"));
+			UE_LOG(LogTemp, Warning, TEXT("Empty API Key, please add it in Edit->Project Settings->Convai"));
 			return false;
 		}
 	}
@@ -191,7 +191,7 @@ public:
 		}
 		else
 		{
-			UE_LOG(ConvaiFormValidationLog, Warning, TEXT("Empty Input Text"));
+			UE_LOG(LogTemp, Warning, TEXT("Empty Input Text"));
 			return false;
 		}
 	}
@@ -247,4 +247,27 @@ public:
 			return false;
 		}
 	}
+};
+
+UCLASS()
+class UCommandLineUtils : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+public:
+
+	// Function to check if a flag is present in the command line - Has issue it always returns false
+	//UFUNCTION(BlueprintCallable, Category = "CommandLine")
+	static bool IsCommandLineFlagPresent(const FString& Flag);
+
+	// Function to get the value of a command line flag as an integer
+	UFUNCTION(BlueprintCallable, Category = "CommandLine")
+		static int32 GetCommandLineFlagValueAsInt(const FString& Flag, int32 DefaultValue = 0);
+
+	// Function to get the value of a command line flag as a string
+	UFUNCTION(BlueprintCallable, Category = "CommandLine")
+		static FString GetCommandLineFlagValueAsString(const FString& Flag, const FString& DefaultValue = TEXT(""));
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "CommandLine")
+	static FString GetCommandLineFlagValueAsStringNoDefault(const FString& Flag);
 };

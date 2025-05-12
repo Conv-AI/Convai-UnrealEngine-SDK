@@ -13,6 +13,76 @@ const TCHAR UConvaiURL::NARRATIVE_DESIGN_SUBDOMAIN[] = TEXT("character/narrative
 
 TArray<EConvaiEndpoint> UConvaiURL::BetaEndpoints;
 
+FString UConvaiURL::CustomBetaBaseURL = TEXT("");
+FString UConvaiURL::CustomProdBaseURL = TEXT("");
+bool UConvaiURL::bURLConfigInitialized = false;
+
+void UConvaiURL::InitializeURLConfig()
+{
+    if (bURLConfigInitialized)
+    {
+        return;
+    }
+
+    // Check command line parameters
+    FString BetaURL;
+    if (FParse::Value(FCommandLine::Get(), TEXT("ConvaiBetaURL="), BetaURL))
+    {
+        CustomBetaBaseURL = BetaURL;
+        UE_LOG(LogTemp, Log, TEXT("Using custom beta URL: %s"), *CustomBetaBaseURL);
+    }
+
+    FString ProdURL;
+    if (FParse::Value(FCommandLine::Get(), TEXT("ConvaiProdURL="), ProdURL))
+    {
+        CustomProdBaseURL = ProdURL;
+        UE_LOG(LogTemp, Log, TEXT("Using custom prod URL: %s"), *CustomProdBaseURL);
+    }
+
+    bURLConfigInitialized = true;
+}
+
+FString UConvaiURL::GetBaseURL(bool bUseBeta)
+{
+    InitializeURLConfig();
+    
+    if (bUseBeta)
+    {
+        if (!CustomBetaBaseURL.IsEmpty())
+        {
+            return CustomBetaBaseURL;
+        }
+        return TEXT("https://beta.convai.com");
+    }
+    else
+    {
+        if (!CustomProdBaseURL.IsEmpty())
+        {
+            return CustomProdBaseURL;
+        }
+        return TEXT("https://api.convai.com");
+    }
+}
+
+FString UConvaiURL::GetFullURL(const FString& ApiPath, bool bUseBeta)
+{
+    FString BaseURL = GetBaseURL(bUseBeta);
+    
+    // Ensure the base URL ends with a slash and the API path doesn't start with one
+    if (!BaseURL.EndsWith(TEXT("/")))
+    {
+        BaseURL += TEXT("/");
+    }
+    
+    FString Path = ApiPath;
+    if (Path.StartsWith(TEXT("/")))
+    {
+        Path = Path.RightChop(1);
+    }
+    
+    return BaseURL + Path;
+}
+
 FString UConvaiURL::GetEndpoint(EConvaiEndpoint Endpoint)
 {
     FString Api;
