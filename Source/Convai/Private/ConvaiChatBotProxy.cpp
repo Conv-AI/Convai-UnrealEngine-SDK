@@ -10,6 +10,7 @@
 #include "Misc/Base64.h"
 #include "Engine.h"
 #include "JsonObjectConverter.h"
+#include "RestAPI/ConvaiURL.h"
 
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
@@ -25,6 +26,18 @@ namespace
 	{
 		Data += ("&" + param + "=" + value);
 	}
+	
+	// Define URL functions for all endpoints
+	static FString GetResponseURL() { return UConvaiURL::GetFullURL(TEXT("character/getResponse/"), false); }
+	static FString GetResponseFromAudioURL() { return UConvaiURL::GetFullURL(TEXT("character/getResponse"), false); }
+	static FString CreateCharacterURL() { return UConvaiURL::GetFullURL(TEXT("character/create"), false); }
+	static FString UpdateCharacterURL() { return UConvaiURL::GetFullURL(TEXT("character/update"), false); }
+	static FString GetCharacterDetailsURL() { return UConvaiURL::GetFullURL(TEXT("character/get"), false); }
+	static FString ListCharactersURL() { return UConvaiURL::GetFullURL(TEXT("character/list"), false); }
+	static FString TextToSpeechURL() { return UConvaiURL::GetFullURL(TEXT("tts"), false); }
+	static FString SpeechToTextURL() { return UConvaiURL::GetFullURL(TEXT("stt/"), false); }
+	static FString GetActionResponseURL() { return UConvaiURL::GetFullURL(TEXT("character/getActionResponse"), false); }
+	static FString GetAvailableVoicesURL() { return UConvaiURL::GetFullURL(TEXT("tts/voices"), false); }
 }
 
 UConvaiChatBotQueryProxy* UConvaiChatBotQueryProxy::CreateChatBotQueryProxy(UObject* WorldContextObject,
@@ -37,7 +50,7 @@ UConvaiChatBotQueryProxy* UConvaiChatBotQueryProxy::CreateChatBotQueryProxy(UObj
 {
 	UConvaiChatBotQueryProxy* Proxy = NewObject<UConvaiChatBotQueryProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/getResponse/";
+	Proxy->URL = GetResponseURL();
 	Proxy->UserQuery = UserQuery;
 	Proxy->VoiceResponse = VoiceResponse;
 	Proxy->CharID = CharID;
@@ -268,7 +281,7 @@ UConvaiChatBotQueryFromAudioProxy* UConvaiChatBotQueryFromAudioProxy::CreateChat
 {
 	UConvaiChatBotQueryFromAudioProxy* Proxy = NewObject<UConvaiChatBotQueryFromAudioProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/getResponse";
+	Proxy->URL = GetResponseFromAudioURL();
 
 	if (!FPaths::FileExists(Filename))
 	{
@@ -309,7 +322,7 @@ UConvaiChatBotQueryFromAudioProxy* UConvaiChatBotQueryFromAudioProxy::CreateChat
 {
 	UConvaiChatBotQueryFromAudioProxy* Proxy = NewObject<UConvaiChatBotQueryFromAudioProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/getResponse";
+	Proxy->URL = GetResponseFromAudioURL();
 
 	if (SoundWave == nullptr)
 	{
@@ -596,7 +609,7 @@ UConvaiChatBotCreateProxy* UConvaiChatBotCreateProxy::CreateCharacterCreateProxy
 {
 	UConvaiChatBotCreateProxy* Proxy = NewObject<UConvaiChatBotCreateProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/create";
+	Proxy->URL = CreateCharacterURL();
 
 	Proxy->CharName = CharName;
 	Proxy->Voice = Voice;
@@ -753,7 +766,7 @@ UConvaiChatBotUpdateProxy* UConvaiChatBotUpdateProxy::CreateCharacterUpdateProxy
 {
 	UConvaiChatBotUpdateProxy* Proxy = NewObject<UConvaiChatBotUpdateProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/update";
+	Proxy->URL = UpdateCharacterURL();
 
 	Proxy->CharID = CharID;
 	Proxy->NewVoice = NewVoice;
@@ -928,7 +941,7 @@ UConvaiChatBotGetDetailsProxy* UConvaiChatBotGetDetailsProxy::CreateCharacterGet
 {
 	UConvaiChatBotGetDetailsProxy* Proxy = NewObject<UConvaiChatBotGetDetailsProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/get";
+	Proxy->URL = GetCharacterDetailsURL();
 
 	Proxy->CharID = CharID;
 	Proxy->HasReadyPlayerMeLink = false;
@@ -1119,7 +1132,7 @@ UConvaiChatBotGetCharsProxy* UConvaiChatBotGetCharsProxy::CreateCharacterGetChar
 {
 	UConvaiChatBotGetCharsProxy* Proxy = NewObject<UConvaiChatBotGetCharsProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/list";
+	Proxy->URL = ListCharactersURL();
 
 	return Proxy;
 }
@@ -1481,7 +1494,7 @@ void UConvaiDownloadImageProxy::finish()
 UConvaiGetAvailableVoicesProxy* UConvaiGetAvailableVoicesProxy::CreateGetAvailableVoicesProxy(EVoiceType VoiceType, ELanguageType LanguageType, EGenderType Gender)
 {
 	UConvaiGetAvailableVoicesProxy* Proxy = NewObject<UConvaiGetAvailableVoicesProxy>();
-	Proxy->URL = "https://api.convai.com/tts/get_available_voices";
+	Proxy->URL = GetAvailableVoicesURL();
 	Proxy->FilterVoiceType = VoiceType;
 	Proxy->FilterLanguageType = LanguageType;
 	Proxy->FilterGender = Gender;

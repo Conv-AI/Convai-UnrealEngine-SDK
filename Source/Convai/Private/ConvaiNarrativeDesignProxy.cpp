@@ -4,6 +4,7 @@
 #include "ConvaiUtils.h"
 #include "../Convai.h"
 #include "Engine.h"
+#include "RestAPI/ConvaiURL.h"
 
 DEFINE_LOG_CATEGORY(ConvaiNarrativeHTTP);
 
@@ -53,7 +54,7 @@ void UFetchNarrativeSectionsProxy::Activate()
 	FHttpModule* HttpModule = &FHttpModule::Get();
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = HttpModule->CreateRequest();
 	HttpRequest->OnProcessRequestComplete().BindUObject(this, &UFetchNarrativeSectionsProxy::OnHttpRequestCompleted);
-	HttpRequest->SetURL(TEXT("https://api.convai.com/character/narrative/list-sections"));
+	HttpRequest->SetURL(UConvaiURL::GetFullURL(TEXT("character/narrative/list-sections"), false));
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	HttpRequest->SetHeader(AuthHeader, AuthKey);
@@ -176,7 +177,7 @@ void UFetchNarrativeTriggersProxy::Activate()
 	FHttpModule* HttpModule = &FHttpModule::Get();
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = HttpModule->CreateRequest();
 	HttpRequest->OnProcessRequestComplete().BindUObject(this, &UFetchNarrativeTriggersProxy::OnHttpRequestCompleted);
-	HttpRequest->SetURL(TEXT("https://api.convai.com/character/narrative/list-triggers"));
+	HttpRequest->SetURL(UConvaiURL::GetFullURL(TEXT("character/narrative/list-triggers"), false));
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	HttpRequest->SetHeader(AuthHeader, AuthKey);

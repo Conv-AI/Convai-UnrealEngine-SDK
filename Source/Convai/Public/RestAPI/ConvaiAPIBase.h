@@ -12,7 +12,7 @@
 
 #if USE_CONVAI_HTTP
 // Use ConvaiHttp module
-	#include "ConvaiHttpModule.h"
+	#include "ConvaihttpModule.h"
 	#include "Interfaces/IConvaihttpRequest.h"
 	#include "Interfaces/IConvaihttpResponse.h"
 	#define CONVAI_HTTP_MODULE FConvaihttpModule

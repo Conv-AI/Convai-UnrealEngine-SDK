@@ -5,6 +5,7 @@
 #include "Engine/Engine.h"
 #include "Async/Async.h"
 #include "../Convai.h"
+#include "ConvaiUtils.h"
 #include "HAL/PlatformProcess.h"
 
 THIRD_PARTY_INCLUDES_START
@@ -193,8 +194,6 @@ namespace
 
 };
 
-
-
 uint32 FgRPCClient::Run()
 {
     void* got_tag;
@@ -335,28 +334,52 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	//AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this)]
 	//	{
-			bool AllowInsecureConnection = Convai::Get().GetConvaiSettings()->AllowInsecureConnection;
+			// Check command line for insecure connection flag first, then fall back to settings
+			bool AllowInsecureConnection = false;
+			FString InsecureConnectionStr = UCommandLineUtils::GetCommandLineFlagValueAsString(TEXT("ConvaiAllowInsecure"), TEXT(""));
+			if (!InsecureConnectionStr.IsEmpty())
+			{
+				// Convert string to bool
+				AllowInsecureConnection = InsecureConnectionStr.ToBool();
+				UE_LOG(ConvaiSubsystemLog, Log, TEXT("Using insecure connection setting from command line: %s"), 
+					AllowInsecureConnection ? TEXT("true") : TEXT("false"));
+			}
+			else
+			{
+				// Use setting from ConvaiSettings
+				AllowInsecureConnection = Convai::Get().GetConvaiSettings()->AllowInsecureConnection;
+			}
 
 			std::shared_ptr<grpc::ChannelCredentials> channel_creds;
-#if PLATFORM_WINDOWS
+	#if PLATFORM_WINDOWS
 			if (AllowInsecureConnection)
 				channel_creds = grpc::InsecureChannelCredentials();
 			else
 				channel_creds = grpc::SslCredentials(getSslOptions());
-#else
+	#else
 			if (AllowInsecureConnection)
 				channel_creds = grpc::InsecureChannelCredentials();
 			else
 				channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions());
-#endif
+	#endif
 
-
+			// Get URL from command line first, then settings, then default
 			FString URL = Convai::Get().GetConvaiSettings()->CustomURL;
 			URL.TrimEndInline();
 			URL.TrimStartInline();
 
-			if (URL.IsEmpty())
+			// Check for command line parameter
+			FString CommandLineURL = UCommandLineUtils::GetCommandLineFlagValueAsString(TEXT("ConvaiStreamURL"), TEXT(""));
+			if (!CommandLineURL.IsEmpty())
+			{
+				URL = CommandLineURL;
+				UE_LOG(ConvaiSubsystemLog, Log, TEXT("Using stream URL from command line: %s"), *URL);
+			}
+			// If settings URL is empty, use default
+			else if (URL.IsEmpty())
+			{
 				URL = "stream.convai.com";
+			}
 
 			gRPC_Runnable = MakeShareable(new FgRPCClient(TCHAR_TO_UTF8(*URL), channel_creds));
 
@@ -365,9 +388,9 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			gRPC_Runnable->StartStub();
 			UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Started"));
 
-#if PLATFORM_ANDROID
+	#if PLATFORM_ANDROID
 			GetAndroidMicPermission();
-#endif
+	#endif
 		//});
 }
 
