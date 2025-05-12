@@ -319,169 +319,6 @@ private:
 	TConvaiQueue& operator=(const TConvaiQueue&) = delete;
 };
 
-
-struct ConvaiAudioChunk
-{
-	TArray<uint8> AudioData;
-	float AudioDuration;
-	uint32 NumChannels;
-	uint32 SampleRate;
-	uint8 SampleSizeBytes;
-
-	// Constructor using initializer list
-	ConvaiAudioChunk(const TArray<uint8>& InAudioData, float InAudioDuration, uint32 InNumChannels, uint32 InSampleRate, uint8 InSampleSizeBytes)
-		: AudioData(InAudioData),
-		AudioDuration(InAudioDuration),
-		NumChannels(InNumChannels),
-		SampleRate(InSampleRate),
-		SampleSizeBytes(InSampleSizeBytes)
-	{
-	}
-
-	ConvaiAudioChunk()
-		: AudioData(TArray<uint8>()),
-		AudioDuration(0),
-		NumChannels(-1),
-		SampleRate(-1),
-		SampleSizeBytes(2)
-	{}
-};
-
-struct ConvaiChunkBuffer
-{
-public:
-
-	TConvaiQueue<ConvaiAudioChunk> AudioBuffer;
-	float TotalBufferedAudioDuration = 0;
-	float TotalAudioDurationElapsed = 0;
-	float LastAudioChunkDuration = 0;
-	uint32 NumChannels = 0;
-	uint32 SampleRate = 0;
-	uint8 SampleSizeBytes = 2;
-
-	TConvaiQueue<FAnimationSequence> LipSyncBuffer;
-	float TotalBufferedLipSyncDuration = 0;
-	float LastLipSyncChunkDuration = 0;
-
-	int NumAudioChunks = 0;
-	int NumLipSyncChunks = 0;
-
-	FCriticalSection AudioCriticalSection;
-	FCriticalSection LipSyncCriticalSection;
-
-	TArray<float> ChunkDurations;
-
-	ConvaiChunkBuffer()
-	{}
-
-	void Enqueue(ConvaiAudioChunk AudioChunk)
-	{
-		FScopeLock ScopeLock(&AudioCriticalSection);
-		TotalBufferedAudioDuration += AudioChunk.AudioDuration;
-		LastAudioChunkDuration = AudioChunk.AudioDuration;
-		AudioBuffer.Enqueue(AudioChunk);
-		NumChannels = AudioChunk.NumChannels;
-		SampleRate = AudioChunk.SampleRate;
-		SampleSizeBytes = AudioChunk.SampleSizeBytes;
-		ChunkDurations.Add(AudioChunk.AudioDuration);
-		NumAudioChunks++;
-	}
-
-	bool Dequeue(ConvaiAudioChunk& AudioChunk)
-	{
-		FScopeLock ScopeLock(&AudioCriticalSection);
-		bool Success = AudioBuffer.Dequeue(AudioChunk);
-		if (!Success)
-			return false;
-
-		TotalBufferedAudioDuration -= AudioChunk.AudioDuration;
-		TotalAudioDurationElapsed += AudioChunk.AudioDuration;
-
-		ChunkDurations.RemoveAt(0);
-		LastAudioChunkDuration = TotalBufferedAudioDuration < LastAudioChunkDuration ? TotalBufferedAudioDuration : LastAudioChunkDuration;
-		NumAudioChunks--;
-		return true;
-	}
-
-	bool IsEmpty()
-	{
-		return AudioBuffer.IsEmpty();
-	}
-
-	void Empty()
-	{
-		TotalBufferedAudioDuration = 0;
-		TotalAudioDurationElapsed = 0;
-		NumChannels = -1;
-		SampleRate = -1;
-		SampleSizeBytes = 2;
-		AudioBuffer.Empty();
-		LipSyncBuffer.Empty();
-		ChunkDurations.Empty();
-		TotalBufferedLipSyncDuration = 0;
-		LastLipSyncChunkDuration = 0;
-		LastAudioChunkDuration = 0;
-		NumAudioChunks = 0;
-		NumLipSyncChunks = 0;
-	}
-
-	ConvaiAudioChunk* Peek()
-	{
-		ConvaiAudioChunk* AudioChunk = AudioBuffer.Peek();
-		return AudioChunk;
-	}
-
-	void EnqueueLipSync(FAnimationSequence AnimationSequence, bool NewChunk)
-	{
-		FScopeLock ScopeLock(&LipSyncCriticalSection);
-		TotalBufferedLipSyncDuration += AnimationSequence.Duration;
-		LastLipSyncChunkDuration = AnimationSequence.Duration;
-
-		if (LipSyncBuffer.IsEmpty() || NewChunk)
-		{
-			LipSyncBuffer.Enqueue(AnimationSequence);
-			NumLipSyncChunks++;
-			return;
-		}
-		
-		FAnimationSequence* CurrChunk = LipSyncBuffer.PeekHead();
-		if (CurrChunk)
-		{
-			CurrChunk->AnimationFrames.Append(AnimationSequence.AnimationFrames);
-			CurrChunk->Duration += AnimationSequence.Duration;
-		}
-	}
-
-	bool DequeueLipSync(FAnimationSequence& LipSyncChunk)
-	{
-		FScopeLock ScopeLock(&LipSyncCriticalSection);
-		bool Success = LipSyncBuffer.Dequeue(LipSyncChunk);
-		if (!Success)
-			return false;
-
-		NumLipSyncChunks--;
-		TotalBufferedLipSyncDuration -= LipSyncChunk.Duration;
-		LastLipSyncChunkDuration = TotalBufferedLipSyncDuration < LastLipSyncChunkDuration ? TotalBufferedLipSyncDuration : LastLipSyncChunkDuration;
-		return true;
-	}
-
-	bool IsEmptyLipSync()
-	{
-		return LipSyncBuffer.IsEmpty();
-	}
-
-	void EmptyLipSync()
-	{
-		LipSyncBuffer.Empty();
-	}
-
-	FAnimationSequence* PeekLipSync()
-	{
-		FAnimationSequence* LipSyncChunk = LipSyncBuffer.Peek();
-		return LipSyncChunk;
-	}
-};
-
 UCLASS()
 class UConvaiAudioStreamer : public UAudioComponent
 {
@@ -611,8 +448,6 @@ public:
 
 	void OnVisemesReadyCallback();
 
-	bool DetectNewLipSyncChunk(int32 InFrameCount, float InChunkDuration, int32 FrameRate);
-
 	void OnLipSyncTimeOut();
 
 	UFUNCTION(BlueprintPure, Category = "Convai|LipSync", Meta = (Tooltip = "Returns last predicted viseme scores"))
@@ -635,27 +470,101 @@ public:
 	virtual void onAudioStarted();
 	virtual void onAudioFinished();
 
+
+// Add to public section
+enum class EAudioLipSyncState : uint8
+{
+    Stopped UMETA(DisplayName = "Stopped"),
+    Playing UMETA(DisplayName = "Playing"),
+    WaitingOnLipSync UMETA(DisplayName = "Waiting On LipSync"),
+    WaitingOnAudio UMETA(DisplayName = "Waiting On Audio")
+};
+
+// Add to protected section
+EAudioLipSyncState CurrentState;
+
+// Simplified buffer structure
+struct FAudioBuffer
+{
+    TArray<uint8> Data;
+    float Duration;
+    uint32 SampleRate;
+    uint32 NumChannels;
+    
+    FAudioBuffer() : Duration(0.0f), SampleRate(0), NumChannels(0) {}
+    
+    void Reset()
+    {
+        Data.Empty();
+        Duration = 0.0f;
+        SampleRate = 0;
+        NumChannels = 0;
+    }
+    
+    bool IsEmpty() const { return Data.Num() == 0; }
+    
+    float GetTotalDuration() const { return Duration; }
+};
+
+struct FLipSyncBuffer
+{
+    TArray<FAnimationSequence> Sequences;
+    float TotalDuration;
+    
+    FLipSyncBuffer() : TotalDuration(0.0f) {}
+    
+    void Reset()
+    {
+        Sequences.Empty();
+        TotalDuration = 0.0f;
+    }
+    
+    bool IsEmpty() const { return Sequences.Num() == 0; }
+    
+    float GetTotalDuration() const { return TotalDuration; }
+    
+    void AddSequence(const FAnimationSequence& Sequence)
+    {
+        Sequences.Add(Sequence);
+        TotalDuration += Sequence.Duration;
+    }
+};
+
+FAudioBuffer AudioBuffer;
+FLipSyncBuffer LipSyncBuffer;
+
+// Configuration parameters
+float MinBufferDuration;
+float AudioLipSyncRatio;
+
+// State management functions
+void TransitionToState(EAudioLipSyncState NewState);
+void HandleAudioReceived(uint8* AudioData, uint32 AudioDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels);
+void HandleLipSyncReceived(FAnimationSequence& FaceSequence);
+bool TryPlayBufferedContent();
+bool HasSufficientLipSync();
+bool HasSufficientAudio() const;
+void PlayBufferedContent(float Duration);
+
+/**
+ * Returns the duration of content (audio and lipsync if applicable) that is 
+ * currently playing or buffered and ready to play.
+ * @return Duration in seconds of content remaining
+ */
+UFUNCTION(BlueprintPure, Category = "Convai|Audio")
+float GetRemainingContentDuration();
+
+// Add to protected section
+// Tracking variables for content
+float TotalPlayingDuration;       // Total duration of content currently being played
+float TotalBufferedDuration;      // Total duration of content buffered but not yet played
+bool bIsSyncingAudioAndLipSync;   // Whether we're syncing audio and lipsync
+
 protected:
-	ConvaiChunkBuffer DataBuffer;
-	bool bIsQueuingLipsync;
-	int32 LastFrameIndex = -1;
-	int32 CurrentChunkFrameCounter = 0;
-	float CurrentChunkDuration = 0;
-	float CurrentChunkLipSyncFrameRate = 0;
-
-	bool PlayNextAudioInQueue();
-
-	bool PlayNextLipSyncInQueue();
-
-	bool PlayAvailableAudioAndLipSync();
-
-	bool HasSufficentLipsyncFrames();
-
-	//UFUNCTION(BlueprintPure, Category = "Convai|LipSync", Meta = (Tooltip = "Calculates the lowest estimated time remaining until the next pause in the character's speech during lip-syncing. Returns true if the time could be determined"))
-	bool HasSufficentLipsyncFrames(float& InSyncTimeRemaining);
 
 	float LipSyncThresholdSecs = -1;
 	float VoiceTimeFactor = -1;
+
 private:
 
 	bool InitEncoder(int32 InSampleRate, int32 InNumChannels, EAudioEncodeHint EncodeHint);

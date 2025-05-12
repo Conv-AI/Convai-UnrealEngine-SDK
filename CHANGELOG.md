@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.5.3-beta
+- Improved LipSync accuracy and synchornization.
+- Fixed Voice cutting off for Elevenlab voices.
+- Fixed PixelStreaming compatability.
+
 # Release 3.5.2
 - Fixed rare crash when new voice data starts to play when the character is already finishing its current sentence.
 
