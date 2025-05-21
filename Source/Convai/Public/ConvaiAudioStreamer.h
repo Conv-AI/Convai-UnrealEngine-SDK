@@ -567,6 +567,15 @@ protected:
 
 private:
 
+	// Critical section for protecting SoundWaveProcedural operations
+	FCriticalSection AudioConfigLock;
+	
+	// Buffer for pending audio data when lock is held
+	TArray<uint8> PendingAudioBuffer;
+	
+	// Process any pending audio data
+	void ProcessPendingAudio();
+
 	bool InitEncoder(int32 InSampleRate, int32 InNumChannels, EAudioEncodeHint EncodeHint);
 	int32 Encode(const uint8* RawPCMData, uint32 RawDataSize, uint8* OutCompressedData, uint32& OutCompressedDataSize);
 	void DestroyOpusEncoder();

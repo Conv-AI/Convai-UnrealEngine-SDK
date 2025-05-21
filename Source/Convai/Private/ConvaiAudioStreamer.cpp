@@ -118,18 +118,18 @@ void UConvaiAudioStreamer::PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSiz
     if (!bIsSyncingAudioAndLipSync)
     {
         // Calculate audio duration
-        uint32 PCM_DataSize = VoiceDataSize;
         if (ContainsHeaderData)
         {
             // Parse WAV header
             FWaveModInfo WaveInfo;
             if (WaveInfo.ReadWaveInfo(VoiceData, VoiceDataSize))
             {
-                PCM_DataSize = *WaveInfo.pWaveDataSize;
+				VoiceDataSize = *WaveInfo.pWaveDataSize;
+				VoiceData += 44;
             }
         }
         
-        float AudioDuration = UConvaiUtils::CalculateAudioDuration(PCM_DataSize, NumChannels, SampleRate, 2);
+        float AudioDuration = UConvaiUtils::CalculateAudioDuration(VoiceDataSize, NumChannels, SampleRate, 2);
         
         // Update tracking variables
         TotalPlayingDuration += AudioDuration;
@@ -143,117 +143,219 @@ void UConvaiAudioStreamer::PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSiz
     HandleAudioReceived(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
 }
 
-void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
+namespace
 {
-	if (IsVoiceCurrentlyFading())
-		StopVoice();
-	ResetVoiceFade();
-
-	uint32 PCM_DataSize = VoiceDataSize;
-
-	if (ContainsHeaderData)
+	void HandleAudioTimer(TWeakObjectPtr<UConvaiAudioStreamer> WeakSelf, int32 PCM_DataSize, int32 SampleRate)
 	{
-		// Parse Wav header
-		FWaveModInfo WaveInfo;
-		FString ErrorReason;
-		bool ParseSuccess = WaveInfo.ReadWaveInfo(VoiceData, VoiceDataSize, &ErrorReason);
-		// Set the number of channels and sample rate for the first time reading from the stream
-		if (ParseSuccess)
+		if (!WeakSelf.IsValid() || !IsValid(WeakSelf->GetWorld()))
 		{
-			// Validate that the world exists
-			if (!IsValid(GetWorld()))
-				return;
-
-			SampleRate = *WaveInfo.pSamplesPerSec;
-			NumChannels = *WaveInfo.pChannels;
-			PCM_DataSize = *WaveInfo.pWaveDataSize;
-		}
-		else if (!ParseSuccess)
-		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Failed to parse wav header, reason: %s"), *ErrorReason);
-		}
-	}
-
-
-	AsyncTask(ENamedThreads::GameThread, [this, PCM_DataSize, SampleRate]
-	{
-		if (!IsValid(GetWorld()))
-		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: GetWorld() is Invalid!"));
+			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Object or World is Invalid!"));
 			return;
 		}
 
-		// TODO (Mohamed): take number of channels in consideration when calculating the duration
-		// Duration = PCM Data Size / (Sample Rate * Bytes per sample)
 		float NewAudioDuration = float(PCM_DataSize) / float(SampleRate * 2);
 
-		float CurrentRemainingAudioDuration = GetWorld()->GetTimerManager().GetTimerRemaining(AudioFinishedTimerHandle);
+		float CurrentRemainingAudioDuration = WeakSelf->GetWorld()->GetTimerManager().GetTimerRemaining(WeakSelf->AudioFinishedTimerHandle);
 		if (CurrentRemainingAudioDuration < 0)
-			CurrentRemainingAudioDuration = 0; // Can never be less than zero
+			CurrentRemainingAudioDuration = 0;
 
-		//if (CurrentRemainingAudioDuration == 0)
-		//	NewAudioDuration -= 0.1; // Hacky way - Reduce the duration by a small amount so that the OnAudioFinished would be called early and this will cause no gap between voice chunks
-
-		// New Duration = Remaining Duration + New Duration
 		float TotalAudioDuration = CurrentRemainingAudioDuration + NewAudioDuration;
 
-		GetWorld()->GetTimerManager().SetTimer(AudioFinishedTimerHandle, this, &UConvaiAudioStreamer::onAudioFinished, TotalAudioDuration, false);
-	});
-
-	if (!IsValid(SoundWaveProcedural))
-		return;
-
-	// TODO (Mohamed) : Needs further testing, especially when sample rate or NumChannels changes
-	// Check that SoundWaveProcedural is valid and able to play input sample rate and channels
-	if (SoundWaveProcedural->GetSampleRateForCurrentPlatform() != SampleRate || SoundWaveProcedural->NumChannels != NumChannels)
-	{
-		//if (IsValid(SoundWaveProcedural)) // Destroy SoundWaveProcedural if it is valid
-		//	SoundWaveProcedural->ConditionalBeginDestroy();
-
-		SoundWaveProcedural->SetSampleRate(SampleRate);
-		SoundWaveProcedural->NumChannels = NumChannels;
-		SoundWaveProcedural->Duration = INDEFINITELY_LOOPING_DURATION;
-		SoundWaveProcedural->SoundGroup = SOUNDGROUP_Voice;
-		SoundWaveProcedural->bLooping = false;
-		SoundWaveProcedural->bProcedural = true;
-		SoundWaveProcedural->Pitch = 1.0f;
-		SoundWaveProcedural->Volume = 1.0f;
-		SoundWaveProcedural->AttenuationSettings = nullptr;
-		SoundWaveProcedural->bDebug = true;
-		SoundWaveProcedural->VirtualizationMode = EVirtualizationMode::PlayWhenSilent;
-
-		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("New SampleRate: %d"), SampleRate);
-		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("New Channels: %d"), NumChannels);
-
-		AsyncTask(ENamedThreads::GameThread, [this]
+		if (WeakSelf.IsValid() && IsValid(WeakSelf->GetWorld()))
 		{
-			SetSound(SoundWaveProcedural);
-			Play();
-		});
+			WeakSelf->GetWorld()->GetTimerManager().SetTimer(WeakSelf->AudioFinishedTimerHandle, WeakSelf.Get(), &UConvaiAudioStreamer::onAudioFinished, TotalAudioDuration, false);
+		}
+		else
+		{
+			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Object or World became invalid before setting timer!"));
+		}
 	}
 
-	if (ContainsHeaderData)
+	void SetupAndPlayAudio(TWeakObjectPtr<UConvaiAudioStreamer> WeakThis, TArray<uint8> AudioDataCopy, int32 SampleRate, int32 NumChannels)
 	{
-		// Play only the PCM data which start after 44 bytes
-		VoiceData += 44;
-		VoiceDataSize -= 44;
-	}
+		if (!WeakThis.IsValid() || !IsValid(WeakThis->SoundWaveProcedural))
+		{
+			return;
+		}
 
-	SoundWaveProcedural->QueueAudio(VoiceData, VoiceDataSize);
+		WeakThis->SetSound(WeakThis->SoundWaveProcedural);
+		WeakThis->Play();
 
-
-	if (!IsTalking)
-	{
-		onAudioStarted();
-		IsTalking = true;
-	}
-
-	// Does the lipsync component require the blendshapes/Visemes to be sent to it
-	if (ConvaiLipSyncExtended && ConvaiLipSyncExtended->RequiresPreGeneratedFaceData())
-		return;
-	else
 		// Lipsync component process the audio data to generate the lipsync
-		PlayLipSync(VoiceData, VoiceDataSize, SampleRate, NumChannels);
+		if (WeakThis.IsValid() && !(WeakThis->ConvaiLipSyncExtended && WeakThis->ConvaiLipSyncExtended->RequiresPreGeneratedFaceData()))
+		{
+			uint8* NonConstData = const_cast<uint8*>(AudioDataCopy.GetData());
+			WeakThis->PlayLipSync(NonConstData, AudioDataCopy.Num(), SampleRate, NumChannels);
+		}
+	}
+};
+
+void UConvaiAudioStreamer::ProcessPendingAudio()
+{
+    // Process the buffer if there's any data
+    if (PendingAudioBuffer.Num() > 0)
+    {
+        SoundWaveProcedural->QueueAudio(PendingAudioBuffer.GetData(), PendingAudioBuffer.Num());
+        PendingAudioBuffer.Empty();
+    }
+}
+
+void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
+{
+    if (IsVoiceCurrentlyFading())
+        StopVoice();
+    ResetVoiceFade();
+
+    if (ContainsHeaderData)
+    {
+        // Parse Wav header
+        FWaveModInfo WaveInfo;
+        FString ErrorReason;
+        bool ParseSuccess = WaveInfo.ReadWaveInfo(VoiceData, VoiceDataSize, &ErrorReason);
+        // Set the number of channels and sample rate for the first time reading from the stream
+        if (ParseSuccess)
+        {
+            // Validate that the world exists
+            if (!IsValid(GetWorld()))
+                return;
+
+            SampleRate = *WaveInfo.pSamplesPerSec;
+            NumChannels = *WaveInfo.pChannels;
+
+			// Play only the PCM data which start after 44 bytes
+			VoiceData += 44;
+			VoiceDataSize -= 44;
+        }
+        else if (!ParseSuccess)
+        {
+            UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Failed to parse wav header, reason: %s"), *ErrorReason);
+        }
+    }
+
+    TWeakObjectPtr<UConvaiAudioStreamer> WeakSelf = this;
+
+    if (IsInGameThread())
+    {
+        HandleAudioTimer(WeakSelf, VoiceDataSize, SampleRate);
+    }
+    else
+    {
+        AsyncTask(ENamedThreads::GameThread, [WeakSelf, VoiceDataSize, SampleRate]()
+        {
+            HandleAudioTimer(WeakSelf, VoiceDataSize, SampleRate);
+        });
+    }
+    
+    if (!IsValid(SoundWaveProcedural))
+        return;
+
+    // Try to acquire the lock, if it's already locked, queue the audio and return
+    if (!AudioConfigLock.TryLock())
+    {
+        // Lock is already held, queue this audio for later processing
+        if (ContainsHeaderData)
+        {
+            // Skip header for the queue
+            PendingAudioBuffer.Append(VoiceData + 44, VoiceDataSize - 44);
+        }
+        else
+        {
+            PendingAudioBuffer.Append(VoiceData, VoiceDataSize);
+        }
+        
+        // Try the lock again before exiting - if it's available now, process the queue
+        if (AudioConfigLock.TryLock())
+        {
+            ProcessPendingAudio();
+            AudioConfigLock.Unlock();
+        }
+        
+        return;
+    }
+    
+    // We have the lock, proceed with processing
+    
+    // Check that SoundWaveProcedural is valid and able to play input sample rate and channels
+    if (SoundWaveProcedural->GetSampleRateForCurrentPlatform() != SampleRate || SoundWaveProcedural->NumChannels != NumChannels)
+    {
+        SoundWaveProcedural->SetSampleRate(SampleRate);
+        SoundWaveProcedural->NumChannels = NumChannels;
+        SoundWaveProcedural->Duration = INDEFINITELY_LOOPING_DURATION;
+        SoundWaveProcedural->SoundGroup = SOUNDGROUP_Voice;
+        SoundWaveProcedural->bLooping = false;
+        SoundWaveProcedural->bProcedural = true;
+        SoundWaveProcedural->Pitch = 1.0f;
+        SoundWaveProcedural->Volume = 1.0f;
+        SoundWaveProcedural->AttenuationSettings = nullptr;
+        SoundWaveProcedural->bDebug = true;
+        SoundWaveProcedural->VirtualizationMode = EVirtualizationMode::PlayWhenSilent;
+
+        UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("New SampleRate: %d"), SampleRate);
+        UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("New Channels: %d"), NumChannels);
+
+        // Create a copy of the audio data for thread safety
+        TArray<uint8> AudioDataCopy;
+		AudioDataCopy.Append(VoiceData, VoiceDataSize);
+        
+
+		SoundWaveProcedural->QueueAudio(VoiceData, VoiceDataSize);
+
+        // Store a copy of the weak pointer for the lambda
+        TWeakObjectPtr<UConvaiAudioStreamer> WeakThis = this;
+        
+
+        if (IsInGameThread())
+        {
+            SetupAndPlayAudio(WeakThis, AudioDataCopy, SampleRate, NumChannels);
+            
+            // Process any pending audio before releasing the lock
+            ProcessPendingAudio();
+            
+            // Release the lock
+            AudioConfigLock.Unlock();
+        }
+        else
+        {            
+            AsyncTask(ENamedThreads::GameThread, [WeakThis, AudioDataCopy, SampleRate, NumChannels]()
+                {
+                    if (WeakThis.IsValid())
+						SetupAndPlayAudio(WeakThis, AudioDataCopy, SampleRate, NumChannels);
+                    
+                    // Process any pending audio before releasing the lock
+                    if (WeakThis.IsValid())
+                        WeakThis->ProcessPendingAudio();
+
+					// Release the lock
+					if (WeakThis.IsValid())
+						WeakThis->AudioConfigLock.Unlock();
+                });
+        }
+
+        if (!IsTalking)
+        {
+            onAudioStarted();
+            IsTalking = true;
+        }
+        
+        return;
+    }
+    
+    // Release the lock if we didn't need to reconfigure
+    AudioConfigLock.Unlock();
+
+    SoundWaveProcedural->QueueAudio(VoiceData, VoiceDataSize);
+
+    if (!IsTalking)
+    {
+        onAudioStarted();
+        IsTalking = true;
+    }
+
+    // Lipsync component process the audio data to generate the lipsync
+    if (!(ConvaiLipSyncExtended && ConvaiLipSyncExtended->RequiresPreGeneratedFaceData()))
+    {
+        PlayLipSync(VoiceData, VoiceDataSize, SampleRate, NumChannels);
+    }
 }
 
 void UConvaiAudioStreamer::ForcePlayVoice(USoundWave* VoiceToPlay)
