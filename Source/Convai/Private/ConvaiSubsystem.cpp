@@ -202,7 +202,6 @@ uint32 FgRPCClient::Run()
 
     // Block until the next result is available in the completion queue "cq
 	while (bIsRunning && cq_.Next(&got_tag, &ok)) {
-		FPlatformProcess::Sleep(0.0001f);
 		if (got_tag)
 		{
 			FgRPC_Delegate* gRPC_Delegate = static_cast<FgRPC_Delegate*>(got_tag);

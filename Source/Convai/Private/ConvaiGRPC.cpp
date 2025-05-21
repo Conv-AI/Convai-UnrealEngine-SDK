@@ -572,7 +572,11 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 				AudioBuffer.Num(),
 				*ConvaiGRPCGetResponseParams.CharID,
 				*ConvaiGRPCGetResponseParams.SessionID);
-				stream_handler->WritesDone((void*)&OnStreamWriteDoneDelegate); UE_LOG(ConvaiGRPCLog, Log, TEXT("On Stream Write Done Writing"));
+				get_response_data->set_audio_data(Data.GetData(), Data.Num());
+				request.set_allocated_get_response_data(get_response_data);
+
+				//stream_handler->WritesDone((void*)&OnStreamWriteDoneDelegate); 
+				stream_handler->WriteLast(request, grpc::WriteOptions(), (void*)&OnStreamWriteDoneDelegate); UE_LOG(ConvaiGRPCLog, Log, TEXT("On Stream Write Done Writing"));
 				FinishedWritingToStream = true;
 			}
 			else
@@ -587,18 +591,13 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 		else
 		{
 			// Load the audio data to the request
-			get_response_data->set_audio_data(Data.GetData(), Data.Num()); // UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWrite: Sending %d bytes"), DataLen);
+			get_response_data->set_audio_data(Data.GetData(), Data.Num());
 		}
 
 		NumberOfAudioBytesSent += Data.Num();
 	}
 	// Prepare the request
 	request.set_allocated_get_response_data(get_response_data);
-
-	//#if ConvaiDebugMode
-	//    FString DebugString(request.DebugString().c_str());
-	//    UE_LOG(ConvaiGRPCLog, Warning, TEXT("request: %s"), *DebugString);
-	//#endif 
 
 	if (IsThisTheFinalWrite)
 	{
@@ -611,12 +610,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 	}
 	else
 	{
-		// Do a normal send of the data
-		//UE_LOG(ConvaiGRPCLog, Log, TEXT("Calling Stream Write | LastWriteReceived : %s | AudioBuffer.Num() : %d | Character ID : %s | Session ID : %s"),
-		//	(LastWriteReceived ? TEXT("True") : TEXT("False")),
-		//	AudioBuffer.Num(),
-		//	*ConvaiGRPCGetResponseParams.CharID,
-		//	*ConvaiGRPCGetResponseParams.SessionID);
 		stream_handler->Write(request, (void*)&OnStreamWriteDelegate);
 	}
 
