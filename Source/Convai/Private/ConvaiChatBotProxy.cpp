@@ -34,8 +34,6 @@ namespace
 	static FString UpdateCharacterURL() { return UConvaiURL::GetFullURL(TEXT("character/update"), false); }
 	static FString GetCharacterDetailsURL() { return UConvaiURL::GetFullURL(TEXT("character/get"), false); }
 	static FString ListCharactersURL() { return UConvaiURL::GetFullURL(TEXT("character/list"), false); }
-	static FString TextToSpeechURL() { return UConvaiURL::GetFullURL(TEXT("tts"), false); }
-	static FString SpeechToTextURL() { return UConvaiURL::GetFullURL(TEXT("stt/"), false); }
 	static FString GetActionResponseURL() { return UConvaiURL::GetFullURL(TEXT("character/getActionResponse"), false); }
 	static FString GetAvailableVoicesURL() { return UConvaiURL::GetFullURL(TEXT("tts/voices"), false); }
 }
