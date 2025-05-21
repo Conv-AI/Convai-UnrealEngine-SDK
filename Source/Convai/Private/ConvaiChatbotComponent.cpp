@@ -835,16 +835,6 @@ void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, boo
 
 void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal)
 {
-	if (!IsInGameThread())
-	{
-		AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal]
-			{
-				onResponseDataReceived(ReceivedText, ReceivedAudio, SampleRate, IsFinal);
-			});
-		return;
-	}
-
-
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
@@ -864,11 +854,33 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 		}
 	}
 
-	// Send text and audio duration to blueprint event
-	OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
 
-	// Run the deprecated event
-	OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+if (ReceivedText != "" || IsFinal == true)
+{
+	if (!IsInGameThread())
+	{
+		TWeakObjectPtr<UConvaiChatbotComponent> WeakThis(this);
+
+		AsyncTask(ENamedThreads::GameThread, [WeakThis, ReceivedText, ReceieivedAudioDuration, IsFinal]()
+		{
+			if (WeakThis.IsValid())
+			{
+				UConvaiChatbotComponent* StrongThis = WeakThis.Get();
+				// Send text and audio duration to blueprint event
+				StrongThis->OnTextReceivedEvent_V2.Broadcast(StrongThis, StrongThis->CurrentConvaiPlayerComponent, StrongThis->CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+
+				// Run the deprecated event
+				StrongThis->OnTextReceivedEvent.Broadcast(StrongThis->CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+			}
+		});
+	}
+	else
+	{
+		// Already on game thread, safe to use 'this'
+		OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+		OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
+	}
+}
 
 
 	if (ReceieivedAudioDuration > 0)
