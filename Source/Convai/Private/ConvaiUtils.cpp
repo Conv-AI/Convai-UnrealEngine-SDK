@@ -17,6 +17,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/DefaultValueHelper.h"
+#include "Misc/CommandLine.h"
 #if PLATFORM_LINUX
 	#include "Linux/LinuxPlatformFile.h"
 #else
