@@ -793,10 +793,14 @@ bool UConvaiAudioStreamer::HasSufficientLipSync()
 bool UConvaiAudioStreamer::HasSufficientAudio() const
 {
     if (AudioBuffer.IsEmpty())
+	{
         return false;
+	}
         
 	if (IsFinalAudioChunkReceived)
+	{
 		return true;
+	}
 
     // Get audio duration
     float AudioDuration = AudioBuffer.GetTotalDuration();
