@@ -53,6 +53,7 @@ UConvaiFaceSyncComponent::UConvaiFaceSyncComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	CurrentSequenceTimePassed = 0;
+	bAutoActivate = true;
 	//CurrentBlendShapesMap = ZeroBlendshapeFrame;
 }
 

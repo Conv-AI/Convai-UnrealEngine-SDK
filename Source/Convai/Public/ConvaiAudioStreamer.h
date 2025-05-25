@@ -345,7 +345,7 @@ public:
 
 	virtual void OnServerAudioReceived(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData = true, uint32 SampleRate = 21000, uint32 NumChannels = 1) {};
 
-	void PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData=true, uint32 SampleRate=21000, uint32 NumChannels=1);
+	void PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData=true, uint32 SampleRate=21000, uint32 NumChannels=1, bool IsFinal=false);
 	
 	void PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData=true, uint32 SampleRate=21000, uint32 NumChannels=1);
 
@@ -466,7 +466,7 @@ public:
 	void AddFaceDataToSend(FAnimationSequence FaceSequence);
 
 	// Should be called in the game thread
-	void AddPCMDataToSend(TArray<uint8> PCMDataToAdd, bool ContainsHeaderData = true, uint32 SampleRate = 21000, uint32 NumChannels = 1);
+	void AddPCMDataToSend(TArray<uint8> PCMDataToAdd, bool ContainsHeaderData = true, uint32 SampleRate = 21000, uint32 NumChannels = 1, bool IsFinal=false);
 
 	virtual void onAudioStarted();
 	virtual void onAudioFinished();
@@ -540,12 +540,13 @@ float AudioLipSyncRatio;
 
 // State management functions
 void TransitionToState(EAudioLipSyncState NewState);
-void HandleAudioReceived(uint8* AudioData, uint32 AudioDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels);
+void HandleAudioReceived(uint8* AudioData, uint32 AudioDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels, bool IsFinal=false);
 void HandleLipSyncReceived(FAnimationSequence& FaceSequence);
 bool TryPlayBufferedContent();
 bool HasSufficientLipSync();
 bool HasSufficientAudio() const;
 void PlayBufferedContent(float Duration);
+bool IsFinalAudioChunkReceived = false;
 
 /**
  * Returns the duration of content (audio and lipsync if applicable) that is 

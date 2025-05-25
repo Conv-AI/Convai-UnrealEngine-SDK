@@ -106,41 +106,18 @@ bool UConvaiAudioStreamer::ShouldMuteGlobal()
 	return false;
 }
 
-void UConvaiAudioStreamer::PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
+/*
+*	PlayVoiceSynced can be called without any audio data only to indicate if IsFinal is true or not
+*/
+void UConvaiAudioStreamer::PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels, bool IsFinal)
 {
     // Do not play incoming audio on the client instance if muted
     if ((ShouldMuteLocal() && GetOwner()->HasLocalNetOwner()) || ShouldMuteGlobal())
     {
         return;
     }
-    
-    // If we don't need lipsync synchronization, just play the voice directly
-    if (!bIsSyncingAudioAndLipSync)
-    {
-        // Calculate audio duration
-        if (ContainsHeaderData)
-        {
-            // Parse WAV header
-            FWaveModInfo WaveInfo;
-            if (WaveInfo.ReadWaveInfo(VoiceData, VoiceDataSize))
-            {
-				VoiceDataSize = *WaveInfo.pWaveDataSize;
-				VoiceData += 44;
-            }
-        }
-        
-        float AudioDuration = UConvaiUtils::CalculateAudioDuration(VoiceDataSize, NumChannels, SampleRate, 2);
-        
-        // Update tracking variables
-        TotalPlayingDuration += AudioDuration;
-        
-        // Play the voice directly
-        PlayVoiceData(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
-        return;
-    }
-    
-    // Otherwise, handle the audio through our state machine
-    HandleAudioReceived(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
+
+    HandleAudioReceived(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels, IsFinal);
 }
 
 namespace
@@ -609,12 +586,11 @@ void UConvaiAudioStreamer::BeginPlay()
     // Initialize tracking variables
     TotalPlayingDuration = 0.0f;
     TotalBufferedDuration = 0.0f;
-    bIsSyncingAudioAndLipSync = false;
     
     // Initialize configuration parameters
 
 	// Minimum buffer duration in seconds
-	MinBufferDuration = UConvaiSettingsUtils::GetParamValueAsFloat("MinBufferDuration", MinBufferDuration) ? MinBufferDuration : 0.7f;
+	MinBufferDuration = UConvaiSettingsUtils::GetParamValueAsFloat("MinBufferDuration", MinBufferDuration) ? MinBufferDuration : 0.5f;
 	MinBufferDuration = MinBufferDuration < 0 ? 0 : MinBufferDuration;
     	
 	// Ratio of lipsync to audio duration required
@@ -671,6 +647,7 @@ void UConvaiAudioStreamer::TransitionToState(EAudioLipSyncState NewState)
             // Clear buffers when stopping
             AudioBuffer.Reset();
             LipSyncBuffer.Reset();
+			IsFinalAudioChunkReceived = false;
             break;
             
         case EAudioLipSyncState::Playing:
@@ -687,39 +664,45 @@ void UConvaiAudioStreamer::TransitionToState(EAudioLipSyncState NewState)
     }
 }
 
-// Handle received audio data
-void UConvaiAudioStreamer::HandleAudioReceived(uint8* AudioData, uint32 AudioDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
+/*
+*	HandleAudioReceived can be called without any audio data only to indicate if IsFinal is true or not
+*/
+void UConvaiAudioStreamer::HandleAudioReceived(uint8* AudioData, uint32 AudioDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels, bool IsFinal)
 {
-    // Calculate audio duration
-    uint32 PCM_DataSize = AudioDataSize;
-    if (ContainsHeaderData)
-    {
-        // Parse WAV header
-        FWaveModInfo WaveInfo;
-        if (WaveInfo.ReadWaveInfo(AudioData, AudioDataSize))
-        {
-            PCM_DataSize = *WaveInfo.pWaveDataSize;
-        }
-    }
-    
-    float AudioDuration = UConvaiUtils::CalculateAudioDuration(PCM_DataSize, NumChannels, SampleRate, 2);
-    
-    // Add to buffer
-    if (AudioBuffer.IsEmpty())
-    {
-        AudioBuffer.Data.Append(AudioData, AudioDataSize);
-        AudioBuffer.Duration = AudioDuration;
-        AudioBuffer.SampleRate = SampleRate;
-        AudioBuffer.NumChannels = NumChannels;
-    }
-    else
-    {
-        AudioBuffer.Data.Append(AudioData, AudioDataSize);
-        AudioBuffer.Duration += AudioDuration;
-    }
-    
-    // Update buffered duration
-    TotalBufferedDuration = AudioBuffer.Duration;
+	IsFinalAudioChunkReceived = IsFinal;
+	if (AudioData && AudioDataSize > 0)
+	{
+		// Calculate audio duration
+		uint32 PCM_DataSize = AudioDataSize;
+		if (ContainsHeaderData)
+		{
+			// Parse WAV header
+			FWaveModInfo WaveInfo;
+			if (WaveInfo.ReadWaveInfo(AudioData, AudioDataSize))
+			{
+				PCM_DataSize = *WaveInfo.pWaveDataSize;
+			}
+		}
+
+		float AudioDuration = UConvaiUtils::CalculateAudioDuration(PCM_DataSize, NumChannels, SampleRate, 2);
+
+		// Add to buffer
+		if (AudioBuffer.IsEmpty())
+		{
+			AudioBuffer.Data.Append(AudioData, AudioDataSize);
+			AudioBuffer.Duration = AudioDuration;
+			AudioBuffer.SampleRate = SampleRate;
+			AudioBuffer.NumChannels = NumChannels;
+		}
+		else
+		{
+			AudioBuffer.Data.Append(AudioData, AudioDataSize);
+			AudioBuffer.Duration += AudioDuration;
+		}
+
+		// Update buffered duration
+		TotalBufferedDuration = AudioBuffer.Duration;
+	}
     
     // Handle based on current state
     switch (CurrentState)
@@ -728,7 +711,15 @@ void UConvaiAudioStreamer::HandleAudioReceived(uint8* AudioData, uint32 AudioDat
         case EAudioLipSyncState::Playing:
             if (HasSufficientLipSync())
             {
-                TryPlayBufferedContent();
+				if (HasSufficientAudio())
+				{
+					TryPlayBufferedContent();
+				}
+				else
+				{
+					TransitionToState(EAudioLipSyncState::WaitingOnAudio);
+					break;
+				}                
             }
             else
             {
@@ -785,12 +776,12 @@ void UConvaiAudioStreamer::HandleLipSyncReceived(FAnimationSequence& FaceSequenc
 
 // Check if we have sufficient lipsync data
 bool UConvaiAudioStreamer::HasSufficientLipSync()
-{
+{        
+	if (!SupportsLipSync() || !ConvaiLipSync->RequiresPrecomputedFaceData() || !bIsSyncingAudioAndLipSync)
+		return true;
+
     if (LipSyncBuffer.IsEmpty())
         return false;
-        
-    if (!SupportsLipSync() || !ConvaiLipSync->RequiresPrecomputedFaceData())
-        return true;
         
     float AudioDuration = AudioBuffer.GetTotalDuration();
     float LipSyncDuration = LipSyncBuffer.GetTotalDuration();
@@ -804,13 +795,16 @@ bool UConvaiAudioStreamer::HasSufficientAudio() const
     if (AudioBuffer.IsEmpty())
         return false;
         
+	if (IsFinalAudioChunkReceived)
+		return true;
+
     // Get audio duration
     float AudioDuration = AudioBuffer.GetTotalDuration();
     
     // If we're not syncing audio and lipsync, just check against minimum buffer duration
     if (!bIsSyncingAudioAndLipSync)
     {
-        return AudioDuration >= 0;
+        return AudioDuration >= MinBufferDuration;
     }
     
     // Otherwise, check against both minimum duration and lipsync duration
@@ -826,9 +820,11 @@ bool UConvaiAudioStreamer::TryPlayBufferedContent()
     {
         return false;
     }
-    
+
     // Calculate how much we can play
-    float PlayDuration = FMath::Min(AudioBuffer.GetTotalDuration(), LipSyncBuffer.GetTotalDuration());
+	float AudioBufferDuration = AudioBuffer.GetTotalDuration();
+	float LipSyncBufferDuration = LipSyncBuffer.GetTotalDuration();
+    float PlayDuration = bIsSyncingAudioAndLipSync? FMath::Min(AudioBufferDuration, LipSyncBufferDuration) : AudioBufferDuration;
     if (PlayDuration <= 0.0f)
         return false;
         
@@ -1154,47 +1150,59 @@ void UConvaiAudioStreamer::AddFaceDataToSend(FAnimationSequence FaceSequence)
 	PlayLipSyncWithPrecomputedFacialAnimationSynced(FaceSequence);
 }
 
+/*
+*	AddPCMDataToSend can be called without any audio data only to indicate if IsFinal is true or not
+*/
 void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 											bool ContainsHeaderData,
                                             uint32 InSampleRate,
-                                            uint32 InNumChannels) {
-	if (ContainsHeaderData)
-	{
-		// Parse Wav header
-		FWaveModInfo WaveInfo;
-		FString ErrorReason;
-		bool ParseSuccess = WaveInfo.ReadWaveInfo(PCMDataToAdd.GetData(), PCMDataToAdd.Num(), &ErrorReason);
-		// Set the number of channels and sample rate for the first time reading from the stream
-		if (ParseSuccess)
-		{
-			InSampleRate = *WaveInfo.pSamplesPerSec;
-			InNumChannels = *WaveInfo.pChannels;
-			PCMDataToAdd.RemoveAt(0, 44); // Remove the header bytes 
-		}
-		else if (!ParseSuccess)
-		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Failed to parse wav header, reason: %s"), *ErrorReason);
-		}
-	}
-
-	InNumChannels = FMath::Max((int)InNumChannels, 1);
-
+                                            uint32 InNumChannels,
+                                            bool IsFinal) {
 	TArray<int16> OutConverted;
 	
-	if (ReplicateVoiceToNetwork && (InNumChannels > 1 || InSampleRate > 24000))
+	if (PCMDataToAdd.Num() > 0)
 	{
-		UConvaiUtils::ResampleAudio(InSampleRate, 24000, InNumChannels, true, (int16*)PCMDataToAdd.GetData(), PCMDataToAdd.Num()/2, OutConverted);
-		InSampleRate = 24000;
-		InNumChannels = 1;
-	}
-	else
-	{
-		OutConverted = TArray<int16>((int16*)PCMDataToAdd.GetData(), PCMDataToAdd.Num()/2);
+		if (ContainsHeaderData)
+		{
+			// Parse Wav header
+			FWaveModInfo WaveInfo;
+			FString ErrorReason;
+			bool ParseSuccess = WaveInfo.ReadWaveInfo(PCMDataToAdd.GetData(), PCMDataToAdd.Num(), &ErrorReason);
+			// Set the number of channels and sample rate for the first time reading from the stream
+			if (ParseSuccess)
+			{
+				InSampleRate = *WaveInfo.pSamplesPerSec;
+				InNumChannels = *WaveInfo.pChannels;
+				PCMDataToAdd.RemoveAt(0, 44); // Remove the header bytes 
+			}
+			else if (!ParseSuccess)
+			{
+				UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Failed to parse wav header, reason: %s"), *ErrorReason);
+			}
+		}
+
+		InNumChannels = FMath::Max((int)InNumChannels, 1);
+
+
+		if (ReplicateVoiceToNetwork && (InNumChannels > 1 || InSampleRate > 24000))
+		{
+			UConvaiUtils::ResampleAudio(InSampleRate, 24000, InNumChannels, true, (int16*)PCMDataToAdd.GetData(), PCMDataToAdd.Num() / 2, OutConverted);
+			InSampleRate = 24000;
+			InNumChannels = 1;
+		}
+		else
+		{
+			OutConverted = TArray<int16>((int16*)PCMDataToAdd.GetData(), PCMDataToAdd.Num() / 2);
+		}
 	}
 
 	// Send it over to the encoder if we are to stream the voice audio to other clients
 	if (ReplicateVoiceToNetwork)
 	{
+		// TODO: Handle the case where we want to send IsFinal event on the network even if there's no audio
+		if (OutConverted.Num() == 0)
+			return;
+
 		// Check that encoder is valid and able to encode the input sample rate and channels
 		if (InSampleRate != EncoderSampleRate || InNumChannels != EncoderNumChannels)
 		{
@@ -1208,7 +1216,7 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 	else if (!ShouldMuteLocal())
 	{
 		// Just play it locally
-		PlayVoiceSynced((uint8*)OutConverted.GetData(), OutConverted.Num()*2, false, InSampleRate, InNumChannels);
+		PlayVoiceSynced((uint8*)OutConverted.GetData(), OutConverted.Num()*2, false, InSampleRate, InNumChannels, IsFinal);
 	}
 }
 

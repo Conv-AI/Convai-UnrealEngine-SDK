@@ -845,53 +845,58 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
 		Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+
 	}
 
-	float ReceieivedAudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
-
-	if (VoiceResponse && ReceivedAudio.Num() > 0)
+	// Only runs on signle player or when server
+	if (UKismetSystemLibrary::IsServer(this))
 	{
-		AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1); // Should be called in the game thread
-
-		if (IsRecordingAudio)
+		if ((VoiceResponse && ReceivedAudio.Num() > 0) || IsFinal)
 		{
-			RecordedAudio.Append(ReceivedAudio);
-			RecordedAudioSampleRate = SampleRate;
+			AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1, IsFinal);
+		}
+	}
+
+	float ReceivedAudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
+
+	if (IsRecordingAudio && VoiceResponse && ReceivedAudio.Num() > 0)
+	{
+		RecordedAudio.Append(ReceivedAudio);
+		RecordedAudioSampleRate = SampleRate;
+	}
+
+
+	if (ReceivedText != "" || IsFinal == true)
+	{
+		if (!IsInGameThread())
+		{
+			TWeakObjectPtr<UConvaiChatbotComponent> WeakThis(this);
+
+			AsyncTask(ENamedThreads::GameThread, [WeakThis, ReceivedText, ReceivedAudioDuration, IsFinal]()
+			{
+				if (WeakThis.IsValid())
+				{
+					UConvaiChatbotComponent* StrongThis = WeakThis.Get();
+					// Send text and audio duration to blueprint event
+					StrongThis->OnTextReceivedEvent_V2.Broadcast(StrongThis, StrongThis->CurrentConvaiPlayerComponent, StrongThis->CharacterName, ReceivedText, ReceivedAudioDuration, IsFinal);
+
+					// Run the deprecated event
+					StrongThis->OnTextReceivedEvent.Broadcast(StrongThis->CharacterName, ReceivedText, ReceivedAudioDuration, IsFinal);
+				}
+			});
+		}
+		else
+		{
+			// Already on game thread, safe to use 'this'
+			OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceivedAudioDuration, IsFinal);
+			OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceivedAudioDuration, IsFinal);
 		}
 	}
 
 
-if (ReceivedText != "" || IsFinal == true)
-{
-	if (!IsInGameThread())
+	if (ReceivedAudioDuration > 0)
 	{
-		TWeakObjectPtr<UConvaiChatbotComponent> WeakThis(this);
-
-		AsyncTask(ENamedThreads::GameThread, [WeakThis, ReceivedText, ReceieivedAudioDuration, IsFinal]()
-		{
-			if (WeakThis.IsValid())
-			{
-				UConvaiChatbotComponent* StrongThis = WeakThis.Get();
-				// Send text and audio duration to blueprint event
-				StrongThis->OnTextReceivedEvent_V2.Broadcast(StrongThis, StrongThis->CurrentConvaiPlayerComponent, StrongThis->CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
-
-				// Run the deprecated event
-				StrongThis->OnTextReceivedEvent.Broadcast(StrongThis->CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
-			}
-		});
-	}
-	else
-	{
-		// Already on game thread, safe to use 'this'
-		OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
-		OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
-	}
-}
-
-
-	if (ReceieivedAudioDuration > 0)
-	{
-		TotalReceivedAudioDuration += ReceieivedAudioDuration;
+		TotalReceivedAudioDuration += ReceivedAudioDuration;
 	}
 	if (IsFinal)
 	{
