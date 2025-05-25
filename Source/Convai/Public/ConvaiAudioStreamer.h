@@ -427,12 +427,11 @@ public:
 	TArray<uint8> ReceivedEncodedAudioDataBuffer;
  
 	IConvaiLipSyncInterface* ConvaiLipSync;
-	IConvaiLipSyncExtendedInterface* ConvaiLipSyncExtended;
 	IConvaiVisionInterface* ConvaiVision;
 
-	void PlayLipSyncWithPreGeneratedDataSynced(FAnimationSequence& FaceSequence);
+	void PlayLipSyncWithPrecomputedFacialAnimationSynced(FAnimationSequence& FaceSequence);
 
-	void PlayLipSyncWithPreGeneratedData(FAnimationSequence FaceSequence);
+	void PlayLipSyncWithPrecomputedFacialAnimation(FAnimationSequence FaceSequence);
 
 	void PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels);
 
@@ -443,6 +442,8 @@ public:
 	void ResumeLipSync();
 
 	virtual bool CanUseLipSync();
+
+	virtual void ForceRecalculateLipsyncStartTime();
 
 	virtual bool CanUseVision();
 
@@ -569,6 +570,7 @@ private:
 
 	// Critical section for protecting SoundWaveProcedural operations
 	FCriticalSection AudioConfigLock;
+	FThreadSafeBool IsAudioConfiguring;
 	
 	// Buffer for pending audio data when lock is held
 	TArray<uint8> PendingAudioBuffer;
