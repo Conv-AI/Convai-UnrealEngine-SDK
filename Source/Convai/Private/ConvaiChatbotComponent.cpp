@@ -542,6 +542,9 @@ void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 		Broadcast_InterruptSpeech(InVoiceFadeOutDuration);
 	}
 
+	// Ensure all GRPC requests are unbound
+	Unbind_GRPC_Request_Delegates();
+
 	if (GetIsTalking() || IsProcessing())
 	{
 		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("InterruptSpeech: Interrupting character | Character ID : %s | Session ID : %s"),
@@ -605,10 +608,10 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAuthKey, FStrin
 	bool RequireFaceData = false;
 	bool GeneratesVisemesAsBlendshapes = false;
 	ReceivedFinalData = false;
-	if (ConvaiLipSyncExtended)
+	if (ConvaiLipSync)
 	{
-		RequireFaceData = ConvaiLipSyncExtended->RequiresPreGeneratedFaceData();
-		GeneratesVisemesAsBlendshapes = ConvaiLipSyncExtended->GeneratesVisemesAsBlendshapes();
+		RequireFaceData = ConvaiLipSync->RequiresPrecomputedFaceData();
+		GeneratesVisemesAsBlendshapes = ConvaiLipSync->GeneratesVisemesAsBlendshapes();
 	}
 	RequireFaceData = RequireFaceData && VoiceResponse;
 
@@ -686,6 +689,9 @@ void UConvaiChatbotComponent::Unbind_GRPC_Request_Delegates()
 	{
 		return;
 	}
+
+	// Do not unbind narrative design delegate
+	//ConvaiGRPCGetResponseProxy->OnNarrativeDataReceived.Unbind();
 
 	ConvaiGRPCGetResponseProxy->OnTranscriptionReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnDataReceived.Unbind();
