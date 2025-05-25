@@ -1,5 +1,5 @@
-
 #include "RestAPI/ConvaiURL.h"
+#include "Misc/CommandLine.h"
 
 // Define static members
 const TCHAR UConvaiURL::BETA_SUBDOMAIN[] = TEXT("beta");
