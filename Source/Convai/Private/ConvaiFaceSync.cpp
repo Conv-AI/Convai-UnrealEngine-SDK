@@ -147,7 +147,7 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	}
 }
 
-void UConvaiFaceSyncComponent::ConvaiProcessLipSyncAdvanced(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels, FAnimationSequence FaceSequence)
+void UConvaiFaceSyncComponent::ConvaiApplyPrecomputedFacialAnimation(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels, FAnimationSequence FaceSequence)
 {
 	SequenceCriticalSection.Lock();
 	MainSequenceBuffer.AnimationFrames.Append(FaceSequence.AnimationFrames);
@@ -165,7 +165,7 @@ void UConvaiFaceSyncComponent::ConvaiProcessLipSyncAdvanced(uint8* InPCMData, ui
 	}
 }
 
-void UConvaiFaceSyncComponent::ConvaiProcessLipSyncSingleFrame(FAnimationFrame FaceFrame, float Duration)
+void UConvaiFaceSyncComponent::ConvaiApplyFacialFrame(FAnimationFrame FaceFrame, float Duration)
 {
 	SequenceCriticalSection.Lock();
 	if (!GeneratesVisemesAsBlendshapes())
@@ -285,7 +285,7 @@ bool UConvaiFaceSyncComponent::PlayRecordedLipSync(FAnimationSequenceBP Recorded
 	}
 
 	UE_LOG(ConvaiFaceSyncLog, Log, TEXT("Playing Recorded LipSync - Total Frames: %d - Duration: %f"), RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
-	ConvaiProcessLipSyncAdvanced(nullptr, 0, 0, 0, RecordedLipSync.AnimationSequence);
+	ConvaiApplyPrecomputedFacialAnimation(nullptr, 0, 0, 0, RecordedLipSync.AnimationSequence);
 	return true;
 }
 
@@ -306,6 +306,11 @@ void UConvaiFaceSyncComponent::CalculateStartingTime()
 {
 	if (!bIsPlaying)
 		StartTime = FPlatformTime::Seconds();
+}
+
+void UConvaiFaceSyncComponent::ForceRecalculateStartTime()
+{
+	StartTime = FPlatformTime::Seconds();
 }
 
 void UConvaiFaceSyncComponent::ClearMainSequence()
