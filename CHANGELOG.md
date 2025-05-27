@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.5.4-hotfix-1
+- Fixed racing condition when playing audio.
+- Updated Android Play Core to 2.0.3.
+- Refactored old unused classes and code.
+
+# Release 3.5.4
+- Further improved LipSync accuracy and synchornization.
+- Fixed an issue where [player speech transcription would fail after short character responses](https://forum.convai.com/t/player-speech-transcription-fails-after-short-character-responses/3735/2).
+- Improved gRPC connection stability to prevent conversation failures.
+- Resolved a rare crash caused by the server sending large volumes of audio in small chunks.
+
 # Release 3.5.4
 - Further improved LipSync accuracy and synchornization.
 - Fixed an issue where [player speech transcription would fail after short character responses](https://forum.convai.com/t/player-speech-transcription-fails-after-short-character-responses/3735/2).
