@@ -345,7 +345,7 @@ public:
 
 	virtual void OnServerAudioReceived(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData = true, uint32 SampleRate = 21000, uint32 NumChannels = 1) {};
 
-	void PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData=true, uint32 SampleRate=21000, uint32 NumChannels=1, bool IsFinal=false);
+	void PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData=true, uint32 SampleRate=21000, uint32 NumChannels=1);
 	
 	void PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData=true, uint32 SampleRate=21000, uint32 NumChannels=1);
 
@@ -416,6 +416,7 @@ public:
 
 	FTimerHandle AudioFinishedTimerHandle;
 	FTimerHandle LypSyncTimeoutTimerHandle;
+	double AudioEndTime = 0.0;
 	bool IsTalking = false;
 	float TotalVoiceFadeOutTime;
 	float RemainingVoiceFadeOutTime;
@@ -466,7 +467,7 @@ public:
 	void AddFaceDataToSend(FAnimationSequence FaceSequence);
 
 	// Should be called in the game thread
-	void AddPCMDataToSend(TArray<uint8> PCMDataToAdd, bool ContainsHeaderData = true, uint32 SampleRate = 21000, uint32 NumChannels = 1, bool IsFinal=false);
+	void AddPCMDataToSend(TArray<uint8> PCMDataToAdd, bool ContainsHeaderData = true, uint32 SampleRate = 21000, uint32 NumChannels = 1);
 
 	virtual void onAudioStarted();
 	virtual void onAudioFinished();
@@ -481,9 +482,9 @@ enum class EAudioLipSyncState : uint8
     WaitingOnAudio UMETA(DisplayName = "Waiting On Audio")
 };
 
-// Add to protected section
 EAudioLipSyncState CurrentState;
-
+FThreadSafeCounter BufferProcessingCounter = 0;
+ 
 // Simplified buffer structure
 struct FAudioBuffer
 {
@@ -540,13 +541,12 @@ float AudioLipSyncRatio;
 
 // State management functions
 void TransitionToState(EAudioLipSyncState NewState);
-void HandleAudioReceived(uint8* AudioData, uint32 AudioDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels, bool IsFinal=false);
+void HandleAudioReceived(uint8* AudioData, uint32 AudioDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels);
 void HandleLipSyncReceived(FAnimationSequence& FaceSequence);
 bool TryPlayBufferedContent();
 bool HasSufficientLipSync();
 bool HasSufficientAudio() const;
 void PlayBufferedContent(float Duration);
-bool IsFinalAudioChunkReceived = false;
 
 /**
  * Returns the duration of content (audio and lipsync if applicable) that is 

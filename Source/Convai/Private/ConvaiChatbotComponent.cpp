@@ -845,24 +845,19 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
 		Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
-
-	}
-
-	// Only runs on signle player or when server
-	if (UKismetSystemLibrary::IsServer(this))
-	{
-		if ((VoiceResponse && ReceivedAudio.Num() > 0) || IsFinal)
-		{
-			AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1, IsFinal);
-		}
 	}
 
 	float ReceivedAudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
 
-	if (IsRecordingAudio && VoiceResponse && ReceivedAudio.Num() > 0)
+	if (VoiceResponse && ReceivedAudio.Num() > 0)
 	{
-		RecordedAudio.Append(ReceivedAudio);
-		RecordedAudioSampleRate = SampleRate;
+		AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1);
+
+		if (IsRecordingAudio)
+		{
+			RecordedAudio.Append(ReceivedAudio);
+			RecordedAudioSampleRate = SampleRate;
+		}
 	}
 
 
