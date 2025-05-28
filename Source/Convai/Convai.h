@@ -35,6 +35,14 @@ public:
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
 	FString CustomURL;
 
+	/* Custom Beta API URL (Used for debugging) */
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	FString CustomBetaURL;
+
+	/* Custom Production API URL (Used for debugging) */
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	FString CustomProdURL;
+
 	/* Test Character ID (Used for debugging) */
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
 	FString TestCharacterID;

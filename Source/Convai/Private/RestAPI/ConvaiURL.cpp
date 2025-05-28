@@ -1,5 +1,6 @@
 #include "RestAPI/ConvaiURL.h"
 #include "Misc/CommandLine.h"
+#include "../Convai.h"
 
 // Define static members
 const TCHAR UConvaiURL::BETA_SUBDOMAIN[] = TEXT("beta");
@@ -24,19 +25,38 @@ void UConvaiURL::InitializeURLConfig()
         return;
     }
 
-    // Check command line parameters
+    // First check settings
+    FString SettingsBetaURL = Convai::Get().GetConvaiSettings()->CustomBetaURL;
+    SettingsBetaURL.TrimEndInline();
+    SettingsBetaURL.TrimStartInline();
+    if (!SettingsBetaURL.IsEmpty())
+    {
+        CustomBetaBaseURL = SettingsBetaURL;
+        UE_LOG(LogTemp, Log, TEXT("Using beta URL from settings: %s"), *CustomBetaBaseURL);
+    }
+
+    FString SettingsProdURL = Convai::Get().GetConvaiSettings()->CustomProdURL;
+    SettingsProdURL.TrimEndInline();
+    SettingsProdURL.TrimStartInline();
+    if (!SettingsProdURL.IsEmpty())
+    {
+        CustomProdBaseURL = SettingsProdURL;
+        UE_LOG(LogTemp, Log, TEXT("Using prod URL from settings: %s"), *CustomProdBaseURL);
+    }
+
+    // Then check command line parameters (these will override settings if present)
     FString BetaURL;
     if (FParse::Value(FCommandLine::Get(), TEXT("ConvaiBetaURL="), BetaURL))
     {
         CustomBetaBaseURL = BetaURL;
-        UE_LOG(LogTemp, Log, TEXT("Using custom beta URL: %s"), *CustomBetaBaseURL);
+        UE_LOG(LogTemp, Log, TEXT("Using custom beta URL from command line: %s"), *CustomBetaBaseURL);
     }
 
     FString ProdURL;
     if (FParse::Value(FCommandLine::Get(), TEXT("ConvaiProdURL="), ProdURL))
     {
         CustomProdBaseURL = ProdURL;
-        UE_LOG(LogTemp, Log, TEXT("Using custom prod URL: %s"), *CustomProdBaseURL);
+        UE_LOG(LogTemp, Log, TEXT("Using custom prod URL from command line: %s"), *CustomProdBaseURL);
     }
 
     bURLConfigInitialized = true;
