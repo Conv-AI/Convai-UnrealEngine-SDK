@@ -51,7 +51,7 @@ void UConvaiCreateSpeakerID::HandleSuccess()
     }
     else
     {
-        UE_LOG(LTMHttpLogs, Error, TEXT("Parse Json failed"));
+        CONVAI_LOG(LTMHttpLogs, Error, TEXT("Parse Json failed"));
         HandleFailure();
     }
 }
@@ -94,7 +94,7 @@ void UConvaiListSpeakerID::HandleSuccess()
     }
     else
     {
-        UE_LOG(LTMHttpLogs, Error, TEXT("Parse speaker id failed"));
+        CONVAI_LOG(LTMHttpLogs, Error, TEXT("Parse speaker id failed"));
         HandleFailure();
     }
 }
@@ -197,7 +197,7 @@ void UConvaiGetLTMStatus::HandleSuccess()
     }
     else
     {
-        UE_LOG(LTMHttpLogs, Error, TEXT("GetLTMStatus failed"));
+        CONVAI_LOG(LTMHttpLogs, Error, TEXT("GetLTMStatus failed"));
         HandleFailure();
     }
 }

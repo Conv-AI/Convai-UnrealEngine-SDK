@@ -324,7 +324,7 @@ FString UConvaiActions::ExtractText(FString Action, FString ActionResult)
 	FRegexMatcher StringMatcher = FRegexMatcher(TextPattern, ActionResult);
 	if (StringMatcher.FindNext())
 	{
-		//UE_LOG(ConvaiUtilsLog, Warning, TEXT("*StringMatcher.GetCaptureGroup(0):%s"), *StringMatcher.GetCaptureGroup(0));
+		//CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("*StringMatcher.GetCaptureGroup(0):%s"), *StringMatcher.GetCaptureGroup(0));
 		ExtraText = *StringMatcher.GetCaptureGroup(0).LeftChop(1).RightChop(1);
 	}
 	else
@@ -344,7 +344,7 @@ float UConvaiActions::ExtractNumber(FString ActionResult)
 	FRegexMatcher NumberMatcher = FRegexMatcher(NumericPattern, ActionResult);
 	if (NumberMatcher.FindNext())
 	{
-		//UE_LOG(ConvaiGetActionHttpLog, Warning, TEXT("*NumberMatcher.GetCaptureGroup(0):%s"), *NumberMatcher.GetCaptureGroup(0));
+		//CONVAI_LOG(ConvaiGetActionHttpLog, Warning, TEXT("*NumberMatcher.GetCaptureGroup(0):%s"), *NumberMatcher.GetCaptureGroup(0));
 		ExtraNumber = FCString::Atof(*NumberMatcher.GetCaptureGroup(0));
 	}
 	return ExtraNumber;
@@ -362,7 +362,7 @@ FString UConvaiActions::RemoveDesc(FString str)
 		str.TrimEndInline();
 		str.TrimStartInline();
 	}
-	//UE_LOG(ConvaiActionUtilsLog, Warning, TEXT("str:%s"), *str);
+	//CONVAI_LOG(ConvaiActionUtilsLog, Warning, TEXT("str:%s"), *str);
 	return str;
 }
 

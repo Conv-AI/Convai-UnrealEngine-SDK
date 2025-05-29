@@ -42,13 +42,13 @@ namespace Audio
 		Audio::FCaptureDeviceInfo DeviceInfo;
 		for (uint32 DeviceIndex = 0; AudioCapture.GetCaptureDeviceInfo(DeviceInfo, DeviceIndex); DeviceIndex++)
 		{
-			//UE_LOG(ConvaiAudioLog, Log, TEXT("DeviceIndex: %d, InputDeviceID: %d - name: %s - channels:%d - NumDevices:%d"), DeviceIndex, InputDeviceID, *DeviceInfo.DeviceName, DeviceInfo.InputChannels, NumDevices);
+			//CONVAI_LOG(ConvaiAudioLog, Log, TEXT("DeviceIndex: %d, InputDeviceID: %d - name: %s - channels:%d - NumDevices:%d"), DeviceIndex, InputDeviceID, *DeviceInfo.DeviceName, DeviceInfo.InputChannels, NumDevices);
 			bool IsInput = DeviceInfo.InputChannels > 0;
 			if (!IsInput)
 			{
 				continue;
 			}
-			//UE_LOG(ConvaiAudioLog, Log, TEXT("DeviceIndex: %d, is an input - name: %s"), DeviceIndex, *DeviceInfo.DeviceName);
+			//CONVAI_LOG(ConvaiAudioLog, Log, TEXT("DeviceIndex: %d, is an input - name: %s"), DeviceIndex, *DeviceInfo.DeviceName);
 			if (NumInputDevices == InputDeviceID)
 			{
 				return DeviceIndex;
@@ -252,7 +252,7 @@ bool UConvaiAudioCaptureComponent::Init(int32& SampleRate)
 		}
 	}
 
-	UE_LOG(ConvaiAudioLog, Log, TEXT("Using %s as Audio capture device with NumChannels:%d and SampleRate:%d"), *DeviceInfo.DeviceName, DeviceInfo.InputChannels, DeviceInfo.PreferredSampleRate);
+	CONVAI_LOG(ConvaiAudioLog, Log, TEXT("Using %s as Audio capture device with NumChannels:%d and SampleRate:%d"), *DeviceInfo.DeviceName, DeviceInfo.InputChannels, DeviceInfo.PreferredSampleRate);
 
 	if (FoundDevice)
 	{
@@ -266,13 +266,13 @@ bool UConvaiAudioCaptureComponent::Init(int32& SampleRate)
 			bIsStreamOpen = CaptureSynth.OpenStream(SelectedDeviceIndex);
 			if (!bIsStreamOpen)
 			{
-				UE_LOG(ConvaiAudioLog, Warning, TEXT("OpenStream returned false."));
+				CONVAI_LOG(ConvaiAudioLog, Warning, TEXT("OpenStream returned false."));
 			}
 			return true;
 		}
 		else
 		{
-			UE_LOG(ConvaiAudioLog, Warning, TEXT("Audio capture components only support mono and stereo mic input - Audio might be mangeled."));
+			CONVAI_LOG(ConvaiAudioLog, Warning, TEXT("Audio capture components only support mono and stereo mic input - Audio might be mangeled."));
 			return true;
 		}
 

@@ -13,6 +13,7 @@
 #include "HAL/PlatformProcess.h"
 #include <string>
 #include "Engine/EngineTypes.h"
+#include "Utility/Log/ConvaiLogger.h"
 
 THIRD_PARTY_INCLUDES_START
 #include <grpc++/grpc++.h>
@@ -100,7 +101,7 @@ void UConvaiGRPCGetResponseProxy::Activate()
 
 	if (!WorldPtr.IsValid())
 	{
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("WorldPtr not valid"));
+		CONVAI_LOG(ConvaiGRPCLog, Warning, TEXT("WorldPtr not valid"));
 		OnFailure.ExecuteIfBound();
 		return;
 	}
@@ -108,7 +109,7 @@ void UConvaiGRPCGetResponseProxy::Activate()
 	UConvaiSubsystem* ConvaiSubsystem = UConvaiUtils::GetConvaiSubsystem(WorldPtr.Get());
 	if (!ConvaiSubsystem)
 	{
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("Convai Subsystem is not valid"));
+		CONVAI_LOG(ConvaiGRPCLog, Warning, TEXT("Convai Subsystem is not valid"));
 		OnFailure.ExecuteIfBound();
 		return;
 	}
@@ -117,7 +118,7 @@ void UConvaiGRPCGetResponseProxy::Activate()
 	stub_ = ConvaiSubsystem->gRPC_Runnable->GetNewStub();
 	if (!stub_)
 	{
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("Could not aquire a new stub instance"));
+		CONVAI_LOG(ConvaiGRPCLog, Warning, TEXT("Could not aquire a new stub instance"));
 		OnFailure.ExecuteIfBound();
 		return;
 	}
@@ -126,7 +127,7 @@ void UConvaiGRPCGetResponseProxy::Activate()
 	cq_ = ConvaiSubsystem->gRPC_Runnable->GetCompletionQueue();
 	if (!cq_)
 	{
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("Got an invalid completion queue instance"));
+		CONVAI_LOG(ConvaiGRPCLog, Warning, TEXT("Got an invalid completion queue instance"));
 		OnFailure.ExecuteIfBound();
 		return;
 	}
@@ -168,7 +169,7 @@ void UConvaiGRPCGetResponseProxy::Activate()
 	// Initialize the stream
 	FScopeLock Lock(&GPRCInitSection);
 	stream_handler = stub_->AsyncGetResponse(&client_context, cq_, (void*)&OnInitStreamDelegate);
-	UE_LOG(ConvaiGRPCLog, Log,
+	CONVAI_LOG(ConvaiGRPCLog, Log,
 	TEXT("AsyncGetResponse started | Character ID : %s | Session ID : %s"),
 	*ConvaiGRPCGetResponseParams.CharID,
 	*ConvaiGRPCGetResponseParams.SessionID);
@@ -182,13 +183,13 @@ void UConvaiGRPCGetResponseProxy::WriteAudioDataToSend(uint8* Buffer, uint32 Len
 
 	m_mutex.Unlock();
 
-	// UE_LOG(ConvaiGRPCLog, Log, TEXT("WriteAudioDataToSend:: InformOnDataReceived = %s"), InformOnDataReceived ? *FString("True") : *FString("False"));
+	// CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("WriteAudioDataToSend:: InformOnDataReceived = %s"), InformOnDataReceived ? *FString("True") : *FString("False"));
 	if (InformOnDataReceived)
 	{
 		// Reset
 		InformOnDataReceived = false;
 
-		//UE_LOG(ConvaiGRPCLog, Log, TEXT("WriteAudioDataToSend:: Informing On Data Received"));
+		//CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("WriteAudioDataToSend:: Informing On Data Received"));
 
 		// Inform of new data to send
 		OnStreamWrite(true);
@@ -199,11 +200,11 @@ void UConvaiGRPCGetResponseProxy::FinishWriting()
 {
 	LastWriteReceived = true;
 
-	UE_LOG(ConvaiGRPCLog, Log, TEXT("Finish Writing to audio data buffer"));
+	CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("Finish Writing to audio data buffer"));
 
 	if (InformOnDataReceived)
 	{
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("FinishWriting:: Informing On Data Received"));
+		CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("FinishWriting:: Informing On Data Received"));
 
 		// Inform of new data to send
 		OnStreamWrite(true);
@@ -218,7 +219,7 @@ void UConvaiGRPCGetResponseProxy::BeginDestroy()
 {
 	client_context.TryCancel();
 	stub_.reset();
-	UE_LOG(ConvaiGRPCLog, Log,
+	CONVAI_LOG(ConvaiGRPCLog, Log,
 		TEXT("Destroying UConvaiGRPCGetResponseProxy... | Character ID : %s | Session ID : %s"),
 		*ConvaiGRPCGetResponseParams.CharID,
 		*ConvaiGRPCGetResponseParams.SessionID);
@@ -229,14 +230,14 @@ void UConvaiGRPCGetResponseProxy::CallFinish()
 {
 	if (CalledFinish || !stream_handler)
 	{
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("stream_handler->Finish is already called | Character ID : %s | Session ID : %s"),
+		CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("stream_handler->Finish is already called | Character ID : %s | Session ID : %s"),
 			*ConvaiGRPCGetResponseParams.CharID,
 			*ConvaiGRPCGetResponseParams.SessionID);
 		return;
 	}
 
 	CalledFinish = true;
-	UE_LOG(ConvaiGRPCLog, Log,
+	CONVAI_LOG(ConvaiGRPCLog, Log,
 		TEXT("Calling Stream Finish | Character ID : %s | Session ID : %s"),
 		*ConvaiGRPCGetResponseParams.CharID,
 		*ConvaiGRPCGetResponseParams.SessionID);
@@ -274,7 +275,7 @@ TArray<uint8> UConvaiGRPCGetResponseProxy::ConsumeFromAudioBuffer(bool& IsThisTh
 
 void UConvaiGRPCGetResponseProxy::LogAndEcecuteFailure(FString FuncName)
 {
-	UE_LOG(ConvaiGRPCLog, Warning,
+	CONVAI_LOG(ConvaiGRPCLog, Warning,
 		TEXT("%s: Status.ok():%s | Debug Log:%s | Error message:%s | Error Details:%s | Error Code:%i | Character ID:%s | Session ID:%s"),
 		*FString(FuncName),
 		*FString(status.ok() ? "Ok" : "Not Ok"),
@@ -309,7 +310,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 #if ENGINE_MAJOR_VERSION < 5
 	if (!IsValid(this) || HasAnyFlags(RF_BeginDestroyed))
 	{
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
+		CONVAI_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
 			*ConvaiGRPCGetResponseParams.CharID,
 			*ConvaiGRPCGetResponseParams.SessionID);
 		LogAndEcecuteFailure("OnStreamInit");
@@ -318,7 +319,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 #else
 	if (!IsValid(this) || !IsValidChecked(this) || HasAnyFlags(RF_BeginDestroyed))
 	{
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
+		CONVAI_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to pending kill! | Character ID : %s | Session ID : %s"),
 			*ConvaiGRPCGetResponseParams.CharID,
 			*ConvaiGRPCGetResponseParams.SessionID);
 		LogAndEcecuteFailure("OnStreamInit");
@@ -332,7 +333,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 		return;
 	}
 
-	UE_LOG(ConvaiGRPCLog, Log, TEXT("GRPC GetResponse stream initialized | Character ID : %s | Session ID : %s"),
+	CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("GRPC GetResponse stream initialized | Character ID : %s | Session ID : %s"),
 		*ConvaiGRPCGetResponseParams.CharID,
 		*ConvaiGRPCGetResponseParams.SessionID);
 
@@ -424,7 +425,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 	}
 	else
 	{
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to invalid Authentication type! | Character ID : %s | Session ID : %s | Authentication type: %s | Authentication Key: %s"),
+		CONVAI_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamInit Could not initialize due to invalid Authentication type! | Character ID : %s | Session ID : %s | Authentication type: %s | Authentication Key: %s"),
 			*ConvaiGRPCGetResponseParams.CharID,
 			*ConvaiGRPCGetResponseParams.SessionID,
 			*ConvaiGRPCGetResponseParams.AuthHeader,
@@ -463,7 +464,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 #if ConvaiDebugMode
 	FString DebugString(getResponseConfig->DebugString().c_str());
-	UE_LOG(ConvaiGRPCLog, Log, TEXT("request: %s | Character ID : %s | Session ID : %s"),
+	CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("request: %s | Character ID : %s | Session ID : %s"),
 		*DebugString,
 		*ConvaiGRPCGetResponseParams.CharID,
 		*ConvaiGRPCGetResponseParams.SessionID);
@@ -489,7 +490,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	// Do a write task
 	stream_handler->Write(request, (void*)&(OnStreamWriteDelegate));
-	UE_LOG(ConvaiGRPCLog, Log,
+	CONVAI_LOG(ConvaiGRPCLog, Log,
 		TEXT("Initial Stream Write | Character ID : %s | Session ID : %s"),
 		*ConvaiGRPCGetResponseParams.CharID,
 		*ConvaiGRPCGetResponseParams.SessionID);
@@ -497,7 +498,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamInit(bool ok)
 
 	// Do a read task
 	stream_handler->Read(reply.get(), (void*)&OnStreamReadDelegate);
-	UE_LOG(ConvaiGRPCLog, Log,
+	CONVAI_LOG(ConvaiGRPCLog, Log,
 		TEXT("Initial Stream Read | Character ID : %s | Session ID : %s"),
 		*ConvaiGRPCGetResponseParams.CharID,
 		*ConvaiGRPCGetResponseParams.SessionID); }
@@ -506,7 +507,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 {
 	if (!IsValid(this))
 	{
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamWrite failed due to pending kill!"));
+		CONVAI_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamWrite failed due to pending kill!"));
 		LogAndEcecuteFailure("OnStreamWrite");
 		return;
 	}
@@ -521,7 +522,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 	if (CalledFinish)
 		return;
 
-	// UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWriteBegin"));
+	// CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWriteBegin"));
 
 	// Clear the request data to make it ready to hold the new data we are going to send
 	request.Clear();
@@ -534,7 +535,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 	{
 		// Add in the text data
 		get_response_data->set_text_data(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.UserQuery));
-		UE_LOG(ConvaiGRPCLog, Log,
+		CONVAI_LOG(ConvaiGRPCLog, Log,
 		TEXT("Sent UserQuery %s: | Character ID : %s | Session ID : %s"),
 		*ConvaiGRPCGetResponseParams.UserQuery,
 		*ConvaiGRPCGetResponseParams.CharID,
@@ -549,7 +550,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 		triggerConfig->set_trigger_message(TCHAR_TO_UTF8(*ConvaiGRPCGetResponseParams.TriggerMessage));
 		get_response_data->set_allocated_trigger_data(triggerConfig);
 		IsThisTheFinalWrite = true;
-		UE_LOG(ConvaiGRPCLog, Log,
+		CONVAI_LOG(ConvaiGRPCLog, Log,
 			TEXT("Sent %s %s: | Character ID : %s | Session ID : %s"),
 			*FString(ConvaiGRPCGetResponseParams.TriggerName.IsEmpty() ? "Trigger Message" : "Trigger Name"),
 			*FString(ConvaiGRPCGetResponseParams.TriggerName.IsEmpty() ? ConvaiGRPCGetResponseParams.TriggerMessage : ConvaiGRPCGetResponseParams.TriggerName),
@@ -567,7 +568,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 			if (IsThisTheFinalWrite)
 			{
 				// Tell the server that we have finished writing
-				UE_LOG(ConvaiGRPCLog, Log, TEXT("Calling Stream WritesDone | LastWriteReceived : %s | AudioBuffer.Num() : %d | Character ID : %s | Session ID : %s"),
+				CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("Calling Stream WritesDone | LastWriteReceived : %s | AudioBuffer.Num() : %d | Character ID : %s | Session ID : %s"),
 				(LastWriteReceived ? TEXT("True") : TEXT("False")),
 				AudioBuffer.Num(),
 				*ConvaiGRPCGetResponseParams.CharID,
@@ -576,13 +577,13 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 				request.set_allocated_get_response_data(get_response_data);
 
 				//stream_handler->WritesDone((void*)&OnStreamWriteDoneDelegate); 
-				stream_handler->WriteLast(request, grpc::WriteOptions(), (void*)&OnStreamWriteDoneDelegate); UE_LOG(ConvaiGRPCLog, Log, TEXT("On Stream Write Done Writing"));
+				stream_handler->WriteLast(request, grpc::WriteOptions(), (void*)&OnStreamWriteDoneDelegate); CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("On Stream Write Done Writing"));
 				FinishedWritingToStream = true;
 			}
 			else
 			{
 				// Let us know when new data is available
-				InformOnDataReceived = true; // UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWrite: Awaiting audio data"));
+				InformOnDataReceived = true; // CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWrite: Awaiting audio data"));
 			}
 
 			// Do not proceed
@@ -602,7 +603,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWrite(bool ok)
 	if (IsThisTheFinalWrite)
 	{
 		// Send the data and tell the server that this is the last piece of data
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("Calling Stream WriteLast | Character ID : %s | Session ID : %s"),
+		CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("Calling Stream WriteLast | Character ID : %s | Session ID : %s"),
 			*ConvaiGRPCGetResponseParams.CharID,
 			*ConvaiGRPCGetResponseParams.SessionID);
 		stream_handler->WriteLast(request, grpc::WriteOptions(), (void*)&OnStreamWriteDoneDelegate);
@@ -619,7 +620,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamWriteDone(bool ok)
 {
 	if (!IsValid(this))
 	{
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamWriteDone failed due to pending kill!"));
+		CONVAI_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamWriteDone failed due to pending kill!"));
 		LogAndEcecuteFailure("OnStreamWriteDone");
 		return;
 	}
@@ -631,14 +632,14 @@ void UConvaiGRPCGetResponseProxy::OnStreamWriteDone(bool ok)
 		return;
 	}
 
-	UE_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWriteDone"));
-	UE_LOG(ConvaiGRPCLog, Log, TEXT("NumberOfAudioBytesSent %i"), NumberOfAudioBytesSent);
+	CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("OnStreamWriteDone"));
+	CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("NumberOfAudioBytesSent %i"), NumberOfAudioBytesSent);
 }
 
 void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 {
 	if (!IsValid(this)) {
-		UE_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamRead failed due to pending kill!"));
+		CONVAI_LOG(ConvaiGRPCLog, Warning, TEXT("OnStreamRead failed due to pending kill!"));
 		LogAndEcecuteFailure("OnStreamRead");
 		return;
 	}
@@ -649,7 +650,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 	// Error handling
 	if (!ok || !status.ok()) {
 		// Log the error details
-		//UE_LOG(ConvaiGRPCLog, Log,
+		//CONVAI_LOG(ConvaiGRPCLog, Log,
 		//	TEXT("OnStreamRead - Received non-ok response: ok:%s Status.ok:%s | Error message:%s | Code:%i | LastWriteReceived:%s | InformOnDataReceived:%s | AudioBuffer.Num():%d | Character ID:%s | Session ID:%s"),
 		//	*FString(ok ? "True" : "False"),
 		//	*FString(status.ok() ? "Ok" : "Not Ok"),
@@ -664,13 +665,13 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		// Retry logic: increment the retry counter
 		RetryCount++;
 		if (RetryCount >= MaxRetries) {
-			UE_LOG(ConvaiGRPCLog, Log, TEXT("No more data to read after 3 attempts. Calling Finish..."));
+			CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("No more data to read after 3 attempts. Calling Finish..."));
 			CallFinish();  // Close the stream after 3 attempts
 			return;
 		}
 
 		// Otherwise, initiate another read to continue the stream (retrying)
-		//UE_LOG(ConvaiGRPCLog, Log, TEXT("Retrying OnStreamRead... Attempt %d of %d"), RetryCount, MaxRetries);
+		//CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("Retrying OnStreamRead... Attempt %d of %d"), RetryCount, MaxRetries);
 		FPlatformProcess::Sleep(0.1f);
 		stream_handler->Read(reply.get(), (void*)&OnStreamReadDelegate);
 		return;
@@ -707,7 +708,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		FString text_string = UConvaiUtils::FUTF8ToFString(UserQuery_std.c_str());
 
 		OnTranscriptionReceived.ExecuteIfBound(text_string, IsTranscriptionReady, IsFinalTranscription);
-		UE_LOG(ConvaiGRPCLog, Log,
+		CONVAI_LOG(ConvaiGRPCLog, Log,
 			TEXT("Received UserQuery %s: | Character ID : %s | Session ID : %s | IsFinalTranscription : %s"),
 			*text_string,
 			*ConvaiGRPCGetResponseParams.CharID,
@@ -730,7 +731,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		{
 			VoiceData = TArray<uint8>(reinterpret_cast<const uint8*>(audio_data.data() + 46), audio_data.length() - 46);
 			SampleRate = reply->audio_response().audio_config().sample_rate_hertz();
-			UE_LOG(ConvaiGRPCLog, Log, TEXT("Received Audio Chunk: %f secs | Character ID : % s | Session ID : % s"), float(audio_data.length()) / (SampleRate * 2.0),
+			CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("Received Audio Chunk: %f secs | Character ID : % s | Session ID : % s"), float(audio_data.length()) / (SampleRate * 2.0),
 				*ConvaiGRPCGetResponseParams.CharID,
 				*ConvaiGRPCGetResponseParams.SessionID);
 		}
@@ -820,7 +821,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 			//	FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
 			//	FaceDataAnimation.Duration = FrameTime;
 			//	FaceDataAnimation.FrameRate = FPS;
-			//	 UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s - Frame Time: %f - Frame Index: %d"), *AnimationFrame.ToString(), FrameTime, FrameIndex);
+			//	 CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s - Frame Time: %f - Frame Index: %d"), *AnimationFrame.ToString(), FrameTime, FrameIndex);
 			//}
 			else if (HasVisemes && !ConvaiGRPCGetResponseParams.GeneratesVisemesAsBlendshapes)
 			{
@@ -848,7 +849,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 					FaceDataAnimation.Duration += 0.01;
 					FaceDataAnimation.FrameRate = 100;
 				}
-				//UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s"), *AnimationFrame.ToString());
+				//CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s"), *AnimationFrame.ToString());
 			}
 
 			if (VoiceData.Num() > 0 && FaceDataAnimation.Duration == 0)
@@ -865,7 +866,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 
 			if (ReceivedFinalResponse)
 			{
-				UE_LOG(ConvaiGRPCLog, Log, TEXT("Chatbot Total Received Lipsync Responses: %d Responses"), TotalLipSyncResponsesReceived);
+				CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("Chatbot Total Received Lipsync Responses: %d Responses"), TotalLipSyncResponsesReceived);
 				TotalLipSyncResponsesReceived = 0;
 			}
 		}
@@ -875,20 +876,20 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 			FString EmotionType = UConvaiUtils::FUTF8ToFString(reply->audio_response().emotion_response().emotion().c_str());
 			FString EmotionScale = UConvaiUtils::FUTF8ToFString(reply->audio_response().emotion_response().scale().c_str());
 			FString EmotionResponse = EmotionType + " " + EmotionScale;
-			UE_LOG(ConvaiGRPCLog, Log, TEXT("EmotionResponse: %s"), *EmotionResponse);
+			CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("EmotionResponse: %s"), *EmotionResponse);
 			OnEmotionReceived.ExecuteIfBound(EmotionResponse, FAnimationFrame(), false);
 		}
 		if (reply->audio_response().has_blendshapes_data())
 		{
 			FString BlendshapesData = UConvaiUtils::FUTF8ToFString(reply->audio_response().blendshapes_data().blendshape_data().c_str());
-			UE_LOG(ConvaiGRPCLog, Log, TEXT("BlendshapesData: %s"), *BlendshapesData);
+			CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("BlendshapesData: %s"), *BlendshapesData);
 		}
 
 		// Broadcast the audio and text
 		OnDataReceived.ExecuteIfBound(text_string, VoiceData, SampleRate, ReceivedFinalResponse);
 		if (ReceivedFinalResponse || !text_string.IsEmpty())
 		{
-			UE_LOG(ConvaiGRPCLog, Log,
+			CONVAI_LOG(ConvaiGRPCLog, Log,
 				TEXT("Received Text %s: | Character ID : %s | Session ID : %s | ReceivedFinalResponse : %s"),
 				*text_string,
 				*ConvaiGRPCGetResponseParams.CharID,
@@ -902,7 +903,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		FString SequenceString = UConvaiUtils::FUTF8ToFString(reply->action_response().action().c_str());
 
 #if ConvaiDebugMode
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse SequenceString: %s"), *SequenceString);
+		CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse SequenceString: %s"), *SequenceString);
 #endif 
 
 		// Parse the actions
@@ -917,7 +918,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 				SequenceOfActions.Add(ConvaiResultAction);
 			}
 
-			UE_LOG(ConvaiGRPCLog, Log, TEXT("Action: %s"), *ConvaiResultAction.Action);
+			CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("Action: %s"), *ConvaiResultAction.Action);
 		}
 		// Broadcast the actions
 		OnActionsReceived.ExecuteIfBound(SequenceOfActions);
@@ -928,7 +929,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		FString BT_Constants = UConvaiUtils::FUTF8ToFString(reply->bt_response().bt_constants().c_str());
 		FString NarrativeSectionID = UConvaiUtils::FUTF8ToFString(reply->bt_response().narrative_section_id().c_str());
 		OnNarrativeDataReceived.ExecuteIfBound(BT_Code, BT_Constants, NarrativeSectionID);
-		UE_LOG(ConvaiGRPCLog, Log,
+		CONVAI_LOG(ConvaiGRPCLog, Log,
 			TEXT("Narrative Section Received %s: | Character ID : %s | Session ID : %s | ReceivedFinalResponse : %s"),
 			*NarrativeSectionID,
 			*ConvaiGRPCGetResponseParams.CharID,
@@ -938,7 +939,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 	else if (!reply->emotion_response().empty())
 	{
 		FString EmotionResponseDebug = UConvaiUtils::FUTF8ToFString(reply->DebugString().c_str());
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse EmotionResponseDebug: %s"), *EmotionResponseDebug);
+		CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse EmotionResponseDebug: %s"), *EmotionResponseDebug);
 		FString EmotionResponse = UConvaiUtils::FUTF8ToFString(reply->emotion_response().c_str());
 		OnEmotionReceived.ExecuteIfBound(EmotionResponse, FAnimationFrame(), true);
 	}
@@ -946,7 +947,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 	{
 #if ConvaiDebugMode
 		FString DebugString(reply->debug_log().c_str());
-		UE_LOG(ConvaiGRPCLog, Log, TEXT("Debug log: %s"), *DebugString);
+		CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("Debug log: %s"), *DebugString);
 #endif 
 	}
 
@@ -966,7 +967,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamFinish(bool ok)
 	}
 
 #if ConvaiDebugMode
-	UE_LOG(ConvaiGRPCLog, Log,
+	CONVAI_LOG(ConvaiGRPCLog, Log,
 		TEXT("On Stream Finish | Character ID : %s | Session ID : %s"),
 		*ConvaiGRPCGetResponseParams.CharID,
 		*ConvaiGRPCGetResponseParams.SessionID);
@@ -1004,7 +1005,7 @@ void UConvaiGRPCSubmitFeedbackProxy::Activate()
 
 	if (!WorldPtr.IsValid())
 	{
-		UE_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("WorldPtr not valid"));
+		CONVAI_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("WorldPtr not valid"));
 		LogAndEcecuteFailure("Activate");
 		return;
 	}
@@ -1012,7 +1013,7 @@ void UConvaiGRPCSubmitFeedbackProxy::Activate()
 	UConvaiSubsystem* ConvaiSubsystem = UConvaiUtils::GetConvaiSubsystem(WorldPtr.Get());
 	if (!ConvaiSubsystem)
 	{
-		UE_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("Convai Subsystem is not valid"));
+		CONVAI_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("Convai Subsystem is not valid"));
 		LogAndEcecuteFailure("Activate");
 		return;
 	}
@@ -1021,7 +1022,7 @@ void UConvaiGRPCSubmitFeedbackProxy::Activate()
 	stub_ = ConvaiSubsystem->gRPC_Runnable->GetNewStub();
 	if (!stub_)
 	{
-		UE_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("Could not aquire a new stub instance"));
+		CONVAI_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("Could not aquire a new stub instance"));
 		LogAndEcecuteFailure("Activate");
 		return;
 	}
@@ -1030,7 +1031,7 @@ void UConvaiGRPCSubmitFeedbackProxy::Activate()
 	cq_ = ConvaiSubsystem->gRPC_Runnable->GetCompletionQueue();
 	if (!cq_)
 	{
-		UE_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("Got an invalid completion queue instance"));
+		CONVAI_LOG(ConvaiGRPCFeedBackLog, Warning, TEXT("Got an invalid completion queue instance"));
 		LogAndEcecuteFailure("Activate");
 		return;
 	}
@@ -1089,7 +1090,7 @@ void UConvaiGRPCSubmitFeedbackProxy::OnStreamFinish(bool ok)
 
 #if ConvaiDebugMode
 	FString ThumbsUpString = ThumbsUp ? "True" : "False";
-	UE_LOG(ConvaiGRPCFeedBackLog, Log,
+	CONVAI_LOG(ConvaiGRPCFeedBackLog, Log,
 		TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
 		*InteractionID,
 		*FeedbackText,
@@ -1105,7 +1106,7 @@ void UConvaiGRPCSubmitFeedbackProxy::BeginDestroy()
 	client_context.TryCancel();
 	stub_.reset();
 	FString ThumbsUpString = ThumbsUp ? "True" : "False";
-	UE_LOG(ConvaiGRPCFeedBackLog, Log,
+	CONVAI_LOG(ConvaiGRPCFeedBackLog, Log,
 	TEXT("On Stream Finish | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
 	*InteractionID,
 	*FeedbackText,
@@ -1117,7 +1118,7 @@ void UConvaiGRPCSubmitFeedbackProxy::LogAndEcecuteFailure(FString FuncName)
 {
 	FString ThumbsUpString = ThumbsUp ? "True" : "False";
 
-	UE_LOG(ConvaiGRPCFeedBackLog, Warning,
+	CONVAI_LOG(ConvaiGRPCFeedBackLog, Warning,
 		TEXT("%s: Status.ok():%s | Debug Log:%s | Error message:%s | Error Details:%s | Error Code:%i | Interaction ID : %s | Feedback Text : %s | ThumbsUp: %s"),
 		*FString(FuncName),
 		*FString(status.ok() ? "Ok" : "Not Ok"),

@@ -90,11 +90,11 @@ void UConvaiPlayerComponent::OnComponentCreated()
 
 	if (_FoundSubmix != nullptr) {
 		AudioCaptureComponent->SoundSubmix = _FoundSubmix;
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("UConvaiPlayerComponent: Found submix \"AudioInput\""));
+		CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("UConvaiPlayerComponent: Found submix \"AudioInput\""));
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("UConvaiPlayerComponent: Audio Submix was not found, please ensure an audio submix exists at this directory: \"/ConvAI/Submixes/AudioInput\" then restart Unreal Engine"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("UConvaiPlayerComponent: Audio Submix was not found, please ensure an audio submix exists at this directory: \"/ConvAI/Submixes/AudioInput\" then restart Unreal Engine"));
 	}
 }
 
@@ -109,7 +109,7 @@ bool UConvaiPlayerComponent::Init()
 {
 	if (IsInit)
 	{
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("AudioCaptureComponent is already init"));
+		CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("AudioCaptureComponent is already init"));
 		return true;
 	}
 
@@ -126,7 +126,7 @@ bool UConvaiPlayerComponent::Init()
 	AudioCaptureComponent = Cast<UConvaiAudioCaptureComponent>(GetOwner()->GetComponentByClass(UConvaiAudioCaptureComponent::StaticClass()));
 	if (!IsValid(AudioCaptureComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("Init: AudioCaptureComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("Init: AudioCaptureComponent is not valid"));
 		return false;
 	}
 
@@ -169,7 +169,7 @@ bool UConvaiPlayerComponent::GetDefaultCaptureDeviceInfo(FCaptureDeviceInfoBP& O
 {
 	if (!IsValid(AudioCaptureComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetDefaultCaptureDeviceInfo: AudioCaptureComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("GetDefaultCaptureDeviceInfo: AudioCaptureComponent is not valid"));
 		return false;
 	}
 
@@ -180,7 +180,7 @@ bool UConvaiPlayerComponent::GetCaptureDeviceInfo(FCaptureDeviceInfoBP& OutInfo,
 {
 	if (!IsValid(AudioCaptureComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetCaptureDeviceInfo: AudioCaptureComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("GetCaptureDeviceInfo: AudioCaptureComponent is not valid"));
 		return false;
 	}
 	Audio::FCaptureDeviceInfo OutDeviceInfo;
@@ -203,7 +203,7 @@ TArray<FCaptureDeviceInfoBP> UConvaiPlayerComponent::GetAvailableCaptureDeviceDe
 	TArray<FCaptureDeviceInfoBP> FCaptureDevicesInfoBP;
 	if (!IsValid(AudioCaptureComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetAvailableCaptureDeviceDetails: AudioCaptureComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("GetAvailableCaptureDeviceDetails: AudioCaptureComponent is not valid"));
 		return FCaptureDevicesInfoBP;
 	}
 
@@ -227,7 +227,7 @@ TArray<FString> UConvaiPlayerComponent::GetAvailableCaptureDeviceNames()
 	TArray<FString> AvailableDeviceNames;
 	if (!IsValid(AudioCaptureComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetAvailableCaptureDeviceNames: AudioCaptureComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("GetAvailableCaptureDeviceNames: AudioCaptureComponent is not valid"));
 		return AvailableDeviceNames;
 	}
 
@@ -243,7 +243,7 @@ void UConvaiPlayerComponent::GetActiveCaptureDevice(FCaptureDeviceInfoBP& OutInf
 {
 	if (!IsValid(AudioCaptureComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetActiveCaptureDevice: AudioCaptureComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("GetActiveCaptureDevice: AudioCaptureComponent is not valid"));
 		return;
 	}
 	Audio::FCaptureDeviceInfo OutDeviceInfo;
@@ -260,13 +260,13 @@ bool UConvaiPlayerComponent::SetCaptureDeviceByIndex(int DeviceIndex)
 {
 	if (!IsValid(AudioCaptureComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByIndex: AudioCaptureComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByIndex: AudioCaptureComponent is not valid"));
 		return false;
 	}
 
 	if (DeviceIndex >= GetAvailableCaptureDeviceDetails().Num())
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByIndex: Invalid Device Index: %d - Max possible index: %d."), DeviceIndex, GetAvailableCaptureDeviceDetails().Num() - 1);
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByIndex: Invalid Device Index: %d - Max possible index: %d."), DeviceIndex, GetAvailableCaptureDeviceDetails().Num() - 1);
 		return false;
 	}
 
@@ -277,7 +277,7 @@ bool UConvaiPlayerComponent::SetCaptureDeviceByName(FString DeviceName)
 {
 	if (!IsValid(AudioCaptureComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: AudioCaptureComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: AudioCaptureComponent is not valid"));
 		return false;
 	}
 
@@ -297,14 +297,14 @@ bool UConvaiPlayerComponent::SetCaptureDeviceByName(FString DeviceName)
 	if (!bDeviceFound)
 	{
 		AvailableDeviceNames = GetAvailableCaptureDeviceNames();
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: Could not find Device name: %s - Available Device names are: [%s]."), *DeviceName, *FString::Join(AvailableDeviceNames, *FString(" - ")));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: Could not find Device name: %s - Available Device names are: [%s]."), *DeviceName, *FString::Join(AvailableDeviceNames, *FString(" - ")));
 		return false;
 	}
 
 	if (!SetCaptureDeviceByIndex(DeviceIndex))
 	{
 		AvailableDeviceNames = GetAvailableCaptureDeviceNames();
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: SetCaptureDeviceByIndex failed for index: %d and device name: %s - Available Device names are: [%s]."), DeviceIndex, *DeviceName, *FString::Join(AvailableDeviceNames, *FString(" - ")));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SetCaptureDeviceByName: SetCaptureDeviceByIndex failed for index: %d and device name: %s - Available Device names are: [%s]."), DeviceIndex, *DeviceName, *FString::Join(AvailableDeviceNames, *FString(" - ")));
 		return false;
 	}
 	return true;
@@ -327,7 +327,7 @@ void UConvaiPlayerComponent::SetMicrophoneVolumeMultiplier(float InVolumeMultipl
 
 	if (!IsValid(AudioCaptureComponent) && !PixelStreamingAudioComponent.IsValid())
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetMicrophoneVolumeMultiplier: AudioCaptureComponent and PixelStreamingAudioComponent are not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SetMicrophoneVolumeMultiplier: AudioCaptureComponent and PixelStreamingAudioComponent are not valid"));
 	}
 }
 
@@ -336,13 +336,13 @@ void UConvaiPlayerComponent::GetMicrophoneVolumeMultiplier(float& OutVolumeMulti
 	Success = false;
 	if (!IsValid(AudioCaptureComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SetMicrophoneVolumeMultiplier: AudioCaptureComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SetMicrophoneVolumeMultiplier: AudioCaptureComponent is not valid"));
 		return;
 	}
 	auto InternalAudioComponent = AudioCaptureComponent->GetAudioComponent();
 	if (!InternalAudioComponent)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetMicrophoneVolumeMultiplier: InternalAudioComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("GetMicrophoneVolumeMultiplier: InternalAudioComponent is not valid"));
 	}
 	OutVolumeMultiplier = InternalAudioComponent->VolumeMultiplier;
 	Success = true;
@@ -353,21 +353,21 @@ void UConvaiPlayerComponent::GetMicrophoneVolumeMultiplier(float& OutVolumeMulti
 // 	Success = false;
 // 	if (!IsValid(AudioCaptureComponent))
 // 	{
-// 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetIfHardwareFeatureIsSupported: AudioCaptureComponent is not valid"));
+// 		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("GetIfHardwareFeatureIsSupported: AudioCaptureComponent is not valid"));
 // 		return;
 // 	}
 
 // 	auto CaptureSynth = AudioCaptureComponent->GetCaptureSynth();
 // 	if (CaptureSynth == nullptr)
 // 	{
-// 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetIfHardwareFeatureIsSupported: CaptureSynth is not valid"));
+// 		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("GetIfHardwareFeatureIsSupported: CaptureSynth is not valid"));
 // 		return;
 // 	}
 
 // 	auto AudioCapture = CaptureSynth->GetAudioCapture();
 // 	if (AudioCapture == nullptr)
 // 	{
-// 		UE_LOG(ConvaiPlayerLog, Warning, TEXT("GetIfHardwareFeatureIsSupported: AudioCapture is not valid"));
+// 		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("GetIfHardwareFeatureIsSupported: AudioCapture is not valid"));
 // 		return;
 // 	}
 // 	Success = AudioCapture->GetIfHardwareFeatureIsSupported((Audio::EHardwareInputFeature)FeatureType);
@@ -448,7 +448,7 @@ void UConvaiPlayerComponent::UpdateVoiceCapture(float DeltaTime)
 void UConvaiPlayerComponent::StartVoiceChunkCapture(float ExpectedRecordingTime)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("StartVoiceChunkCapture() in VoiceCaptureComp.cpp")));
-	//UE_LOG(LogTemp, Warning, TEXT("StartVoiceChunkCapture() in VoiceCaptureComp.cpp"));
+	//CONVAI_LOG(LogTemp, Warning, TEXT("StartVoiceChunkCapture() in VoiceCaptureComp.cpp"));
 	UAudioMixerBlueprintLibrary::StartRecordingOutput(this, ExpectedRecordingTime, Cast<USoundSubmix>(AudioCaptureComponent->SoundSubmix));
 }
 
@@ -461,12 +461,12 @@ void UConvaiPlayerComponent::ReadRecordedBuffer(Audio::AlignedFloatBuffer& Recor
 
 		if (RecordedBuffer.Num() == 0)
 		{
-			//UE_LOG(ConvaiPlayerLog, Warning, TEXT("ReadRecordedBuffer: No audio data. Did you call Start Recording Output?"));
+			//CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("ReadRecordedBuffer: No audio data. Did you call Start Recording Output?"));
 		}
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("ReadRecordedBuffer: Could not get MixerDevice"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("ReadRecordedBuffer: Could not get MixerDevice"));
 	}
 }
 
@@ -520,8 +520,8 @@ void UConvaiPlayerComponent::StopVoiceChunkCapture()
 	//OutConverted = (TArray<int16>)Int16Buffer.GetArrayView();
 	//OutConverted = TArray<int16>(Int16Buffer.GetData(), Int16Buffer.GetNumSamples());
 
-	//UE_LOG(ConvaiPlayerLog, Log, TEXT("Int16Buffer.GetNumSamples() %i, NumChannels %f,  SampleRate %f"), Int16Buffer.GetNumSamples(), NumChannels, SampleRate);
-	//UE_LOG(ConvaiPlayerLog, Log, TEXT("OutConverted.Num() %i"), OutConverted.Num());
+	//CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("Int16Buffer.GetNumSamples() %i, NumChannels %f,  SampleRate %f"), Int16Buffer.GetNumSamples(), NumChannels, SampleRate);
+	//CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("OutConverted.Num() %i"), OutConverted.Num());
 
 	if (IsRecording)
 	{
@@ -547,27 +547,27 @@ void UConvaiPlayerComponent::StartRecording()
 {
 	if (IsRecording)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartRecording: already recording!"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("StartRecording: already recording!"));
 		return;
 	}
 
 	if (IsStreaming)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartRecording: already talking!"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("StartRecording: already talking!"));
 		return;
 	}
 
 	if (!IsInit)
 	{
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("StartRecording: Initializing..."));
+		CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("StartRecording: Initializing..."));
 		if (!Init())
 		{
-			UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartRecording: Could not initialize"));
+			CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("StartRecording: Could not initialize"));
 			return;
 		}
 	}
 
-	UE_LOG(ConvaiPlayerLog, Log, TEXT("Started Recording "));
+	CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("Started Recording "));
 	StartAudioCaptureComponent();    //Start the AudioCaptureComponent
 
 	// reset audio buffers
@@ -582,17 +582,17 @@ USoundWave* UConvaiPlayerComponent::FinishRecording()
 {
 	if (!IsRecording)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("FinishRecording: did not start recording"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("FinishRecording: did not start recording"));
 		return nullptr;
 	}
 
-	UE_LOG(ConvaiPlayerLog, Log, TEXT("Stopped Recording "));
+	CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("Stopped Recording "));
 	StopVoiceChunkCapture();
 
 	USoundWave* OutSoundWave = UConvaiUtils::PCMDataToSoundWav(VoiceCaptureBuffer, 1, ConvaiConstants::VoiceCaptureSampleRate);
 	StopAudioCaptureComponent();  //stop the AudioCaptureComponent
 	if (IsValid(OutSoundWave))
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("OutSoundWave->GetDuration(): %f seconds "), OutSoundWave->GetDuration());
+		CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("OutSoundWave->GetDuration(): %f seconds "), OutSoundWave->GetDuration());
 	IsRecording = false;
 	return OutSoundWave;
 }
@@ -608,22 +608,22 @@ void UConvaiPlayerComponent::StartTalking(
 {
 	if (IsStreaming)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: already talking!"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: already talking!"));
 		return;
 	}
 
 	if (IsRecording)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: already recording!"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: already recording!"));
 		return;
 	}
 
 	if (!IsInit)
 	{
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking Initializing..."));
+		CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking Initializing..."));
 		if (!Init())
 		{
-			UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking Could not initialize"));
+			CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking Could not initialize"));
 			return;
 		}
 	}
@@ -632,16 +632,16 @@ void UConvaiPlayerComponent::StartTalking(
 	{
 		if (RunOnServer)
 		{
-			UE_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking: ConvaiChatbotComponent is not valid, will still stream voice chat to network"));
+			CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("StartTalking: ConvaiChatbotComponent is not valid, will still stream voice chat to network"));
 		}
 		else
 		{
-			UE_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: ConvaiChatbotComponent is not valid"));
+			CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("StartTalking: ConvaiChatbotComponent is not valid"));
 			return;
 		}
 	}
 
-	UE_LOG(ConvaiPlayerLog, Log, TEXT("Started Talking"));
+	CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("Started Talking"));
 
 	StartAudioCaptureComponent();    //Start the AudioCaptureComponent
 
@@ -682,7 +682,7 @@ void UConvaiPlayerComponent::FinishTalking()
 {
 	if (!IsStreaming)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking did not start talking"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking did not start talking"));
 		return;
 	}
 
@@ -701,17 +701,17 @@ void UConvaiPlayerComponent::FinishTalking()
 
 		if (IsValid(CurrentConvaiChatbotComponent))
 		{
-			UE_LOG(ConvaiPlayerLog, Log, TEXT("FinishTalking calling FinishGetResponseStream"));
+			CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("FinishTalking calling FinishGetResponseStream"));
 			CurrentConvaiChatbotComponent->FinishGetResponseStream(this);
 			CurrentConvaiChatbotComponent = nullptr;
 		}
 		else
 		{
-			UE_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking failed to call FinishGetResponseStream"));
+			CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking failed to call FinishGetResponseStream"));
 		}
 	}
 
-	UE_LOG(ConvaiPlayerLog, Log, TEXT("Finished Talking"));
+	CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("Finished Talking"));
 }
 
 void UConvaiPlayerComponent::StartTalkingServer_Implementation(
@@ -765,13 +765,13 @@ void UConvaiPlayerComponent::FinishTalkingServer_Implementation()
 
 	if (IsValid(CurrentConvaiChatbotComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Log, TEXT("FinishTalking calling FinishGetResponseStream"));
+		CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("FinishTalking calling FinishGetResponseStream"));
 		CurrentConvaiChatbotComponent->FinishGetResponseStream(this);
 		CurrentConvaiChatbotComponent = nullptr;
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking failed to call FinishGetResponseStream"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("FinishTalking failed to call FinishGetResponseStream"));
 	}
 }
 
@@ -780,21 +780,21 @@ void UConvaiPlayerComponent::SendText(UConvaiChatbotComponent* ConvaiChatbotComp
 	//FString Error;
 	//if (GenerateActions && !UConvaiActions::ValidateEnvironment(Environment, Error))
 	//{
-	//	UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendText: %s"), *Error);
-	//	UE_LOG(ConvaiPlayerLog, Log, TEXT("SendText: Environment object seems to have issues -> setting GenerateActions to false"));
+	//	CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SendText: %s"), *Error);
+	//	CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("SendText: Environment object seems to have issues -> setting GenerateActions to false"));
 	//	GenerateActions = false;
 	//}
 
 
 	if (!IsValid(ConvaiChatbotComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendText: ConvaiChatbotComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SendText: ConvaiChatbotComponent is not valid"));
 		return;
 	}
 
 	if (Text.Len() == 0)
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendText: Text is empty"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SendText: Text is empty"));
 		return;
 	}
 
@@ -844,7 +844,7 @@ void UConvaiPlayerComponent::SendTextServer_Implementation(
 {
 	if (!IsValid(ConvaiChatbotComponent))
 	{
-		UE_LOG(ConvaiPlayerLog, Warning, TEXT("SendTextServer: ConvaiChatbotComponent is not valid"));
+		CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("SendTextServer: ConvaiChatbotComponent is not valid"));
 		return;
 	}
 
@@ -888,7 +888,7 @@ void UConvaiPlayerComponent::OnServerAudioReceived(uint8* VoiceData, uint32 Voic
 	//if (IsStreaming)
 	//	VoiceCaptureRingBuffer.Enqueue(VoiceData, VoiceDataSize);
 
-	//UE_LOG(ConvaiPlayerLog, Log, TEXT("OnServerAudioReceived received %d bytes"), VoiceDataSize);
+	//CONVAI_LOG(ConvaiPlayerLog, Log, TEXT("OnServerAudioReceived received %d bytes"), VoiceDataSize);
 	//onDataReceived_Delegate.ExecuteIfBound();
 
 	// Simply enque the data into the ring buffer
@@ -905,14 +905,14 @@ void UConvaiPlayerComponent::BeginPlay()
 	}
 	else
 	{
-		UE_LOG(ConvaiPlayerLog, Error, TEXT("Could not attach AudioCaptureComponent"));
+		CONVAI_LOG(ConvaiPlayerLog, Error, TEXT("Could not attach AudioCaptureComponent"));
 	}
 
 	if (!IsInit)
 	{
 		if (!Init())
 		{
-			UE_LOG(ConvaiPlayerLog, Warning, TEXT("Could not initialize Audio Decoder"));
+			CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("Could not initialize Audio Decoder"));
 			return;
 		}
 	}

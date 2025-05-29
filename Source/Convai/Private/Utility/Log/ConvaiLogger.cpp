@@ -53,7 +53,8 @@ void FConvaiLogger::StartThread()
         TEXT("ConvaiLoggerThread"),
         0,
         TPri_BelowNormal
-    );}
+    );
+}
 
 void FConvaiLogger::ShutdownThread()
 {

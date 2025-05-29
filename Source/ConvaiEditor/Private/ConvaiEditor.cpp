@@ -8,6 +8,7 @@
 #include "DetailWidgetRow.h"
 #include "../Convai.h"
 #include "EditorUtilityWidgetBlueprint.h"
+#include "Utility/Log/ConvaiLogger.h"
 
 #define LOCTEXT_NAMESPACE "FConvaiEditorModule"
 
@@ -84,16 +85,16 @@ FReply FConvaiEditorSettingsCustomization::OnSpawnTabClicked()
         if (UEditorUtilitySubsystem* Subsystem = GEditor->GetEditorSubsystem<UEditorUtilitySubsystem>())
         {
             Subsystem->SpawnAndRegisterTab(WidgetBlueprint);
-            UE_LOG(LogTemp, Log, TEXT("Successfully spawned the Editor Utility Widget: %s"), *WidgetPath);
+            CONVAI_LOG(LogTemp, Log, TEXT("Successfully spawned the Editor Utility Widget: %s"), *WidgetPath);
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Failed to get Editor Utility Subsystem."));
+            CONVAI_LOG(LogTemp, Warning, TEXT("Failed to get Editor Utility Subsystem."));
         }
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to load Editor Utility Widget Blueprint at path: %s"), *WidgetPath);
+        CONVAI_LOG(LogTemp, Error, TEXT("Failed to load Editor Utility Widget Blueprint at path: %s"), *WidgetPath);
     }
 
     return FReply::Handled();

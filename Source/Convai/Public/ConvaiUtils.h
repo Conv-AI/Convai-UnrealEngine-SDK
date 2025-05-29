@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "ConvaiDefinitions.h"
+#include "Utility/Log/ConvaiLogger.h"
 #include "ConvaiUtils.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiUtilsLog, Log, All);
@@ -152,7 +153,7 @@ public:
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Empty API Key, please add it in Edit->Project Settings->Convai"));
+			CONVAI_LOG(LogTemp, Warning, TEXT("Empty API Key, please add it in Edit->Project Settings->Convai"));
 			return false;
 		}
 	}
@@ -165,7 +166,7 @@ public:
 		}
 		else
 		{
-			UE_LOG(ConvaiFormValidationLog, Warning, TEXT("Empty Session ID"));
+			CONVAI_LOG(ConvaiFormValidationLog, Warning, TEXT("Empty Session ID"));
 			return false;
 		}
 	}
@@ -178,7 +179,7 @@ public:
 		}
 		else
 		{
-			UE_LOG(ConvaiFormValidationLog, Warning, TEXT("Empty Character ID"));
+			CONVAI_LOG(ConvaiFormValidationLog, Warning, TEXT("Empty Character ID"));
 			return false;
 		}
 	}
@@ -191,7 +192,7 @@ public:
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Empty Input Text"));
+			CONVAI_LOG(LogTemp, Warning, TEXT("Empty Input Text"));
 			return false;
 		}
 	}
@@ -204,7 +205,7 @@ public:
 		}
 		else
 		{
-			UE_LOG(ConvaiFormValidationLog, Warning, TEXT("Invalid Voice Type"));
+			CONVAI_LOG(ConvaiFormValidationLog, Warning, TEXT("Invalid Voice Type"));
 			return false;
 		}
 	}
@@ -217,7 +218,7 @@ public:
 		}
 		else
 		{
-			UE_LOG(ConvaiFormValidationLog, Warning, TEXT("Empty Backstory"));
+			CONVAI_LOG(ConvaiFormValidationLog, Warning, TEXT("Empty Backstory"));
 			return false;
 		}
 	}
@@ -230,7 +231,7 @@ public:
 		}
 		else
 		{
-			UE_LOG(ConvaiFormValidationLog, Warning, TEXT("Empty Character Name"));
+			CONVAI_LOG(ConvaiFormValidationLog, Warning, TEXT("Empty Character Name"));
 			return false;
 		}
 	}
@@ -243,7 +244,7 @@ public:
 		}
 		else
 		{
-			UE_LOG(ConvaiFormValidationLog, Warning, TEXT("Input Voice is too short (less than 44 bytes)"));
+			CONVAI_LOG(ConvaiFormValidationLog, Warning, TEXT("Input Voice is too short (less than 44 bytes)"));
 			return false;
 		}
 	}

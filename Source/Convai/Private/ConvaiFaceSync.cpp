@@ -136,7 +136,7 @@ void UConvaiFaceSyncComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 		}
 		SequenceCriticalSection.Unlock();
 
-		// UE_LOG(ConvaiFaceSyncLog, Log, TEXT("Evaluate: FrameIndex:%d Alpha: %f FramesLeft: %d"), FrameIndex, Alpha, MainSequenceBuffer.AnimationFrames.Num() - BufferIndex);
+		// CONVAI_LOG(ConvaiFaceSyncLog, Log, TEXT("Evaluate: FrameIndex:%d Alpha: %f FramesLeft: %d"), FrameIndex, Alpha, MainSequenceBuffer.AnimationFrames.Num() - BufferIndex);
 
 		//CurrentBlendShapesMap = StartFrame;
 		CurrentBlendShapesMap = InterpolateFrames(StartFrame, EndFrame, Alpha);
@@ -198,17 +198,17 @@ void UConvaiFaceSyncComponent::StartRecordingLipSync()
 {
 	if (IsRecordingLipSync)
 	{
-		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("Cannot start Recording LipSync while already recording LipSync"));
+		CONVAI_LOG(ConvaiFaceSyncLog, Warning, TEXT("Cannot start Recording LipSync while already recording LipSync"));
 		return;
 	}
 
-	UE_LOG(ConvaiFaceSyncLog, Log, TEXT("Started Recording LipSync"));
+	CONVAI_LOG(ConvaiFaceSyncLog, Log, TEXT("Started Recording LipSync"));
 	IsRecordingLipSync = true;
 }
 
 FAnimationSequenceBP UConvaiFaceSyncComponent::FinishRecordingLipSync()
 {
-	UE_LOG(ConvaiFaceSyncLog, Log, TEXT("Finished Recording LipSync - Total Frames: %d - Duration: %f"), RecordedSequenceBuffer.AnimationFrames.Num(), RecordedSequenceBuffer.Duration);
+	CONVAI_LOG(ConvaiFaceSyncLog, Log, TEXT("Finished Recording LipSync - Total Frames: %d - Duration: %f"), RecordedSequenceBuffer.AnimationFrames.Num(), RecordedSequenceBuffer.Duration);
 
 	if (!IsRecordingLipSync)
 		return FAnimationSequenceBP();
@@ -227,38 +227,38 @@ bool UConvaiFaceSyncComponent::PlayRecordedLipSync(FAnimationSequenceBP Recorded
 {
 	if (!IsValidSequence(RecordedLipSync.AnimationSequence))
 	{
-		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("Recorded LipSync is not valid - Total Frames: %d - Duration: %f"), RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
+		CONVAI_LOG(ConvaiFaceSyncLog, Warning, TEXT("Recorded LipSync is not valid - Total Frames: %d - Duration: %f"), RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
 		return false;
 	}
 
 	if (IsRecordingLipSync)
 	{
-		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("Cannot Play Recorded LipSync while Recording LipSync"));
+		CONVAI_LOG(ConvaiFaceSyncLog, Warning, TEXT("Cannot Play Recorded LipSync while Recording LipSync"));
 		return false;
 	}
 
 	if (IsValidSequence(MainSequenceBuffer))
 	{
-		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("Playing Recorded LipSync and stopping currently playing LipSync"));
+		CONVAI_LOG(ConvaiFaceSyncLog, Warning, TEXT("Playing Recorded LipSync and stopping currently playing LipSync"));
 		ConvaiStopLipSync();
 	}
 
 	if (StartFrame > 0 && StartFrame > RecordedLipSync.AnimationSequence.AnimationFrames.Num() - 1)
 	{
-		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("StartFrame is greater than the recorded LipSync - StartFrame: %d Total Frames: %d - Duration: %f"), StartFrame, RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
+		CONVAI_LOG(ConvaiFaceSyncLog, Warning, TEXT("StartFrame is greater than the recorded LipSync - StartFrame: %d Total Frames: %d - Duration: %f"), StartFrame, RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
 		return false;
 	}
 
 
 	if (EndFrame > 0 && EndFrame < StartFrame)
 	{
-		UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("StartFrame cannot be greater than the EndFrame"));
+		CONVAI_LOG(ConvaiFaceSyncLog, Warning, TEXT("StartFrame cannot be greater than the EndFrame"));
 		return false;
 	}
 
 	//if (EndFrame > 0 && EndFrame > RecordedLipSync.AnimationSequence.AnimationFrames.Num() - 1)
 	//{
-	//	UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("EndFrame is greater than the recorded LipSync - EndFrame: %d Total Frames: %d - Duration: %f"), EndFrame, RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
+	//	CONVAI_LOG(ConvaiFaceSyncLog, Warning, TEXT("EndFrame is greater than the recorded LipSync - EndFrame: %d Total Frames: %d - Duration: %f"), EndFrame, RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
 	//	return false;
 	//}
 	
@@ -285,7 +285,7 @@ bool UConvaiFaceSyncComponent::PlayRecordedLipSync(FAnimationSequenceBP Recorded
 		RecordedLipSync.AnimationSequence.Duration = OverwriteDuration;
 	}
 
-	UE_LOG(ConvaiFaceSyncLog, Log, TEXT("Playing Recorded LipSync - Total Frames: %d - Duration: %f"), RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
+	CONVAI_LOG(ConvaiFaceSyncLog, Log, TEXT("Playing Recorded LipSync - Total Frames: %d - Duration: %f"), RecordedLipSync.AnimationSequence.AnimationFrames.Num(), RecordedLipSync.AnimationSequence.Duration);
 	ConvaiApplyPrecomputedFacialAnimation(nullptr, 0, 0, 0, RecordedLipSync.AnimationSequence);
 	return true;
 }
@@ -342,5 +342,5 @@ void UConvaiFaceSyncComponent::ConvaiStopLipSync()
 	ClearMainSequence();
 	SetCurrentFrametoZero();
 	OnVisemesDataReady.ExecuteIfBound();
-	// UE_LOG(ConvaiFaceSyncLog, Warning, TEXT("Stopping LipSync"));
+	// CONVAI_LOG(ConvaiFaceSyncLog, Warning, TEXT("Stopping LipSync"));
 }

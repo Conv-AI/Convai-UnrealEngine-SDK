@@ -198,7 +198,7 @@ uint32 FgRPCClient::Run()
 {
     void* got_tag;
     bool ok = false;
-	UE_LOG(ConvaiSubsystemLog, Log, TEXT("Start Run"));
+	CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Start Run"));
 
     // Block until the next result is available in the completion queue "cq
 	while (bIsRunning && cq_.Next(&got_tag, &ok)) {
@@ -212,16 +212,16 @@ uint32 FgRPCClient::Run()
 			}
 			else
 			{
-				UE_LOG(ConvaiSubsystemLog, Log, TEXT("Could not run gRPC delegate due to thread closing down"));
+				CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Could not run gRPC delegate due to thread closing down"));
 			}
 		}
 		else
 		{
-			UE_LOG(ConvaiSubsystemLog, Log, TEXT("Bad got_tag"));
+			CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Bad got_tag"));
 		}
 
     }
-	UE_LOG(ConvaiSubsystemLog, Log, TEXT("End Run"));
+	CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("End Run"));
 
 	return 0;
 }
@@ -237,7 +237,7 @@ void FgRPCClient::StartStub()
 
 void FgRPCClient::CreateChannel()
 {
-	UE_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC Creating Channel..."));
+	CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC Creating Channel..."));
 	grpc::ChannelArguments args;
 	args.SetMaxReceiveMessageSize(2147483647);
 
@@ -260,18 +260,18 @@ void FgRPCClient::OnStateChange(bool ok)
 	{
 		if (!bIsRunning)
 		{
-			UE_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel state changed to %s... Attempting to reconnect"), *FString(grpc_connectivity_state_str[state]));
+			CONVAI_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel state changed to %s... Attempting to reconnect"), *FString(grpc_connectivity_state_str[state]));
 			CreateChannel();
 		}
 		else
 		{
-			UE_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC channel state changed to %s... Closing"), *FString(grpc_connectivity_state_str[state]));
+			CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC channel state changed to %s... Closing"), *FString(grpc_connectivity_state_str[state]));
 		}
 		//Channel->NotifyOnStateChange(state, std::chrono::system_clock::time_point().max(), &cq_, (void*)&OnStateChangeDelegate);
 	}
 	else
 	{
-		UE_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC channel state changed to %s"), *FString(grpc_connectivity_state_str[state]));
+		CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC channel state changed to %s"), *FString(grpc_connectivity_state_str[state]));
 		Channel->NotifyOnStateChange(state, std::chrono::system_clock::time_point().max(), &cq_, (void*)&OnStateChangeDelegate);
 	}
 }
@@ -312,7 +312,7 @@ std::unique_ptr<ConvaiService::Stub> FgRPCClient::GetNewStub()
 
 	if (state != grpc_connectivity_state::GRPC_CHANNEL_READY)
 	{
-		UE_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel not ready yet.. Current State: %s"), *FString(grpc_connectivity_state_str[state]));
+		CONVAI_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel not ready yet.. Current State: %s"), *FString(grpc_connectivity_state_str[state]));
 	}
 	return ConvaiService::NewStub(Channel);
 }
@@ -340,7 +340,7 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			{
 				// Convert string to bool
 				AllowInsecureConnection = InsecureConnectionStr.ToBool();
-				UE_LOG(ConvaiSubsystemLog, Log, TEXT("Using insecure connection setting from command line: %s"), 
+				CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Using insecure connection setting from command line: %s"), 
 					AllowInsecureConnection ? TEXT("true") : TEXT("false"));
 			}
 			else
@@ -372,7 +372,7 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			if (!CommandLineURL.IsEmpty())
 			{
 				URL = CommandLineURL;
-				UE_LOG(ConvaiSubsystemLog, Log, TEXT("Using stream URL from command line: %s"), *URL);
+				CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Using stream URL from command line: %s"), *URL);
 			}
 			// If settings URL is empty, use default
 			else if (URL.IsEmpty())
@@ -385,7 +385,7 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			//gRPC_Runnable = MakeShareable(new FgRPCClient(std::string("0.tcp.us-cal-1.ngrok.io:13976"), channel_creds));
 
 			gRPC_Runnable->StartStub();
-			UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Started"));
+			CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Started"));
 
 	#if PLATFORM_ANDROID
 			GetAndroidMicPermission();
@@ -397,7 +397,7 @@ void UConvaiSubsystem::Deinitialize()
 {
 	gRPC_Runnable->Exit();
 	Super::Deinitialize();
-	UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Stopped"));
+	CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Stopped"));
 }
 
 void UConvaiSubsystem::GetAndroidMicPermission()

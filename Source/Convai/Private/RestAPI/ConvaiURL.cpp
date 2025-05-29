@@ -32,7 +32,7 @@ void UConvaiURL::InitializeURLConfig()
     if (!SettingsBetaURL.IsEmpty())
     {
         CustomBetaBaseURL = SettingsBetaURL;
-        UE_LOG(LogTemp, Log, TEXT("Using beta URL from settings: %s"), *CustomBetaBaseURL);
+        CONVAI_LOG(LogTemp, Log, TEXT("Using beta URL from settings: %s"), *CustomBetaBaseURL);
     }
 
     FString SettingsProdURL = Convai::Get().GetConvaiSettings()->CustomProdURL;
@@ -41,7 +41,7 @@ void UConvaiURL::InitializeURLConfig()
     if (!SettingsProdURL.IsEmpty())
     {
         CustomProdBaseURL = SettingsProdURL;
-        UE_LOG(LogTemp, Log, TEXT("Using prod URL from settings: %s"), *CustomProdBaseURL);
+        CONVAI_LOG(LogTemp, Log, TEXT("Using prod URL from settings: %s"), *CustomProdBaseURL);
     }
 
     // Then check command line parameters (these will override settings if present)
@@ -49,14 +49,14 @@ void UConvaiURL::InitializeURLConfig()
     if (FParse::Value(FCommandLine::Get(), TEXT("ConvaiBetaURL="), BetaURL))
     {
         CustomBetaBaseURL = BetaURL;
-        UE_LOG(LogTemp, Log, TEXT("Using custom beta URL from command line: %s"), *CustomBetaBaseURL);
+        CONVAI_LOG(LogTemp, Log, TEXT("Using custom beta URL from command line: %s"), *CustomBetaBaseURL);
     }
 
     FString ProdURL;
     if (FParse::Value(FCommandLine::Get(), TEXT("ConvaiProdURL="), ProdURL))
     {
         CustomProdBaseURL = ProdURL;
-        UE_LOG(LogTemp, Log, TEXT("Using custom prod URL from command line: %s"), *CustomProdBaseURL);
+        CONVAI_LOG(LogTemp, Log, TEXT("Using custom prod URL from command line: %s"), *CustomProdBaseURL);
     }
 
     bURLConfigInitialized = true;
@@ -139,7 +139,7 @@ FString UConvaiURL::GetEndpoint(EConvaiEndpoint Endpoint)
         Api = FString(NARRATIVE_DESIGN_SUBDOMAIN) + TEXT("list-triggers");
         break;
     default:
-        UE_LOG(LogTemp, Warning, TEXT("Invalid endpoint!"));
+        CONVAI_LOG(LogTemp, Warning, TEXT("Invalid endpoint!"));
         return FString();
     }
 

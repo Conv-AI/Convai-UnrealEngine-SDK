@@ -33,7 +33,7 @@
 #define OPUS_CHECK_CTL(Category, CTL) \
 	if (ErrCode != OPUS_OK) \
 	{ \
-		UE_LOG(Category, Warning, TEXT("Failure to get CTL %s"), #CTL); \
+		CONVAI_LOG(Category, Warning, TEXT("Failure to get CTL %s"), #CTL); \
 	}
 
 
@@ -53,7 +53,7 @@ void UConvaiAudioStreamer::BroadcastVoiceDataToClients_Implementation(TArray<uin
 	{
 		DestroyOpusDecoder();
 		InitDecoder(SampleRate, NumChannels);
-		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Initialized Decoder with SampleRate:%d and Channels:%d"), DecoderSampleRate, DecoderNumChannels);
+		CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Initialized Decoder with SampleRate:%d and Channels:%d"), DecoderSampleRate, DecoderNumChannels);
 	}
 
 
@@ -64,7 +64,7 @@ void UConvaiAudioStreamer::BroadcastVoiceDataToClients_Implementation(TArray<uin
 
 	// Decode the Audio data
 	uint32 outsize = ReceivedEncodedAudioDataBuffer.GetAllocatedSize();
-	//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Allocated buffer size for decoding: %d bytes"), outsize);
+	//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Allocated buffer size for decoding: %d bytes"), outsize);
 
 	Decode(EncodedVoiceData.GetData(), EncodedVoiceData.Num(), ReceivedEncodedAudioDataBuffer.GetData(), outsize);
 
@@ -81,7 +81,7 @@ void UConvaiAudioStreamer::BroadcastVoiceDataToClients_Implementation(TArray<uin
 		OnServerAudioReceived(ReceivedEncodedAudioDataBuffer.GetData(), outsize, false, SampleRate, NumChannels);
 	}
 
-	//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Decoder Received %d bytes and Outputted %d bytes"), EncodedVoiceData.Num(), outsize);
+	//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Decoder Received %d bytes and Outputted %d bytes"), EncodedVoiceData.Num(), outsize);
 }
 
 //void UConvaiAudioStreamer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -123,7 +123,7 @@ namespace
 	{
 		if (!WeakSelf.IsValid() || !IsValid(WeakSelf->GetWorld()))
 		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Object or World is Invalid!"));
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Object or World is Invalid!"));
 			return;
 		}
 
@@ -156,7 +156,7 @@ namespace
 		}
 		else
 		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Object or World became invalid before setting timer!"));
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Object or World became invalid before setting timer!"));
 		}
 	}
 
@@ -228,7 +228,7 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
         }
         else if (!ParseSuccess)
         {
-            UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Failed to parse wav header, reason: %s"), *ErrorReason);
+            CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Failed to parse wav header, reason: %s"), *ErrorReason);
         }
     }
 
@@ -293,8 +293,8 @@ void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize,
         SoundWaveProcedural->bDebug = true;
         SoundWaveProcedural->VirtualizationMode = EVirtualizationMode::PlayWhenSilent;
 
-        UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("New SampleRate: %d"), SampleRate);
-        UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("New Channels: %d"), NumChannels);
+        CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("New SampleRate: %d"), SampleRate);
+        CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("New Channels: %d"), NumChannels);
 
         // Create a copy of the audio data for thread safety
         TArray<uint8> AudioDataCopy;
@@ -426,7 +426,7 @@ void UConvaiAudioStreamer::StopVoiceWithFade(float InVoiceFadeOutDuration)
 
 	if (!IsValid(GetWorld()))
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: GetWorld() is Invalid!"));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: GetWorld() is Invalid!"));
 		return;
 	}
 
@@ -469,7 +469,7 @@ void UConvaiAudioStreamer::ClearAudioFinishedTimer()
 {
 	if (!IsValid(GetWorld()))
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("ClearAudioFinishedTimer: GetWorld() is Invalid!"));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("ClearAudioFinishedTimer: GetWorld() is Invalid!"));
 		return;
 	}
 	GetWorld()->GetTimerManager().ClearTimer(AudioFinishedTimerHandle);
@@ -650,7 +650,7 @@ void UConvaiAudioStreamer::TransitionToState(EAudioLipSyncState NewState)
         case EAudioLipSyncState::WaitingOnAudio: NewStateStr = TEXT("WaitingOnAudio"); break;
     }
     
-    UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("State transition: %s -> %s"), 
+    CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("State transition: %s -> %s"), 
         CurrentStateStr, NewStateStr);
         
     CurrentState = NewState;
@@ -1032,8 +1032,8 @@ void UConvaiAudioStreamer::TickComponent(float DeltaTime, ELevelTick TickType, F
 		// Free the Encoded data buffer
 		free(CurrentEncodedAudioDataPtr);
 
-		//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Encoder Received %d bytes and Outputted %d bytes"), SizeOfDataBeforeEncoding, CurrentEncodedAudioDataSize);
-		//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Remaining %d bytes"), AudioDataBuffer.Num());
+		//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Encoder Received %d bytes and Outputted %d bytes"), SizeOfDataBeforeEncoding, CurrentEncodedAudioDataSize);
+		//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Remaining %d bytes"), AudioDataBuffer.Num());
 	}
 }
 
@@ -1191,7 +1191,7 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 		}
 		else if (!ParseSuccess)
 		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Failed to parse wav header, reason: %s"), *ErrorReason);
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Failed to parse wav header, reason: %s"), *ErrorReason);
 		}
 	}
 
@@ -1219,7 +1219,7 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 			AudioDataBuffer.Reset();
 			DestroyOpusEncoder();
 			InitEncoder(InSampleRate, InNumChannels, EAudioEncodeHint::VoiceEncode_Voice);
-			UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Initialized Encoder with SampleRate:%d and Channels:%d"), EncoderSampleRate, EncoderNumChannels);
+			CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Initialized Encoder with SampleRate:%d and Channels:%d"), EncoderSampleRate, EncoderNumChannels);
 		}
 		AudioDataBuffer.Append((uint8*)OutConverted.GetData(), OutConverted.Num()*2);
 	}
@@ -1266,7 +1266,7 @@ void UConvaiAudioStreamer::onAudioStarted()
 
 void UConvaiAudioStreamer::onAudioFinished()
 {
-    UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("onAudioFinished"));
+    CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("onAudioFinished"));
     
     // Reset the audio end time
     AudioEndTime = 0.0;
@@ -1311,13 +1311,13 @@ bool UConvaiAudioStreamer::InitEncoder(int32 InSampleRate, int32 InNumChannels, 
 		InSampleRate != 24000 &&
 		InSampleRate != 48000)
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice encoder doesn't support %d hz"), InSampleRate);
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice encoder doesn't support %d hz"), InSampleRate);
 		return false;
 	}
 
 	if (InNumChannels < 1 || InNumChannels > 2)
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice encoder only supports 1 or 2 channels"));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice encoder only supports 1 or 2 channels"));
 		return false;
 	}
 
@@ -1357,7 +1357,7 @@ bool UConvaiAudioStreamer::InitEncoder(int32 InSampleRate, int32 InNumChannels, 
 	}
 	else
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to init Opus Encoder: %s"), ANSI_TO_TCHAR(opus_strerror(EncError)));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to init Opus Encoder: %s"), ANSI_TO_TCHAR(opus_strerror(EncError)));
 		DestroyOpus();
 	}
 
@@ -1377,7 +1377,7 @@ int32 UConvaiAudioStreamer::Encode(const uint8* RawPCMData, uint32 RawDataSize, 
 	const int32 DataRemainder = RawDataSize - NumFramesToEncode * BytesPerFrame;
 	const int32 RawDataStride = BytesPerFrame;
 
-	//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("NumFramesToEncode %d frames"), NumFramesToEncode);
+	//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("NumFramesToEncode %d frames"), NumFramesToEncode);
 
 
 	if (NumFramesToEncode == 0)
@@ -1411,7 +1411,7 @@ int32 UConvaiAudioStreamer::Encode(const uint8* RawPCMData, uint32 RawDataSize, 
 		if (CompressedLength < 0)
 		{
 			const char* ErrorStr = opus_strerror(CompressedLength);
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to encode: [%d] %s"), CompressedLength, ANSI_TO_TCHAR(ErrorStr));
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to encode: [%d] %s"), CompressedLength, ANSI_TO_TCHAR(ErrorStr));
 
 			// Mark header as nothing encoded
 			OutCompressedData[0] = 0;
@@ -1428,7 +1428,7 @@ int32 UConvaiAudioStreamer::Encode(const uint8* RawPCMData, uint32 RawDataSize, 
 		}
 		else
 		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Nothing to encode!"));
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Nothing to encode!"));
 			CompressedOffsets[i] = 0;
 		}
 	}
@@ -1436,7 +1436,7 @@ int32 UConvaiAudioStreamer::Encode(const uint8* RawPCMData, uint32 RawDataSize, 
 	// End of buffer
 	OutCompressedDataSize = HeaderSize + CompressedBufferOffset;
 
-	UE_LOG(ConvaiAudioStreamerLog, Verbose, TEXT("OpusEncode[%d]: RawSize: %d HeaderSize: %d CompressedSize: %d NumFramesEncoded: %d Remains: %d"), EncoderGeneration, RawDataSize, HeaderSize, OutCompressedDataSize, NumFramesToEncode, DataRemainder);
+	CONVAI_LOG(ConvaiAudioStreamerLog, Verbose, TEXT("OpusEncode[%d]: RawSize: %d HeaderSize: %d CompressedSize: %d NumFramesEncoded: %d Remains: %d"), EncoderGeneration, RawDataSize, HeaderSize, OutCompressedDataSize, NumFramesToEncode, DataRemainder);
 
 	EncoderGeneration = (EncoderGeneration + 1) % MAX_uint8;
 	return DataRemainder;
@@ -1453,7 +1453,7 @@ void UConvaiAudioStreamer::DestroyOpusEncoder()
 
 bool UConvaiAudioStreamer::InitDecoder(int32 InSampleRate, int32 InNumChannels)
 {
-	UE_LOG(ConvaiAudioStreamerLog, Display, TEXT("DecoderVersion: %s"), ANSI_TO_TCHAR(opus_get_version_string()));
+	CONVAI_LOG(ConvaiAudioStreamerLog, Display, TEXT("DecoderVersion: %s"), ANSI_TO_TCHAR(opus_get_version_string()));
 
 	if (InSampleRate != 8000 &&
 		InSampleRate != 12000 &&
@@ -1461,13 +1461,13 @@ bool UConvaiAudioStreamer::InitDecoder(int32 InSampleRate, int32 InNumChannels)
 		InSampleRate != 24000 &&
 		InSampleRate != 48000)
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice decoder doesn't support %d hz"), InSampleRate);
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice decoder doesn't support %d hz"), InSampleRate);
 		return false;
 	}
 
 	if (InNumChannels < 1 || InNumChannels > 2)
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice decoder only supports 1 or 2 channels"));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice decoder only supports 1 or 2 channels"));
 		return false;
 	}
 
@@ -1489,7 +1489,7 @@ bool UConvaiAudioStreamer::InitDecoder(int32 InSampleRate, int32 InNumChannels)
 	}
 	else
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to init Opus Decoder: %s"), ANSI_TO_TCHAR(opus_strerror(DecError)));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to init Opus Decoder: %s"), ANSI_TO_TCHAR(opus_strerror(DecError)));
 		DestroyOpus();
 	}
 
@@ -1540,11 +1540,11 @@ void UConvaiAudioStreamer::Decode(const uint8* InCompressedData, uint32 Compress
 	const int32 NumFramesToDecode = InCompressedData[0];
 	const int32 PacketGeneration = InCompressedData[1];
 
-	//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("NumFramesToDecode %d frames"), NumFramesToDecode);
+	//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("NumFramesToDecode %d frames"), NumFramesToDecode);
 
 	if (PacketGeneration != DecoderLastGeneration + 1)
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Packet generation skipped from %d to %d"), DecoderLastGeneration, PacketGeneration);
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Packet generation skipped from %d to %d"), DecoderLastGeneration, PacketGeneration);
 	}
 
 	if ((NumFramesToDecode > 0) && (NumFramesToDecode <= MaxFramesEncoded))
@@ -1583,13 +1583,13 @@ void UConvaiAudioStreamer::Decode(const uint8* InCompressedData, uint32 Compress
 						if (NumDecompressedSamples < 0)
 						{
 							const char* ErrorStr = opus_strerror(NumDecompressedSamples);
-							UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: [%d] %s"), NumDecompressedSamples, ANSI_TO_TCHAR(ErrorStr));
+							CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: [%d] %s"), NumDecompressedSamples, ANSI_TO_TCHAR(ErrorStr));
 						}
 						else
 						{
 							if (NumDecompressedSamples != DecoderFrameSize)
 							{
-								UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Unexpected decode result NumSamplesDecoded %d != FrameSize %d"), NumDecompressedSamples, DecoderFrameSize);
+								CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Unexpected decode result NumSamplesDecoded %d != FrameSize %d"), NumDecompressedSamples, DecoderFrameSize);
 							}
 
 							// Advance within the decompressed output stream
@@ -1602,13 +1602,13 @@ void UConvaiAudioStreamer::Decode(const uint8* InCompressedData, uint32 Compress
 					}
 					else
 					{
-						UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Decompression buffer skipped a frame"));
+						CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Decompression buffer skipped a frame"));
 						// Nothing to advance within the compressed input stream
 					}
 				}
 				else
 				{
-					UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Decompression buffer too small to decode voice"));
+					CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Decompression buffer too small to decode voice"));
 					break;
 				}
 			}
@@ -1617,17 +1617,17 @@ void UConvaiAudioStreamer::Decode(const uint8* InCompressedData, uint32 Compress
 		}
 		else
 		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: header corrupted"));
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: header corrupted"));
 			OutRawDataSize = 0;
 		}
 	}
 	else
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: buffer corrupted"));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: buffer corrupted"));
 		OutRawDataSize = 0;
 	}
 
-	UE_LOG(ConvaiAudioStreamerLog, Verbose, TEXT("OpusDecode[%d]: RawSize: %d HeaderSize: %d CompressedSize: %d NumFramesDecoded: %d "), PacketGeneration, OutRawDataSize, HeaderSize, CompressedDataSize, NumFramesToDecode);
+	CONVAI_LOG(ConvaiAudioStreamerLog, Verbose, TEXT("OpusDecode[%d]: RawSize: %d HeaderSize: %d CompressedSize: %d NumFramesDecoded: %d "), PacketGeneration, OutRawDataSize, HeaderSize, CompressedDataSize, NumFramesToDecode);
 
 	DecoderLastGeneration = PacketGeneration;
 }

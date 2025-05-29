@@ -23,7 +23,7 @@ void UFetchNarrativeSectionsProxy::Activate()
 
 	if (!World)
 	{
-		UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -31,7 +31,7 @@ void UFetchNarrativeSectionsProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
@@ -46,7 +46,7 @@ void UFetchNarrativeSectionsProxy::Activate()
 		|| !UConvaiFormValidation::ValidateCharacterID(CharacterId)
 		)
 	{
-		UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("UFetchNarrativeSectionsProxy::Activate Invalid Character or API key"));
+		CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("UFetchNarrativeSectionsProxy::Activate Invalid Character or API key"));
 		failed();
 		return;
 	}
@@ -69,11 +69,11 @@ void UFetchNarrativeSectionsProxy::OnHttpRequestCompleted(FHttpRequestPtr Reques
 	{
 		if (bWasSuccessful)
 		{
-			UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+			CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
 		}
 		else
 		{
-			UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+			CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
 		}
 
 		failed();
@@ -82,8 +82,8 @@ void UFetchNarrativeSectionsProxy::OnHttpRequestCompleted(FHttpRequestPtr Reques
 
 	if (!bWasSuccessful || Response->GetResponseCode() < 200 || Response->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request failed with code %d"), Response->GetResponseCode());
-		UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Response:%s"), *Response->GetContentAsString());
+		CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request failed with code %d"), Response->GetResponseCode());
+		CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Response:%s"), *Response->GetContentAsString());
 
 		failed();
 		return;
@@ -110,20 +110,20 @@ void UFetchNarrativeSectionsProxy::OnHttpRequestCompleted(FHttpRequestPtr Reques
 void UFetchNarrativeSectionsProxy::failed()
 {
 	//auto InvocationList = OnFailure.GetAllObjects();
-	//UE_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnFailure delegate is bound to %d functions before invokation."), InvocationList.Num());
+	//CONVAI_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnFailure delegate is bound to %d functions before invokation."), InvocationList.Num());
 
 	OnFailure.Broadcast(NarrativeSections);
-	//UE_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnFailure delegate is bound to %d functions after invokation."), InvocationList.Num());
+	//CONVAI_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnFailure delegate is bound to %d functions after invokation."), InvocationList.Num());
 	finish();
 }
 
 void UFetchNarrativeSectionsProxy::success()
 {
 	//auto InvocationList = OnSuccess.GetAllObjects();
-	//UE_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnSuccess delegate is bound to %d functions before invokation."), InvocationList.Num());
+	//CONVAI_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnSuccess delegate is bound to %d functions before invokation."), InvocationList.Num());
 
 	OnSuccess.Broadcast(NarrativeSections);
-	//UE_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnSuccess delegate is bound to %d functions after invokation."), InvocationList.Num());
+	//CONVAI_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnSuccess delegate is bound to %d functions after invokation."), InvocationList.Num());
 	finish();
 }
 
@@ -147,7 +147,7 @@ void UFetchNarrativeTriggersProxy::Activate()
 
 	if (!World)
 	{
-		UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -155,7 +155,7 @@ void UFetchNarrativeTriggersProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
@@ -170,7 +170,7 @@ void UFetchNarrativeTriggersProxy::Activate()
 		|| !UConvaiFormValidation::ValidateCharacterID(CharacterId)
 		)
 	{
-		UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("UFetchNarrativeTriggersProxy::Activate Invalid Character or API key"));
+		CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("UFetchNarrativeTriggersProxy::Activate Invalid Character or API key"));
 		failed();
 		return;
 	}
@@ -192,11 +192,11 @@ void UFetchNarrativeTriggersProxy::OnHttpRequestCompleted(FHttpRequestPtr Reques
 	{
 		if (bWasSuccessful)
 		{
-			UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+			CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
 		}
 		else
 		{
-			UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+			CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
 		}
 
 		failed();
@@ -205,8 +205,8 @@ void UFetchNarrativeTriggersProxy::OnHttpRequestCompleted(FHttpRequestPtr Reques
 
 	if (!bWasSuccessful || Response->GetResponseCode() < 200 || Response->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request failed with code %d"), Response->GetResponseCode());
-		UE_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Response:%s"), *Response->GetContentAsString());
+		CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("HTTP request failed with code %d"), Response->GetResponseCode());
+		CONVAI_LOG(ConvaiNarrativeHTTP, Warning, TEXT("Response:%s"), *Response->GetContentAsString());
 
 		failed();
 		return;
@@ -233,20 +233,20 @@ void UFetchNarrativeTriggersProxy::OnHttpRequestCompleted(FHttpRequestPtr Reques
 void UFetchNarrativeTriggersProxy::failed()
 {
 	//auto InvocationList = OnFailure.GetAllObjects();
-	//UE_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnFailure delegate is bound to %d functions before invokation."), InvocationList.Num());
+	//CONVAI_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnFailure delegate is bound to %d functions before invokation."), InvocationList.Num());
 
 	OnFailure.Broadcast(NarrativeTriggers);
-	//UE_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnFailure delegate is bound to %d functions after invokation."), InvocationList.Num());
+	//CONVAI_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnFailure delegate is bound to %d functions after invokation."), InvocationList.Num());
 	finish();
 }
 
 void UFetchNarrativeTriggersProxy::success()
 {
 	//auto InvocationList = OnSuccess.GetAllObjects();
-	//UE_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnSuccess delegate is bound to %d functions before invokation."), InvocationList.Num());
+	//CONVAI_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnSuccess delegate is bound to %d functions before invokation."), InvocationList.Num());
 
 	OnSuccess.Broadcast(NarrativeTriggers);
-	//UE_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnSuccess delegate is bound to %d functions after invokation."), InvocationList.Num());
+	//CONVAI_LOG(ConvaiNarrativeHTTP, Log, TEXT("OnSuccess delegate is bound to %d functions after invokation."), InvocationList.Num());
 	finish();
 }
 
