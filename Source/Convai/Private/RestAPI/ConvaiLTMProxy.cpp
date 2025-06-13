@@ -2,6 +2,7 @@
 #include "RestAPI/ConvaiLTMProxy.h"
 #include "RestAPI/ConvaiURL.h"
 #include "ConvaiDefinitions.h"
+#include "Utility/Log/ConvaiLogger.h"
 
 DEFINE_LOG_CATEGORY(LTMHttpLogs);
 

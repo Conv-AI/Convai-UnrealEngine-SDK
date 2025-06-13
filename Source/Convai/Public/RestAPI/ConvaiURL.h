@@ -31,6 +31,8 @@ public:
     
     /** Get the full URL for a specific API endpoint */
     static FString GetFullURL(const FString& ApiPath, bool bUseBeta = false);
+
+    static FString GetFormattedBaseURL(const FString& Subdomain);
     
     /** Initialize URL configuration from command line or settings */
     static void InitializeURLConfig();
@@ -39,7 +41,8 @@ private:
     static const TCHAR BETA_SUBDOMAIN[];
     static const TCHAR PROD_SUBDOMAIN[];
     static const TCHAR BASE_URL[];
-
+    static const TCHAR BASE_URL_FORMAT[];
+    
     static const TCHAR LTM_SUBDOMAIN[];
     static const TCHAR USER_SUBDOMAIN[];
     static const TCHAR CHARACTER_SUBDOMAIN[];

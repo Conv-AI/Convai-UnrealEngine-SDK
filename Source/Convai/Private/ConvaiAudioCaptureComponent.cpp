@@ -3,6 +3,7 @@
 
 #include "ConvaiAudioCaptureComponent.h"
 #include "ConvaiDefinitions.h"
+#include "Utility/Log/ConvaiLogger.h"
 
 DEFINE_LOG_CATEGORY(ConvaiAudioLog);
 

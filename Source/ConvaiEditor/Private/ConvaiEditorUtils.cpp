@@ -8,6 +8,7 @@
 #include "ISettingsModule.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "EditorAssetLibrary.h"
+#include "Utility/Log/ConvaiLogger.h"
 
 void UConvaiEditorUtils::ConvaiAddSpeakerID(const FConvaiSpeakerInfo& Speaker)
 {

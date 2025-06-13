@@ -1,11 +1,13 @@
 #include "RestAPI/ConvaiURL.h"
 #include "Misc/CommandLine.h"
 #include "../Convai.h"
+#include "Utility/Log/ConvaiLogger.h"
 
 // Define static members
 const TCHAR UConvaiURL::BETA_SUBDOMAIN[] = TEXT("beta");
 const TCHAR UConvaiURL::PROD_SUBDOMAIN[] = TEXT("api");
 const TCHAR UConvaiURL::BASE_URL[] = TEXT("https://%s.convai.com/");
+const TCHAR UConvaiURL::BASE_URL_FORMAT[] = TEXT("https://{0}.convai.com/");
 
 const TCHAR UConvaiURL::LTM_SUBDOMAIN[] = TEXT("user/speaker/");
 const TCHAR UConvaiURL::USER_SUBDOMAIN[] = TEXT("user/");
@@ -62,7 +64,7 @@ void UConvaiURL::InitializeURLConfig()
     bURLConfigInitialized = true;
 }
 
-FString UConvaiURL::GetBaseURL(bool bUseBeta)
+FString UConvaiURL::GetBaseURL(const bool bUseBeta)
 {
     InitializeURLConfig();
     
@@ -84,7 +86,7 @@ FString UConvaiURL::GetBaseURL(bool bUseBeta)
     }
 }
 
-FString UConvaiURL::GetFullURL(const FString& ApiPath, bool bUseBeta)
+FString UConvaiURL::GetFullURL(const FString& ApiPath, const bool bUseBeta)
 {
     FString BaseURL = GetBaseURL(bUseBeta);
     
@@ -103,7 +105,12 @@ FString UConvaiURL::GetFullURL(const FString& ApiPath, bool bUseBeta)
     return BaseURL + Path;
 }
 
-FString UConvaiURL::GetEndpoint(EConvaiEndpoint Endpoint)
+FString UConvaiURL::GetFormattedBaseURL(const FString& Subdomain)
+{
+    return FString::Format(BASE_URL_FORMAT, { Subdomain });
+}
+
+FString UConvaiURL::GetEndpoint(const EConvaiEndpoint Endpoint)
 {
     FString Api;
     switch (Endpoint)
@@ -143,8 +150,8 @@ FString UConvaiURL::GetEndpoint(EConvaiEndpoint Endpoint)
         return FString();
     }
 
-    bool bOnProd = !BetaEndpoints.Contains(Endpoint);
-    FString Subdomain = bOnProd ? FString(PROD_SUBDOMAIN) : FString(BETA_SUBDOMAIN);
+    const bool bOnProd = !BetaEndpoints.Contains(Endpoint);
+    const FString Subdomain = bOnProd ? FString(PROD_SUBDOMAIN) : FString(BETA_SUBDOMAIN);
 
-    return FString::Printf(BASE_URL, *Subdomain) + Api;
+    return GetFormattedBaseURL(Subdomain) + Api;
 }
