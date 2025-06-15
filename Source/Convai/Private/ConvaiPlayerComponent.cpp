@@ -20,7 +20,7 @@
 #include "AudioDevice.h"
 #include "AudioMixerDevice.h"
 #include "UObject/ConstructorHelpers.h"
-
+#include "ConvaiSubsystem.h"
 
 DEFINE_LOG_CATEGORY(ConvaiPlayerLog);
 
@@ -410,6 +410,18 @@ void UConvaiPlayerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UConvaiPlayerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	// Unregister from the ConvaiSubsystem
+	if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
+	{
+		if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
+		{
+			if (IsValid(ConvaiSubsystem))
+			{
+				ConvaiSubsystem->UnregisterPlayerComponent(this);
+			}
+		}
+	}
+	
 	if (IsRecording)
 		FinishRecording();
 
@@ -916,6 +928,22 @@ void UConvaiPlayerComponent::BeginPlay()
 			return;
 		}
 	}
+	
+	// Register with the ConvaiSubsystem
+	if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
+	{
+		if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
+		{
+			if (IsValid(ConvaiSubsystem))
+			{
+				ConvaiSubsystem->RegisterPlayerComponent(this);
+			}
+			else
+			{
+				CONVAI_LOG(ConvaiPlayerLog, Warning, TEXT("BeginPlay: ConvaiSubsystem is not valid"));
+			}
+		}
+	}
 }
 
 bool UConvaiPlayerComponent::ConsumeStreamingBuffer(TArray<uint8>& Buffer)
@@ -935,4 +963,21 @@ void UConvaiPlayerComponent::SetIsStreamingServer_Implementation(bool value)
 	IsStreaming = value;
 	if (IsStreaming == false)
 		onDataReceived_Delegate.ExecuteIfBound(); // In case a consumer was waiting on this delegate
+}
+
+void UConvaiPlayerComponent::BeginDestroy()
+{
+	// Fallback unregistration in case EndPlay wasn't called
+	if (UGameInstance* GameInstance = GetWorld() ? GetWorld()->GetGameInstance() : nullptr)
+	{
+		if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
+		{
+			if (IsValid(ConvaiSubsystem))
+			{
+				ConvaiSubsystem->UnregisterPlayerComponent(this);
+			}
+		}
+	}
+	
+	Super::BeginDestroy();
 }

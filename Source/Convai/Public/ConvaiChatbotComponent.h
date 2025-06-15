@@ -355,6 +355,7 @@ public:
 	// End AActorComponent interface
 
 	//~ Begin UObject Interface.
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void BeginDestroy() override;
 	//~ End UObject Interface.
 

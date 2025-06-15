@@ -7,6 +7,8 @@
 #include "../Convai.h"
 #include "ConvaiUtils.h"
 #include "HAL/PlatformProcess.h"
+#include "ConvaiChatbotComponent.h"
+#include "ConvaiPlayerComponent.h"
 
 THIRD_PARTY_INCLUDES_START
 // grpc includes
@@ -404,4 +406,48 @@ void UConvaiSubsystem::GetAndroidMicPermission()
 {
 	if (!UConvaiAndroid::ConvaiAndroidHasMicrophonePermission())
 		UConvaiAndroid::ConvaiAndroidAskMicrophonePermission();
+}
+
+void UConvaiSubsystem::RegisterChatbotComponent(UConvaiChatbotComponent* ChatbotComponent)
+{
+	if (IsValid(ChatbotComponent) && !RegisteredChatbotComponents.Contains(ChatbotComponent))
+	{
+		RegisteredChatbotComponents.Add(ChatbotComponent);
+	}
+}
+
+void UConvaiSubsystem::UnregisterChatbotComponent(UConvaiChatbotComponent* ChatbotComponent)
+{
+	if (RegisteredChatbotComponents.Contains(ChatbotComponent))
+	{
+		RegisteredChatbotComponents.Remove(ChatbotComponent);
+	}
+}
+
+TArray<UConvaiChatbotComponent*> UConvaiSubsystem::GetAllChatbotComponents() const
+{
+	return RegisteredChatbotComponents;
+}
+
+void UConvaiSubsystem::RegisterPlayerComponent(UConvaiPlayerComponent* PlayerComponent)
+{
+	if (IsValid(PlayerComponent) && !RegisteredPlayerComponents.Contains(PlayerComponent))
+	{
+		RegisteredPlayerComponents.Add(PlayerComponent);
+		CONVAI_LOG(ConvaiSubsystemLog, Verbose, TEXT("Registered player component: %s"), *PlayerComponent->GetName());
+	}
+}
+
+void UConvaiSubsystem::UnregisterPlayerComponent(UConvaiPlayerComponent* PlayerComponent)
+{
+	if (RegisteredPlayerComponents.Contains(PlayerComponent))
+	{
+		RegisteredPlayerComponents.Remove(PlayerComponent);
+		CONVAI_LOG(ConvaiSubsystemLog, Verbose, TEXT("Unregistered player component: %s"), *PlayerComponent->GetName());
+	}
+}
+
+TArray<UConvaiPlayerComponent*> UConvaiSubsystem::GetAllPlayerComponents() const
+{
+	return RegisteredPlayerComponents;
 }

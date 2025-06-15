@@ -8,6 +8,7 @@
 #include "ConvaiUtils.h"
 #include "LipSyncInterface.h"
 #include "VisionInterface.h"
+#include "ConvaiSubsystem.h"
 
 #include "Sound/SoundWaveProcedural.h"
 #include "Net/UnrealNetwork.h"
@@ -1188,7 +1189,6 @@ void UConvaiChatbotComponent::BeginPlay()
 	if (IsValid(Environment))
 	{
 		Environment->OnEnvironmentChanged.BindUObject(this, &UConvaiChatbotComponent::UpdateEnvironmentData);
-
 	}
 	else
 	{
@@ -1199,6 +1199,38 @@ void UConvaiChatbotComponent::BeginPlay()
 	if (CharacterID != "")
 		ConvaiGetDetails();
 
+	// Register with the ConvaiSubsystem
+	if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
+	{
+		if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
+		{
+			if (IsValid(ConvaiSubsystem))
+			{
+				ConvaiSubsystem->RegisterChatbotComponent(this);
+			}
+			else
+			{
+				CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("BeginPlay: ConvaiSubsystem is not valid"));
+			}
+		}
+	}
+}
+
+void UConvaiChatbotComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Unregister from the ConvaiSubsystem
+	if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
+	{
+		if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
+		{
+			if (IsValid(ConvaiSubsystem))
+			{
+				ConvaiSubsystem->UnregisterChatbotComponent(this);
+			}
+		}
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -1231,7 +1263,18 @@ void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType
 
 void UConvaiChatbotComponent::BeginDestroy()
 {
-	//InterruptSpeech(0);
+	// Fallback unregistration in case EndPlay wasn't called
+	if (UGameInstance* GameInstance = GetWorld() ? GetWorld()->GetGameInstance() : nullptr)
+	{
+		if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
+		{
+			if (IsValid(ConvaiSubsystem))
+			{
+				ConvaiSubsystem->UnregisterChatbotComponent(this);
+			}
+		}
+	}
+	
 	if (IsValid(Environment))
 	{
 		Environment->OnEnvironmentChanged.Unbind();
