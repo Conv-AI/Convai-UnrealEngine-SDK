@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.6.0
+- UE5.6 support.
+- Optimized GetAllChatbotComponents and GetAllPlayerComponents function.
+- Added Convai Logger.
+
 # Release 3.5.4-hotfix-1
 - Fixed racing condition when playing audio.
 - Updated Android Play Core to 2.0.3.
