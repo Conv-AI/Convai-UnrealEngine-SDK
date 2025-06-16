@@ -137,3 +137,44 @@ void FConvaiLogger::Log(const FString& Message)
     MessageQueue.Enqueue(Formatted);
     if (WakeEvent) WakeEvent->Trigger();
 }
+
+
+void UConvaiBlueprintLogger::C_ConvaiLog(UObject* WorldContextObject, EC_LogLevel Verbosity, const FString& Message)
+{    
+    const FString ContextName = WorldContextObject
+        ? WorldContextObject->GetName()
+        : TEXT("UnknownContext");
+
+    const UEnum* EnumPtr = StaticEnum<EC_LogLevel>();
+    const FString VerbName = EnumPtr
+        ? EnumPtr->GetNameStringByValue(static_cast<int64>(Verbosity))
+        : TEXT("UnknownVerbosity");
+
+    const FString FullMessage = FString::Printf(
+        TEXT("%s : %s : %s"),
+        *ContextName, *VerbName, *Message);
+
+    switch (Verbosity)
+    {
+    case EC_LogLevel::Verbose:
+        UE_LOG(LogTemp, Verbose, TEXT("%s"), *FullMessage);
+        break;
+    case EC_LogLevel::Log:
+        UE_LOG(LogTemp, Log,     TEXT("%s"), *FullMessage);
+        break;
+    case EC_LogLevel::Warning:
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *FullMessage);
+        break;
+    case EC_LogLevel::Error:
+        UE_LOG(LogTemp, Error,   TEXT("%s"), *FullMessage);
+        break;
+    case EC_LogLevel::Fatal:
+        UE_LOG(LogTemp, Fatal,   TEXT("%s"), *FullMessage);
+        break;
+    default:
+        UE_LOG(LogTemp, Log,     TEXT("%s"), *FullMessage);
+        break;
+    }
+    
+    FConvaiLogger::Get().Log(FullMessage);
+}
