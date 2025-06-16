@@ -16,6 +16,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "TimerManager.h"
 #include "Async/Async.h"
+#include "Engine/GameInstance.h"
 
 DEFINE_LOG_CATEGORY(ConvaiChatbotComponentLog);
 

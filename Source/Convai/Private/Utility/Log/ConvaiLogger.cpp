@@ -5,6 +5,8 @@
 #include "HAL/PlatformFilemanager.h"
 #include "HAL/PlatformFile.h"
 #include "Misc/App.h"
+#include "HAL/PlatformProcess.h"  // for FPlatformProcess
+#include "HAL/Event.h"            // for FEvent methods
 
 FConvaiLogger& FConvaiLogger::Get()
 {

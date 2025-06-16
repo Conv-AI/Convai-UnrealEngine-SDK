@@ -10,6 +10,7 @@
 #include "HAL/PlatformFilemanager.h"  
 #include "HAL/PlatformFile.h"         
 #include "HAL/ThreadSafeBool.h"
+#include "HAL/Event.h"
 
 #if WITH_EDITOR
   // In editor: log to both UE4’s log window AND your file logger
