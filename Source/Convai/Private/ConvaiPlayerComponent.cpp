@@ -21,6 +21,7 @@
 #include "AudioMixerDevice.h"
 #include "UObject/ConstructorHelpers.h"
 #include "ConvaiSubsystem.h"
+#include "Engine/GameInstance.h"
 
 DEFINE_LOG_CATEGORY(ConvaiPlayerLog);
 
