@@ -7,8 +7,9 @@
 #include "Containers/Queue.h"
 #include "Misc/DateTime.h"
 #include "Misc/Paths.h"
-#include "HAL/PlatformFilemanager.h"  // for IPlatformFile
-#include "HAL/PlatformFile.h"         // for IFileHandle
+#include "HAL/PlatformFilemanager.h"  
+#include "HAL/PlatformFile.h"         
+#include "HAL/ThreadSafeBool.h"
 
 #if WITH_EDITOR
   // In editor: log to both UE4’s log window AND your file logger
