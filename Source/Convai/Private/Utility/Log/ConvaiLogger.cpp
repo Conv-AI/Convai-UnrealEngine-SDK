@@ -36,7 +36,8 @@ void FConvaiLogger::StartThread()
     // Logs go in "<ProjectDir>/ConvaiLog"
     const FString LogDir = FPaths::Combine(
         FPaths::ProjectDir(),
-        TEXT("ConvaiLog")
+        TEXT("Saved"),
+        TEXT("ConvaiLogs")
     );
     IPlatformFile& Plat = FPlatformFileManager::Get().GetPlatformFile();
     Plat.CreateDirectoryTree(*LogDir);
