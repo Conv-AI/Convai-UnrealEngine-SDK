@@ -148,6 +148,17 @@ public:
 	 */
 	FORCEINLINE uint64 TotalDataPushed() const;
 
+	/**
+	 * Maximum size the buffer can grow to (50 MB by default)
+	 */
+	static constexpr uint32 MaxBufferSize = 1024 * 1024 * 50;
+
+	/**
+	 * Resizes the buffer to a new size, preserving existing data
+	 * @param NewBufferSize The new size of the buffer
+	 * @return true if resize was successful, false otherwise
+	 */
+	bool Resize(uint32 NewBufferSize);
 
 private:
 	//TRingBuffer();
@@ -220,12 +231,56 @@ void TRingBuffer< DataType >::Enqueue(const DataType& Val)
 template< typename DataType >
 void TRingBuffer< DataType >::Enqueue(const DataType* ValBuf, const uint32& BufLen)
 {
+	// Check if we need to resize
+	if (BufLen > BufferDataSize || NumDataAvailable + BufLen > BufferDataSize)
+	{
+		// Calculate new size (double the current size or enough to fit the new data, whichever is larger)
+		uint32 NewSize = FMath::Max(BufferDataSize * 2, NumDataAvailable + BufLen);
+		
+		// Cap the maximum size
+		NewSize = FMath::Min(NewSize, MaxBufferSize);
+		
+		// Try to resize
+		bool ResizeSuccess = Resize(NewSize);
+		
+		// If resize failed and the buffer is too small for the new data
+		if (!ResizeSuccess && BufLen > BufferDataSize)
+		{
+			// We can't fit the entire new buffer, so we'll copy as much as we can
+			uint32 AmountToCopy = BufferDataSize;
+			
+			// Copy from the end of the input buffer to get the most recent data
+			const DataType* SourcePtr = ValBuf + (BufLen - AmountToCopy);
+			
+			// Clear the buffer and copy what we can
+			Empty();
+			FMemory::Memcpy(Data, SourcePtr, sizeof(DataType) * AmountToCopy);
+			NumDataAvailable = AmountToCopy;
+			DataIndex = 0;
+			TotalNumDataPushed += AmountToCopy;
+			
+			return;
+		}
+		// If resize failed but we can fit some data by overwriting old data
+		else if (!ResizeSuccess)
+		{
+			// Calculate how much old data we need to discard
+			uint32 SpaceNeeded = NumDataAvailable + BufLen - BufferDataSize;
+			
+			// Discard oldest data
+			NumDataAvailable -= SpaceNeeded;
+			
+			// Continue with normal enqueue below
+		}
+	}
+
+	// Original enqueue logic
 	check(BufLen <= BufferDataSize);
 	const uint32 FirstPartLen = BufferDataSize - DataIndex;
-	FMemory::Memcpy(Data + DataIndex, ValBuf, sizeof(DataType)* FMath::Min(FirstPartLen, BufLen));
+	FMemory::Memcpy(Data + DataIndex, ValBuf, sizeof(DataType) * FMath::Min(FirstPartLen, BufLen));
 	if (FirstPartLen < BufLen)
 	{
-		FMemory::Memcpy(Data, ValBuf + FirstPartLen, sizeof(DataType)* (BufLen - FirstPartLen));
+		FMemory::Memcpy(Data, ValBuf + FirstPartLen, sizeof(DataType) * (BufLen - FirstPartLen));
 	}
 	DataIndex += BufLen;
 	DataIndex %= BufferDataSize;
@@ -250,8 +305,22 @@ bool TRingBuffer< DataType >::Dequeue(DataType& ValOut)
 template< typename DataType >
 uint32 TRingBuffer< DataType >::Dequeue(DataType* ValBuf, const uint32& BufLen)
 {
-	const uint32 DataProvided = Peek(ValBuf, BufLen);
+	uint32 DataProvided = 0;
+	
+	if (ValBuf != nullptr)
+	{
+		// Normal case: copy data to the provided buffer
+		DataProvided = Peek(ValBuf, BufLen);
+	}
+	else
+	{
+		// Special case: just discard data without copying
+		DataProvided = FMath::Min(BufLen, NumDataAvailable);
+	}
+	
+	// Update the available data count
 	NumDataAvailable -= DataProvided;
+	
 	return DataProvided;
 }
 
@@ -389,4 +458,48 @@ template< typename DataType >
 FORCEINLINE uint64 TRingBuffer< DataType >::TotalDataPushed() const
 {
 	return TotalNumDataPushed;
+}
+
+template< typename DataType >
+bool TRingBuffer< DataType >::Resize(uint32 NewBufferSize)
+{
+	// Don't resize if new size is smaller than current usage
+ 	if (NewBufferSize < NumDataAvailable)
+	{
+		return false;
+	}
+
+	// Create a new buffer
+	DataType* NewData = new DataType[NewBufferSize];
+	if (!NewData)
+	{
+		return false;
+	}
+
+	// Copy existing data to the new buffer
+	if (NumDataAvailable > 0)
+	{
+		// Get the current data in sequential order
+		const uint32 BottomIdx = BottomIndex();
+		const uint32 BottomPartLen = FMath::Min(BufferDataSize - BottomIdx, NumDataAvailable);
+		
+		// Copy first part (from bottom index to end of buffer)
+		FMemory::Memcpy(NewData, Data + BottomIdx, sizeof(DataType) * BottomPartLen);
+		
+		// Copy second part (from start of buffer if wrapped)
+		if (BottomPartLen < NumDataAvailable)
+		{
+			FMemory::Memcpy(NewData + BottomPartLen, Data, sizeof(DataType) * (NumDataAvailable - BottomPartLen));
+		}
+	}
+
+	// Clean up old buffer and update state
+	delete[] Data;
+	Data = NewData;
+	BufferDataSize = NewBufferSize;
+	
+	// Reset the data index to start at 0
+	DataIndex = NumDataAvailable % BufferDataSize;
+
+	return true;
 }

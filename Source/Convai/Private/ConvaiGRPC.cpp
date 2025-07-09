@@ -715,7 +715,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 			*ConvaiGRPCGetResponseParams.SessionID,
 			*FString(IsFinalTranscription ? "True" : "False"));
 	}
-	else if (reply->has_audio_response()) // Is there an audio response
+	if (reply->has_audio_response()) // Is there an audio response
 	{
 		// Grab bot text
 		std::string text_string_std = reply->audio_response().text_data();
@@ -848,20 +848,10 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 					FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
 					FaceDataAnimation.Duration += 0.01;
 					FaceDataAnimation.FrameRate = 100;
+
+					OnFaceDataReceived.ExecuteIfBound(FaceDataAnimation);
+					TotalLipSyncResponsesReceived += 1;
 				}
-				//CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse FaceData: %s"), *AnimationFrame.ToString());
-			}
-
-			if (VoiceData.Num() > 0 && FaceDataAnimation.Duration == 0)
-			{
-				float FaceDataDuration = float(VoiceData.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
-				FaceDataAnimation.Duration = FaceDataDuration;
-			}
-
-			if (FaceDataAnimation.AnimationFrames.Num() > 0 && FaceDataAnimation.Duration > 0)
-			{
-				OnFaceDataReceived.ExecuteIfBound(FaceDataAnimation);
-				TotalLipSyncResponsesReceived += 1;
 			}
 
 			if (ReceivedFinalResponse)
@@ -897,7 +887,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 				*FString(ReceivedFinalResponse ? "True" : "False"));
 		}
 	}
-	else if (reply->has_action_response()) // Is there an action response
+	if (reply->has_action_response()) // Is there an action response
 	{
 		// Convert Action string to FString
 		FString SequenceString = UConvaiUtils::FUTF8ToFString(reply->action_response().action().c_str());
@@ -923,7 +913,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 		// Broadcast the actions
 		OnActionsReceived.ExecuteIfBound(SequenceOfActions);
 	}
-	else if (reply->has_bt_response())
+	if (reply->has_bt_response())
 	{
 		FString BT_Code = UConvaiUtils::FUTF8ToFString(reply->bt_response().bt_code().c_str());
 		FString BT_Constants = UConvaiUtils::FUTF8ToFString(reply->bt_response().bt_constants().c_str());
@@ -936,14 +926,14 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 			*ConvaiGRPCGetResponseParams.SessionID,
 			*FString(ReceivedFinalResponse ? "True" : "False"));
 	}
-	else if (!reply->emotion_response().empty())
+	if (!reply->emotion_response().empty())
 	{
 		FString EmotionResponseDebug = UConvaiUtils::FUTF8ToFString(reply->DebugString().c_str());
 		CONVAI_LOG(ConvaiGRPCLog, Log, TEXT("GetResponse EmotionResponseDebug: %s"), *EmotionResponseDebug);
 		FString EmotionResponse = UConvaiUtils::FUTF8ToFString(reply->emotion_response().c_str());
 		OnEmotionReceived.ExecuteIfBound(EmotionResponse, FAnimationFrame(), true);
 	}
-	else if (!reply->debug_log().empty()) // This is a debug message response
+	if (!reply->debug_log().empty()) // This is a debug message response
 	{
 #if ConvaiDebugMode
 		FString DebugString(reply->debug_log().c_str());

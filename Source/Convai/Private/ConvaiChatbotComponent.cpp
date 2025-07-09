@@ -1044,14 +1044,16 @@ void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse,
 
 void UConvaiChatbotComponent::onFinishedReceivingData()
 {
+	CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent Request Finished! | Character ID : %s | Session ID : %s"),
+		*CharacterID,
+		*SessionID);
 	if (ConvaiGRPCGetResponseProxy)
 	{
-		CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent Request Finished! | Character ID : %s | Session ID : %s"),
-			*CharacterID,
-			*SessionID);
 		Unbind_GRPC_Request_Delegates();
 		ConvaiGRPCGetResponseProxy = nullptr;
 	}
+	// Attempt to play all buffered audio and lipsync
+	TryPlayBufferedContent(true);
 }
 
 void UConvaiChatbotComponent::OnNarrativeSectionReceived(FString BT_Code, FString BT_Constants, FString ReceivedNarrativeSectionID)

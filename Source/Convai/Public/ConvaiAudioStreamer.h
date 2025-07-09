@@ -4,6 +4,7 @@
 //#include "CoreMinimal.h"
 // #undef UpdateResource
 #include "Components/AudioComponent.h"
+#include "RingBuffer.h"
 #include "ConvaiDefinitions.h"
 #include "Misc/ScopeLock.h"
 #include "Interfaces/VoiceCodec.h"
@@ -483,12 +484,11 @@ enum class EAudioLipSyncState : uint8
 };
 
 EAudioLipSyncState CurrentState;
-FThreadSafeCounter BufferProcessingCounter = 0;
  
 // Simplified buffer structure
 struct FAudioBuffer
 {
-    TArray<uint8> Data;
+    TRingBuffer<uint8> Data;
     float Duration;
     uint32 SampleRate;
     uint32 NumChannels;
@@ -503,9 +503,40 @@ struct FAudioBuffer
         NumChannels = 0;
     }
     
-    bool IsEmpty() const { return Data.Num() == 0; }
+    void Init(uint32 BufferSize)
+    {
+        Data.Init(BufferSize);
+    }
+    
+    bool IsEmpty() const { return Data.RingDataUsage() == 0; }
     
     float GetTotalDuration() const { return Duration; }
+    
+    // Add data to the buffer
+    void AppendData(const uint8* NewData, uint32 DataSize)
+    {
+        Data.Enqueue(NewData, DataSize);
+    }
+    
+    // Get data from the buffer (copies to the provided buffer)
+    uint32 GetData(uint8* OutBuffer, uint32 BufferSize) const
+    {
+        return Data.Peek(OutBuffer, BufferSize);
+    }
+    
+    // Remove data from the buffer
+    void RemoveData(uint32 BytesToRemove)
+    {
+        // Ensure we don't try to remove more than what's available
+        uint32 BytesToActuallyRemove = FMath::Min(BytesToRemove, Data.RingDataUsage());
+        
+        if (BytesToActuallyRemove > 0)
+        {
+            // The TRingBuffer::Dequeue method with nullptr is designed to discard data
+            // without copying it, which is exactly what we want for efficient removal
+            Data.Dequeue(nullptr, BytesToActuallyRemove);
+        }
+    }
 };
 
 struct FLipSyncBuffer
@@ -543,7 +574,7 @@ float AudioLipSyncRatio;
 void TransitionToState(EAudioLipSyncState NewState);
 void HandleAudioReceived(uint8* AudioData, uint32 AudioDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels);
 void HandleLipSyncReceived(FAnimationSequence& FaceSequence);
-bool TryPlayBufferedContent();
+bool TryPlayBufferedContent(bool force = false);
 bool HasSufficientLipSync();
 bool HasSufficientAudio() const;
 void PlayBufferedContent(float Duration);
@@ -620,4 +651,8 @@ private:
 	struct OpusDecoder* Decoder;
 	/** Generation value received from the last incoming packet */
 	uint8 DecoderLastGeneration;
+
+	// Pre-allocated temporary buffer for audio playback
+	TArray<uint8> TempAudioBuffer;
+	static constexpr uint32 TempBufferSize = 1024 * 1024 * 3; // 3 MB buffer
 };
