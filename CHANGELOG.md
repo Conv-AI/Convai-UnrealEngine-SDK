@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.6.2
+- Potential fix for missing audio for Elevenlabs and some of Azure voices
+- Improved Performance when receiving AI audio responses
+
+# Release 3.6.1
+- Fix headers fr linux build.
+
 # Release 3.6.0
 - UE5.6 support.
 - Optimized GetAllChatbotComponents and GetAllPlayerComponents function.
