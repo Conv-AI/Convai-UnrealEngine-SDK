@@ -10,7 +10,7 @@ on:
 
 jobs:
   checkout-code:
-    runs-on: self-hosted
+    runs-on: UE-Dev-Runner
     outputs:
       version_name: ${{ steps.extract_version.outputs.version_name }}
     steps:
@@ -27,7 +27,7 @@ jobs:
 
   check-version:
     needs: checkout-code
-    runs-on: self-hosted
+    runs-on: UE-Dev-Runner
     outputs:
       release_exists: ${{ steps.check_release.outputs.release_exists }}  # Define job output based on step output
     steps:
@@ -61,7 +61,7 @@ jobs:
 
   build-and-package:
     needs: check-version
-    runs-on: self-hosted
+    runs-on: UE-Dev-Runner
     if: needs.check-version.outputs.release_exists == 'false'
     steps:
       - name: Debug output
@@ -208,7 +208,7 @@ jobs:
 
   compress-and-release:
     needs: [checkout-code, build-and-package]
-    runs-on: self-hosted
+    runs-on: UE-Dev-Runner
     if: needs.check-version.outputs.release_exists == 'false'
     steps:
       - name: Extract release notes
