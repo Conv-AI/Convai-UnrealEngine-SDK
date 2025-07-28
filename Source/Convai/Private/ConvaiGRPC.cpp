@@ -84,6 +84,8 @@ UConvaiGRPCGetResponseProxy* UConvaiGRPCGetResponseProxy::CreateConvaiGRPCGetRes
 
 void UConvaiGRPCGetResponseProxy::Activate()
 {
+	AddToRoot();
+
 	OnInitStreamDelegate = FgRPC_Delegate::CreateUObject(this, &ThisClass::OnStreamInit);
 	OnStreamReadDelegate = FgRPC_Delegate::CreateUObject(this, &ThisClass::OnStreamRead);
 	OnStreamWriteDelegate = FgRPC_Delegate::CreateUObject(this, &ThisClass::OnStreamWrite);
@@ -649,19 +651,6 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 
 	// Error handling
 	if (!ok || !status.ok()) {
-		// Log the error details
-		//CONVAI_LOG(ConvaiGRPCLog, Log,
-		//	TEXT("OnStreamRead - Received non-ok response: ok:%s Status.ok:%s | Error message:%s | Code:%i | LastWriteReceived:%s | InformOnDataReceived:%s | AudioBuffer.Num():%d | Character ID:%s | Session ID:%s"),
-		//	*FString(ok ? "True" : "False"),
-		//	*FString(status.ok() ? "Ok" : "Not Ok"),
-		//	*FString(status.error_message().c_str()),
-		//	status.error_code(),
-		//	(LastWriteReceived ? TEXT("True") : TEXT("False")),
-		//	(InformOnDataReceived ? TEXT("True") : TEXT("False")),
-		//	AudioBuffer.Num(),
-		//	*ConvaiGRPCGetResponseParams.CharID,
-		//	*ConvaiGRPCGetResponseParams.SessionID);
-
 		// Retry logic: increment the retry counter
 		RetryCount++;
 		if (RetryCount >= MaxRetries) {
@@ -846,7 +835,7 @@ void UConvaiGRPCGetResponseProxy::OnStreamRead(bool ok)
 					AnimationFrame.BlendShapes.Add("oh", Visemes.oh());
 					AnimationFrame.BlendShapes.Add("ou", Visemes.ou());
 					FaceDataAnimation.AnimationFrames.Add(AnimationFrame);
-					FaceDataAnimation.Duration += 0.01;
+					FaceDataAnimation.Duration = 0.01;
 					FaceDataAnimation.FrameRate = 100;
 
 					OnFaceDataReceived.ExecuteIfBound(FaceDataAnimation);
@@ -965,6 +954,8 @@ void UConvaiGRPCGetResponseProxy::OnStreamFinish(bool ok)
 
 
 	OnFinish.ExecuteIfBound();
+	
+	RemoveFromRoot();
 }
 
 
