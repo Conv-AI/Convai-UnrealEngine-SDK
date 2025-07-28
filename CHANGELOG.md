@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.6.3
+- Improve memory management in ConvaiGRPC.
+
 # Release 3.6.2
 - Potential fix for missing audio for Elevenlabs and some of Azure voices
 - Improved Performance when receiving AI audio responses
