@@ -1082,8 +1082,13 @@ struct FConvaiSpeakerInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speaker Info")
 	FString Name;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speaker Info")
+	FString DeviceID;
+	
 	FConvaiSpeakerInfo()
-		: SpeakerID(TEXT("")), Name(TEXT(""))
+		: SpeakerID(TEXT(""))
+		, Name(TEXT(""))
+		, DeviceID(TEXT(""))
 	{
 	}
 };

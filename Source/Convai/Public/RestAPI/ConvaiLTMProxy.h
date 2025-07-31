@@ -32,7 +32,7 @@ public:
 	FSpeakerIDHttpResponseCallbackSignature OnFailure;
 
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName = "Convai Create Speaker ID"), Category = "Convai|LTM")
-	static UConvaiCreateSpeakerID* ConvaiCreateSpeakerIDProxy(FString SpeakerName);
+	static UConvaiCreateSpeakerID* ConvaiCreateSpeakerIDProxy(FString SpeakerName, FString DeviceId);
 
 protected:
 	virtual bool ConfigureRequest(TSharedRef<CONVAI_HTTP_REQUEST_INTERFACE> Request, const TCHAR* Verb) override;
@@ -42,6 +42,7 @@ protected:
 	virtual void HandleFailure() override;
 
 	FString AssociatedSpeakerName;
+	FString AssociatedDeviceId;
 	FConvaiSpeakerInfo AssociatedSpeakerInfo;
 };
 // END create speaker id
