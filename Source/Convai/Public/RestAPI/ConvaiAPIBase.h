@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "Dom/JsonObject.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 #ifdef USE_CONVAI_HTTP
 #else
