@@ -515,6 +515,11 @@ struct FAudioBuffer
     // Add data to the buffer
     void AppendData(const uint8* NewData, uint32 DataSize)
     {
+        // Validate input parameters to prevent crashes
+        if (!NewData || DataSize == 0)
+        {
+            return; // Ignore invalid data
+        }
         Data.Enqueue(NewData, DataSize);
     }
     

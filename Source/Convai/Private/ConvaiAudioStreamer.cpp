@@ -815,7 +815,7 @@ bool UConvaiAudioStreamer::HasSufficientAudio() const
     // Otherwise, check against both minimum duration and lipsync duration
     float LipSyncDuration = LipSyncBuffer.GetTotalDuration();
     
-    return AudioDuration >= MinBufferDuration || AudioDuration >= LipSyncDuration;
+    return AudioDuration >= MinBufferDuration && AudioDuration >= LipSyncDuration;
 }
 
 // Try to play buffered content
@@ -1195,6 +1195,30 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 											bool ContainsHeaderData,
                                             uint32 InSampleRate,
                                             uint32 InNumChannels) {
+	// Validate input parameters to prevent crashes from corrupted data
+	const uint32 MaxReasonableBufferSize = 1024 * 1024 * 10; // 10 MB max
+	const uint32 MaxReasonableSampleRate = 192000; // 192 kHz max
+	const uint32 MaxReasonableChannels = 2; // 8 channels max
+
+	// Check for invalid/corrupted parameters
+	if (PCMDataToAdd.Num() == 0 || PCMDataToAdd.Num() > (int32)MaxReasonableBufferSize)
+	{
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Invalid PCMDataToAdd size: %d. Ignoring data."), PCMDataToAdd.Num());
+		return;
+	}
+
+	if (InSampleRate > MaxReasonableSampleRate)
+	{
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Invalid InSampleRate value: %u. Ignoring data."), InSampleRate);
+		return;
+	}
+
+	if (InNumChannels > MaxReasonableChannels)
+	{
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Invalid InNumChannels value: %u. Ignoring data."), InNumChannels);
+		return;
+	}
+
 	if (ContainsHeaderData)
 	{
 		// Parse Wav header
@@ -1206,11 +1230,26 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 		{
 			InSampleRate = *WaveInfo.pSamplesPerSec;
 			InNumChannels = *WaveInfo.pChannels;
-			PCMDataToAdd.RemoveAt(0, 44); // Remove the header bytes 
+
+			// Validate parsed values
+			if (InSampleRate == 0 || InSampleRate > MaxReasonableSampleRate)
+			{
+				CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Invalid parsed SampleRate: %u. Ignoring data."), InSampleRate);
+				return;
+			}
+
+			if (InNumChannels == 0 || InNumChannels > MaxReasonableChannels)
+			{
+				CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Invalid parsed NumChannels: %u. Ignoring data."), InNumChannels);
+				return;
+			}
+
+			PCMDataToAdd.RemoveAt(0, 44); // Remove the header bytes
 		}
 		else if (!ParseSuccess)
 		{
 			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Failed to parse wav header, reason: %s"), *ErrorReason);
+			return; // Don't process invalid data
 		}
 	}
 
