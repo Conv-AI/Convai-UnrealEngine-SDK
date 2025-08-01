@@ -1,12 +1,16 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.6.4
+- Improve data validation in ConvaiAudioStreamer to prevent crashes from invalid input.
+- fixed MinBufferDuration not working as expected when lipsync is active.
+
 # Release 3.6.3
 - Improve memory management in ConvaiGRPC.
 
 # Release 3.6.2
-- Potential fix for missing audio for Elevenlabs and some of Azure voices
-- Improved Performance when receiving AI audio responses
+- Potential fix for missing audio for Elevenlabs and some of Azure voices.
+- Improved Performance when receiving AI audio responses.
 
 # Release 3.6.1
 - Fix headers fr linux build.
