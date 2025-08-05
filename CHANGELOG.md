@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.6.5
+- Adjust MinBufferDuration and AudioLipSyncRatio defaults to reduce audio stutters.
+
 # Release 3.6.4
 - Improve data validation in ConvaiAudioStreamer to prevent crashes from invalid input.
 - fixed MinBufferDuration not working as expected when lipsync is active.
