@@ -611,12 +611,13 @@ void UConvaiAudioStreamer::BeginPlay()
     // Initialize configuration parameters
 
 	// Minimum buffer duration in seconds
-	MinBufferDuration = UConvaiSettingsUtils::GetParamValueAsFloat("MinBufferDuration", MinBufferDuration) ? MinBufferDuration : 0.7f;
+	MinBufferDuration = UConvaiSettingsUtils::GetParamValueAsFloat("MinBufferDuration", MinBufferDuration) ? MinBufferDuration : 0.9f;
 	MinBufferDuration = MinBufferDuration < 0 ? 0 : MinBufferDuration;
     	
 	// Ratio of lipsync to audio duration required
-	AudioLipSyncRatio = UConvaiSettingsUtils::GetParamValueAsFloat("AudioLipSyncRatio", AudioLipSyncRatio) ? AudioLipSyncRatio : 0.5f;
-	AudioLipSyncRatio = VoiceTimeFactor < 0.5 ? 0.5 : AudioLipSyncRatio;
+	AudioLipSyncRatio = UConvaiSettingsUtils::GetParamValueAsFloat("AudioLipSyncRatio", AudioLipSyncRatio) ? AudioLipSyncRatio : 0.1f;
+	AudioLipSyncRatio = AudioLipSyncRatio < 0 ? 0 : AudioLipSyncRatio;
+	AudioLipSyncRatio = AudioLipSyncRatio > 1 ? 1 : AudioLipSyncRatio;
 
 	// Initialize the audio component
 	bAutoActivate = true;
@@ -785,9 +786,6 @@ bool UConvaiAudioStreamer::HasSufficientLipSync()
 {        
 	if (!SupportsLipSync() || !ConvaiLipSync->RequiresPrecomputedFaceData() || !bIsSyncingAudioAndLipSync)
 		return true;
-
-    if (LipSyncBuffer.IsEmpty())
-        return false;
         
     float AudioDuration = AudioBuffer.GetTotalDuration();
     float LipSyncDuration = LipSyncBuffer.GetTotalDuration();

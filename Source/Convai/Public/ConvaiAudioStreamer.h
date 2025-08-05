@@ -598,11 +598,6 @@ float TotalPlayingDuration;       // Total duration of content currently being p
 float TotalBufferedDuration;      // Total duration of content buffered but not yet played
 bool bIsSyncingAudioAndLipSync;   // Whether we're syncing audio and lipsync
 
-protected:
-
-	float LipSyncThresholdSecs = -1;
-	float VoiceTimeFactor = -1;
-
 private:
 
 	// Critical section for protecting SoundWaveProcedural operations
