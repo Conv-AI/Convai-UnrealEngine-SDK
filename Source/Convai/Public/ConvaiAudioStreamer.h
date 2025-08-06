@@ -574,6 +574,7 @@ FLipSyncBuffer LipSyncBuffer;
 // Configuration parameters
 float MinBufferDuration;
 float AudioLipSyncRatio;
+float EnableSync;
 
 // State management functions
 void TransitionToState(EAudioLipSyncState NewState);

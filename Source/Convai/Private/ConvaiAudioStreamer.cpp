@@ -527,9 +527,13 @@ bool UConvaiAudioStreamer::SetLipSyncComponent(UActorComponent* LipSyncComponent
 	{
 		ConvaiLipSync = Cast<IConvaiLipSyncInterface>(LipSyncComponent);
 		ConvaiLipSync->OnVisemesDataReady.BindUObject(this, &UConvaiAudioStreamer::OnVisemesReadyCallback);
+
+		// Should lipsync and audio be synchronized
+		EnableSync = UConvaiSettingsUtils::GetParamValueAsFloat("EnableSync", EnableSync) ? EnableSync : 1;
+		EnableSync = EnableSync >= 0.5 ? 1 : 0;
 		
 		// Update bIsSyncingAudioAndLipSync based on the new component
-		bIsSyncingAudioAndLipSync = SupportsLipSync() && ConvaiLipSync->RequiresPrecomputedFaceData() && !ReplicateVoiceToNetwork;
+		bIsSyncingAudioAndLipSync = EnableSync && SupportsLipSync() && ConvaiLipSync->RequiresPrecomputedFaceData() && !ReplicateVoiceToNetwork;
 		
 		return true;
 	}
@@ -837,7 +841,7 @@ bool UConvaiAudioStreamer::TryPlayBufferedContent(bool force)
 		return true;
 	}
 
-    if (AudioBuffer.IsEmpty() || (SupportsLipSync() && ConvaiLipSync->RequiresPrecomputedFaceData() && LipSyncBuffer.IsEmpty()))
+    if (AudioBuffer.IsEmpty() || (bIsSyncingAudioAndLipSync && SupportsLipSync() && ConvaiLipSync->RequiresPrecomputedFaceData() && LipSyncBuffer.IsEmpty()))
     {
         return false;
     }
@@ -845,7 +849,7 @@ bool UConvaiAudioStreamer::TryPlayBufferedContent(bool force)
     // Calculate how much we can play
 	float AudioBufferDuration = AudioBuffer.GetTotalDuration();
 	float LipSyncBufferDuration = LipSyncBuffer.GetTotalDuration();
-    float PlayDuration = bIsSyncingAudioAndLipSync && !force? FMath::Min(AudioBufferDuration, LipSyncBufferDuration) : AudioBufferDuration;
+    float PlayDuration = bIsSyncingAudioAndLipSync? FMath::Min(AudioBufferDuration, LipSyncBufferDuration) : AudioBufferDuration;
     if (PlayDuration <= 0.0f)
 	{
         return false;

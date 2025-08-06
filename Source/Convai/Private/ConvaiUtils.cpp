@@ -1108,36 +1108,71 @@ TMap<FName, float> UConvaiUtils::MapBlendshapes(const TMap<FName, float>& InputB
 }
 
 bool UConvaiSettingsUtils::GetParamValueAsString(const FString& paramName, FString& outValue) {
-	FString input = Convai::Get().GetConvaiSettings()->ExtraParams;
-	FString result;
-	FString trimmedInput = input.Replace(TEXT(" "), TEXT("")); // Remove all spaces
-	if (trimmedInput.Split(paramName + TEXT("="), nullptr, &result)) {
-		result.Split(TEXT(","), &result, nullptr);
-		outValue = result.TrimStartAndEnd().Replace(TEXT("\""), TEXT("")).TrimStartAndEnd();
-		return true;
-	}
-	outValue = FString();
-	return false;
+    // First check command line parameters
+    FString CommandLineValue = UCommandLineUtils::GetCommandLineFlagValueAsString(paramName, TEXT(""));
+    if (!CommandLineValue.IsEmpty())
+    {
+        outValue = CommandLineValue;
+        return true;
+    }
+
+    // Fall back to ExtraParams setting
+    FString input = Convai::Get().GetConvaiSettings()->ExtraParams;
+    FString result;
+    FString trimmedInput = input.Replace(TEXT(" "), TEXT("")); // Remove all spaces
+    if (trimmedInput.Split(paramName + TEXT("="), nullptr, &result)) {
+        result.Split(TEXT(","), &result, nullptr);
+        outValue = result.TrimStartAndEnd().Replace(TEXT("\""), TEXT("")).TrimStartAndEnd();
+        return true;
+    }
+    outValue = FString();
+    return false;
 }
 
 bool UConvaiSettingsUtils::GetParamValueAsFloat(const FString& paramName, float& outValue) {
-	FString stringValue;
-	if (GetParamValueAsString(paramName, stringValue)) {
-		FDefaultValueHelper::ParseFloat(stringValue, outValue);
-		return true;
-	}
-	outValue = 0.0f;
-	return false;
+    // First check command line parameters
+    FString CommandLineValue = UCommandLineUtils::GetCommandLineFlagValueAsString(paramName, TEXT(""));
+    if (!CommandLineValue.IsEmpty())
+    {
+        if (FDefaultValueHelper::ParseFloat(CommandLineValue, outValue))
+        {
+            return true;
+        }
+    }
+
+    // Fall back to ExtraParams setting
+    FString stringValue;
+    if (GetParamValueAsString(paramName, stringValue)) {
+        if (FDefaultValueHelper::ParseFloat(stringValue, outValue))
+        {
+            return true;
+        }
+    }
+    outValue = 0.0f;
+    return false;
 }
 
 bool UConvaiSettingsUtils::GetParamValueAsInt(const FString& paramName, int32& outValue) {
-	FString stringValue;
-	if (GetParamValueAsString(paramName, stringValue)) {
-		FDefaultValueHelper::ParseInt(stringValue, outValue);
-		return true;
-	}
-	outValue = 0;
-	return false;
+    // First check command line parameters
+    FString CommandLineValue = UCommandLineUtils::GetCommandLineFlagValueAsString(paramName, TEXT(""));
+    if (!CommandLineValue.IsEmpty())
+    {
+        if (FDefaultValueHelper::ParseInt(CommandLineValue, outValue))
+        {
+            return true;
+        }
+    }
+
+    // Fall back to ExtraParams setting
+    FString stringValue;
+    if (GetParamValueAsString(paramName, stringValue)) {
+        if (FDefaultValueHelper::ParseInt(stringValue, outValue))
+        {
+            return true;
+        }
+    }
+    outValue = 0;
+    return false;
 }
 
 bool UConvaiUtils::WriteSoundWaveToWavFile(USoundWave* SoundWave, const FString& FilePath)
