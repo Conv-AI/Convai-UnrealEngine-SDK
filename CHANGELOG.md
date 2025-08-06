@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.6.6
+- Add EnableSync parameter for audio and lip sync synchronization control
+
 # Release 3.6.5
 - Adjust MinBufferDuration and AudioLipSyncRatio defaults to reduce audio stutters.
 
