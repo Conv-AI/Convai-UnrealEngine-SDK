@@ -14,26 +14,15 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "ConvaiLogger.generated.h"
 
-#if WITH_EDITOR
-  // In editor: log to both UE4’s log window AND your file logger
-  #define CONVAI_LOG(Category, Verbosity, Format, ...)                  \
-  UE_LOG(Category, Verbosity, Format, ##__VA_ARGS__);					\
-  FConvaiLogger::Get().Log(                                             \
-  FString::Printf(														\
-  TEXT(#Category) TEXT(" : ") TEXT(#Verbosity) TEXT(" : ") Format,		\
-  ##__VA_ARGS__															\
-  )																		\
-  );     
-
-#else
-  #define CONVAI_LOG(Category, Verbosity, Format, ...)                      \
-  FConvaiLogger::Get().Log(                                                 \
-  FString::Printf(															\
-  TEXT(#Category) TEXT(" : ") TEXT(#Verbosity) TEXT(" : ") Format,			\
-  ##__VA_ARGS__																\
-  )																			\
-  );
-#endif
+// In editor: log to both UE4’s log window AND your file logger
+#define CONVAI_LOG(Category, Verbosity, Format, ...)                  \
+UE_LOG(Category, Verbosity, Format, ##__VA_ARGS__);					\
+FConvaiLogger::Get().Log(                                             \
+FString::Printf(														\
+TEXT(#Category) TEXT(" : ") TEXT(#Verbosity) TEXT(" : ") Format,		\
+##__VA_ARGS__															\
+)																		\
+);     
 
 /**
  * Asynchronous, file-based logger singleton using IFileHandle in append mode.
