@@ -65,7 +65,12 @@ There are multiple ways to install the plugin:
    ```
    cd Convai-UnrealEngine-SDK
    ```
-4. Run the build script with the Unreal Engine directory as the first argument:
+4. Make sure you're on the staging branch by runnung:
+   ```
+   git checkout staging
+   ```
+
+5. Run the build script with the Unreal Engine directory as the first argument:
 
      ```
      python Build.py [Unreal Engine Directory] [Additional Flags]
