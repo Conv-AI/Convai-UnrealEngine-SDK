@@ -46,34 +46,6 @@ namespace
 		return strTo;
 	}
 
-	SslCredentialsOptions getSslOptionsystem()
-	{
-		// Fetch root certificate as required on Windows (s. issue 25533).
-		SslCredentialsOptions result;
-
-		// Open root certificate store.
-		HANDLE hRootCertStore = CertOpenSystemStoreW(NULL, L"ROOT");
-		if (!hRootCertStore)
-			return result;
-
-		// Get all root certificates.
-		PCCERT_CONTEXT pCert = NULL;
-		while ((pCert = CertEnumCertificatesInStore(hRootCertStore, pCert)) != NULL)
-		{
-			// Append this certificate in PEM formatted data.
-			DWORD size = 0;
-			CryptBinaryToStringW(pCert->pbCertEncoded, pCert->cbCertEncoded,
-				CRYPT_STRING_BASE64HEADER, NULL, &size);
-			std::vector<WCHAR> pem(size);
-			CryptBinaryToStringW(pCert->pbCertEncoded, pCert->cbCertEncoded,
-				CRYPT_STRING_BASE64HEADER, pem.data(), &size);
-
-			result.pem_root_certs += utf8Encode(pem.data());
-		}
-
-		CertCloseStore(hRootCertStore, 0);
-		return result;
-	}
 
 	SslCredentialsOptions getSslOptions() {
 		SslCredentialsOptions result;
@@ -177,6 +149,36 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 )";
 
 		result.pem_root_certs = pem_root_certs;
+		return result;
+	}
+
+
+		SslCredentialsOptions getSslOptionsystem()
+	{
+		// Start with hardcoded certificates
+		SslCredentialsOptions result = getSslOptions();
+
+		// Open root certificate store.
+		HANDLE hRootCertStore = CertOpenSystemStoreW(NULL, L"ROOT");
+		if (!hRootCertStore)
+			return result;
+
+		// Get all root certificates and append them.
+		PCCERT_CONTEXT pCert = NULL;
+		while ((pCert = CertEnumCertificatesInStore(hRootCertStore, pCert)) != NULL)
+		{
+			// Append this certificate in PEM formatted data.
+			DWORD size = 0;
+			CryptBinaryToStringW(pCert->pbCertEncoded, pCert->cbCertEncoded,
+				CRYPT_STRING_BASE64HEADER, NULL, &size);
+			std::vector<WCHAR> pem(size);
+			CryptBinaryToStringW(pCert->pbCertEncoded, pCert->cbCertEncoded,
+				CRYPT_STRING_BASE64HEADER, pem.data(), &size);
+
+			result.pem_root_certs += utf8Encode(pem.data());
+		}
+
+		CertCloseStore(hRootCertStore, 0);
 		return result;
 	}
 
@@ -356,7 +358,27 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			if (AllowInsecureConnection)
 				channel_creds = grpc::InsecureChannelCredentials();
 			else
-				channel_creds = grpc::SslCredentials(getSslOptions());
+			{
+				// Check if we should use system certificates (can be overridden by command line)
+				bool UseSystemCerts = Convai::Get().GetConvaiSettings()->UseSystemCertificates;
+				FString UseSystemCertsStr = UCommandLineUtils::GetCommandLineFlagValueAsString(TEXT("ConvaiUseSystemCerts"), TEXT(""));
+				if (!UseSystemCertsStr.IsEmpty())
+				{
+					UseSystemCerts = UseSystemCertsStr.ToBool();
+					CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Using system certificates setting from command line: %s"), 
+						UseSystemCerts ? TEXT("true") : TEXT("false"));
+				}
+				
+				if (UseSystemCerts)
+				{
+					CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Using both hardcoded and system SSL certificates"));
+					channel_creds = grpc::SslCredentials(getSslOptionsystem());
+				}
+				else
+				{
+					channel_creds = grpc::SslCredentials(getSslOptions());
+				}
+			}
 	#else
 			if (AllowInsecureConnection)
 				channel_creds = grpc::InsecureChannelCredentials();

@@ -50,6 +50,10 @@ public:
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
 	bool AllowInsecureConnection;
 
+	/* Use both hardcoded and system SSL certificates on Windows */
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	bool UseSystemCertificates;
+
 	/* Extra Parameters (Used for debugging) */
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
 	FString ExtraParams;
