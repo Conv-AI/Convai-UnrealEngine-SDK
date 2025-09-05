@@ -846,7 +846,7 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		if (ReceivedText.isEmpty() && IsFinal == false)
+		if (ReceivedText.IsEmpty() && IsFinal == false)
 		{
 			return;
 		}
