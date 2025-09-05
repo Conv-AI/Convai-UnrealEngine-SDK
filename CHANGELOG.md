@@ -1,8 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.6.7-Beta
+- Add UseSystemCertificates option for SSL configuration on Windows.
+- Fixed Convai logging not showing after packaging.
+- Fixed multiplayer crash due to sending text data over non-game thread.
+
 # Release 3.6.6
-- Add EnableSync parameter for audio and lip sync synchronization control
+- Add EnableSync parameter for audio and lip sync synchronization control.
 
 # Release 3.6.5
 - Adjust MinBufferDuration and AudioLipSyncRatio defaults to reduce audio stutters.
