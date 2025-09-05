@@ -8,6 +8,12 @@ on:
       - beta
   workflow_dispatch:
 
+# Explicitly grant permissions to GITHUB_TOKEN
+permissions:
+  contents: write    # Required for creating releases and pushing tags
+  actions: read      # Required for workflow execution
+  checks: read       # Required for status checks
+
 jobs:
   checkout-code:
     runs-on: UE-Dev-Runner
@@ -207,10 +213,13 @@ jobs:
         shell: pwsh
 
   compress-and-release:
-    needs: [checkout-code, build-and-package]
+    needs: [checkout-code, check-version, build-and-package]
     runs-on: UE-Dev-Runner
     if: needs.check-version.outputs.release_exists == 'false'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Extract release notes
         id: extract_notes
         run: |
@@ -222,13 +231,83 @@ jobs:
         shell: pwsh
 
       - name: Create Git tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          Write-Host "=== Git Tag Creation Debug Info ==="
+          Write-Host "Repository: ${{ github.repository }}"
+          Write-Host "Actor: ${{ github.actor }}"
+          Write-Host "Event: ${{ github.event_name }}"
+          Write-Host "Ref: ${{ github.ref }}"
+
+          # Check if token is available (without exposing it)
+          if ($env:GITHUB_TOKEN) {
+            Write-Host "✓ GITHUB_TOKEN is available (length: $($env:GITHUB_TOKEN.Length))"
+          } else {
+            Write-Host "✗ GITHUB_TOKEN is not available"
+            exit 1
+          }
+
+          Write-Host "Configuring git user..."
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
+
+          Write-Host "Current git remote URL:"
+          git remote get-url origin
+
+          Write-Host "Configuring git remote for token authentication..."
+          git remote set-url origin https://x-access-token:$env:GITHUB_TOKEN@github.com/${{ github.repository }}.git
+
+          Write-Host "Updated git remote URL (token masked):"
+          git remote get-url origin | ForEach-Object { $_ -replace $env:GITHUB_TOKEN, "***TOKEN***" }
+
           $version = "${{ needs.checkout-code.outputs.version_name }}"
-          if (-not $version) { Write-Host "Version is empty!"; exit 1 }
+          Write-Host "Version to tag: '$version'"
+          if (-not $version) {
+            Write-Host "✗ Version is empty!"
+            exit 1
+          }
+
+          Write-Host "Creating git tag: $version"
           git tag $version
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️ Tag creation failed - checking if tag already exists..."
+            $existingTag = git tag -l $version
+            if ($existingTag) {
+              Write-Host "✓ Tag '$version' already exists locally, continuing..."
+            } else {
+              Write-Host "✗ Failed to create tag for unknown reason"
+              exit 1
+            }
+          } else {
+            Write-Host "✓ Successfully created tag locally"
+          }
+
+          Write-Host "Checking if tag exists locally:"
+          git tag -l $version
+
+          Write-Host "Pushing tag to remote..."
           git push origin $version
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️ Tag push failed - checking if tag already exists on remote..."
+
+            # Check if the tag exists on remote
+            $remoteTag = git ls-remote --tags origin $version
+            if ($remoteTag) {
+              Write-Host "✓ Tag '$version' already exists on remote, continuing..."
+            } else {
+              Write-Host "✗ Failed to push tag and tag doesn't exist on remote"
+              Write-Host "Git status:"
+              git status
+              Write-Host "Git remote -v:"
+              git remote -v
+              exit 1
+            }
+          } else {
+            Write-Host "✓ Successfully pushed tag to remote"
+          }
+
+          Write-Host "✓ Successfully created and pushed tag: $version"
         shell: pwsh
 
       - name: Confirm Git tag exists
