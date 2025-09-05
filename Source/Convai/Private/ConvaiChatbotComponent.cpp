@@ -846,7 +846,28 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+		if (ReceivedText.isEmpty() && IsFinal == false)
+		{
+			return;
+		}
+
+		if (!IsInGameThread())
+		{
+			TWeakObjectPtr<UConvaiChatbotComponent> WeakThis(this);
+			AsyncTask(ENamedThreads::GameThread, [WeakThis, ReceivedText, IsFinal]()
+			{
+				if (WeakThis.IsValid())
+				{
+					UConvaiChatbotComponent* StrongThis = WeakThis.Get();
+					StrongThis->Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+				}
+			});
+		}
+		else
+		{
+			Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+		}
+
 	}
 
 	float ReceivedAudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
