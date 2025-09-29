@@ -245,6 +245,8 @@ void FgRPCClient::CreateChannel()
 	grpc::ChannelArguments args;
 	args.SetMaxReceiveMessageSize(2147483647);
 
+	args.SetInt(GRPC_ARG_CLIENT_IDLE_TIMEOUT_MS, INT_MAX);
+
 	Channel = grpc::CreateCustomChannel(Target, Creds, args);
 
 	//Channel->NotifyOnStateChange(grpc_connectivity_state::GRPC_CHANNEL_CONNECTING, std::chrono::system_clock::time_point().max(), &cq_, (void*)&OnStateChangeDelegate);
