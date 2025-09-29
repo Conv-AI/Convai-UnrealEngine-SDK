@@ -9,6 +9,7 @@
 #include "Serialization/JsonReader.h"
 #include "Engine/GameEngine.h"
 #include "Runtime/Launch/Resources/Version.h"
+#include "RestAPI/ConvaiURL.h"
 #include "ConvaiDefinitions.generated.h"
 
 USTRUCT(BlueprintType)
@@ -939,10 +940,9 @@ namespace ConvaiConstants
 	const FString API_Key_Header = "CONVAI-API-KEY";
 	const FString Auth_Token_Header = "API-AUTH-TOKEN";
 
-	const FString ExperienceUpdateEndpoint = "https://api.convai.com/xp/experiences/update";
-	const FString ExperienceSessionDetailEndpoint = "https://api.convai.com/xp/sessions/detail";
 
-	//char* AvatarDefaultImage2 = "https://convai.com/_next/static/images/placeholder-3d-cab6463359f6ccedb4cda311c4056788.jpg";
+	inline FString GetExperienceUpdateEndpoint(){return UConvaiURL::GetFullURL(TEXT("xp/experiences/update"), false);}
+	inline FString GetExperienceSessionDetailEndpoint(){return UConvaiURL::GetFullURL(TEXT("xp/sessions/detail"), false);}
 };
 
 
@@ -1082,8 +1082,13 @@ struct FConvaiSpeakerInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speaker Info")
 	FString Name;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speaker Info")
+	FString DeviceID;
+	
 	FConvaiSpeakerInfo()
-		: SpeakerID(TEXT("")), Name(TEXT(""))
+		: SpeakerID(TEXT(""))
+		, Name(TEXT(""))
+		, DeviceID(TEXT(""))
 	{
 	}
 };

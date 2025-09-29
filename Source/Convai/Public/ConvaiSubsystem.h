@@ -130,4 +130,34 @@ public:
 
 public:
     TSharedPtr<FgRPCClient> gRPC_Runnable;
+
+public:
+    // Register a chatbot component with the subsystem
+    void RegisterChatbotComponent(class UConvaiChatbotComponent* ChatbotComponent);
+    
+    // Unregister a chatbot component from the subsystem
+    void UnregisterChatbotComponent(class UConvaiChatbotComponent* ChatbotComponent);
+    
+    // Get all registered chatbot components
+    TArray<class UConvaiChatbotComponent*> GetAllChatbotComponents() const;
+
+public:
+    // Register a player component with the subsystem
+    void RegisterPlayerComponent(class UConvaiPlayerComponent* PlayerComponent);
+    
+    // Unregister a player component from the subsystem
+    void UnregisterPlayerComponent(class UConvaiPlayerComponent* PlayerComponent);
+    
+    // Get all registered player components
+    TArray<class UConvaiPlayerComponent*> GetAllPlayerComponents() const;
+
+private:
+    // Array to store all active chatbot components
+    UPROPERTY()
+    TArray<class UConvaiChatbotComponent*> RegisteredChatbotComponents;
+
+private:
+    // Array to store all active player components
+    UPROPERTY()
+    TArray<class UConvaiPlayerComponent*> RegisteredPlayerComponents;
 };

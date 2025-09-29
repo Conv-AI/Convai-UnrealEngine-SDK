@@ -1,6 +1,53 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# Release 3.6.7-Beta
+- Add UseSystemCertificates option for SSL configuration on Windows.
+- Fixed Convai logging not showing after packaging.
+- Fixed multiplayer crash due to sending text data over non-game thread.
+
+# Release 3.6.6
+- Add EnableSync parameter for audio and lip sync synchronization control.
+
+# Release 3.6.5
+- Adjust MinBufferDuration and AudioLipSyncRatio defaults to reduce audio stutters.
+
+# Release 3.6.4
+- Improve data validation in ConvaiAudioStreamer to prevent crashes from invalid input.
+- fixed MinBufferDuration not working as expected when lipsync is active.
+
+# Release 3.6.3
+- Improve memory management in ConvaiGRPC.
+
+# Release 3.6.2
+- Potential fix for missing audio for Elevenlabs and some of Azure voices.
+- Improved Performance when receiving AI audio responses.
+
+# Release 3.6.1
+- Fix headers fr linux build.
+
+# Release 3.6.0
+- UE5.6 support.
+- Optimized GetAllChatbotComponents and GetAllPlayerComponents function.
+- Added Convai Logger.
+
+# Release 3.5.4-hotfix-1
+- Fixed racing condition when playing audio.
+- Updated Android Play Core to 2.0.3.
+- Refactored old unused classes and code.
+
+# Release 3.5.4
+- Further improved LipSync accuracy and synchornization.
+- Fixed an issue where [player speech transcription would fail after short character responses](https://forum.convai.com/t/player-speech-transcription-fails-after-short-character-responses/3735/2).
+- Improved gRPC connection stability to prevent conversation failures.
+- Resolved a rare crash caused by the server sending large volumes of audio in small chunks.
+
+# Release 3.5.4
+- Further improved LipSync accuracy and synchornization.
+- Fixed an issue where [player speech transcription would fail after short character responses](https://forum.convai.com/t/player-speech-transcription-fails-after-short-character-responses/3735/2).
+- Improved gRPC connection stability to prevent conversation failures.
+- Resolved a rare crash caused by the server sending large volumes of audio in small chunks.
+
 # Release 3.5.3-beta
 - Improved LipSync accuracy and synchornization.
 - Fixed Voice cutting off for Elevenlab voices.

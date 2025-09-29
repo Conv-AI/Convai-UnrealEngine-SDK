@@ -33,7 +33,7 @@
 #define OPUS_CHECK_CTL(Category, CTL) \
 	if (ErrCode != OPUS_OK) \
 	{ \
-		UE_LOG(Category, Warning, TEXT("Failure to get CTL %s"), #CTL); \
+		CONVAI_LOG(Category, Warning, TEXT("Failure to get CTL %s"), #CTL); \
 	}
 
 
@@ -44,6 +44,12 @@ UConvaiAudioStreamer::UConvaiAudioStreamer(const FObjectInitializer& ObjectIniti
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	bAutoActivate = true;
+
+	// Pre-allocate the temporary buffer
+	TempAudioBuffer.Reserve(TempBufferSize);
+
+	// Initialize the audio buffer with a reasonable size
+	AudioBuffer.Init(TempBufferSize);
 }
 
 void UConvaiAudioStreamer::BroadcastVoiceDataToClients_Implementation(TArray<uint8> const& EncodedVoiceData, uint32 SampleRate, uint32 NumChannels, uint32 SizeBeforeEncode)
@@ -53,7 +59,7 @@ void UConvaiAudioStreamer::BroadcastVoiceDataToClients_Implementation(TArray<uin
 	{
 		DestroyOpusDecoder();
 		InitDecoder(SampleRate, NumChannels);
-		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Initialized Decoder with SampleRate:%d and Channels:%d"), DecoderSampleRate, DecoderNumChannels);
+		CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Initialized Decoder with SampleRate:%d and Channels:%d"), DecoderSampleRate, DecoderNumChannels);
 	}
 
 
@@ -64,7 +70,7 @@ void UConvaiAudioStreamer::BroadcastVoiceDataToClients_Implementation(TArray<uin
 
 	// Decode the Audio data
 	uint32 outsize = ReceivedEncodedAudioDataBuffer.GetAllocatedSize();
-	//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Allocated buffer size for decoding: %d bytes"), outsize);
+	//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Allocated buffer size for decoding: %d bytes"), outsize);
 
 	Decode(EncodedVoiceData.GetData(), EncodedVoiceData.Num(), ReceivedEncodedAudioDataBuffer.GetData(), outsize);
 
@@ -81,7 +87,7 @@ void UConvaiAudioStreamer::BroadcastVoiceDataToClients_Implementation(TArray<uin
 		OnServerAudioReceived(ReceivedEncodedAudioDataBuffer.GetData(), outsize, false, SampleRate, NumChannels);
 	}
 
-	//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Decoder Received %d bytes and Outputted %d bytes"), EncodedVoiceData.Num(), outsize);
+	//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Decoder Received %d bytes and Outputted %d bytes"), EncodedVoiceData.Num(), outsize);
 }
 
 //void UConvaiAudioStreamer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -113,147 +119,246 @@ void UConvaiAudioStreamer::PlayVoiceSynced(uint8* VoiceData, uint32 VoiceDataSiz
     {
         return;
     }
-    
-    // If we don't need lipsync synchronization, just play the voice directly
-    if (!bIsSyncingAudioAndLipSync)
-    {
-        // Calculate audio duration
-        uint32 PCM_DataSize = VoiceDataSize;
-        if (ContainsHeaderData)
-        {
-            // Parse WAV header
-            FWaveModInfo WaveInfo;
-            if (WaveInfo.ReadWaveInfo(VoiceData, VoiceDataSize))
-            {
-                PCM_DataSize = *WaveInfo.pWaveDataSize;
-            }
-        }
-        
-        float AudioDuration = UConvaiUtils::CalculateAudioDuration(PCM_DataSize, NumChannels, SampleRate, 2);
-        
-        // Update tracking variables
-        TotalPlayingDuration += AudioDuration;
-        
-        // Play the voice directly
-        PlayVoiceData(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
-        return;
-    }
-    
-    // Otherwise, handle the audio through our state machine
+
     HandleAudioReceived(VoiceData, VoiceDataSize, ContainsHeaderData, SampleRate, NumChannels);
+}
+
+namespace
+{
+	void HandleAudioTimer(TWeakObjectPtr<UConvaiAudioStreamer> WeakSelf, int32 PCM_DataSize, int32 SampleRate)
+	{
+		if (!WeakSelf.IsValid() || !IsValid(WeakSelf->GetWorld()))
+		{
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Object or World is Invalid!"));
+			return;
+		}
+
+		float NewAudioDuration = float(PCM_DataSize) / float(SampleRate * 2);
+
+		
+		double CurrentTime = FPlatformTime::Seconds();
+		
+		double RemainingAudioDuration = 0.0;
+		if (WeakSelf->AudioEndTime > 0.0)
+		{
+			RemainingAudioDuration = WeakSelf->AudioEndTime - CurrentTime;
+			if (RemainingAudioDuration < 0.0)
+				RemainingAudioDuration = 0.0;
+		}
+
+		
+		double TotalAudioDuration = RemainingAudioDuration + NewAudioDuration;
+		
+		WeakSelf->AudioEndTime = CurrentTime + TotalAudioDuration;
+
+		if (WeakSelf.IsValid() && IsValid(WeakSelf->GetWorld()))
+		{
+			WeakSelf->GetWorld()->GetTimerManager().SetTimer(
+				WeakSelf->AudioFinishedTimerHandle, 
+				WeakSelf.Get(), 
+				&UConvaiAudioStreamer::onAudioFinished, 
+				TotalAudioDuration, 
+				false);
+		}
+		else
+		{
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Object or World became invalid before setting timer!"));
+		}
+	}
+
+	void SetupAndPlayAudio(TWeakObjectPtr<UConvaiAudioStreamer> WeakThis, TArray<uint8> AudioDataCopy, int32 SampleRate, int32 NumChannels)
+	{
+		if (!WeakThis.IsValid() || !IsValid(WeakThis->SoundWaveProcedural))
+		{
+			return;
+		}
+
+		WeakThis->SetSound(WeakThis->SoundWaveProcedural);
+		WeakThis->SoundWaveProcedural->QueueAudio(AudioDataCopy.GetData(), AudioDataCopy.Num());
+		WeakThis->Play();
+
+		// Lipsync component process the audio data to generate the lipsync
+		if (WeakThis.IsValid() && !(WeakThis->ConvaiLipSync && WeakThis->ConvaiLipSync->RequiresPrecomputedFaceData()))
+		{
+			uint8* NonConstData = const_cast<uint8*>(AudioDataCopy.GetData());
+			WeakThis->PlayLipSync(NonConstData, AudioDataCopy.Num(), SampleRate, NumChannels);
+		}
+
+		WeakThis->ForceRecalculateLipsyncStartTime();
+	}
+};
+
+void UConvaiAudioStreamer::ProcessPendingAudio()
+{
+	if (!IsValid(SoundWaveProcedural) && PendingAudioBuffer.Num() <= 0)
+		return;
+
+    // Process the buffer if there's any data
+    SoundWaveProcedural->QueueAudio(PendingAudioBuffer.GetData(), PendingAudioBuffer.Num());
+
+	// Lipsync component process the audio data to generate the lipsync
+	if (!(ConvaiLipSync && ConvaiLipSync->RequiresPrecomputedFaceData()))
+	{
+		uint32 SampleRate = SoundWaveProcedural->GetSampleRateForCurrentPlatform();
+		uint32 NumChannels = SoundWaveProcedural->NumChannels;
+		PlayLipSync(PendingAudioBuffer.GetData(), PendingAudioBuffer.Num(), SampleRate>0? SampleRate : 48000, NumChannels > 0? NumChannels : 1);
+	}
+    PendingAudioBuffer.Empty();
 }
 
 void UConvaiAudioStreamer::PlayVoiceData(uint8* VoiceData, uint32 VoiceDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels)
 {
-	if (IsVoiceCurrentlyFading())
-		StopVoice();
-	ResetVoiceFade();
+    if (IsVoiceCurrentlyFading())
+        StopVoice();
+    ResetVoiceFade();
 
-	uint32 PCM_DataSize = VoiceDataSize;
+    if (ContainsHeaderData)
+    {
+        // Parse Wav header
+        FWaveModInfo WaveInfo;
+        FString ErrorReason;
+        bool ParseSuccess = WaveInfo.ReadWaveInfo(VoiceData, VoiceDataSize, &ErrorReason);
+        // Set the number of channels and sample rate for the first time reading from the stream
+        if (ParseSuccess)
+        {
+            // Validate that the world exists
+            if (!IsValid(GetWorld()))
+                return;
 
-	if (ContainsHeaderData)
-	{
-		// Parse Wav header
-		FWaveModInfo WaveInfo;
-		FString ErrorReason;
-		bool ParseSuccess = WaveInfo.ReadWaveInfo(VoiceData, VoiceDataSize, &ErrorReason);
-		// Set the number of channels and sample rate for the first time reading from the stream
-		if (ParseSuccess)
+            SampleRate = *WaveInfo.pSamplesPerSec;
+            NumChannels = *WaveInfo.pChannels;
+
+			// Play only the PCM data which start after 44 bytes
+			VoiceData += 44;
+			VoiceDataSize -= 44;
+        }
+        else if (!ParseSuccess)
+        {
+            CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Failed to parse wav header, reason: %s"), *ErrorReason);
+        }
+    }
+
+    TWeakObjectPtr<UConvaiAudioStreamer> WeakSelf = this;
+
+    if (IsInGameThread())
+    {
+        HandleAudioTimer(WeakSelf, VoiceDataSize, SampleRate);
+    }
+    else
+    {
+        AsyncTask(ENamedThreads::GameThread, [WeakSelf, VoiceDataSize, SampleRate]()
+        {
+            HandleAudioTimer(WeakSelf, VoiceDataSize, SampleRate);
+        });
+    }
+    
+    if (!IsValid(SoundWaveProcedural))
+        return;
+
+    // If configuring audio then queue the audio and return
+    if (IsAudioConfiguring)
+    {
+        // Lock is already held, queue this audio for later processing
+        if (ContainsHeaderData)
+        {
+            // Skip header for the queue
+            PendingAudioBuffer.Append(VoiceData + 44, VoiceDataSize - 44);
+        }
+        else
+        {
+            PendingAudioBuffer.Append(VoiceData, VoiceDataSize);
+        }
+        
+        // Try the lock again before exiting - if it's available now, process the queue
+        if (!IsAudioConfiguring)
+        {
+			IsAudioConfiguring.AtomicSet(true);
+            ProcessPendingAudio();
+			IsAudioConfiguring.AtomicSet(false);
+        }
+        
+        return;
+    }
+    
+    // We have the lock, proceed with processing
+    
+    // Check that SoundWaveProcedural is valid and able to play input sample rate and channels
+    if (SoundWaveProcedural->GetSampleRateForCurrentPlatform() != SampleRate || SoundWaveProcedural->NumChannels != NumChannels)
+    {
+		IsAudioConfiguring.AtomicSet(true);
+
+        SoundWaveProcedural->SetSampleRate(SampleRate);
+        SoundWaveProcedural->NumChannels = NumChannels;
+        SoundWaveProcedural->Duration = INDEFINITELY_LOOPING_DURATION;
+        SoundWaveProcedural->SoundGroup = SOUNDGROUP_Voice;
+        SoundWaveProcedural->bLooping = false;
+        SoundWaveProcedural->bProcedural = true;
+        SoundWaveProcedural->Pitch = 1.0f;
+        SoundWaveProcedural->Volume = 1.0f;
+        SoundWaveProcedural->AttenuationSettings = nullptr;
+        SoundWaveProcedural->bDebug = true;
+        SoundWaveProcedural->VirtualizationMode = EVirtualizationMode::PlayWhenSilent;
+
+        CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("New SampleRate: %d"), SampleRate);
+        CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("New Channels: %d"), NumChannels);
+
+        // Create a copy of the audio data for thread safety
+        TArray<uint8> AudioDataCopy;
+		AudioDataCopy.Append(VoiceData, VoiceDataSize);
+        
+        // Store a copy of the weak pointer for the lambda
+        TWeakObjectPtr<UConvaiAudioStreamer> WeakThis = this;
+        
+
+        if (IsInGameThread())
 		{
-			// Validate that the world exists
-			if (!IsValid(GetWorld()))
-				return;
+            SetupAndPlayAudio(WeakThis, AudioDataCopy, SampleRate, NumChannels);
+            
+            // Process any pending audio before releasing the lock
+            ProcessPendingAudio();
 
-			SampleRate = *WaveInfo.pSamplesPerSec;
-			NumChannels = *WaveInfo.pChannels;
-			PCM_DataSize = *WaveInfo.pWaveDataSize;
-		}
-		else if (!ParseSuccess)
-		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: Failed to parse wav header, reason: %s"), *ErrorReason);
-		}
-	}
+            // Release the lock
+			IsAudioConfiguring.AtomicSet(false);
+        }
+        else
+        {            
+            AsyncTask(ENamedThreads::GameThread, [WeakThis, AudioDataCopy, SampleRate, NumChannels]()
+                {
+                    if (WeakThis.IsValid())
+						SetupAndPlayAudio(WeakThis, AudioDataCopy, SampleRate, NumChannels);
+                    
+                    // Process any pending audio before releasing the lock
+                    if (WeakThis.IsValid())
+                        WeakThis->ProcessPendingAudio();
 
+					// Release the lock
+					if (WeakThis.IsValid())
+						WeakThis->IsAudioConfiguring.AtomicSet(false);
+                });
+        }
 
-	AsyncTask(ENamedThreads::GameThread, [this, PCM_DataSize, SampleRate]
-	{
-		if (!IsValid(GetWorld()))
-		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: GetWorld() is Invalid!"));
-			return;
-		}
+        if (!IsTalking)
+        {
+            onAudioStarted();
+            IsTalking = true;
+        }
+        
+        return;
+    }
+    
+    SoundWaveProcedural->QueueAudio(VoiceData, VoiceDataSize);
 
-		// TODO (Mohamed): take number of channels in consideration when calculating the duration
-		// Duration = PCM Data Size / (Sample Rate * Bytes per sample)
-		float NewAudioDuration = float(PCM_DataSize) / float(SampleRate * 2);
+    if (!IsTalking)
+    {
+        onAudioStarted();
+        IsTalking = true;
+    }
 
-		float CurrentRemainingAudioDuration = GetWorld()->GetTimerManager().GetTimerRemaining(AudioFinishedTimerHandle);
-		if (CurrentRemainingAudioDuration < 0)
-			CurrentRemainingAudioDuration = 0; // Can never be less than zero
-
-		//if (CurrentRemainingAudioDuration == 0)
-		//	NewAudioDuration -= 0.1; // Hacky way - Reduce the duration by a small amount so that the OnAudioFinished would be called early and this will cause no gap between voice chunks
-
-		// New Duration = Remaining Duration + New Duration
-		float TotalAudioDuration = CurrentRemainingAudioDuration + NewAudioDuration;
-
-		GetWorld()->GetTimerManager().SetTimer(AudioFinishedTimerHandle, this, &UConvaiAudioStreamer::onAudioFinished, TotalAudioDuration, false);
-	});
-
-	if (!IsValid(SoundWaveProcedural))
-		return;
-
-	// TODO (Mohamed) : Needs further testing, especially when sample rate or NumChannels changes
-	// Check that SoundWaveProcedural is valid and able to play input sample rate and channels
-	if (SoundWaveProcedural->GetSampleRateForCurrentPlatform() != SampleRate || SoundWaveProcedural->NumChannels != NumChannels)
-	{
-		//if (IsValid(SoundWaveProcedural)) // Destroy SoundWaveProcedural if it is valid
-		//	SoundWaveProcedural->ConditionalBeginDestroy();
-
-		SoundWaveProcedural->SetSampleRate(SampleRate);
-		SoundWaveProcedural->NumChannels = NumChannels;
-		SoundWaveProcedural->Duration = INDEFINITELY_LOOPING_DURATION;
-		SoundWaveProcedural->SoundGroup = SOUNDGROUP_Voice;
-		SoundWaveProcedural->bLooping = false;
-		SoundWaveProcedural->bProcedural = true;
-		SoundWaveProcedural->Pitch = 1.0f;
-		SoundWaveProcedural->Volume = 1.0f;
-		SoundWaveProcedural->AttenuationSettings = nullptr;
-		SoundWaveProcedural->bDebug = true;
-		SoundWaveProcedural->VirtualizationMode = EVirtualizationMode::PlayWhenSilent;
-
-		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("New SampleRate: %d"), SampleRate);
-		UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("New Channels: %d"), NumChannels);
-
-		AsyncTask(ENamedThreads::GameThread, [this]
-		{
-			SetSound(SoundWaveProcedural);
-			Play();
-		});
-	}
-
-	if (ContainsHeaderData)
-	{
-		// Play only the PCM data which start after 44 bytes
-		VoiceData += 44;
-		VoiceDataSize -= 44;
-	}
-
-	SoundWaveProcedural->QueueAudio(VoiceData, VoiceDataSize);
-
-
-	if (!IsTalking)
-	{
-		onAudioStarted();
-		IsTalking = true;
-	}
-
-	// Does the lipsync component require the blendshapes/Visemes to be sent to it
-	if (ConvaiLipSyncExtended && ConvaiLipSyncExtended->RequiresPreGeneratedFaceData())
-		return;
-	else
-		// Lipsync component process the audio data to generate the lipsync
-		PlayLipSync(VoiceData, VoiceDataSize, SampleRate, NumChannels);
+    // Lipsync component process the audio data to generate the lipsync
+    if (!(ConvaiLipSync && ConvaiLipSync->RequiresPrecomputedFaceData()))
+    {
+        PlayLipSync(VoiceData, VoiceDataSize, SampleRate, NumChannels);
+    }
 }
 
 void UConvaiAudioStreamer::ForcePlayVoice(USoundWave* VoiceToPlay)
@@ -266,6 +371,9 @@ void UConvaiAudioStreamer::ForcePlayVoice(USoundWave* VoiceToPlay)
 
 void UConvaiAudioStreamer::StopVoice()
 {    
+    // Reset the audio end time
+    AudioEndTime = 0.0;
+    
     // Clear audio and lipsync buffers
     AudioBuffer.Reset();
     LipSyncBuffer.Reset();
@@ -324,7 +432,7 @@ void UConvaiAudioStreamer::StopVoiceWithFade(float InVoiceFadeOutDuration)
 
 	if (!IsValid(GetWorld()))
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: GetWorld() is Invalid!"));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("PlayVoiceData: GetWorld() is Invalid!"));
 		return;
 	}
 
@@ -367,7 +475,7 @@ void UConvaiAudioStreamer::ClearAudioFinishedTimer()
 {
 	if (!IsValid(GetWorld()))
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("ClearAudioFinishedTimer: GetWorld() is Invalid!"));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("ClearAudioFinishedTimer: GetWorld() is Invalid!"));
 		return;
 	}
 	GetWorld()->GetTimerManager().ClearTimer(AudioFinishedTimerHandle);
@@ -418,21 +526,20 @@ bool UConvaiAudioStreamer::SetLipSyncComponent(UActorComponent* LipSyncComponent
 	if (LipSyncComponent && LipSyncComponent->GetClass()->ImplementsInterface(UConvaiLipSyncInterface::StaticClass()))
 	{
 		ConvaiLipSync = Cast<IConvaiLipSyncInterface>(LipSyncComponent);
-		ConvaiLipSyncExtended = Cast<IConvaiLipSyncExtendedInterface>(LipSyncComponent);
 		ConvaiLipSync->OnVisemesDataReady.BindUObject(this, &UConvaiAudioStreamer::OnVisemesReadyCallback);
+
+		// Should lipsync and audio be synchronized
+		EnableSync = UConvaiSettingsUtils::GetParamValueAsFloat("EnableSync", EnableSync) ? EnableSync : 1;
+		EnableSync = EnableSync >= 0.5 ? 1 : 0;
 		
 		// Update bIsSyncingAudioAndLipSync based on the new component
-		bIsSyncingAudioAndLipSync = SupportsLipSync() && 
-								   ConvaiLipSyncExtended != nullptr && 
-								   ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() && 
-								   !ReplicateVoiceToNetwork;
+		bIsSyncingAudioAndLipSync = EnableSync && SupportsLipSync() && ConvaiLipSync->RequiresPrecomputedFaceData() && !ReplicateVoiceToNetwork;
 		
 		return true;
 	}
 	else
 	{
 		ConvaiLipSync = nullptr;
-		ConvaiLipSyncExtended = nullptr;
 		
 		// Update bIsSyncingAudioAndLipSync
 		bIsSyncingAudioAndLipSync = false;
@@ -504,17 +611,17 @@ void UConvaiAudioStreamer::BeginPlay()
     // Initialize tracking variables
     TotalPlayingDuration = 0.0f;
     TotalBufferedDuration = 0.0f;
-    bIsSyncingAudioAndLipSync = false;
     
     // Initialize configuration parameters
 
 	// Minimum buffer duration in seconds
-	MinBufferDuration = UConvaiSettingsUtils::GetParamValueAsFloat("MinBufferDuration", MinBufferDuration) ? MinBufferDuration : 0.7f;
+	MinBufferDuration = UConvaiSettingsUtils::GetParamValueAsFloat("MinBufferDuration", MinBufferDuration) ? MinBufferDuration : 0.9f;
 	MinBufferDuration = MinBufferDuration < 0 ? 0 : MinBufferDuration;
     	
 	// Ratio of lipsync to audio duration required
-	AudioLipSyncRatio = UConvaiSettingsUtils::GetParamValueAsFloat("AudioLipSyncRatio", AudioLipSyncRatio) ? AudioLipSyncRatio : 0.5f;
-	AudioLipSyncRatio = VoiceTimeFactor < 0.5 ? 0.5 : AudioLipSyncRatio;
+	AudioLipSyncRatio = UConvaiSettingsUtils::GetParamValueAsFloat("AudioLipSyncRatio", AudioLipSyncRatio) ? AudioLipSyncRatio : 0.1f;
+	AudioLipSyncRatio = AudioLipSyncRatio < 0 ? 0 : AudioLipSyncRatio;
+	AudioLipSyncRatio = AudioLipSyncRatio > 1 ? 1 : AudioLipSyncRatio;
 
 	// Initialize the audio component
 	bAutoActivate = true;
@@ -554,7 +661,7 @@ void UConvaiAudioStreamer::TransitionToState(EAudioLipSyncState NewState)
         case EAudioLipSyncState::WaitingOnAudio: NewStateStr = TEXT("WaitingOnAudio"); break;
     }
     
-    UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("State transition: %s -> %s"), 
+    CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("State transition: %s -> %s"), 
         CurrentStateStr, NewStateStr);
         
     CurrentState = NewState;
@@ -602,14 +709,14 @@ void UConvaiAudioStreamer::HandleAudioReceived(uint8* AudioData, uint32 AudioDat
     // Add to buffer
     if (AudioBuffer.IsEmpty())
     {
-        AudioBuffer.Data.Append(AudioData, AudioDataSize);
+        AudioBuffer.AppendData(AudioData, AudioDataSize);
         AudioBuffer.Duration = AudioDuration;
         AudioBuffer.SampleRate = SampleRate;
         AudioBuffer.NumChannels = NumChannels;
     }
     else
     {
-        AudioBuffer.Data.Append(AudioData, AudioDataSize);
+        AudioBuffer.AppendData(AudioData, AudioDataSize);
         AudioBuffer.Duration += AudioDuration;
     }
     
@@ -621,9 +728,18 @@ void UConvaiAudioStreamer::HandleAudioReceived(uint8* AudioData, uint32 AudioDat
     {
         case EAudioLipSyncState::Stopped:
         case EAudioLipSyncState::Playing:
+        case EAudioLipSyncState::WaitingOnAudio:
             if (HasSufficientLipSync())
             {
-                TryPlayBufferedContent();
+				if (HasSufficientAudio())
+				{
+					TryPlayBufferedContent();
+				}
+				else
+				{
+					TransitionToState(EAudioLipSyncState::WaitingOnAudio);
+					break;
+				}                
             }
             else
             {
@@ -633,13 +749,6 @@ void UConvaiAudioStreamer::HandleAudioReceived(uint8* AudioData, uint32 AudioDat
             
         case EAudioLipSyncState::WaitingOnLipSync:
             // Just buffer, waiting for lipsync
-            break;
-            
-        case EAudioLipSyncState::WaitingOnAudio:
-            if (HasSufficientAudio())
-            {
-                TryPlayBufferedContent();
-            }
             break;
     }
 }
@@ -655,22 +764,20 @@ void UConvaiAudioStreamer::HandleLipSyncReceived(FAnimationSequence& FaceSequenc
     {
         case EAudioLipSyncState::Stopped:
         case EAudioLipSyncState::Playing:
-            if (HasSufficientAudio())
-            {
-                TryPlayBufferedContent();
-            }
-            else
-            {
-                TransitionToState(EAudioLipSyncState::WaitingOnAudio);
-            }
-            break;
-            
         case EAudioLipSyncState::WaitingOnLipSync:
-            if (HasSufficientLipSync())
-            {
-                TryPlayBufferedContent();
-            }
-            break;
+			if (HasSufficientLipSync())
+			{
+				if (HasSufficientAudio())
+				{
+					TryPlayBufferedContent();
+				}
+				else
+				{
+					TransitionToState(EAudioLipSyncState::WaitingOnAudio);
+					break;
+				}
+			}
+			break;
             
         case EAudioLipSyncState::WaitingOnAudio:
             // Just buffer, waiting for audio
@@ -680,12 +787,9 @@ void UConvaiAudioStreamer::HandleLipSyncReceived(FAnimationSequence& FaceSequenc
 
 // Check if we have sufficient lipsync data
 bool UConvaiAudioStreamer::HasSufficientLipSync()
-{
-    if (LipSyncBuffer.IsEmpty())
-        return false;
-        
-    if (!SupportsLipSync() || ConvaiLipSyncExtended == nullptr || !ConvaiLipSyncExtended->RequiresPreGeneratedFaceData())
-        return true;
+{        
+	if (!SupportsLipSync() || !ConvaiLipSync->RequiresPrecomputedFaceData() || !bIsSyncingAudioAndLipSync)
+		return true;
         
     float AudioDuration = AudioBuffer.GetTotalDuration();
     float LipSyncDuration = LipSyncBuffer.GetTotalDuration();
@@ -697,43 +801,66 @@ bool UConvaiAudioStreamer::HasSufficientLipSync()
 bool UConvaiAudioStreamer::HasSufficientAudio() const
 {
     if (AudioBuffer.IsEmpty())
+	{
         return false;
-        
+	}
+
     // Get audio duration
     float AudioDuration = AudioBuffer.GetTotalDuration();
     
     // If we're not syncing audio and lipsync, just check against minimum buffer duration
     if (!bIsSyncingAudioAndLipSync)
     {
-        return AudioDuration >= 0;
+        return AudioDuration >= MinBufferDuration;
     }
     
     // Otherwise, check against both minimum duration and lipsync duration
     float LipSyncDuration = LipSyncBuffer.GetTotalDuration();
     
-    return AudioDuration >= MinBufferDuration || AudioDuration >= LipSyncDuration;
+    return AudioDuration >= MinBufferDuration && AudioDuration >= LipSyncDuration;
 }
 
 // Try to play buffered content
-bool UConvaiAudioStreamer::TryPlayBufferedContent()
+bool UConvaiAudioStreamer::TryPlayBufferedContent(bool force)
 {
-    if (AudioBuffer.IsEmpty() || (SupportsLipSync() && ConvaiLipSyncExtended && 
-        ConvaiLipSyncExtended->RequiresPreGeneratedFaceData() && LipSyncBuffer.IsEmpty()))
+	if (force)
+	{
+		float AudioBufferDuration = AudioBuffer.GetTotalDuration();
+		float PlayDuration = AudioBufferDuration;
+		if (PlayDuration <= 0.0f)
+		{
+			return false;
+		}
+
+		// Play the content
+		PlayBufferedContent(PlayDuration);
+
+		// Transition to Playing state
+		TransitionToState(EAudioLipSyncState::Playing);
+
+		return true;
+	}
+
+    if (AudioBuffer.IsEmpty() || (bIsSyncingAudioAndLipSync && SupportsLipSync() && ConvaiLipSync->RequiresPrecomputedFaceData() && LipSyncBuffer.IsEmpty()))
     {
         return false;
     }
-    
+
     // Calculate how much we can play
-    float PlayDuration = FMath::Min(AudioBuffer.GetTotalDuration(), LipSyncBuffer.GetTotalDuration());
+	float AudioBufferDuration = AudioBuffer.GetTotalDuration();
+	float LipSyncBufferDuration = LipSyncBuffer.GetTotalDuration();
+    float PlayDuration = bIsSyncingAudioAndLipSync? FMath::Min(AudioBufferDuration, LipSyncBufferDuration) : AudioBufferDuration;
     if (PlayDuration <= 0.0f)
+	{
         return false;
+	}
         
     // Play the content
     PlayBufferedContent(PlayDuration);
     
     // Transition to Playing state
     TransitionToState(EAudioLipSyncState::Playing);
-    
+	
     return true;
 }
 
@@ -748,7 +875,7 @@ void UConvaiAudioStreamer::PlayBufferedContent(float Duration)
     if (!AudioBuffer.IsEmpty())
     {
         // Calculate how many bytes to play based on sample rate, channels, and bytes per sample
-        uint32 BytesToPlay = AudioBuffer.Data.Num();
+        uint32 BytesToPlay = AudioBuffer.Data.RingDataUsage();
         
         if (Duration < AudioBuffer.Duration)
         {
@@ -764,27 +891,43 @@ void UConvaiAudioStreamer::PlayBufferedContent(float Duration)
             BytesToPlay = SamplesToPlay * NumChannels * BytesPerSample;
             
             // Ensure we don't exceed the buffer size
-            BytesToPlay = FMath::Min(BytesToPlay, (uint32)AudioBuffer.Data.Num());
+            BytesToPlay = FMath::Min(BytesToPlay, AudioBuffer.Data.RingDataUsage());
             
             // Ensure we're aligned to a sample boundary
             BytesToPlay = (BytesToPlay / (NumChannels * BytesPerSample)) * (NumChannels * BytesPerSample);
         }
         
+        // Ensure our temp buffer is large enough
+        if ((uint32)TempAudioBuffer.Max() < BytesToPlay)
+        {
+            // Only resize if necessary
+            TempAudioBuffer.SetNumUninitialized(BytesToPlay);
+        }
+        else
+        {
+            // Just set the used size without reallocating
+            TempAudioBuffer.SetNumUninitialized(BytesToPlay, false);
+        }
+        
+        // Get the data from the ring buffer
+        AudioBuffer.GetData(TempAudioBuffer.GetData(), BytesToPlay);
+        
         // Play the audio
-        PlayVoiceData(AudioBuffer.Data.GetData(), BytesToPlay, false, 
+        PlayVoiceData(TempAudioBuffer.GetData(), BytesToPlay, false, 
             AudioBuffer.SampleRate, AudioBuffer.NumChannels);
             
         // Remove played data from buffer
-        if (BytesToPlay == AudioBuffer.Data.Num())
+        if (BytesToPlay >= AudioBuffer.Data.RingDataUsage())
         {
             AudioBuffer.Reset();
         }
         else
         {
-            AudioBuffer.Data.RemoveAt(0, BytesToPlay);
+            // Efficiently remove data from the ring buffer
+            AudioBuffer.RemoveData(BytesToPlay);
             
             // Recalculate the remaining duration based on the actual bytes removed
-            float PlayedDuration = (float)BytesToPlay / (AudioBuffer.SampleRate * AudioBuffer.NumChannels * 2);
+            float PlayedDuration = (float)BytesToPlay / ((float)AudioBuffer.SampleRate * (float)AudioBuffer.NumChannels * 2.0f);
             AudioBuffer.Duration -= PlayedDuration;
         }
     }
@@ -859,7 +1002,7 @@ void UConvaiAudioStreamer::PlayBufferedContent(float Duration)
         // Play all the sequences we collected
         for (const FAnimationSequence& Sequence : SequencesToPlay)
         {
-            PlayLipSyncWithPreGeneratedData(Sequence);
+            PlayLipSyncWithPrecomputedFacialAnimation(Sequence);
         }
         
         // Remove completely played sequences from buffer
@@ -910,8 +1053,8 @@ void UConvaiAudioStreamer::TickComponent(float DeltaTime, ELevelTick TickType, F
 		// Free the Encoded data buffer
 		free(CurrentEncodedAudioDataPtr);
 
-		//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Encoder Received %d bytes and Outputted %d bytes"), SizeOfDataBeforeEncoding, CurrentEncodedAudioDataSize);
-		//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Remaining %d bytes"), AudioDataBuffer.Num());
+		//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Encoder Received %d bytes and Outputted %d bytes"), SizeOfDataBeforeEncoding, CurrentEncodedAudioDataSize);
+		//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Remaining %d bytes"), AudioDataBuffer.Num());
 	}
 }
 
@@ -928,12 +1071,12 @@ void UConvaiAudioStreamer::DestroyOpus()
 
 }
 
-void UConvaiAudioStreamer::PlayLipSyncWithPreGeneratedDataSynced(FAnimationSequence& FaceSequence)
+void UConvaiAudioStreamer::PlayLipSyncWithPrecomputedFacialAnimationSynced(FAnimationSequence& FaceSequence)
 {
     // If we don't need lipsync synchronization, just play the lipsync directly
     if (!bIsSyncingAudioAndLipSync)
     {
-        PlayLipSyncWithPreGeneratedData(FaceSequence);
+        PlayLipSyncWithPrecomputedFacialAnimation(FaceSequence);
         return;
     }
     
@@ -941,22 +1084,19 @@ void UConvaiAudioStreamer::PlayLipSyncWithPreGeneratedDataSynced(FAnimationSeque
     HandleLipSyncReceived(FaceSequence);
 }
 
-void UConvaiAudioStreamer::PlayLipSyncWithPreGeneratedData(FAnimationSequence FaceSequence)
+void UConvaiAudioStreamer::PlayLipSyncWithPrecomputedFacialAnimation(FAnimationSequence FaceSequence)
 {
-	if (ConvaiLipSync)
+	if (SupportsLipSync() && ConvaiLipSync->RequiresPrecomputedFaceData())
 	{
-		if (ConvaiLipSyncExtended && ConvaiLipSyncExtended->RequiresPreGeneratedFaceData())
-		{
-			ConvaiLipSyncExtended->ConvaiProcessLipSyncAdvanced(nullptr, 0, 0, 0, FaceSequence);
-		}
+		ConvaiLipSync->ConvaiApplyPrecomputedFacialAnimation(nullptr, 0, 0, 0, FaceSequence);
 	}
 }
 
 void UConvaiAudioStreamer::PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels)
 {
-	if (ConvaiLipSync)
+	if (SupportsLipSync())
 	{
-		ConvaiLipSync->ConvaiProcessLipSync(InPCMData, InPCMDataSize, InSampleRate, InNumChannels);
+		ConvaiLipSync->ConvaiInferFacialDataFromAudio(InPCMData, InPCMDataSize, InSampleRate, InNumChannels);
 	}
 }
 
@@ -973,10 +1113,7 @@ void UConvaiAudioStreamer::PauseLipSync()
 {
 	if (ConvaiLipSync)
 	{
-		if (ConvaiLipSyncExtended)
-		{
-			//ConvaiLipSyncExtended->ConvaiPauseLipSync();
-		}
+		//ConvaiLipSync->ConvaiPauseLipSync();
 	}
 }
 
@@ -984,16 +1121,21 @@ void UConvaiAudioStreamer::ResumeLipSync()
 {
 	if (ConvaiLipSync)
 	{
-		if (ConvaiLipSyncExtended)
-		{
-			//ConvaiLipSyncExtended->ConvaiResumeLipSync();
-		}
+		//ConvaiLipSyncExtended->ConvaiResumeLipSync();
 	}
 }
 
 bool UConvaiAudioStreamer::CanUseLipSync()
 {
 	return false;
+}
+
+void UConvaiAudioStreamer::ForceRecalculateLipsyncStartTime()
+{
+	if (SupportsLipSync())
+	{
+		ConvaiLipSync->ForceRecalculateStartTime();
+	}
 }
 
 bool UConvaiAudioStreamer::CanUseVision()
@@ -1030,31 +1172,55 @@ const TArray<FString> UConvaiAudioStreamer::GetVisemeNames() const
 
 const TMap<FName, float> UConvaiAudioStreamer::ConvaiGetFaceBlendshapes() const
 {
-	if (ConvaiLipSyncExtended)
+	if (ConvaiLipSync)
 	{
-		return ConvaiLipSyncExtended->ConvaiGetFaceBlendshapes();
+		return ConvaiLipSync->ConvaiGetFaceBlendshapes();
 	}
 	return TMap<FName, float>();
 }
 
 bool UConvaiAudioStreamer::GeneratesVisemesAsBlendshapes()
 {
-	if (ConvaiLipSyncExtended)
+	if (SupportsLipSync())
 	{
-		return ConvaiLipSyncExtended->GeneratesVisemesAsBlendshapes();
+		return ConvaiLipSync->GeneratesVisemesAsBlendshapes();
 	}
 	return false;
 }
 
 void UConvaiAudioStreamer::AddFaceDataToSend(FAnimationSequence FaceSequence)
 {
-	PlayLipSyncWithPreGeneratedDataSynced(FaceSequence);
+	PlayLipSyncWithPrecomputedFacialAnimationSynced(FaceSequence);
 }
 
 void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 											bool ContainsHeaderData,
                                             uint32 InSampleRate,
                                             uint32 InNumChannels) {
+	// Validate input parameters to prevent crashes from corrupted data
+	const uint32 MaxReasonableBufferSize = 1024 * 1024 * 10; // 10 MB max
+	const uint32 MaxReasonableSampleRate = 192000; // 192 kHz max
+	const uint32 MaxReasonableChannels = 2; // 8 channels max
+
+	// Check for invalid/corrupted parameters
+	if (PCMDataToAdd.Num() == 0 || PCMDataToAdd.Num() > (int32)MaxReasonableBufferSize)
+	{
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Invalid PCMDataToAdd size: %d. Ignoring data."), PCMDataToAdd.Num());
+		return;
+	}
+
+	if (InSampleRate > MaxReasonableSampleRate)
+	{
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Invalid InSampleRate value: %u. Ignoring data."), InSampleRate);
+		return;
+	}
+
+	if (InNumChannels > MaxReasonableChannels)
+	{
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Invalid InNumChannels value: %u. Ignoring data."), InNumChannels);
+		return;
+	}
+
 	if (ContainsHeaderData)
 	{
 		// Parse Wav header
@@ -1066,11 +1232,26 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 		{
 			InSampleRate = *WaveInfo.pSamplesPerSec;
 			InNumChannels = *WaveInfo.pChannels;
-			PCMDataToAdd.RemoveAt(0, 44); // Remove the header bytes 
+
+			// Validate parsed values
+			if (InSampleRate == 0 || InSampleRate > MaxReasonableSampleRate)
+			{
+				CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Invalid parsed SampleRate: %u. Ignoring data."), InSampleRate);
+				return;
+			}
+
+			if (InNumChannels == 0 || InNumChannels > MaxReasonableChannels)
+			{
+				CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Invalid parsed NumChannels: %u. Ignoring data."), InNumChannels);
+				return;
+			}
+
+			PCMDataToAdd.RemoveAt(0, 44); // Remove the header bytes
 		}
 		else if (!ParseSuccess)
 		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Failed to parse wav header, reason: %s"), *ErrorReason);
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("AddPCMDataToSend: Failed to parse wav header, reason: %s"), *ErrorReason);
+			return; // Don't process invalid data
 		}
 	}
 
@@ -1098,7 +1279,7 @@ void UConvaiAudioStreamer::AddPCMDataToSend(TArray<uint8> PCMDataToAdd,
 			AudioDataBuffer.Reset();
 			DestroyOpusEncoder();
 			InitEncoder(InSampleRate, InNumChannels, EAudioEncodeHint::VoiceEncode_Voice);
-			UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("Initialized Encoder with SampleRate:%d and Channels:%d"), EncoderSampleRate, EncoderNumChannels);
+			CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("Initialized Encoder with SampleRate:%d and Channels:%d"), EncoderSampleRate, EncoderNumChannels);
 		}
 		AudioDataBuffer.Append((uint8*)OutConverted.GetData(), OutConverted.Num()*2);
 	}
@@ -1145,33 +1326,12 @@ void UConvaiAudioStreamer::onAudioStarted()
 
 void UConvaiAudioStreamer::onAudioFinished()
 {
-    UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("onAudioFinished"));
+    CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("onAudioFinished"));
     
-    // Update tracking variables
+    // Reset the audio end time
+    AudioEndTime = 0.0;
     TotalPlayingDuration = 0.0f;
-    
-    // Check if we have more content to play
-    if (!AudioBuffer.IsEmpty() || !LipSyncBuffer.IsEmpty())
-    {
-        if (TryPlayBufferedContent())
-        {
-            return;
-        }
-        else if (!AudioBuffer.IsEmpty())
-        {
-            TransitionToState(EAudioLipSyncState::WaitingOnLipSync);
-        }
-        else if (!LipSyncBuffer.IsEmpty())
-        {
-            TransitionToState(EAudioLipSyncState::WaitingOnAudio);
-        }
-    }
-    else
-    {
-        // No more content, transition to Stopped
-        TransitionToState(EAudioLipSyncState::Stopped);
-    }
-    
+        
     // Broadcast that audio has finished
     AsyncTask(ENamedThreads::GameThread, [this] {
         OnFinishedTalking.Broadcast();
@@ -1188,13 +1348,13 @@ bool UConvaiAudioStreamer::InitEncoder(int32 InSampleRate, int32 InNumChannels, 
 		InSampleRate != 24000 &&
 		InSampleRate != 48000)
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice encoder doesn't support %d hz"), InSampleRate);
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice encoder doesn't support %d hz"), InSampleRate);
 		return false;
 	}
 
 	if (InNumChannels < 1 || InNumChannels > 2)
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice encoder only supports 1 or 2 channels"));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice encoder only supports 1 or 2 channels"));
 		return false;
 	}
 
@@ -1234,7 +1394,7 @@ bool UConvaiAudioStreamer::InitEncoder(int32 InSampleRate, int32 InNumChannels, 
 	}
 	else
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to init Opus Encoder: %s"), ANSI_TO_TCHAR(opus_strerror(EncError)));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to init Opus Encoder: %s"), ANSI_TO_TCHAR(opus_strerror(EncError)));
 		DestroyOpus();
 	}
 
@@ -1254,7 +1414,7 @@ int32 UConvaiAudioStreamer::Encode(const uint8* RawPCMData, uint32 RawDataSize, 
 	const int32 DataRemainder = RawDataSize - NumFramesToEncode * BytesPerFrame;
 	const int32 RawDataStride = BytesPerFrame;
 
-	//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("NumFramesToEncode %d frames"), NumFramesToEncode);
+	//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("NumFramesToEncode %d frames"), NumFramesToEncode);
 
 
 	if (NumFramesToEncode == 0)
@@ -1288,7 +1448,7 @@ int32 UConvaiAudioStreamer::Encode(const uint8* RawPCMData, uint32 RawDataSize, 
 		if (CompressedLength < 0)
 		{
 			const char* ErrorStr = opus_strerror(CompressedLength);
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to encode: [%d] %s"), CompressedLength, ANSI_TO_TCHAR(ErrorStr));
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to encode: [%d] %s"), CompressedLength, ANSI_TO_TCHAR(ErrorStr));
 
 			// Mark header as nothing encoded
 			OutCompressedData[0] = 0;
@@ -1305,7 +1465,7 @@ int32 UConvaiAudioStreamer::Encode(const uint8* RawPCMData, uint32 RawDataSize, 
 		}
 		else
 		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Nothing to encode!"));
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Nothing to encode!"));
 			CompressedOffsets[i] = 0;
 		}
 	}
@@ -1313,7 +1473,7 @@ int32 UConvaiAudioStreamer::Encode(const uint8* RawPCMData, uint32 RawDataSize, 
 	// End of buffer
 	OutCompressedDataSize = HeaderSize + CompressedBufferOffset;
 
-	UE_LOG(ConvaiAudioStreamerLog, Verbose, TEXT("OpusEncode[%d]: RawSize: %d HeaderSize: %d CompressedSize: %d NumFramesEncoded: %d Remains: %d"), EncoderGeneration, RawDataSize, HeaderSize, OutCompressedDataSize, NumFramesToEncode, DataRemainder);
+	CONVAI_LOG(ConvaiAudioStreamerLog, Verbose, TEXT("OpusEncode[%d]: RawSize: %d HeaderSize: %d CompressedSize: %d NumFramesEncoded: %d Remains: %d"), EncoderGeneration, RawDataSize, HeaderSize, OutCompressedDataSize, NumFramesToEncode, DataRemainder);
 
 	EncoderGeneration = (EncoderGeneration + 1) % MAX_uint8;
 	return DataRemainder;
@@ -1330,7 +1490,7 @@ void UConvaiAudioStreamer::DestroyOpusEncoder()
 
 bool UConvaiAudioStreamer::InitDecoder(int32 InSampleRate, int32 InNumChannels)
 {
-	UE_LOG(ConvaiAudioStreamerLog, Display, TEXT("DecoderVersion: %s"), ANSI_TO_TCHAR(opus_get_version_string()));
+	CONVAI_LOG(ConvaiAudioStreamerLog, Display, TEXT("DecoderVersion: %s"), ANSI_TO_TCHAR(opus_get_version_string()));
 
 	if (InSampleRate != 8000 &&
 		InSampleRate != 12000 &&
@@ -1338,13 +1498,13 @@ bool UConvaiAudioStreamer::InitDecoder(int32 InSampleRate, int32 InNumChannels)
 		InSampleRate != 24000 &&
 		InSampleRate != 48000)
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice decoder doesn't support %d hz"), InSampleRate);
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice decoder doesn't support %d hz"), InSampleRate);
 		return false;
 	}
 
 	if (InNumChannels < 1 || InNumChannels > 2)
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice decoder only supports 1 or 2 channels"));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Voice decoder only supports 1 or 2 channels"));
 		return false;
 	}
 
@@ -1366,7 +1526,7 @@ bool UConvaiAudioStreamer::InitDecoder(int32 InSampleRate, int32 InNumChannels)
 	}
 	else
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to init Opus Decoder: %s"), ANSI_TO_TCHAR(opus_strerror(DecError)));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to init Opus Decoder: %s"), ANSI_TO_TCHAR(opus_strerror(DecError)));
 		DestroyOpus();
 	}
 
@@ -1417,11 +1577,11 @@ void UConvaiAudioStreamer::Decode(const uint8* InCompressedData, uint32 Compress
 	const int32 NumFramesToDecode = InCompressedData[0];
 	const int32 PacketGeneration = InCompressedData[1];
 
-	//UE_LOG(ConvaiAudioStreamerLog, Log, TEXT("NumFramesToDecode %d frames"), NumFramesToDecode);
+	//CONVAI_LOG(ConvaiAudioStreamerLog, Log, TEXT("NumFramesToDecode %d frames"), NumFramesToDecode);
 
 	if (PacketGeneration != DecoderLastGeneration + 1)
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Packet generation skipped from %d to %d"), DecoderLastGeneration, PacketGeneration);
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Packet generation skipped from %d to %d"), DecoderLastGeneration, PacketGeneration);
 	}
 
 	if ((NumFramesToDecode > 0) && (NumFramesToDecode <= MaxFramesEncoded))
@@ -1460,13 +1620,13 @@ void UConvaiAudioStreamer::Decode(const uint8* InCompressedData, uint32 Compress
 						if (NumDecompressedSamples < 0)
 						{
 							const char* ErrorStr = opus_strerror(NumDecompressedSamples);
-							UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: [%d] %s"), NumDecompressedSamples, ANSI_TO_TCHAR(ErrorStr));
+							CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: [%d] %s"), NumDecompressedSamples, ANSI_TO_TCHAR(ErrorStr));
 						}
 						else
 						{
 							if (NumDecompressedSamples != DecoderFrameSize)
 							{
-								UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Unexpected decode result NumSamplesDecoded %d != FrameSize %d"), NumDecompressedSamples, DecoderFrameSize);
+								CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Unexpected decode result NumSamplesDecoded %d != FrameSize %d"), NumDecompressedSamples, DecoderFrameSize);
 							}
 
 							// Advance within the decompressed output stream
@@ -1479,13 +1639,13 @@ void UConvaiAudioStreamer::Decode(const uint8* InCompressedData, uint32 Compress
 					}
 					else
 					{
-						UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Decompression buffer skipped a frame"));
+						CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Decompression buffer skipped a frame"));
 						// Nothing to advance within the compressed input stream
 					}
 				}
 				else
 				{
-					UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Decompression buffer too small to decode voice"));
+					CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Decompression buffer too small to decode voice"));
 					break;
 				}
 			}
@@ -1494,17 +1654,17 @@ void UConvaiAudioStreamer::Decode(const uint8* InCompressedData, uint32 Compress
 		}
 		else
 		{
-			UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: header corrupted"));
+			CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: header corrupted"));
 			OutRawDataSize = 0;
 		}
 	}
 	else
 	{
-		UE_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: buffer corrupted"));
+		CONVAI_LOG(ConvaiAudioStreamerLog, Warning, TEXT("Failed to decode: buffer corrupted"));
 		OutRawDataSize = 0;
 	}
 
-	UE_LOG(ConvaiAudioStreamerLog, Verbose, TEXT("OpusDecode[%d]: RawSize: %d HeaderSize: %d CompressedSize: %d NumFramesDecoded: %d "), PacketGeneration, OutRawDataSize, HeaderSize, CompressedDataSize, NumFramesToDecode);
+	CONVAI_LOG(ConvaiAudioStreamerLog, Verbose, TEXT("OpusDecode[%d]: RawSize: %d HeaderSize: %d CompressedSize: %d NumFramesDecoded: %d "), PacketGeneration, OutRawDataSize, HeaderSize, CompressedDataSize, NumFramesToDecode);
 
 	DecoderLastGeneration = PacketGeneration;
 }

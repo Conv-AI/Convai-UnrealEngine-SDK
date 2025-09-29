@@ -8,13 +8,14 @@
 #include "ISettingsModule.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "EditorAssetLibrary.h"
+#include "Utility/Log/ConvaiLogger.h"
 
 void UConvaiEditorUtils::ConvaiAddSpeakerID(const FConvaiSpeakerInfo& Speaker)
 {
     UConvaiSettings* Settings = GetMutableDefault<UConvaiSettings>();
     if (!Settings)
     {
-        UE_LOG(LogTemp, Warning, TEXT("ConvaiSettings not found."));
+        CONVAI_LOG(LogTemp, Warning, TEXT("ConvaiSettings not found."));
         return;
     }
 
@@ -26,7 +27,7 @@ void UConvaiEditorUtils::ConvaiAddSpeakerID(const FConvaiSpeakerInfo& Speaker)
     if (Index == INDEX_NONE)
     {
         Settings->SpeakerIDs.Add(Speaker);
-        //UE_LOG(LogTemp, Log, TEXT("Added Speaker: ID=%s, Name=%s"), *Speaker.SpeakerID, *Speaker.Name);
+        //CONVAI_LOG(LogTemp, Log, TEXT("Added Speaker: ID=%s, Name=%s"), *Speaker.SpeakerID, *Speaker.Name);
     }
 
     Settings->SaveConfig(CPF_Config, *Settings->GetDefaultConfigFilename());
@@ -39,7 +40,7 @@ void UConvaiEditorUtils::ConvaiRemoveSpeakerID(const FString& SpeakerID)
     UConvaiSettings* Settings = GetMutableDefault<UConvaiSettings>();
     if (!Settings)
     {
-        UE_LOG(LogTemp, Warning, TEXT("ConvaiSettings not found."));
+        CONVAI_LOG(LogTemp, Warning, TEXT("ConvaiSettings not found."));
         return;
     }
 
@@ -51,11 +52,11 @@ void UConvaiEditorUtils::ConvaiRemoveSpeakerID(const FString& SpeakerID)
     if (Index != INDEX_NONE)
     {
         Settings->SpeakerIDs.RemoveAt(Index);
-        //UE_LOG(LogTemp, Log, TEXT("Removed Speaker: ID=%s"), *SpeakerID);
+        //CONVAI_LOG(LogTemp, Log, TEXT("Removed Speaker: ID=%s"), *SpeakerID);
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("Speaker ID not found: %s"), *SpeakerID);
+        CONVAI_LOG(LogTemp, Warning, TEXT("Speaker ID not found: %s"), *SpeakerID);
     }
 
     Settings->SaveConfig(CPF_Config, *Settings->GetDefaultConfigFilename());

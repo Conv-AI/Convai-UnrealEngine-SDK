@@ -2,14 +2,16 @@
 #include "RestAPI/ConvaiLTMProxy.h"
 #include "RestAPI/ConvaiURL.h"
 #include "ConvaiDefinitions.h"
+#include "Utility/Log/ConvaiLogger.h"
 
 DEFINE_LOG_CATEGORY(LTMHttpLogs);
 
-UConvaiCreateSpeakerID* UConvaiCreateSpeakerID::ConvaiCreateSpeakerIDProxy(FString SpeakerName)
+UConvaiCreateSpeakerID* UConvaiCreateSpeakerID::ConvaiCreateSpeakerIDProxy(FString SpeakerName, FString DeviceId)
 {
     UConvaiCreateSpeakerID* Proxy = NewObject<UConvaiCreateSpeakerID>();
     Proxy->URL = UConvaiURL::GetEndpoint(EConvaiEndpoint::NewSpeaker);
     Proxy->AssociatedSpeakerName = SpeakerName;
+    Proxy->AssociatedDeviceId = DeviceId;
     return Proxy;
 }
 
@@ -27,11 +29,17 @@ bool UConvaiCreateSpeakerID::AddContentToRequestAsString(TSharedPtr<FJsonObject>
 {
     if (AssociatedSpeakerName.IsEmpty())
     {
+        CONVAI_LOG(LTMHttpLogs, Error, TEXT("Speaker name is empty"));
         HandleFailure();
         return false;
     }
 
     ObjectToSend->SetStringField(TEXT("name"), AssociatedSpeakerName);
+
+    if (!AssociatedDeviceId.IsEmpty())
+    {
+        ObjectToSend->SetStringField(TEXT("deviceId"), AssociatedDeviceId);
+    }
 
     return true;
 }
@@ -41,17 +49,18 @@ void UConvaiCreateSpeakerID::HandleSuccess()
     Super::HandleSuccess();
 
     TSharedPtr<FJsonObject> JsonObject;
-    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
 
     if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
     {
-        AssociatedSpeakerInfo.Name = AssociatedSpeakerName;
         JsonObject->TryGetStringField(TEXT("speaker_id"), AssociatedSpeakerInfo.SpeakerID);
+        JsonObject->TryGetStringField(TEXT("name"), AssociatedSpeakerInfo.Name);
+        JsonObject->TryGetStringField(TEXT("device_id"), AssociatedSpeakerInfo.DeviceID);
         OnSuccess.Broadcast(AssociatedSpeakerInfo);
     }
     else
     {
-        UE_LOG(LTMHttpLogs, Error, TEXT("Parse Json failed"));
+        CONVAI_LOG(LTMHttpLogs, Error, TEXT("Parse Json failed"));
         HandleFailure();
     }
 }
@@ -94,7 +103,7 @@ void UConvaiListSpeakerID::HandleSuccess()
     }
     else
     {
-        UE_LOG(LTMHttpLogs, Error, TEXT("Parse speaker id failed"));
+        CONVAI_LOG(LTMHttpLogs, Error, TEXT("Parse speaker id failed"));
         HandleFailure();
     }
 }
@@ -197,7 +206,7 @@ void UConvaiGetLTMStatus::HandleSuccess()
     }
     else
     {
-        UE_LOG(LTMHttpLogs, Error, TEXT("GetLTMStatus failed"));
+        CONVAI_LOG(LTMHttpLogs, Error, TEXT("GetLTMStatus failed"));
         HandleFailure();
     }
 }
@@ -270,7 +279,7 @@ bool UConvaiLTMUtils::ParseConvaiSpeakerInfoArray(const FString& JsonString, TAr
 {
     OutSpeakerInfoArray.Empty();
 
-    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
     TArray<TSharedPtr<FJsonValue>> JsonArray;
 
     if (FJsonSerializer::Deserialize(Reader, JsonArray))
@@ -281,8 +290,10 @@ bool UConvaiLTMUtils::ParseConvaiSpeakerInfoArray(const FString& JsonString, TAr
             if (JsonObject.IsValid())
             {
                 FConvaiSpeakerInfo SpeakerInfo;
-                SpeakerInfo.SpeakerID = JsonObject->GetStringField(TEXT("speaker_id"));
-                SpeakerInfo.Name = JsonObject->GetStringField(TEXT("name"));
+                JsonObject->TryGetStringField(TEXT("speaker_id"), SpeakerInfo.SpeakerID);
+                JsonObject->TryGetStringField(TEXT("name"), SpeakerInfo.Name);
+                JsonObject->TryGetStringField(TEXT("device_id"), SpeakerInfo.DeviceID);              
+
                 OutSpeakerInfoArray.Add(SpeakerInfo);
             }
         }

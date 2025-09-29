@@ -10,6 +10,7 @@
 #include "Misc/Base64.h"
 #include "Engine.h"
 #include "JsonObjectConverter.h"
+#include "RestAPI/ConvaiURL.h"
 
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
@@ -25,6 +26,16 @@ namespace
 	{
 		Data += ("&" + param + "=" + value);
 	}
+	
+	// Define URL functions for all endpoints
+	static FString GetResponseURL() { return UConvaiURL::GetFullURL(TEXT("character/getResponse/"), false); }
+	static FString GetResponseFromAudioURL() { return UConvaiURL::GetFullURL(TEXT("character/getResponse"), false); }
+	static FString CreateCharacterURL() { return UConvaiURL::GetFullURL(TEXT("character/create"), false); }
+	static FString UpdateCharacterURL() { return UConvaiURL::GetFullURL(TEXT("character/update"), false); }
+	static FString GetCharacterDetailsURL() { return UConvaiURL::GetFullURL(TEXT("character/get"), false); }
+	static FString ListCharactersURL() { return UConvaiURL::GetFullURL(TEXT("character/list"), false); }
+	static FString GetActionResponseURL() { return UConvaiURL::GetFullURL(TEXT("character/getActionResponse"), false); }
+	static FString GetAvailableVoicesURL() { return UConvaiURL::GetFullURL(TEXT("tts/voices"), false); }
 }
 
 UConvaiChatBotQueryProxy* UConvaiChatBotQueryProxy::CreateChatBotQueryProxy(UObject* WorldContextObject,
@@ -37,7 +48,7 @@ UConvaiChatBotQueryProxy* UConvaiChatBotQueryProxy::CreateChatBotQueryProxy(UObj
 {
 	UConvaiChatBotQueryProxy* Proxy = NewObject<UConvaiChatBotQueryProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/getResponse/";
+	Proxy->URL = GetResponseURL();
 	Proxy->UserQuery = UserQuery;
 	Proxy->VoiceResponse = VoiceResponse;
 	Proxy->CharID = CharID;
@@ -51,13 +62,13 @@ UConvaiChatBotQueryProxy* UConvaiChatBotQueryProxy::CreateChatBotQueryProxy(UObj
 
 void UConvaiChatBotQueryProxy::Activate()
 {
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
 
 	UWorld* World = WorldPtr.Get();
 
 	if (!World)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -65,7 +76,7 @@ void UConvaiChatBotQueryProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
@@ -144,8 +155,8 @@ void UConvaiChatBotQueryProxy::Activate()
 	//	Count--;
 	//}
 
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Content: %s"), *JsonString);
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Content: %s"), *Result);
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Content: %s"), *JsonString);
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Content: %s"), *Result);
 
 	// Run the request
 	if (!Request->ProcessRequest()) failed();
@@ -158,11 +169,11 @@ void UConvaiChatBotQueryProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 	{
 		if (bWasSuccessful)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
 		}
 		else
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
 		}
 
 		failed();
@@ -170,15 +181,15 @@ void UConvaiChatBotQueryProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), ResponsePtr->GetResponseCode());
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), ResponsePtr->GetResponseCode());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
 
 		failed();
 		return;
 	}
 
 	FString Response = ResponsePtr->GetContentAsString();
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP Response: %s"), *Response);
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP Response: %s"), *Response);
 
 	TSharedPtr<FJsonValue> JsonValue;
 	// Create a reader pointer to read the json data
@@ -196,7 +207,7 @@ void UConvaiChatBotQueryProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 			TArray<uint8> OutByteArray;
 			if (!FBase64::Decode(AudioContentString, OutByteArray))
 			{
-				UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not decode audio content, Response:%s"), *Response);
+				CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not decode audio content, Response:%s"), *Response);
 				failed();
 				return;
 			}
@@ -206,7 +217,7 @@ void UConvaiChatBotQueryProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 
 			if (this->AudioContent == nullptr)
 			{
-				UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to decode response content to a sound wave"));
+				CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to decode response content to a sound wave"));
 				failed();
 				return;
 			}
@@ -215,7 +226,7 @@ void UConvaiChatBotQueryProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 
 		if (BotText.Len() == 0 || NewSessionID.Len() == 0 || (AudioContentString.Len() == 0 && VoiceResponse))
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("One or more expected inputs was not received, Response:%s"), *Response);
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("One or more expected inputs was not received, Response:%s"), *Response);
 			//failed();
 			//return;
 		}
@@ -228,7 +239,7 @@ void UConvaiChatBotQueryProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 	}
 	else
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
 		failed();
 		return;
 	}
@@ -268,7 +279,7 @@ UConvaiChatBotQueryFromAudioProxy* UConvaiChatBotQueryFromAudioProxy::CreateChat
 {
 	UConvaiChatBotQueryFromAudioProxy* Proxy = NewObject<UConvaiChatBotQueryFromAudioProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/getResponse";
+	Proxy->URL = GetResponseFromAudioURL();
 
 	if (!FPaths::FileExists(Filename))
 	{
@@ -278,7 +289,7 @@ UConvaiChatBotQueryFromAudioProxy* UConvaiChatBotQueryFromAudioProxy::CreateChat
 		if (!FPaths::FileExists(Filename))
 		{
 			//if (!FPaths::GameAgnosticSavedDir)
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("File does not exist!, %s"), *Filename);
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("File does not exist!, %s"), *Filename);
 			Proxy->failed();
 			return nullptr;
 		}
@@ -309,11 +320,11 @@ UConvaiChatBotQueryFromAudioProxy* UConvaiChatBotQueryFromAudioProxy::CreateChat
 {
 	UConvaiChatBotQueryFromAudioProxy* Proxy = NewObject<UConvaiChatBotQueryFromAudioProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/getResponse";
+	Proxy->URL = GetResponseFromAudioURL();
 
 	if (SoundWave == nullptr)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Sound wave is invalid!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Sound wave is invalid!"));
 		Proxy->failed();
 		return nullptr;
 	}
@@ -324,7 +335,7 @@ UConvaiChatBotQueryFromAudioProxy* UConvaiChatBotQueryFromAudioProxy::CreateChat
 	//int32 numBytes = SoundWave->GeneratePCMData(PCMData, SoundWave->TotalSamples);
 
 	if (SoundWave->RawPCMData == nullptr) {
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("RawPCMData is invalid!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("RawPCMData is invalid!"));
 	}
 
 	//TArray<uint8> AudioBuffer(SoundWave->RawPCMData, SoundWave->RawPCMDataSize);
@@ -345,13 +356,13 @@ UConvaiChatBotQueryFromAudioProxy* UConvaiChatBotQueryFromAudioProxy::CreateChat
 
 void UConvaiChatBotQueryFromAudioProxy::Activate()
 {
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
 
 	UWorld* World = WorldPtr.Get();
 
 	if (!World)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -359,14 +370,14 @@ void UConvaiChatBotQueryFromAudioProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
 
 	if (Payload.Num() <= 44)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Payload size is too small, %d bytes!"), Payload.Num());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Payload size is too small, %d bytes!"), Payload.Num());
 		failed();
 		return;
 	}
@@ -475,7 +486,7 @@ void UConvaiChatBotQueryFromAudioProxy::Activate()
 	data.Append((uint8*)TCHAR_TO_UTF8(*m), m.Len());
 	data.Append((uint8*)TCHAR_TO_UTF8(*n), n.Len());
 	data.Append(monoWavBytes);
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("%d bytes"), monoWavBytes.Num());
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("%d bytes"), monoWavBytes.Num());
 
 	data.Append((uint8*)TCHAR_TO_UTF8(*o), o.Len());
 
@@ -492,11 +503,11 @@ void UConvaiChatBotQueryFromAudioProxy::onHttpRequestComplete(FHttpRequestPtr Re
 	{
 		if (bWasSuccessful)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
 		}
 		else
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
 		}
 
 		failed();
@@ -504,15 +515,15 @@ void UConvaiChatBotQueryFromAudioProxy::onHttpRequestComplete(FHttpRequestPtr Re
 	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, Response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, Response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
 
 		failed();
 		return;
 	}
 
 	FString Response = ResponsePtr->GetContentAsString();
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %s"), *Response);
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %s"), *Response);
 
 	TSharedPtr<FJsonValue> JsonValue;
 	// Create a reader pointer to read the json data
@@ -532,7 +543,7 @@ void UConvaiChatBotQueryFromAudioProxy::onHttpRequestComplete(FHttpRequestPtr Re
 			TArray<uint8> OutByteArray;
 			if (!FBase64::Decode(AudioContentString, OutByteArray))
 			{
-				UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not decode audio content, Response:%s"), *Response);
+				CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not decode audio content, Response:%s"), *Response);
 				failed();
 				return;
 			}
@@ -542,13 +553,13 @@ void UConvaiChatBotQueryFromAudioProxy::onHttpRequestComplete(FHttpRequestPtr Re
 
 			if (this->AudioContent == nullptr)
 			{
-				UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to decode response content to a sound wave, Response:%s"), *Response);
+				CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to decode response content to a sound wave, Response:%s"), *Response);
 				failed();
 				return;
 			}
 			if (BotText.Len() == 0 || UserQuery.Len() == 0 || NewSessionID.Len() == 0 || (AudioContentString.Len() == 0 && VoiceResponse))
 			{
-				UE_LOG(ConvaiBotHttpLog, Warning, TEXT("One or more expected inputs was not received, Response:%s"), *Response);
+				CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("One or more expected inputs was not received, Response:%s"), *Response);
 				//failed();
 				//return;
 			}
@@ -563,7 +574,7 @@ void UConvaiChatBotQueryFromAudioProxy::onHttpRequestComplete(FHttpRequestPtr Re
 	}
 	else
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
 		failed();
 		return;
 	}
@@ -596,7 +607,7 @@ UConvaiChatBotCreateProxy* UConvaiChatBotCreateProxy::CreateCharacterCreateProxy
 {
 	UConvaiChatBotCreateProxy* Proxy = NewObject<UConvaiChatBotCreateProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/create";
+	Proxy->URL = CreateCharacterURL();
 
 	Proxy->CharName = CharName;
 	Proxy->Voice = Voice;
@@ -607,13 +618,13 @@ UConvaiChatBotCreateProxy* UConvaiChatBotCreateProxy::CreateCharacterCreateProxy
 
 void UConvaiChatBotCreateProxy::Activate()
 {
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
 
 	UWorld* World = WorldPtr.Get();
 
 	if (!World)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -621,7 +632,7 @@ void UConvaiChatBotCreateProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
@@ -679,11 +690,11 @@ void UConvaiChatBotCreateProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 	{
 		if (bWasSuccessful)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
 		}
 		else
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
 		}
 
 		failed();
@@ -691,8 +702,8 @@ void UConvaiChatBotCreateProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
 
 		failed();
 		return;
@@ -709,14 +720,14 @@ void UConvaiChatBotCreateProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 		CharID = JsonValue->AsObject()->GetStringField("charID");
 		if (CharID.Len() == 0)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to receive CharID, Response:%s"), *Response);
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to receive CharID, Response:%s"), *Response);
 			failed();
 			return;
 		}
 	}
 	else
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
 		failed();
 		return;
 	}
@@ -753,7 +764,7 @@ UConvaiChatBotUpdateProxy* UConvaiChatBotUpdateProxy::CreateCharacterUpdateProxy
 {
 	UConvaiChatBotUpdateProxy* Proxy = NewObject<UConvaiChatBotUpdateProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/update";
+	Proxy->URL = UpdateCharacterURL();
 
 	Proxy->CharID = CharID;
 	Proxy->NewVoice = NewVoice;
@@ -766,13 +777,13 @@ UConvaiChatBotUpdateProxy* UConvaiChatBotUpdateProxy::CreateCharacterUpdateProxy
 
 void UConvaiChatBotUpdateProxy::Activate()
 {
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
 
 	UWorld* World = WorldPtr.Get();
 
 	if (!World)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -780,7 +791,7 @@ void UConvaiChatBotUpdateProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
@@ -847,11 +858,11 @@ void UConvaiChatBotUpdateProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 	{
 		if (bWasSuccessful)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
 		}
 		else
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
 		}
 
 		failed();
@@ -859,8 +870,8 @@ void UConvaiChatBotUpdateProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
 
 		failed();
 		return;
@@ -877,20 +888,20 @@ void UConvaiChatBotUpdateProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 		FString status = JsonValue->AsObject()->GetStringField("STATUS");
 		if (status.Len() == 0)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to receive status, Response:%s"), *Response);
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to receive status, Response:%s"), *Response);
 			failed();
 			return;
 		}
 		else if (status != "SUCCESS")
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("%s"), *Response);
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("%s"), *Response);
 			failed();
 			return;
 		}
 	}
 	else
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
 		failed();
 		return;
 	}
@@ -928,7 +939,7 @@ UConvaiChatBotGetDetailsProxy* UConvaiChatBotGetDetailsProxy::CreateCharacterGet
 {
 	UConvaiChatBotGetDetailsProxy* Proxy = NewObject<UConvaiChatBotGetDetailsProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/get";
+	Proxy->URL = GetCharacterDetailsURL();
 
 	Proxy->CharID = CharID;
 	Proxy->HasReadyPlayerMeLink = false;
@@ -942,7 +953,7 @@ void UConvaiChatBotGetDetailsProxy::Activate()
 
 	if (!World)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -950,7 +961,7 @@ void UConvaiChatBotGetDetailsProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
@@ -1003,11 +1014,11 @@ void UConvaiChatBotGetDetailsProxy::onHttpRequestComplete(FHttpRequestPtr Reques
 	{
 		if (bWasSuccessful)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
 		}
 		else
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
 		}
 
 		failed();
@@ -1015,15 +1026,15 @@ void UConvaiChatBotGetDetailsProxy::onHttpRequestComplete(FHttpRequestPtr Reques
 	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
 
 		failed();
 		return;
 	}
 
 	//FString ResponseContent = ResponsePtr->GetContentAsString();
-	//UE_LOG(LogTemp, Log, TEXT("HTTP Response Content: %s"), *ResponseContent);
+	//CONVAI_LOG(LogTemp, Log, TEXT("HTTP Response Content: %s"), *ResponseContent);
 
 	FString Response = ResponsePtr->GetContentAsString();
 
@@ -1058,14 +1069,14 @@ void UConvaiChatBotGetDetailsProxy::onHttpRequestComplete(FHttpRequestPtr Reques
 
 		if (character_name.Len() == 0 || voice_type.Len() == 0)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("One or more expected inputs was not received, Response:%s"), *Response);
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("One or more expected inputs was not received, Response:%s"), *Response);
 			failed();
 			return;
 		}
 	}
 	else
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
 		failed();
 		return;
 	}
@@ -1119,7 +1130,7 @@ UConvaiChatBotGetCharsProxy* UConvaiChatBotGetCharsProxy::CreateCharacterGetChar
 {
 	UConvaiChatBotGetCharsProxy* Proxy = NewObject<UConvaiChatBotGetCharsProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/character/list";
+	Proxy->URL = ListCharactersURL();
 
 	return Proxy;
 }
@@ -1127,13 +1138,13 @@ UConvaiChatBotGetCharsProxy* UConvaiChatBotGetCharsProxy::CreateCharacterGetChar
 
 void UConvaiChatBotGetCharsProxy::Activate()
 {
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
 
 	UWorld* World = WorldPtr.Get();
 
 	if (!World)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -1141,7 +1152,7 @@ void UConvaiChatBotGetCharsProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
@@ -1179,11 +1190,11 @@ void UConvaiChatBotGetCharsProxy::onHttpRequestComplete(FHttpRequestPtr RequestP
 	{
 		if (bWasSuccessful)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
 		}
 		else
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
 		}
 
 		failed();
@@ -1191,8 +1202,8 @@ void UConvaiChatBotGetCharsProxy::onHttpRequestComplete(FHttpRequestPtr RequestP
 	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
 
 		failed();
 		return;
@@ -1218,7 +1229,7 @@ void UConvaiChatBotGetCharsProxy::onHttpRequestComplete(FHttpRequestPtr RequestP
 				}
 				else
 				{
-					UE_LOG(ConvaiBotHttpLog, Warning, TEXT("CharIDs is received in an invalid format, Response:%s"), *Response);
+					CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("CharIDs is received in an invalid format, Response:%s"), *Response);
 					failed();
 					return;
 				}
@@ -1226,14 +1237,14 @@ void UConvaiChatBotGetCharsProxy::onHttpRequestComplete(FHttpRequestPtr RequestP
 		}
 		else
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to receive CharIDs, Response:%s"), *Response);
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to receive CharIDs, Response:%s"), *Response);
 			failed();
 			return;
 		}
 	}
 	else
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not deserialize response into Json, Response:%s"), *Response);
 		failed();
 		return;
 	}
@@ -1306,13 +1317,13 @@ UConvaiDownloadImageProxy* UConvaiDownloadImageProxy::CreateDownloadImageForRPMP
 
 void UConvaiDownloadImageProxy::Activate()
 {
-	//UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
+	//CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d"), sum(1,6));
 
 	UWorld* World = WorldPtr.Get();
 
 	if (!World)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -1320,7 +1331,7 @@ void UConvaiDownloadImageProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
@@ -1346,11 +1357,11 @@ void UConvaiDownloadImageProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 	{
 		if (bWasSuccessful)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
 		}
 		else
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
 		}
 
 		failed();
@@ -1358,8 +1369,8 @@ void UConvaiDownloadImageProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
 
 		failed();
 		return;
@@ -1367,7 +1378,7 @@ void UConvaiDownloadImageProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 
 	if (ResponsePtr->GetContentLength() <= 0)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to download image - Received 0 bytes"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to download image - Received 0 bytes"));
 	}
 
 	// Load image data into memory buffer
@@ -1388,7 +1399,7 @@ void UConvaiDownloadImageProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 
 	if (ImageFormat == EImageFormat::Invalid)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not detect Image format from URL - Assuming PNG"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not detect Image format from URL - Assuming PNG"));
 		ImageFormat = EImageFormat::PNG;
 	}
 
@@ -1419,13 +1430,13 @@ void UConvaiDownloadImageProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 			}
 			else
 			{
-				UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not create Image texture"));
+				CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not create Image texture"));
 				failed();
 			}
 		}
 		else
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("ImageWrapper->GetRaw was not successful"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("ImageWrapper->GetRaw was not successful"));
 			failed();
 		}
 	}
@@ -1434,12 +1445,12 @@ void UConvaiDownloadImageProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 		if (!ImageWrapper.IsValid())
 		{
 
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("ImageWrapper is not valid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("ImageWrapper is not valid"));
 		}
 		else
 		{
 			//FString ImageFormatString = UEnum::GetValueAsString(ImageFormat); // Convert enum to string
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Image data was not in the expected form - expected: %d"), ImageFormat);
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Image data was not in the expected form - expected: %d"), ImageFormat);
 		}
 		failed();
 	}
@@ -1481,7 +1492,7 @@ void UConvaiDownloadImageProxy::finish()
 UConvaiGetAvailableVoicesProxy* UConvaiGetAvailableVoicesProxy::CreateGetAvailableVoicesProxy(EVoiceType VoiceType, ELanguageType LanguageType, EGenderType Gender)
 {
 	UConvaiGetAvailableVoicesProxy* Proxy = NewObject<UConvaiGetAvailableVoicesProxy>();
-	Proxy->URL = "https://api.convai.com/tts/get_available_voices";
+	Proxy->URL = GetAvailableVoicesURL();
 	Proxy->FilterVoiceType = VoiceType;
 	Proxy->FilterLanguageType = LanguageType;
 	Proxy->FilterGender = Gender;
@@ -1493,7 +1504,7 @@ void UConvaiGetAvailableVoicesProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
@@ -1530,11 +1541,11 @@ void UConvaiGetAvailableVoicesProxy::onHttpRequestComplete(FHttpRequestPtr Reque
 	{
 		if (bWasSuccessful)
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
 		}
 		else
 		{
-			UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
 		}
 
 		failed();
@@ -1542,8 +1553,8 @@ void UConvaiGetAvailableVoicesProxy::onHttpRequestComplete(FHttpRequestPtr Reque
 	}
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
-		UE_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("HTTP request failed with code %d, and response:%s"), ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
 
 		failed();
 		return;

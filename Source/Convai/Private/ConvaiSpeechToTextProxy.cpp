@@ -11,13 +11,20 @@
 #include "JsonObjectConverter.h"
 #include "../Convai.h"
 
+namespace
+{	
+	static FString TextToSpeechURL() { return UConvaiURL::GetFullURL(TEXT("tts"), false); }
+	static FString SpeechToTextURL() { return UConvaiURL::GetFullURL(TEXT("stt/"), false); }
+}
+
+
 DEFINE_LOG_CATEGORY(ConvaiS2THttpLog);
 
 UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromFileNameQueryProxy(UObject* WorldContextObject, FString filename)
 {
 	UConvaiSpeechToTextProxy* Proxy = NewObject<UConvaiSpeechToTextProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/stt/";
+	Proxy->URL = SpeechToTextURL();
 
 	if (!FPaths::FileExists(filename))
 	{
@@ -27,7 +34,7 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromFileNam
 		if (!FPaths::FileExists(filename))
 		{
 			//if (!FPaths::GameAgnosticSavedDir)
-			UE_LOG(ConvaiS2THttpLog, Warning, TEXT("File does not exist!, %s"), *filename);
+			CONVAI_LOG(ConvaiS2THttpLog, Warning, TEXT("File does not exist!, %s"), *filename);
 			Proxy->failed();
 			return nullptr;
 		}
@@ -44,11 +51,11 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromSoundWa
 {
 	UConvaiSpeechToTextProxy* Proxy = NewObject<UConvaiSpeechToTextProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/stt/";
+	Proxy->URL = SpeechToTextURL();
 
 	if (SoundWave == nullptr)
 	{
-		UE_LOG(ConvaiS2THttpLog, Warning, TEXT("Sound wave is invalid!"));
+		CONVAI_LOG(ConvaiS2THttpLog, Warning, TEXT("Sound wave is invalid!"));
 		Proxy->failed();
 		return nullptr;
 	}
@@ -62,16 +69,16 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromSoundWa
 	//int32 numBytes = SoundWave->GeneratePCMData(PCMData, SoundWave->TotalSamples);
 
 	if (SoundWave->RawPCMData == nullptr || SoundWave->RawPCMDataSize <= 0) {
-		UE_LOG(LogTemp, Display, TEXT("SoundWave PCM Data is compressed. Starting Decompressing....."));
+		CONVAI_LOG(LogTemp, Display, TEXT("SoundWave PCM Data is compressed. Starting Decompressing....."));
 		RawPCMData = UConvaiUtils::ExtractPCMDataFromSoundWave(SoundWave, OutSampleRate, outNumChannels);
 
 		if (RawPCMData.Num() > 0) {
-			UE_LOG(LogTemp, Display, TEXT("SoundWave PCM Data decompression successfully done....."));
+			CONVAI_LOG(LogTemp, Display, TEXT("SoundWave PCM Data decompression successfully done....."));
 		}
 		else {
-			UE_LOG(LogTemp,Warning,TEXT("SoundWave couldn't be decompressed successuflly !!!"));
+			CONVAI_LOG(LogTemp,Warning,TEXT("SoundWave couldn't be decompressed successuflly !!!"));
 		}
-		//UE_LOG(ConvaiS2THttpLog, Warning, TEXT("RawPCMData is invalid!"));
+		//CONVAI_LOG(ConvaiS2THttpLog, Warning, TEXT("RawPCMData is invalid!"));
 	}
 	else {
 		RawPCMData = TArray<uint8>(SoundWave->RawPCMData, SoundWave->RawPCMDataSize);
@@ -81,7 +88,7 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromSoundWa
 
 	SerializeWaveFile(Proxy->Payload, RawPCMData.GetData(), RawPCMData.Num(), SoundWave->NumChannels, SoundWave->GetSampleRateForCurrentPlatform());
 
-	//UE_LOG(ConvaiS2THttpLog, Warning, TEXT("Sound wave sample rate: %f"), SoundWave->GetSampleRateForCurrentPlatform());
+	//CONVAI_LOG(ConvaiS2THttpLog, Warning, TEXT("Sound wave sample rate: %f"), SoundWave->GetSampleRateForCurrentPlatform());
 	Proxy->bStereo = SoundWave->NumChannels>1? true : false;
 	return Proxy;
 }
@@ -90,7 +97,7 @@ UConvaiSpeechToTextProxy* UConvaiSpeechToTextProxy::CreateSpeech2TextFromArrayQu
 {
 	UConvaiSpeechToTextProxy* Proxy = NewObject<UConvaiSpeechToTextProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://te-apis.convai.com/asr";
+	Proxy->URL = SpeechToTextURL();
 	Proxy->Payload = Payload;
 	Proxy->bStereo = true;
 	return Proxy;
@@ -103,7 +110,7 @@ void UConvaiSpeechToTextProxy::Activate()
 
 	if (!World)
 	{
-		UE_LOG(ConvaiS2THttpLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiS2THttpLog, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -111,14 +118,14 @@ void UConvaiSpeechToTextProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiS2THttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiS2THttpLog, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
 
 	if (Payload.Num() <= 44)
 	{
-		UE_LOG(ConvaiS2THttpLog, Warning, TEXT("Payload size is too small, %d bytes!"), Payload.Num());
+		CONVAI_LOG(ConvaiS2THttpLog, Warning, TEXT("Payload size is too small, %d bytes!"), Payload.Num());
 		failed();
 		return;
 	}
@@ -189,8 +196,8 @@ void UConvaiSpeechToTextProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 {
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiS2THttpLog, Warning, TEXT("HTTP request failed with code %d"), ResponsePtr->GetResponseCode());
-		UE_LOG(ConvaiS2THttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiS2THttpLog, Warning, TEXT("HTTP request failed with code %d"), ResponsePtr->GetResponseCode());
+		CONVAI_LOG(ConvaiS2THttpLog, Warning, TEXT("Response:%s"), *ResponsePtr->GetContentAsString());
 
 		this->Response = ResponsePtr->GetContentAsString();
 		failed();

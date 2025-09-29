@@ -4,6 +4,7 @@
 //#include "CoreMinimal.h"
 // #undef UpdateResource
 #include "Components/AudioComponent.h"
+#include "RingBuffer.h"
 #include "ConvaiDefinitions.h"
 #include "Misc/ScopeLock.h"
 #include "Interfaces/VoiceCodec.h"
@@ -416,6 +417,7 @@ public:
 
 	FTimerHandle AudioFinishedTimerHandle;
 	FTimerHandle LypSyncTimeoutTimerHandle;
+	double AudioEndTime = 0.0;
 	bool IsTalking = false;
 	float TotalVoiceFadeOutTime;
 	float RemainingVoiceFadeOutTime;
@@ -427,12 +429,11 @@ public:
 	TArray<uint8> ReceivedEncodedAudioDataBuffer;
  
 	IConvaiLipSyncInterface* ConvaiLipSync;
-	IConvaiLipSyncExtendedInterface* ConvaiLipSyncExtended;
 	IConvaiVisionInterface* ConvaiVision;
 
-	void PlayLipSyncWithPreGeneratedDataSynced(FAnimationSequence& FaceSequence);
+	void PlayLipSyncWithPrecomputedFacialAnimationSynced(FAnimationSequence& FaceSequence);
 
-	void PlayLipSyncWithPreGeneratedData(FAnimationSequence FaceSequence);
+	void PlayLipSyncWithPrecomputedFacialAnimation(FAnimationSequence FaceSequence);
 
 	void PlayLipSync(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels);
 
@@ -443,6 +444,8 @@ public:
 	void ResumeLipSync();
 
 	virtual bool CanUseLipSync();
+
+	virtual void ForceRecalculateLipsyncStartTime();
 
 	virtual bool CanUseVision();
 
@@ -480,13 +483,12 @@ enum class EAudioLipSyncState : uint8
     WaitingOnAudio UMETA(DisplayName = "Waiting On Audio")
 };
 
-// Add to protected section
 EAudioLipSyncState CurrentState;
-
+ 
 // Simplified buffer structure
 struct FAudioBuffer
 {
-    TArray<uint8> Data;
+    TRingBuffer<uint8> Data;
     float Duration;
     uint32 SampleRate;
     uint32 NumChannels;
@@ -501,9 +503,45 @@ struct FAudioBuffer
         NumChannels = 0;
     }
     
-    bool IsEmpty() const { return Data.Num() == 0; }
+    void Init(uint32 BufferSize)
+    {
+        Data.Init(BufferSize);
+    }
+    
+    bool IsEmpty() const { return Data.RingDataUsage() == 0; }
     
     float GetTotalDuration() const { return Duration; }
+    
+    // Add data to the buffer
+    void AppendData(const uint8* NewData, uint32 DataSize)
+    {
+        // Validate input parameters to prevent crashes
+        if (!NewData || DataSize == 0)
+        {
+            return; // Ignore invalid data
+        }
+        Data.Enqueue(NewData, DataSize);
+    }
+    
+    // Get data from the buffer (copies to the provided buffer)
+    uint32 GetData(uint8* OutBuffer, uint32 BufferSize) const
+    {
+        return Data.Peek(OutBuffer, BufferSize);
+    }
+    
+    // Remove data from the buffer
+    void RemoveData(uint32 BytesToRemove)
+    {
+        // Ensure we don't try to remove more than what's available
+        uint32 BytesToActuallyRemove = FMath::Min(BytesToRemove, Data.RingDataUsage());
+        
+        if (BytesToActuallyRemove > 0)
+        {
+            // The TRingBuffer::Dequeue method with nullptr is designed to discard data
+            // without copying it, which is exactly what we want for efficient removal
+            Data.Dequeue(nullptr, BytesToActuallyRemove);
+        }
+    }
 };
 
 struct FLipSyncBuffer
@@ -536,12 +574,13 @@ FLipSyncBuffer LipSyncBuffer;
 // Configuration parameters
 float MinBufferDuration;
 float AudioLipSyncRatio;
+float EnableSync;
 
 // State management functions
 void TransitionToState(EAudioLipSyncState NewState);
 void HandleAudioReceived(uint8* AudioData, uint32 AudioDataSize, bool ContainsHeaderData, uint32 SampleRate, uint32 NumChannels);
 void HandleLipSyncReceived(FAnimationSequence& FaceSequence);
-bool TryPlayBufferedContent();
+bool TryPlayBufferedContent(bool force = false);
 bool HasSufficientLipSync();
 bool HasSufficientAudio() const;
 void PlayBufferedContent(float Duration);
@@ -560,12 +599,17 @@ float TotalPlayingDuration;       // Total duration of content currently being p
 float TotalBufferedDuration;      // Total duration of content buffered but not yet played
 bool bIsSyncingAudioAndLipSync;   // Whether we're syncing audio and lipsync
 
-protected:
-
-	float LipSyncThresholdSecs = -1;
-	float VoiceTimeFactor = -1;
-
 private:
+
+	// Critical section for protecting SoundWaveProcedural operations
+	FCriticalSection AudioConfigLock;
+	FThreadSafeBool IsAudioConfiguring;
+	
+	// Buffer for pending audio data when lock is held
+	TArray<uint8> PendingAudioBuffer;
+	
+	// Process any pending audio data
+	void ProcessPendingAudio();
 
 	bool InitEncoder(int32 InSampleRate, int32 InNumChannels, EAudioEncodeHint EncodeHint);
 	int32 Encode(const uint8* RawPCMData, uint32 RawDataSize, uint8* OutCompressedData, uint32& OutCompressedDataSize);
@@ -608,4 +652,8 @@ private:
 	struct OpusDecoder* Decoder;
 	/** Generation value received from the last incoming packet */
 	uint8 DecoderLastGeneration;
+
+	// Pre-allocated temporary buffer for audio playback
+	TArray<uint8> TempAudioBuffer;
+	static constexpr uint32 TempBufferSize = 1024 * 1024 * 3; // 3 MB buffer
 };

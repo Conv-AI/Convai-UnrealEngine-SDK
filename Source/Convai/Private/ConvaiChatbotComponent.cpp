@@ -8,6 +8,7 @@
 #include "ConvaiUtils.h"
 #include "LipSyncInterface.h"
 #include "VisionInterface.h"
+#include "ConvaiSubsystem.h"
 
 #include "Sound/SoundWaveProcedural.h"
 #include "Net/UnrealNetwork.h"
@@ -15,6 +16,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "TimerManager.h"
 #include "Async/Async.h"
+#include "Engine/GameInstance.h"
 
 DEFINE_LOG_CATEGORY(ConvaiChatbotComponentLog);
 
@@ -126,7 +128,7 @@ void UConvaiChatbotComponent::HandleActionCompletion(bool IsSuccessful, float De
 	if (!UConvaiUtils::IsNewActionSystemEnabled())
 	{
 
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("HandleActionCompletion: New Action System is not enabled in settings"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("HandleActionCompletion: New Action System is not enabled in settings"));
 		return;
 	}
 
@@ -161,7 +163,7 @@ bool UConvaiChatbotComponent::IsActionsQueueEmpty()
 	if (!UConvaiUtils::IsNewActionSystemEnabled())
 	{
 
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("IsActionsQueueEmpty: New Action System is not enabled in settings"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("IsActionsQueueEmpty: New Action System is not enabled in settings"));
 		return true;
 	}
 
@@ -177,7 +179,7 @@ bool UConvaiChatbotComponent::FetchFirstAction(FConvaiResultAction& ConvaiResult
 {
 	if (!UConvaiUtils::IsNewActionSystemEnabled())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("FetchFirstAction: New Action System is not enabled in settings"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("FetchFirstAction: New Action System is not enabled in settings"));
 		return false;
 	}
 
@@ -238,11 +240,11 @@ bool UConvaiChatbotComponent::TriggerNamedBlueprintAction(const FString& ActionN
 		}
 
 		// Log an error if the function is not found in both places
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Could not find a valid function '%s' on the owning actor or the component (self)."), *ActionName);
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Could not find a valid function '%s' on the owning actor or the component (self)."), *ActionName);
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Provided action name is empty."));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TriggerNamedBlueprintAction: Provided action name is empty."));
 	}
 
 	return false;
@@ -252,14 +254,14 @@ bool UConvaiChatbotComponent::TryCallFunction(UObject* Object, const FString& Fu
 {
 	if (!Object)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TryCallFunction: Null object provided."));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TryCallFunction: Null object provided."));
 		return false;
 	}
 
 	UFunction* Function = Object->FindFunction(FName(*FunctionName));
 	if (!Function)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Verbose, TEXT("TryCallFunction: Function '%s' not found on '%s'."), *FunctionName, *Object->GetName());
+		CONVAI_LOG(ConvaiChatbotComponentLog, Verbose, TEXT("TryCallFunction: Function '%s' not found on '%s'."), *FunctionName, *Object->GetName());
 		return false;
 	}
 
@@ -287,7 +289,7 @@ bool UConvaiChatbotComponent::TryCallFunction(UObject* Object, const FString& Fu
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TryCallFunction: Function '%s' found on '%s' but has incompatible parameters. Ensure it accepts 'FConvaiResultAction' or has no parameters."), *FunctionName, *Object->GetName());
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("TryCallFunction: Function '%s' found on '%s' but has incompatible parameters. Ensure it accepts 'FConvaiResultAction' or has no parameters."), *FunctionName, *Object->GetName());
 	}
 
 	return false;
@@ -319,7 +321,7 @@ void UConvaiChatbotComponent::StartRecordingVoice()
 {
 	if (IsRecordingAudio)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Cannot start Recording voice while already recording voice"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Cannot start Recording voice while already recording voice"));
 		return;
 	}
 	IsRecordingAudio = true;
@@ -327,7 +329,7 @@ void UConvaiChatbotComponent::StartRecordingVoice()
 
 USoundWave* UConvaiChatbotComponent::FinishRecordingVoice()
 {
-	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Finished Recording Audio - Total bytes: %d - Duration: %f"), RecordedAudio.Num(), UConvaiUtils::CalculateAudioDuration(RecordedAudio.Num(), 1,RecordedAudioSampleRate, 2));
+	CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("Finished Recording Audio - Total bytes: %d - Duration: %f"), RecordedAudio.Num(), UConvaiUtils::CalculateAudioDuration(RecordedAudio.Num(), 1,RecordedAudioSampleRate, 2));
 
 	if (!IsRecordingAudio)
 		return nullptr;
@@ -341,23 +343,23 @@ bool UConvaiChatbotComponent::PlayRecordedVoice(USoundWave* RecordedVoice)
 {
 	if (!IsValid(RecordedVoice))
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Recorded voice is not valid"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Recorded voice is not valid"));
 		return false;
 	}
 
 	if (IsRecordingAudio)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Cannot Play Recorded voice while Recording voice"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Cannot Play Recorded voice while Recording voice"));
 		return false;
 	}
 
 	if (GetIsTalking())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Playing Recorded voice and stopping currently playing voice"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Playing Recorded voice and stopping currently playing voice"));
 		InterruptSpeech(0);
 	}
 
-	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Play Recorded Audio - Duration: %f"), RecordedVoice->Duration);
+	CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("Play Recorded Audio - Duration: %f"), RecordedVoice->Duration);
 
 	InterruptSpeech(InterruptVoiceFadeOutDuration);
 
@@ -370,13 +372,13 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 {
 	if (!IsValid(InConvaiPlayerComponent))
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: ConvaiPlayerComponent is not valid"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: ConvaiPlayerComponent is not valid"));
 		return;
 	}
 
 	if (IsValid(CurrentConvaiPlayerComponent) && CurrentConvaiPlayerComponent != InConvaiPlayerComponent && CheckTokenValidity())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: character is currently being talked to by another player, make sure to run \"Finish Talking\""));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: character is currently being talked to by another player, make sure to run \"Finish Talking\""));
 		return;
 	}
 
@@ -386,15 +388,15 @@ void UConvaiChatbotComponent::StartGetResponseStream(UConvaiPlayerComponent* InC
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: Environment is not valid"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: Environment is not valid"));
 	}
 
 	FString Error;
 	bool ValidEnvironment = UConvaiActions::ValidateEnvironment(Environment, Error);
 	if (GenerateActions && !ValidEnvironment)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: %s"), *Error);
-		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("StartGetResponseStream: Environment object seems to have issues -> setting GenerateActions to false"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("StartGetResponseStream: %s"), *Error);
+		CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("StartGetResponseStream: Environment object seems to have issues -> setting GenerateActions to false"));
 		GenerateActions = false;
 	}
 
@@ -437,7 +439,7 @@ void UConvaiChatbotComponent::FinishGetResponseStream(UConvaiPlayerComponent* In
 {
 	if (!HasOnGoingGetResponseStream())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent::FinishGetResponseStream Trying to finish a non-existent stream | Character ID : %s | Session ID : %s"),
+		CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent::FinishGetResponseStream Trying to finish a non-existent stream | Character ID : %s | Session ID : %s"),
 			*CharacterID,
 			*SessionID);
 		return;
@@ -445,7 +447,7 @@ void UConvaiChatbotComponent::FinishGetResponseStream(UConvaiPlayerComponent* In
 
 	if (!CanWriteToGetResponseStream())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent::FinishGetResponseStream stream is no longer writable | Character ID : %s | Session ID : %s"),
+		CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent::FinishGetResponseStream stream is no longer writable | Character ID : %s | Session ID : %s"),
 			*CharacterID,
 			*SessionID);
 		return;
@@ -453,7 +455,7 @@ void UConvaiChatbotComponent::FinishGetResponseStream(UConvaiPlayerComponent* In
 
 	if (CurrentConvaiPlayerComponent != InConvaiPlayerComponent)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent::FinishGetResponseStream Trying to finish using a player that did not start the stream | Character ID : %s | Session ID : %s"),
+		CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent::FinishGetResponseStream Trying to finish using a player that did not start the stream | Character ID : %s | Session ID : %s"),
 			*CharacterID,
 			*SessionID);
 		return;
@@ -467,10 +469,10 @@ void UConvaiChatbotComponent::ExecuteNarrativeTrigger(FString TriggerMessage, UC
 {
 	if (TriggerMessage.IsEmpty())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Invoke Speech: TriggerMessage is missing"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Invoke Speech: TriggerMessage is missing"));
 		return;
 	}
-	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Invoke Speech: Executed | Character ID : %s | Session ID : %s"),
+	CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("Invoke Speech: Executed | Character ID : %s | Session ID : %s"),
 		*CharacterID,
 		*SessionID);
 	InvokeTrigger_Internal("", TriggerMessage, InEnvironment, InGenerateActions, InVoiceResponse, InReplicateOnNetwork);
@@ -480,10 +482,10 @@ void UConvaiChatbotComponent::InvokeNarrativeDesignTrigger(FString TriggerName, 
 {
 	if (TriggerName.IsEmpty())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Invoke Narrative Design Trigger: TriggerName is missing"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Invoke Narrative Design Trigger: TriggerName is missing"));
 		return;
 	}
-	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Invoke Narrative Design Trigger: Executed | Character ID : %s | Session ID : %s"),
+	CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("Invoke Narrative Design Trigger: Executed | Character ID : %s | Session ID : %s"),
 		*CharacterID,
 		*SessionID);
 	InvokeTrigger_Internal(TriggerName, "", InEnvironment, InGenerateActions, InVoiceResponse, InReplicateOnNetwork);
@@ -493,7 +495,7 @@ void UConvaiChatbotComponent::InvokeTrigger_Internal(FString TriggerName, FStrin
 {
 	if (TriggerMessage.IsEmpty() && TriggerName.IsEmpty())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("InvokeTrigger_Internal: TriggerName and TriggerMessage are missing - Please supply one of them"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("InvokeTrigger_Internal: TriggerName and TriggerMessage are missing - Please supply one of them"));
 		return;
 	}
 
@@ -503,15 +505,15 @@ void UConvaiChatbotComponent::InvokeTrigger_Internal(FString TriggerName, FStrin
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("InvokeTrigger_Internal: Environment is not valid"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("InvokeTrigger_Internal: Environment is not valid"));
 	}
 
 	FString Error;
 	bool ValidEnvironment = UConvaiActions::ValidateEnvironment(Environment, Error);
 	if (GenerateActions && !ValidEnvironment)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("InvokeTrigger_Internal: %s"), *Error);
-		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("InvokeTrigger_Internal: Environment object seems to have issues -> setting GenerateActions to false"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("InvokeTrigger_Internal: %s"), *Error);
+		CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("InvokeTrigger_Internal: Environment object seems to have issues -> setting GenerateActions to false"));
 		GenerateActions = false;
 	}
 
@@ -542,9 +544,12 @@ void UConvaiChatbotComponent::InterruptSpeech(float InVoiceFadeOutDuration)
 		Broadcast_InterruptSpeech(InVoiceFadeOutDuration);
 	}
 
+	// Ensure all GRPC requests are unbound
+	Unbind_GRPC_Request_Delegates();
+
 	if (GetIsTalking() || IsProcessing())
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("InterruptSpeech: Interrupting character | Character ID : %s | Session ID : %s"),
+		CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("InterruptSpeech: Interrupting character | Character ID : %s | Session ID : %s"),
 			*CharacterID,
 			*SessionID);
 		onFinishedReceivingData();
@@ -605,10 +610,10 @@ void UConvaiChatbotComponent::Start_GRPC_Request(bool UseOverrideAuthKey, FStrin
 	bool RequireFaceData = false;
 	bool GeneratesVisemesAsBlendshapes = false;
 	ReceivedFinalData = false;
-	if (ConvaiLipSyncExtended)
+	if (ConvaiLipSync)
 	{
-		RequireFaceData = ConvaiLipSyncExtended->RequiresPreGeneratedFaceData();
-		GeneratesVisemesAsBlendshapes = ConvaiLipSyncExtended->GeneratesVisemesAsBlendshapes();
+		RequireFaceData = ConvaiLipSync->RequiresPrecomputedFaceData();
+		GeneratesVisemesAsBlendshapes = ConvaiLipSync->GeneratesVisemesAsBlendshapes();
 	}
 	RequireFaceData = RequireFaceData && VoiceResponse;
 
@@ -664,7 +669,7 @@ void UConvaiChatbotComponent::Bind_GRPC_Request_Delegates()
 {
 	if (!IsValid(ConvaiGRPCGetResponseProxy))
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Bind_GRPC_Request_Delegates: ConvaiGRPCGetResponseProxy is invalid"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Bind_GRPC_Request_Delegates: ConvaiGRPCGetResponseProxy is invalid"));
 		return;
 	}
 
@@ -687,6 +692,9 @@ void UConvaiChatbotComponent::Unbind_GRPC_Request_Delegates()
 		return;
 	}
 
+	// Do not unbind narrative design delegate
+	//ConvaiGRPCGetResponseProxy->OnNarrativeDataReceived.Unbind();
+
 	ConvaiGRPCGetResponseProxy->OnTranscriptionReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnDataReceived.Unbind();
 	ConvaiGRPCGetResponseProxy->OnFaceDataReceived.Unbind();
@@ -700,7 +708,7 @@ void UConvaiChatbotComponent::Unbind_GRPC_Request_Delegates()
 
 void UConvaiChatbotComponent::Cleanup(bool StreamConnectionFinished)
 {
-	UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Cleanup | Character ID : %s | Session ID : %s"),
+	CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("Cleanup | Character ID : %s | Session ID : %s"),
 		*CharacterID,
 		*SessionID);
 	if (IsValid(CurrentConvaiPlayerComponent))
@@ -715,10 +723,10 @@ void UConvaiChatbotComponent::Cleanup(bool StreamConnectionFinished)
 
 void UConvaiChatbotComponent::onMicrophoneDataReceived()
 {
-	//UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("onMicrophoneDataReceived"));
+	//CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("onMicrophoneDataReceived"));
 	if (!IsValid(CurrentConvaiPlayerComponent))
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("onMicrophoneDataReceived: CurrentConvaiPlayerComponent is invalid"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("onMicrophoneDataReceived: CurrentConvaiPlayerComponent is invalid"));
 		return;
 	}
 
@@ -835,27 +843,38 @@ void UConvaiChatbotComponent::OnTranscriptionReceived(FString Transcription, boo
 
 void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText, const TArray<uint8>& ReceivedAudio, uint32 SampleRate, bool IsFinal)
 {
-	if (!IsInGameThread())
-	{
-		AsyncTask(ENamedThreads::GameThread, [this, ReceivedText, ReceivedAudio, SampleRate, IsFinal]
-			{
-				onResponseDataReceived(ReceivedText, ReceivedAudio, SampleRate, IsFinal);
-			});
-		return;
-	}
-
-
 	// Broadcast to clients
 	if (UKismetSystemLibrary::IsServer(this) && ReplicateVoiceToNetwork)
 	{
-		Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+		if (ReceivedText.IsEmpty() && IsFinal == false)
+		{
+			return;
+		}
+
+		if (!IsInGameThread())
+		{
+			TWeakObjectPtr<UConvaiChatbotComponent> WeakThis(this);
+			AsyncTask(ENamedThreads::GameThread, [WeakThis, ReceivedText, IsFinal]()
+			{
+				if (WeakThis.IsValid())
+				{
+					UConvaiChatbotComponent* StrongThis = WeakThis.Get();
+					StrongThis->Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+				}
+			});
+		}
+		else
+		{
+			Broadcast_onResponseDataReceived(ReceivedText, IsFinal);
+		}
+
 	}
 
-	float ReceieivedAudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
+	float ReceivedAudioDuration = float(ReceivedAudio.Num() - 44) / float(SampleRate * 2); // Assuming 1 channel
 
 	if (VoiceResponse && ReceivedAudio.Num() > 0)
 	{
-		AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1); // Should be called in the game thread
+		AddPCMDataToSend(ReceivedAudio, false, SampleRate, 1);
 
 		if (IsRecordingAudio)
 		{
@@ -864,20 +883,42 @@ void UConvaiChatbotComponent::onResponseDataReceived(const FString ReceivedText,
 		}
 	}
 
-	// Send text and audio duration to blueprint event
-	OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
 
-	// Run the deprecated event
-	OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceieivedAudioDuration, IsFinal);
-
-
-	if (ReceieivedAudioDuration > 0)
+	if (ReceivedText != "" || IsFinal == true)
 	{
-		TotalReceivedAudioDuration += ReceieivedAudioDuration;
+		if (!IsInGameThread())
+		{
+			TWeakObjectPtr<UConvaiChatbotComponent> WeakThis(this);
+
+			AsyncTask(ENamedThreads::GameThread, [WeakThis, ReceivedText, ReceivedAudioDuration, IsFinal]()
+			{
+				if (WeakThis.IsValid())
+				{
+					UConvaiChatbotComponent* StrongThis = WeakThis.Get();
+					// Send text and audio duration to blueprint event
+					StrongThis->OnTextReceivedEvent_V2.Broadcast(StrongThis, StrongThis->CurrentConvaiPlayerComponent, StrongThis->CharacterName, ReceivedText, ReceivedAudioDuration, IsFinal);
+
+					// Run the deprecated event
+					StrongThis->OnTextReceivedEvent.Broadcast(StrongThis->CharacterName, ReceivedText, ReceivedAudioDuration, IsFinal);
+				}
+			});
+		}
+		else
+		{
+			// Already on game thread, safe to use 'this'
+			OnTextReceivedEvent_V2.Broadcast(this, CurrentConvaiPlayerComponent, CharacterName, ReceivedText, ReceivedAudioDuration, IsFinal);
+			OnTextReceivedEvent.Broadcast(CharacterName, ReceivedText, ReceivedAudioDuration, IsFinal);
+		}
+	}
+
+
+	if (ReceivedAudioDuration > 0)
+	{
+		TotalReceivedAudioDuration += ReceivedAudioDuration;
 	}
 	if (IsFinal)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("Chatbot Total Received Audio: %f seconds"), TotalReceivedAudioDuration);
+		CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("Chatbot Total Received Audio: %f seconds"), TotalReceivedAudioDuration);
 		TotalReceivedAudioDuration = 0;
 	}
 
@@ -1024,14 +1065,16 @@ void UConvaiChatbotComponent::onEmotionReceived(FString ReceivedEmotionResponse,
 
 void UConvaiChatbotComponent::onFinishedReceivingData()
 {
+	CONVAI_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent Request Finished! | Character ID : %s | Session ID : %s"),
+		*CharacterID,
+		*SessionID);
 	if (ConvaiGRPCGetResponseProxy)
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Log, TEXT("UConvaiChatbotComponent Request Finished! | Character ID : %s | Session ID : %s"),
-			*CharacterID,
-			*SessionID);
 		Unbind_GRPC_Request_Delegates();
 		ConvaiGRPCGetResponseProxy = nullptr;
 	}
+	// Attempt to play all buffered audio and lipsync
+	TryPlayBufferedContent(true);
 }
 
 void UConvaiChatbotComponent::OnNarrativeSectionReceived(FString BT_Code, FString BT_Constants, FString ReceivedNarrativeSectionID)
@@ -1061,7 +1104,7 @@ void UConvaiChatbotComponent::OnNarrativeSectionReceived(FString BT_Code, FStrin
 
 void UConvaiChatbotComponent::onFailure()
 {
-	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("UConvaiChatbotComponent Get Response Failed! | Character ID : %s | Session ID : %s"),
+	CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("UConvaiChatbotComponent Get Response Failed! | Character ID : %s | Session ID : %s"),
 		*CharacterID,
 		*SessionID);
 
@@ -1079,7 +1122,7 @@ void UConvaiChatbotComponent::OnRep_EnvironmentData()
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("OnRep_EnvironmentData: Environment is not valid"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("OnRep_EnvironmentData: Environment is not valid"));
 	}
 }
 
@@ -1091,7 +1134,7 @@ void UConvaiChatbotComponent::UpdateEnvironmentData()
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("UpdateEnvironmentData: Environment is not valid"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("UpdateEnvironmentData: Environment is not valid"));
 	}
 }
 
@@ -1103,7 +1146,7 @@ void UConvaiChatbotComponent::LoadEnvironment(UConvaiEnvironment* NewConvaiEnvir
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("LoadEnvironment: Environment is not valid"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("LoadEnvironment: Environment is not valid"));
 	}
 }
 
@@ -1122,7 +1165,7 @@ void UConvaiChatbotComponent::OnPlayerTimeOut()
 {
 	ClearTimeOutTimer();
 	CurrentConvaiPlayerComponent = nullptr;
-	UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Player timed out | Character ID : %s | Session ID : %s"),
+	CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("Player timed out | Character ID : %s | Session ID : %s"),
 		*CharacterID,
 		*SessionID);
 }
@@ -1170,17 +1213,48 @@ void UConvaiChatbotComponent::BeginPlay()
 	if (IsValid(Environment))
 	{
 		Environment->OnEnvironmentChanged.BindUObject(this, &UConvaiChatbotComponent::UpdateEnvironmentData);
-
 	}
 	else
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("BeginPlay: Environment is not valid"));
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("BeginPlay: Environment is not valid"));
 	}
 
 	// Get character details
 	if (CharacterID != "")
 		ConvaiGetDetails();
 
+	// Register with the ConvaiSubsystem
+	if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
+	{
+		if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
+		{
+			if (IsValid(ConvaiSubsystem))
+			{
+				ConvaiSubsystem->RegisterChatbotComponent(this);
+			}
+			else
+			{
+				CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("BeginPlay: ConvaiSubsystem is not valid"));
+			}
+		}
+	}
+}
+
+void UConvaiChatbotComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Unregister from the ConvaiSubsystem
+	if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
+	{
+		if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
+		{
+			if (IsValid(ConvaiSubsystem))
+			{
+				ConvaiSubsystem->UnregisterChatbotComponent(this);
+			}
+		}
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -1213,7 +1287,18 @@ void UConvaiChatbotComponent::TickComponent(float DeltaTime, ELevelTick TickType
 
 void UConvaiChatbotComponent::BeginDestroy()
 {
-	//InterruptSpeech(0);
+	// Fallback unregistration in case EndPlay wasn't called
+	if (UGameInstance* GameInstance = GetWorld() ? GetWorld()->GetGameInstance() : nullptr)
+	{
+		if (UConvaiSubsystem* ConvaiSubsystem = GameInstance->GetSubsystem<UConvaiSubsystem>())
+		{
+			if (IsValid(ConvaiSubsystem))
+			{
+				ConvaiSubsystem->UnregisterChatbotComponent(this);
+			}
+		}
+	}
+	
 	if (IsValid(Environment))
 	{
 		Environment->OnEnvironmentChanged.Unbind();
@@ -1255,7 +1340,7 @@ void UConvaiChatbotComponent::OnConvaiGetDetailsCompleted(FString ReceivedCharac
 {
 	if (ReceivedCharacterName == "" && ReceivedVoiceType == "" && ReceivedBackstory == "")
 	{
-		UE_LOG(ConvaiChatbotComponentLog, Warning, TEXT("OnConvaiGetDetailsCompleted: Could not get character details for charID:\"%s\""), *CharacterID);
+		CONVAI_LOG(ConvaiChatbotComponentLog, Warning, TEXT("OnConvaiGetDetailsCompleted: Could not get character details for charID:\"%s\""), *CharacterID);
 		OnCharacterDataLoadEvent.Broadcast(false);
 		return;
 	}

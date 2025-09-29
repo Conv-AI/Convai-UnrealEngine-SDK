@@ -8,9 +8,15 @@ on:
       - beta
   workflow_dispatch:
 
+# Explicitly grant permissions to GITHUB_TOKEN
+permissions:
+  contents: write    # Required for creating releases and pushing tags
+  actions: read      # Required for workflow execution
+  checks: read       # Required for status checks
+
 jobs:
   checkout-code:
-    runs-on: self-hosted
+    runs-on: UE-Dev-Runner
     outputs:
       version_name: ${{ steps.extract_version.outputs.version_name }}
     steps:
@@ -23,11 +29,11 @@ jobs:
           $plugin = Get-Content "ConvAI.uplugin" | ConvertFrom-Json
           $plugin_version = $plugin.VersionName
           echo "::set-output name=version_name::$plugin_version"
-        shell: powershell
+        shell: pwsh
 
   check-version:
     needs: checkout-code
-    runs-on: self-hosted
+    runs-on: UE-Dev-Runner
     outputs:
       release_exists: ${{ steps.check_release.outputs.release_exists }}  # Define job output based on step output
     steps:
@@ -57,11 +63,11 @@ jobs:
           } else {
               echo "::set-output name=release_exists::false"
           }
-        shell: powershell
+        shell: pwsh
 
   build-and-package:
     needs: check-version
-    runs-on: self-hosted
+    runs-on: UE-Dev-Runner
     if: needs.check-version.outputs.release_exists == 'false'
     steps:
       - name: Debug output
@@ -81,7 +87,7 @@ jobs:
           echo "::set-output name=ue_root::$ue_root"
           echo "::set-output name=output_root::$output_root"
           echo "::set-output name=plugin_path::$plugin_path"
-        shell: powershell
+        shell: pwsh
 
       - name: Extract and Copy Dependencies
         run: |
@@ -105,12 +111,12 @@ jobs:
             Write-Host "Failed to extract and copy dependencies. Error: $_"
             exit 1
           }
-        shell: powershell
+        shell: pwsh
 
-      - name: Build and package for Unreal versions 5.1 to 5.5
+      - name: Build and package for Unreal versions 5.2 to 5.6
         run: |
           try {
-            $versions = @("5.5", "5.4","5.3","5.2","5.1")
+            $versions = @("5.6", "5.5", "5.4","5.3","5.2")
             foreach ($version in $versions) {
                 $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_$version"
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version/Convai"
@@ -132,13 +138,13 @@ jobs:
             Write-Host "Packaging failed for Unreal Engine version $version. Error: $_"
             exit 1
           }
-        shell: powershell
+        shell: pwsh
 
-      - name: Test packaging for Windows UE 5.5
+      - name: Test packaging for Windows UE 5.6
         run: |
           try {
-            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_5.5"
-            $output_path = "${{ steps.paths.outputs.output_root }}/V5.5"
+            $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_5.6"
+            $output_path = "${{ steps.paths.outputs.output_root }}/V5.6"
             $test_project_path = "E:/Software/TestProject"
             $plugin_folder = "$test_project_path/Plugins"
             if (Test-Path $plugin_folder) {
@@ -148,7 +154,7 @@ jobs:
             Copy-Item -Recurse -Force "$output_path/Convai" $plugin_folder
             Write-Host "Copied the plugin to the TestProject."
             $uat_path = "$ue_version_path/Engine/Build/BatchFiles/RunUAT.bat"
-            Write-Host "Starting project packaging for Unreal 5.5..."
+            Write-Host "Starting project packaging for Unreal 5.6..."
             & $uat_path BuildCookRun `
             -project="$test_project_path/TestProject.uproject" `
             -noP4 -utf8output -platform=Win64 -clientconfig=Shipping -cook -stage -package -compressed -pak `
@@ -158,22 +164,22 @@ jobs:
                 Write-Host "Packaging failed for UE_$version. Exit code: $LASTEXITCODE"
                 exit $LASTEXITCODE
             }
-            Write-Host "Project packaging completed successfully for Unreal 5.5"
+            Write-Host "Project packaging completed successfully for Unreal 5.6"
           } catch {
-            Write-Host "Project packaging failed for Unreal Engine 5.5. Error: $_"
+            Write-Host "Project packaging failed for Unreal Engine 5.6. Error: $_"
             exit 1
           }
-        shell: powershell
+        shell: pwsh
 
-      - name: Test packaging for Android UE 5.5
+      - name: Test packaging for Android UE 5.6
         run: |
-          $UE_PATH = "${{ steps.paths.outputs.ue_root }}/UE_5.5/Engine/Build/BatchFiles/RunUAT.bat"
+          $UE_PATH = "${{ steps.paths.outputs.ue_root }}/UE_5.6/Engine/Build/BatchFiles/RunUAT.bat"
           $TEST_PROJECT_PATH = "E:/Software/TestProject"
           $PLUGIN_FOLDER = "$TEST_PROJECT_PATH/Plugins"
 
           Write-Host "Starting project packaging for Android..."
 
-          # The below commands are commented out for now, using PowerShell-style comments
+          # The below commands are commented out for now, using pwsh-style comments
           & "$UE_PATH" BuildCookRun `
             -project="$TEST_PROJECT_PATH/TestProject.uproject" `
             -noP4 -utf8output -platform=Android -targetplatform=Android -clientconfig=Shipping `
@@ -188,13 +194,13 @@ jobs:
           }
 
           Write-Host "Android packaging completed successfully."
-        shell: powershell
+        shell: pwsh
 
 
       - name: Zip Plugin for each version
         run: |
           try {
-            $versions = @("5.5","5.4","5.3","5.2","5.1")
+            $versions = @("5.6","5.5","5.4","5.3","5.2")
             foreach ($version in $versions) {
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
                 Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip" -Force
@@ -204,13 +210,16 @@ jobs:
             Write-Host "Zipping failed. Error: $_"
             exit 1
           }
-        shell: powershell
+        shell: pwsh
 
   compress-and-release:
-    needs: [checkout-code, build-and-package]
-    runs-on: self-hosted
+    needs: [checkout-code, check-version, build-and-package]
+    runs-on: UE-Dev-Runner
     if: needs.check-version.outputs.release_exists == 'false'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Extract release notes
         id: extract_notes
         run: |
@@ -219,17 +228,87 @@ jobs:
           $notes = $changelog -split "\r?\n" | Select-String -Pattern "^# Release $version" -Context 0,10 | ForEach-Object { $_.Context.PostContext }
           $notes = $notes -join "`n"
           echo "::set-output name=release_notes::$notes"
-        shell: powershell
+        shell: pwsh
 
       - name: Create Git tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          Write-Host "=== Git Tag Creation Debug Info ==="
+          Write-Host "Repository: ${{ github.repository }}"
+          Write-Host "Actor: ${{ github.actor }}"
+          Write-Host "Event: ${{ github.event_name }}"
+          Write-Host "Ref: ${{ github.ref }}"
+
+          # Check if token is available (without exposing it)
+          if ($env:GITHUB_TOKEN) {
+            Write-Host "✓ GITHUB_TOKEN is available (length: $($env:GITHUB_TOKEN.Length))"
+          } else {
+            Write-Host "✗ GITHUB_TOKEN is not available"
+            exit 1
+          }
+
+          Write-Host "Configuring git user..."
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
+
+          Write-Host "Current git remote URL:"
+          git remote get-url origin
+
+          Write-Host "Configuring git remote for token authentication..."
+          git remote set-url origin https://x-access-token:$env:GITHUB_TOKEN@github.com/${{ github.repository }}.git
+
+          Write-Host "Updated git remote URL (token masked):"
+          git remote get-url origin | ForEach-Object { $_ -replace $env:GITHUB_TOKEN, "***TOKEN***" }
+
           $version = "${{ needs.checkout-code.outputs.version_name }}"
-          if (-not $version) { Write-Host "Version is empty!"; exit 1 }
+          Write-Host "Version to tag: '$version'"
+          if (-not $version) {
+            Write-Host "✗ Version is empty!"
+            exit 1
+          }
+
+          Write-Host "Creating git tag: $version"
           git tag $version
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️ Tag creation failed - checking if tag already exists..."
+            $existingTag = git tag -l $version
+            if ($existingTag) {
+              Write-Host "✓ Tag '$version' already exists locally, continuing..."
+            } else {
+              Write-Host "✗ Failed to create tag for unknown reason"
+              exit 1
+            }
+          } else {
+            Write-Host "✓ Successfully created tag locally"
+          }
+
+          Write-Host "Checking if tag exists locally:"
+          git tag -l $version
+
+          Write-Host "Pushing tag to remote..."
           git push origin $version
-        shell: powershell
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️ Tag push failed - checking if tag already exists on remote..."
+
+            # Check if the tag exists on remote
+            $remoteTag = git ls-remote --tags origin $version
+            if ($remoteTag) {
+              Write-Host "✓ Tag '$version' already exists on remote, continuing..."
+            } else {
+              Write-Host "✗ Failed to push tag and tag doesn't exist on remote"
+              Write-Host "Git status:"
+              git status
+              Write-Host "Git remote -v:"
+              git remote -v
+              exit 1
+            }
+          } else {
+            Write-Host "✓ Successfully pushed tag to remote"
+          }
+
+          Write-Host "✓ Successfully created and pushed tag: $version"
+        shell: pwsh
 
       - name: Confirm Git tag exists
         run: |
@@ -237,7 +316,7 @@ jobs:
           if (-not $version) { Write-Host "Version is empty!"; exit 1 }
           git fetch --tags
           git show-ref --tags | Select-String $version
-        shell: powershell
+        shell: pwsh
 
       - name: Update GitHub Release
         uses: softprops/action-gh-release@v1
@@ -246,10 +325,10 @@ jobs:
           name: "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
           body: ${{ steps.extract_notes.outputs.release_notes }}
           files: |
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.6.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.5.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.3.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.2.zip
-            E:/Output/${{ github.event.repository.name }}_Binaries/V5.1.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

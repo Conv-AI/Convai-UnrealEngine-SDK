@@ -70,6 +70,7 @@ class CONVAI_API UConvaiPlayerComponent : public UConvaiAudioStreamer
 
 	//~ Begin ActorComponent Interface.
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void BeginDestroy() override;
 	//~ End ActorComponent Interface.
 
 public:

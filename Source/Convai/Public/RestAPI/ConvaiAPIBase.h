@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "Dom/JsonObject.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 #ifdef USE_CONVAI_HTTP
 #else
@@ -12,7 +13,7 @@
 
 #if USE_CONVAI_HTTP
 // Use ConvaiHttp module
-	#include "ConvaiHttpModule.h"
+	#include "ConvaihttpModule.h"
 	#include "Interfaces/IConvaihttpRequest.h"
 	#include "Interfaces/IConvaihttpResponse.h"
 	#define CONVAI_HTTP_MODULE FConvaihttpModule
@@ -33,7 +34,11 @@
 	#define CONVAI_HTTP_REQUEST_PTR FHttpRequestPtr
 	#define CONVAI_HTTP_RESPONSE_PTR FHttpResponsePtr
 	#define CONVAI_HTTP_PAYLOAD_ARRAY_TYPE TArray<uint8>
+#if ENGINE_MAJOR_VERSION > 5 || (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 4)
+	#define CONVAI_HTTP_DOWN_PROGRESS_TYPE uint64
+#else
 	#define CONVAI_HTTP_DOWN_PROGRESS_TYPE int32
+#endif
 #endif
 
 #include "ConvaiAPIBase.generated.h"

@@ -93,11 +93,11 @@ void UConvaiAPIBaseProxy::OnHttpRequestComplete(CONVAI_HTTP_REQUEST_PTR Request,
     {
         if (bWasSuccessful)
         {
-            UE_LOG(ConvaiBaseHttpLogs, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
+            CONVAI_LOG(ConvaiBaseHttpLogs, Warning, TEXT("HTTP request succeded - But response pointer is invalid"));
         }
         else
         {
-            UE_LOG(ConvaiBaseHttpLogs, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
+            CONVAI_LOG(ConvaiBaseHttpLogs, Warning, TEXT("HTTP request failed - Response pointer is invalid"));
         }
 
         HandleFailure();
@@ -105,7 +105,7 @@ void UConvaiAPIBaseProxy::OnHttpRequestComplete(CONVAI_HTTP_REQUEST_PTR Request,
     }
     if (!bWasSuccessful || Response->GetResponseCode() < 200 || Response->GetResponseCode() > 299)
     {
-        UE_LOG(ConvaiBaseHttpLogs, Warning, TEXT("HTTP request failed with code %d, and with response:%s"), Response->GetResponseCode(), *Response->GetContentAsString());
+        CONVAI_LOG(ConvaiBaseHttpLogs, Warning, TEXT("HTTP request failed with code %d, and with response:%s"), Response->GetResponseCode(), *Response->GetContentAsString());
         HandleFailure();
         return;
     }

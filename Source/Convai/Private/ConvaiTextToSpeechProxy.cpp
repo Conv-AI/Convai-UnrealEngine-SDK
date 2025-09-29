@@ -6,6 +6,7 @@
 #include "Sound/SoundWave.h"
 #include "Engine.h"
 #include "JsonObjectConverter.h"
+#include "RestAPI/ConvaiURL.h"
 
 #include "../Convai.h"
 
@@ -40,7 +41,8 @@ UConvaiTextToSpeechProxy* UConvaiTextToSpeechProxy::CreateTextToSpeechQueryProxy
 {
 	UConvaiTextToSpeechProxy* Proxy = NewObject<UConvaiTextToSpeechProxy>();
 	Proxy->WorldPtr = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	Proxy->URL = "https://api.convai.com/tts";
+	Proxy->URL = UConvaiURL::GetFullURL(TEXT("tts"), false);
+	
 	Proxy->Transcript = Transcript;
 	Proxy->VoiceStr = Voice;
 	//Proxy->VoiceStr = FString(TTS_Voice_Type_str[uint8(Voice)]);
@@ -57,7 +59,7 @@ void UConvaiTextToSpeechProxy::Activate()
 
 	if (!World)
 	{
-		UE_LOG(ConvaiT2SHttpLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiT2SHttpLog, Warning, TEXT("Could not get a pointer to world!"));
 		failed();
 		return;
 	}
@@ -65,7 +67,7 @@ void UConvaiTextToSpeechProxy::Activate()
 	FHttpModule* Http = &FHttpModule::Get();
 	if (!Http)
 	{
-		UE_LOG(ConvaiT2SHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
+		CONVAI_LOG(ConvaiT2SHttpLog, Warning, TEXT("Could not get a pointer to http module!"));
 		failed();
 		return;
 	}
@@ -108,7 +110,7 @@ void UConvaiTextToSpeechProxy::Activate()
 	Request->SetContentAsString(JsonString);
 
 	// Debug
-	//UE_LOG(ConvaiT2SHttpLog, Warning, TEXT("%s"), *UConvaiUtils::ByteArrayToString(Request->GetContent()));
+	//CONVAI_LOG(ConvaiT2SHttpLog, Warning, TEXT("%s"), *UConvaiUtils::ByteArrayToString(Request->GetContent()));
 
 	// Initiate the request
 	if (!Request->ProcessRequest()) failed();
@@ -118,7 +120,7 @@ void UConvaiTextToSpeechProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 {
 	if (!bWasSuccessful || ResponsePtr->GetResponseCode() < 200 || ResponsePtr->GetResponseCode() > 299)
 	{
-		UE_LOG(ConvaiT2SHttpLog, Warning, TEXT("HTTP request failed with code %d, and with response:%s"),ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
+		CONVAI_LOG(ConvaiT2SHttpLog, Warning, TEXT("HTTP request failed with code %d, and with response:%s"),ResponsePtr->GetResponseCode(), *ResponsePtr->GetContentAsString());
 		failed();
 		return;
 	}
@@ -128,7 +130,7 @@ void UConvaiTextToSpeechProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 	//this->SoundWave = UConvaiUtils::PCMDataToSoundWav(ResponsePtr->GetContent(), 1, 44100); // use this if in PCM format
 	if (this->SoundWave == nullptr)
 	{
-		UE_LOG(ConvaiT2SHttpLog, Warning, TEXT("Failed to decode response content to a sound wave"));
+		CONVAI_LOG(ConvaiT2SHttpLog, Warning, TEXT("Failed to decode response content to a sound wave"));
 		failed();
 		return;
 	}

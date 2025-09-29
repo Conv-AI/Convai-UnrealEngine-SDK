@@ -5,7 +5,10 @@
 #include "Engine/Engine.h"
 #include "Async/Async.h"
 #include "../Convai.h"
+#include "ConvaiUtils.h"
 #include "HAL/PlatformProcess.h"
+#include "ConvaiChatbotComponent.h"
+#include "ConvaiPlayerComponent.h"
 
 THIRD_PARTY_INCLUDES_START
 // grpc includes
@@ -43,34 +46,6 @@ namespace
 		return strTo;
 	}
 
-	SslCredentialsOptions getSslOptionsystem()
-	{
-		// Fetch root certificate as required on Windows (s. issue 25533).
-		SslCredentialsOptions result;
-
-		// Open root certificate store.
-		HANDLE hRootCertStore = CertOpenSystemStoreW(NULL, L"ROOT");
-		if (!hRootCertStore)
-			return result;
-
-		// Get all root certificates.
-		PCCERT_CONTEXT pCert = NULL;
-		while ((pCert = CertEnumCertificatesInStore(hRootCertStore, pCert)) != NULL)
-		{
-			// Append this certificate in PEM formatted data.
-			DWORD size = 0;
-			CryptBinaryToStringW(pCert->pbCertEncoded, pCert->cbCertEncoded,
-				CRYPT_STRING_BASE64HEADER, NULL, &size);
-			std::vector<WCHAR> pem(size);
-			CryptBinaryToStringW(pCert->pbCertEncoded, pCert->cbCertEncoded,
-				CRYPT_STRING_BASE64HEADER, pem.data(), &size);
-
-			result.pem_root_certs += utf8Encode(pem.data());
-		}
-
-		CertCloseStore(hRootCertStore, 0);
-		return result;
-	}
 
 	SslCredentialsOptions getSslOptions() {
 		SslCredentialsOptions result;
@@ -177,6 +152,36 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 		return result;
 	}
 
+
+		SslCredentialsOptions getSslOptionsystem()
+	{
+		// Start with hardcoded certificates
+		SslCredentialsOptions result = getSslOptions();
+
+		// Open root certificate store.
+		HANDLE hRootCertStore = CertOpenSystemStoreW(NULL, L"ROOT");
+		if (!hRootCertStore)
+			return result;
+
+		// Get all root certificates and append them.
+		PCCERT_CONTEXT pCert = NULL;
+		while ((pCert = CertEnumCertificatesInStore(hRootCertStore, pCert)) != NULL)
+		{
+			// Append this certificate in PEM formatted data.
+			DWORD size = 0;
+			CryptBinaryToStringW(pCert->pbCertEncoded, pCert->cbCertEncoded,
+				CRYPT_STRING_BASE64HEADER, NULL, &size);
+			std::vector<WCHAR> pem(size);
+			CryptBinaryToStringW(pCert->pbCertEncoded, pCert->cbCertEncoded,
+				CRYPT_STRING_BASE64HEADER, pem.data(), &size);
+
+			result.pem_root_certs += utf8Encode(pem.data());
+		}
+
+		CertCloseStore(hRootCertStore, 0);
+		return result;
+	}
+
 };
 #endif
 
@@ -193,17 +198,14 @@ namespace
 
 };
 
-
-
 uint32 FgRPCClient::Run()
 {
     void* got_tag;
     bool ok = false;
-	UE_LOG(ConvaiSubsystemLog, Log, TEXT("Start Run"));
+	CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Start Run"));
 
     // Block until the next result is available in the completion queue "cq
 	while (bIsRunning && cq_.Next(&got_tag, &ok)) {
-		FPlatformProcess::Sleep(0.0001f);
 		if (got_tag)
 		{
 			FgRPC_Delegate* gRPC_Delegate = static_cast<FgRPC_Delegate*>(got_tag);
@@ -214,16 +216,16 @@ uint32 FgRPCClient::Run()
 			}
 			else
 			{
-				UE_LOG(ConvaiSubsystemLog, Log, TEXT("Could not run gRPC delegate due to thread closing down"));
+				CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Could not run gRPC delegate due to thread closing down"));
 			}
 		}
 		else
 		{
-			UE_LOG(ConvaiSubsystemLog, Log, TEXT("Bad got_tag"));
+			CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Bad got_tag"));
 		}
 
     }
-	UE_LOG(ConvaiSubsystemLog, Log, TEXT("End Run"));
+	CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("End Run"));
 
 	return 0;
 }
@@ -239,7 +241,7 @@ void FgRPCClient::StartStub()
 
 void FgRPCClient::CreateChannel()
 {
-	UE_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC Creating Channel..."));
+	CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC Creating Channel..."));
 	grpc::ChannelArguments args;
 	args.SetMaxReceiveMessageSize(2147483647);
 
@@ -262,18 +264,18 @@ void FgRPCClient::OnStateChange(bool ok)
 	{
 		if (!bIsRunning)
 		{
-			UE_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel state changed to %s... Attempting to reconnect"), *FString(grpc_connectivity_state_str[state]));
+			CONVAI_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel state changed to %s... Attempting to reconnect"), *FString(grpc_connectivity_state_str[state]));
 			CreateChannel();
 		}
 		else
 		{
-			UE_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC channel state changed to %s... Closing"), *FString(grpc_connectivity_state_str[state]));
+			CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC channel state changed to %s... Closing"), *FString(grpc_connectivity_state_str[state]));
 		}
 		//Channel->NotifyOnStateChange(state, std::chrono::system_clock::time_point().max(), &cq_, (void*)&OnStateChangeDelegate);
 	}
 	else
 	{
-		UE_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC channel state changed to %s"), *FString(grpc_connectivity_state_str[state]));
+		CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("gRPC channel state changed to %s"), *FString(grpc_connectivity_state_str[state]));
 		Channel->NotifyOnStateChange(state, std::chrono::system_clock::time_point().max(), &cq_, (void*)&OnStateChangeDelegate);
 	}
 }
@@ -314,7 +316,7 @@ std::unique_ptr<ConvaiService::Stub> FgRPCClient::GetNewStub()
 
 	if (state != grpc_connectivity_state::GRPC_CHANNEL_READY)
 	{
-		UE_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel not ready yet.. Current State: %s"), *FString(grpc_connectivity_state_str[state]));
+		CONVAI_LOG(ConvaiSubsystemLog, Warning, TEXT("gRPC channel not ready yet.. Current State: %s"), *FString(grpc_connectivity_state_str[state]));
 	}
 	return ConvaiService::NewStub(Channel);
 }
@@ -335,39 +337,83 @@ void UConvaiSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	//AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this)]
 	//	{
-			bool AllowInsecureConnection = Convai::Get().GetConvaiSettings()->AllowInsecureConnection;
+			// Check command line for insecure connection flag first, then fall back to settings
+			bool AllowInsecureConnection = false;
+			FString InsecureConnectionStr = UCommandLineUtils::GetCommandLineFlagValueAsString(TEXT("ConvaiAllowInsecure"), TEXT(""));
+			if (!InsecureConnectionStr.IsEmpty())
+			{
+				// Convert string to bool
+				AllowInsecureConnection = InsecureConnectionStr.ToBool();
+				CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Using insecure connection setting from command line: %s"), 
+					AllowInsecureConnection ? TEXT("true") : TEXT("false"));
+			}
+			else
+			{
+				// Use setting from ConvaiSettings
+				AllowInsecureConnection = Convai::Get().GetConvaiSettings()->AllowInsecureConnection;
+			}
 
 			std::shared_ptr<grpc::ChannelCredentials> channel_creds;
-#if PLATFORM_WINDOWS
+	#if PLATFORM_WINDOWS
 			if (AllowInsecureConnection)
 				channel_creds = grpc::InsecureChannelCredentials();
 			else
-				channel_creds = grpc::SslCredentials(getSslOptions());
-#else
+			{
+				// Check if we should use system certificates (can be overridden by command line)
+				bool UseSystemCerts = Convai::Get().GetConvaiSettings()->UseSystemCertificates;
+				FString UseSystemCertsStr = UCommandLineUtils::GetCommandLineFlagValueAsString(TEXT("ConvaiUseSystemCerts"), TEXT(""));
+				if (!UseSystemCertsStr.IsEmpty())
+				{
+					UseSystemCerts = UseSystemCertsStr.ToBool();
+					CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Using system certificates setting from command line: %s"), 
+						UseSystemCerts ? TEXT("true") : TEXT("false"));
+				}
+				
+				if (UseSystemCerts)
+				{
+					CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Using both hardcoded and system SSL certificates"));
+					channel_creds = grpc::SslCredentials(getSslOptionsystem());
+				}
+				else
+				{
+					channel_creds = grpc::SslCredentials(getSslOptions());
+				}
+			}
+	#else
 			if (AllowInsecureConnection)
 				channel_creds = grpc::InsecureChannelCredentials();
 			else
 				channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions());
-#endif
+	#endif
 
-
+			// Get URL from command line first, then settings, then default
 			FString URL = Convai::Get().GetConvaiSettings()->CustomURL;
 			URL.TrimEndInline();
 			URL.TrimStartInline();
 
-			if (URL.IsEmpty())
+			// Check for command line parameter
+			FString CommandLineURL = UCommandLineUtils::GetCommandLineFlagValueAsString(TEXT("ConvaiStreamURL"), TEXT(""));
+			if (!CommandLineURL.IsEmpty())
+			{
+				URL = CommandLineURL;
+				CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("Using stream URL from command line: %s"), *URL);
+			}
+			// If settings URL is empty, use default
+			else if (URL.IsEmpty())
+			{
 				URL = "stream.convai.com";
+			}
 
 			gRPC_Runnable = MakeShareable(new FgRPCClient(TCHAR_TO_UTF8(*URL), channel_creds));
 
 			//gRPC_Runnable = MakeShareable(new FgRPCClient(std::string("0.tcp.us-cal-1.ngrok.io:13976"), channel_creds));
 
 			gRPC_Runnable->StartStub();
-			UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Started"));
+			CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Started"));
 
-#if PLATFORM_ANDROID
+	#if PLATFORM_ANDROID
 			GetAndroidMicPermission();
-#endif
+	#endif
 		//});
 }
 
@@ -375,11 +421,55 @@ void UConvaiSubsystem::Deinitialize()
 {
 	gRPC_Runnable->Exit();
 	Super::Deinitialize();
-	UE_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Stopped"));
+	CONVAI_LOG(ConvaiSubsystemLog, Log, TEXT("UConvaiSubsystem Stopped"));
 }
 
 void UConvaiSubsystem::GetAndroidMicPermission()
 {
 	if (!UConvaiAndroid::ConvaiAndroidHasMicrophonePermission())
 		UConvaiAndroid::ConvaiAndroidAskMicrophonePermission();
+}
+
+void UConvaiSubsystem::RegisterChatbotComponent(UConvaiChatbotComponent* ChatbotComponent)
+{
+	if (IsValid(ChatbotComponent) && !RegisteredChatbotComponents.Contains(ChatbotComponent))
+	{
+		RegisteredChatbotComponents.Add(ChatbotComponent);
+	}
+}
+
+void UConvaiSubsystem::UnregisterChatbotComponent(UConvaiChatbotComponent* ChatbotComponent)
+{
+	if (RegisteredChatbotComponents.Contains(ChatbotComponent))
+	{
+		RegisteredChatbotComponents.Remove(ChatbotComponent);
+	}
+}
+
+TArray<UConvaiChatbotComponent*> UConvaiSubsystem::GetAllChatbotComponents() const
+{
+	return RegisteredChatbotComponents;
+}
+
+void UConvaiSubsystem::RegisterPlayerComponent(UConvaiPlayerComponent* PlayerComponent)
+{
+	if (IsValid(PlayerComponent) && !RegisteredPlayerComponents.Contains(PlayerComponent))
+	{
+		RegisteredPlayerComponents.Add(PlayerComponent);
+		CONVAI_LOG(ConvaiSubsystemLog, Verbose, TEXT("Registered player component: %s"), *PlayerComponent->GetName());
+	}
+}
+
+void UConvaiSubsystem::UnregisterPlayerComponent(UConvaiPlayerComponent* PlayerComponent)
+{
+	if (RegisteredPlayerComponents.Contains(PlayerComponent))
+	{
+		RegisteredPlayerComponents.Remove(PlayerComponent);
+		CONVAI_LOG(ConvaiSubsystemLog, Verbose, TEXT("Unregistered player component: %s"), *PlayerComponent->GetName());
+	}
+}
+
+TArray<UConvaiPlayerComponent*> UConvaiSubsystem::GetAllPlayerComponents() const
+{
+	return RegisteredPlayerComponents;
 }

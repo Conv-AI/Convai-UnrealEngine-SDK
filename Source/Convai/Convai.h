@@ -35,12 +35,24 @@ public:
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
 	FString CustomURL;
 
+	/* Custom Beta API URL (Used for debugging) */
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	FString CustomBetaURL;
+
+	/* Custom Production API URL (Used for debugging) */
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	FString CustomProdURL;
+
 	/* Test Character ID (Used for debugging) */
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
 	FString TestCharacterID;
 
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
 	bool AllowInsecureConnection;
+
+	/* Use both hardcoded and system SSL certificates on Windows */
+	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")
+	bool UseSystemCertificates;
 
 	/* Extra Parameters (Used for debugging) */
 	UPROPERTY(Config, EditAnywhere, AdvancedDisplay, Category = "Convai API")

@@ -12,7 +12,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(ConvaiFaceSyncLog, Log, All);
 
 UCLASS(meta = (BlueprintSpawnableComponent), DisplayName = "Convai Face Sync")
-class CONVAI_API UConvaiFaceSyncComponent : public USceneComponent, public IConvaiLipSyncExtendedInterface
+class CONVAI_API UConvaiFaceSyncComponent : public USceneComponent, public IConvaiLipSyncInterface
 {
 	GENERATED_BODY()
 public:
@@ -29,7 +29,7 @@ public:
 	// End UActorComponent interface
 
 	// IConvaiLipSyncInterface
-	virtual void ConvaiProcessLipSync(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels) override { return; }
+	virtual void ConvaiInferFacialDataFromAudio(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels) override { return; }
 	virtual void ConvaiStopLipSync() override;
 	virtual TArray<float> ConvaiGetVisemes() override 
 	{ 
@@ -41,9 +41,9 @@ public:
 	// End IConvaiLipSyncInterface interface
 
 	// IConvaiLipSyncExtendedInterface
-	virtual void ConvaiProcessLipSyncAdvanced(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels, FAnimationSequence FaceSequence) override;
-	virtual void ConvaiProcessLipSyncSingleFrame(FAnimationFrame FaceFrame, float Duration) override;
-	virtual bool RequiresPreGeneratedFaceData() override { return true; }
+	virtual void ConvaiApplyPrecomputedFacialAnimation(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels, FAnimationSequence FaceSequence) override;
+	virtual void ConvaiApplyFacialFrame(FAnimationFrame FaceFrame, float Duration) override;
+	virtual bool RequiresPrecomputedFaceData() override { return true; }
 	virtual bool GeneratesVisemesAsBlendshapes() override { return ToggleBlendshapeOrViseme; }
 	virtual TMap<FName, float> ConvaiGetFaceBlendshapes() override { return CurrentBlendShapesMap; }
 	// End IConvaiLipSyncExtendedInterface interface
@@ -66,6 +66,8 @@ public:
 
 	// Record the current time if this is the first LipSync sequence to be received after silence
 	virtual void CalculateStartingTime();
+
+	virtual void ForceRecalculateStartTime() override;
 
 	void ClearMainSequence();
 

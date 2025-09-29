@@ -17,10 +17,11 @@
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/DefaultValueHelper.h"
+#include "Misc/CommandLine.h"
 #if PLATFORM_LINUX
 	#include "Linux/LinuxPlatformFile.h"
 #else
-	#include "HAL/PlatformFilemanager.h"
+	#include "HAL/PlatformFileManager.h"
 #endif
 #include "Engine/GameInstance.h"
 #include "ConvaiSubsystem.h"
@@ -71,14 +72,14 @@ UConvaiSubsystem* UConvaiUtils::GetConvaiSubsystem(const UObject* WorldContextOb
 
 	if (!WorldContextObject)
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("WorldContextObject ptr is invalid!"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("WorldContextObject ptr is invalid!"));
 		return nullptr;
 	}
 
 	UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(WorldContextObject);
 	if (!GameInstance)
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get pointer to a GameInstance"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get pointer to a GameInstance"));
 		return nullptr;
 	}
 
@@ -89,7 +90,7 @@ UConvaiSubsystem* UConvaiUtils::GetConvaiSubsystem(const UObject* WorldContextOb
 	}
 	else
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get pointer to Convai Subsystem"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get pointer to Convai Subsystem"));
 		return nullptr;
 	}
 
@@ -104,7 +105,7 @@ void UConvaiUtils::StereoToMono(TArray<uint8> stereoWavBytes, TArray<uint8>& mon
 		if (i == 22)
 		{
 			short NumChannels = (*(short*)&stereoWavBytes[i]);
-			//UE_LOG(ConvaiUtilsLog, Warning, TEXT("NumChannels %d"), NumChannels);
+			//CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("NumChannels %d"), NumChannels);
 			if (NumChannels == 1)
 			{
 				monoWavBytes = stereoWavBytes;
@@ -205,7 +206,7 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	if (!World)
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
 		return;
 	}
 
@@ -216,7 +217,7 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 
 	if (!PlayerController)
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("GetLookedAtCharacter: Could not get a pointer to PlayerController"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("GetLookedAtCharacter: Could not get a pointer to PlayerController"));
 		return;
 	}
 
@@ -232,7 +233,7 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 	}
 	else
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("GetLookedAtCharacter: Could not get a camera location"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("GetLookedAtCharacter: Could not get a camera location"));
 		return;
 	}
 
@@ -338,7 +339,7 @@ void UConvaiUtils::ConvaiGetLookedAtCharacter(UObject* WorldContextObject, APlay
 			FocuseDotThresshold = CurrentFocuseDot;
 			ConvaiCharacter = CurrentConvaiCharacter;
 			Found = true;
-			//UE_LOG(ConvaiUtilsLog, Log, TEXT("GetLookedAtCharacter: Found! %s = %f"), *CurrentConvaiCharacter->GetFullName(), FocuseDotThresshold);
+			//CONVAI_LOG(ConvaiUtilsLog, Log, TEXT("GetLookedAtCharacter: Found! %s = %f"), *CurrentConvaiCharacter->GetFullName(), FocuseDotThresshold);
 
 		}
 	}
@@ -353,7 +354,7 @@ void UConvaiUtils::ConvaiGetLookedAtObjectOrCharacter(UObject* WorldContextObjec
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	if (!World)
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
 		return;
 	}
 
@@ -364,7 +365,7 @@ void UConvaiUtils::ConvaiGetLookedAtObjectOrCharacter(UObject* WorldContextObjec
 
 	if (!PlayerController)
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("ConvaiGetLookedAtActor: Could not get a pointer to PlayerController"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("ConvaiGetLookedAtActor: Could not get a pointer to PlayerController"));
 		return;
 	}
 
@@ -380,7 +381,7 @@ void UConvaiUtils::ConvaiGetLookedAtObjectOrCharacter(UObject* WorldContextObjec
 	}
 	else
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("ConvaiGetLookedAtActor: Could not get a camera location"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("ConvaiGetLookedAtActor: Could not get a camera location"));
 		return;
 	}
 
@@ -452,7 +453,7 @@ void UConvaiUtils::ConvaiGetAllPlayerComponents(UObject* WorldContextObject, TAr
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	if (!World)
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
 		return;
 	}
 
@@ -482,7 +483,7 @@ void UConvaiUtils::ConvaiGetAllChatbotComponents(UObject* WorldContextObject, TA
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	if (!World)
 	{
-		UE_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
+		CONVAI_LOG(ConvaiUtilsLog, Warning, TEXT("Could not get a pointer to world!"));
 		return;
 	}
 
@@ -661,7 +662,7 @@ namespace
 		}
 		else
 		{
-			//UE_LOG(ConvaiT2SHttpLog, Warning, TEXT("%s"), *ErrorReason);
+			//CONVAI_LOG(ConvaiT2SHttpLog, Warning, TEXT("%s"), *ErrorReason);
 			return nullptr;
 		}
 	}
@@ -748,7 +749,7 @@ TArray<uint8> UConvaiUtils::ExtractPCMDataFromSoundWave(USoundWave* SoundWave, i
 
 	if (!SoundWave)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SoundWave is null!"));
+		CONVAI_LOG(LogTemp, Warning, TEXT("SoundWave is null!"));
 		return PCMData;
 	}
 
@@ -787,7 +788,7 @@ USoundWave* UConvaiUtils::PCMDataToSoundWav(TArray<uint8> InPCMBytes, int NumCha
 
 	// Save the wav file to disk for debug
 	//FString SaveDir = "C:\\Users\\pc\\Videos\\MetahumansConvaiTutorial\\outtest.wav";
-	//UE_LOG(ConvaiUtilsLog, Log, TEXT("OutSerializeWave.Num() final: %d bytes "), OutSerializeWave.Num());
+	//CONVAI_LOG(ConvaiUtilsLog, Log, TEXT("OutSerializeWave.Num() final: %d bytes "), OutSerializeWave.Num());
 	//FFileHelper::SaveArrayToFile(OutSerializeWave, *SaveDir);
 
 	return UConvaiUtils::WavDataToSoundWave(OutSerializeWave);
@@ -967,7 +968,7 @@ bool UConvaiUtils::ParseVisemeValuesToAnimationFrame(const FString& VisemeValues
 	if (StringValues.Num() != ConvaiConstants::VisemeNames.Num())
 	{
 		// Log an error message and return the uninitialized FAnimationFrame object
-		//UE_LOG(LogTemp, Error, TEXT("Number of values does not match the number of viseme names."));
+		//CONVAI_LOG(LogTemp, Error, TEXT("Number of values does not match the number of viseme names."));
 		return false;
 	}
 
@@ -990,7 +991,7 @@ bool UConvaiUtils::ParseVisemeValuesToAnimationFrame(const FString& VisemeValues
 		else
 		{
 			// Log a warning message if a string value is not numeric
-			//UE_LOG(LogTemp, Warning, TEXT("Invalid numeric value: %s"), *StringValues[Index])
+			//CONVAI_LOG(LogTemp, Warning, TEXT("Invalid numeric value: %s"), *StringValues[Index])
 			Value = 0;
 			AnimationFrame.BlendShapes.Add(*ConvaiConstants::VisemeNames[Index], Value);
 		}
@@ -1107,36 +1108,71 @@ TMap<FName, float> UConvaiUtils::MapBlendshapes(const TMap<FName, float>& InputB
 }
 
 bool UConvaiSettingsUtils::GetParamValueAsString(const FString& paramName, FString& outValue) {
-	FString input = Convai::Get().GetConvaiSettings()->ExtraParams;
-	FString result;
-	FString trimmedInput = input.Replace(TEXT(" "), TEXT("")); // Remove all spaces
-	if (trimmedInput.Split(paramName + TEXT("="), nullptr, &result)) {
-		result.Split(TEXT(","), &result, nullptr);
-		outValue = result.TrimStartAndEnd().Replace(TEXT("\""), TEXT("")).TrimStartAndEnd();
-		return true;
-	}
-	outValue = FString();
-	return false;
+    // First check command line parameters
+    FString CommandLineValue = UCommandLineUtils::GetCommandLineFlagValueAsString(paramName, TEXT(""));
+    if (!CommandLineValue.IsEmpty())
+    {
+        outValue = CommandLineValue;
+        return true;
+    }
+
+    // Fall back to ExtraParams setting
+    FString input = Convai::Get().GetConvaiSettings()->ExtraParams;
+    FString result;
+    FString trimmedInput = input.Replace(TEXT(" "), TEXT("")); // Remove all spaces
+    if (trimmedInput.Split(paramName + TEXT("="), nullptr, &result)) {
+        result.Split(TEXT(","), &result, nullptr);
+        outValue = result.TrimStartAndEnd().Replace(TEXT("\""), TEXT("")).TrimStartAndEnd();
+        return true;
+    }
+    outValue = FString();
+    return false;
 }
 
 bool UConvaiSettingsUtils::GetParamValueAsFloat(const FString& paramName, float& outValue) {
-	FString stringValue;
-	if (GetParamValueAsString(paramName, stringValue)) {
-		FDefaultValueHelper::ParseFloat(stringValue, outValue);
-		return true;
-	}
-	outValue = 0.0f;
-	return false;
+    // First check command line parameters
+    FString CommandLineValue = UCommandLineUtils::GetCommandLineFlagValueAsString(paramName, TEXT(""));
+    if (!CommandLineValue.IsEmpty())
+    {
+        if (FDefaultValueHelper::ParseFloat(CommandLineValue, outValue))
+        {
+            return true;
+        }
+    }
+
+    // Fall back to ExtraParams setting
+    FString stringValue;
+    if (GetParamValueAsString(paramName, stringValue)) {
+        if (FDefaultValueHelper::ParseFloat(stringValue, outValue))
+        {
+            return true;
+        }
+    }
+    outValue = 0.0f;
+    return false;
 }
 
 bool UConvaiSettingsUtils::GetParamValueAsInt(const FString& paramName, int32& outValue) {
-	FString stringValue;
-	if (GetParamValueAsString(paramName, stringValue)) {
-		FDefaultValueHelper::ParseInt(stringValue, outValue);
-		return true;
-	}
-	outValue = 0;
-	return false;
+    // First check command line parameters
+    FString CommandLineValue = UCommandLineUtils::GetCommandLineFlagValueAsString(paramName, TEXT(""));
+    if (!CommandLineValue.IsEmpty())
+    {
+        if (FDefaultValueHelper::ParseInt(CommandLineValue, outValue))
+        {
+            return true;
+        }
+    }
+
+    // Fall back to ExtraParams setting
+    FString stringValue;
+    if (GetParamValueAsString(paramName, stringValue)) {
+        if (FDefaultValueHelper::ParseInt(stringValue, outValue))
+        {
+            return true;
+        }
+    }
+    outValue = 0;
+    return false;
 }
 
 bool UConvaiUtils::WriteSoundWaveToWavFile(USoundWave* SoundWave, const FString& FilePath)
@@ -1177,3 +1213,60 @@ USoundWave* UConvaiUtils::ReadWavFileAsSoundWave(const FString & FilePath)
 
 	return NewSoundWave;
 }
+
+bool UCommandLineUtils::IsCommandLineFlagPresent(const FString& Flag)
+{
+    // Check if the flag is present as a standalone flag (e.g., -fullscreen)
+    if (FParse::Param(FCommandLine::Get(), *Flag))
+    {
+        return true;
+    }
+
+    // Check if the flag is present as a flag with a value (e.g., -port=12345)
+    FString DummyString;
+    if (FParse::Value(FCommandLine::Get(), *(Flag + "="), DummyString))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+int32 UCommandLineUtils::GetCommandLineFlagValueAsInt(const FString& Flag, int32 DefaultValue)
+{
+	int32 Value = DefaultValue;
+
+	// Check for the "-Flag=" and get its value as an integer
+	if (FParse::Value(FCommandLine::Get(), *(Flag + "="), Value))
+	{
+		return Value;
+	}
+
+	return DefaultValue; // Return default if not found
+}
+
+FString UCommandLineUtils::GetCommandLineFlagValueAsString(const FString& Flag, const FString& DefaultValue)
+{
+	FString Value;
+
+	// Check for the "-Flag=" and get its value as a string
+	if (FParse::Value(FCommandLine::Get(), *(Flag + "="), Value))
+	{
+		Value.TrimStartInline();
+		Value.TrimEndInline();
+		if (!Value.IsEmpty())
+		{
+			return Value;
+		}
+	}
+
+	return DefaultValue; // Return default if not found or empty
+}
+
+FString UCommandLineUtils::GetCommandLineFlagValueAsStringNoDefault(const FString& Flag)
+{
+	FString BaseUrl = FString();
+	FParse::Value(FCommandLine::Get(), *Flag, BaseUrl);    
+	return BaseUrl;
+}
+
