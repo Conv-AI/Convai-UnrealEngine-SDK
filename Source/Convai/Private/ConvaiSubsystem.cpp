@@ -247,6 +247,10 @@ void FgRPCClient::CreateChannel()
 
 	args.SetInt(GRPC_ARG_CLIENT_IDLE_TIMEOUT_MS, INT_MAX);
 
+	args.SetInt(GRPC_ARG_KEEPALIVE_TIME_MS, 30000);           // Send keepalive ping every 30 seconds
+    args.SetInt(GRPC_ARG_KEEPALIVE_TIMEOUT_MS, 500000);         // Wait 5 seconds for keepalive response
+    args.SetInt(GRPC_ARG_KEEPALIVE_PERMIT_WITHOUT_CALLS, 1);  // Allow keepalive even when no active calls
+
 	Channel = grpc::CreateCustomChannel(Target, Creds, args);
 
 	//Channel->NotifyOnStateChange(grpc_connectivity_state::GRPC_CHANNEL_CONNECTING, std::chrono::system_clock::time_point().max(), &cq_, (void*)&OnStateChangeDelegate);
