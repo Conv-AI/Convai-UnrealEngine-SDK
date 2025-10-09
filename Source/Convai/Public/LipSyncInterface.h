@@ -23,6 +23,7 @@ public:
 	FOnVisemesDataReadySignature OnVisemesDataReady;
 
 	virtual void ConvaiInferFacialDataFromAudio(uint8* InPCMData, uint32 InPCMDataSize, uint32 InSampleRate, uint32 InNumChannels) = 0;
+	virtual void MarkEndOfAudio() {};
 	virtual void ConvaiStopLipSync() = 0;
 	virtual TArray<float> ConvaiGetVisemes() = 0;
 	virtual TArray<FString> ConvaiGetVisemeNames() = 0;

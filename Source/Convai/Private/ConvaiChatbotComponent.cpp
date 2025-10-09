@@ -1075,6 +1075,8 @@ void UConvaiChatbotComponent::onFinishedReceivingData()
 	}
 	// Attempt to play all buffered audio and lipsync
 	TryPlayBufferedContent(true);
+	if (ConvaiLipSync)
+		ConvaiLipSync->MarkEndOfAudio();
 }
 
 void UConvaiChatbotComponent::OnNarrativeSectionReceived(FString BT_Code, FString BT_Constants, FString ReceivedNarrativeSectionID)
