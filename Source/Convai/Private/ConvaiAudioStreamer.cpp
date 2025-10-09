@@ -1336,6 +1336,8 @@ void UConvaiAudioStreamer::onAudioFinished()
     AsyncTask(ENamedThreads::GameThread, [this] {
         OnFinishedTalking.Broadcast();
     });
+
+	StopLipSync();
     
     IsTalking = false;
 }

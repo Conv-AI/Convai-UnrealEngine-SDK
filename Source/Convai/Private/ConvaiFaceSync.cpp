@@ -340,7 +340,4 @@ void UConvaiFaceSyncComponent::ConvaiStopLipSync()
 	bIsPlaying = false;
 	CurrentSequenceTimePassed = 0;
 	ClearMainSequence();
-	SetCurrentFrametoZero();
-	OnVisemesDataReady.ExecuteIfBound();
-	// CONVAI_LOG(ConvaiFaceSyncLog, Warning, TEXT("Stopping LipSync"));
 }
