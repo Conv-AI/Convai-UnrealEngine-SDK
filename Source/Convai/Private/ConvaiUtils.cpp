@@ -1107,6 +1107,60 @@ TMap<FName, float> UConvaiUtils::MapBlendshapes(const TMap<FName, float>& InputB
 	return OutputMap;
 }
 
+void UConvaiUtils::SplitBlendshapeMapByKeys(
+	TMap<FName, float>& InOutOriginalMap,
+	const TArray<FName>& SplitKeys,
+	TMap<FName, float>& OutSplitMap
+)
+{
+	// Convert array to set for O(1) lookups
+	TSet<FName> SplitKeySet(SplitKeys);
+
+	// Pre-reserve memory for the split map
+	OutSplitMap.Empty(SplitKeys.Num());
+
+	// Collect keys to remove
+	TArray<FName> KeysToRemove;
+	KeysToRemove.Reserve(SplitKeys.Num());
+
+	for (const auto& Pair : InOutOriginalMap)
+	{
+		if (SplitKeySet.Contains(Pair.Key))
+		{
+			// Add to split map
+			OutSplitMap.Add(Pair.Key, Pair.Value);
+			// Mark for removal from original map
+			KeysToRemove.Add(Pair.Key);
+		}
+	}
+
+	// Remove the keys from the original map
+	for (const FName& Key : KeysToRemove)
+	{
+		InOutOriginalMap.Remove(Key);
+	}
+}
+
+TMap<FName, float> UConvaiUtils::MergeBlendshapeMaps(
+	const TMap<FName, float>& BaseMap,
+	const TMap<FName, float>& OverrideMap
+)
+{
+	// Start with a copy of the base map
+	TMap<FName, float> Result = BaseMap;
+
+	// Reserve additional space for potential new keys from override map
+	Result.Reserve(BaseMap.Num() + OverrideMap.Num());
+
+	// Add/override with values from the override map
+	for (const auto& Pair : OverrideMap)
+	{
+		Result.Add(Pair.Key, Pair.Value);
+	}
+
+	return Result;
+}
+
 bool UConvaiSettingsUtils::GetParamValueAsString(const FString& paramName, FString& outValue) {
     // First check command line parameters
     FString CommandLineValue = UCommandLineUtils::GetCommandLineFlagValueAsString(paramName, TEXT(""));

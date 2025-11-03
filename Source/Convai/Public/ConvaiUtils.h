@@ -86,8 +86,86 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Convai|Utilities")
 	static void GetPlatformInfo(FString& EngineVersion, FString& PlatformName);
 
-	UFUNCTION(BlueprintPure, Category = "Convai|Utilities")
+	/**
+	 * Maps and transforms blendshapes from one naming convention/rig to another.
+	 * Supports per-blendshape multipliers, offsets, clamping, and override values.
+	 *
+	 * This is useful for:
+	 * - Converting ARKit blendshapes to MetaHuman blendshapes
+	 * - Remapping custom character rigs
+	 * - Applying global scaling and offset to all blendshapes
+	 * - Overriding specific blendshape values
+	 * - Clamping blendshape values to valid ranges
+	 *
+	 * @param InputBlendshapes The source blendshape map (e.g., from ARKit or AI system)
+	 * @param BlendshapeMap Mapping configuration for each blendshape (multipliers, offsets, target names, etc.)
+	 * @param GlobalMultiplier Global multiplier applied to all blendshapes (unless IgnoreGlobalModifiers is set)
+	 * @param GlobalOffset Global offset added to all blendshapes (unless IgnoreGlobalModifiers is set)
+	 * @return Transformed blendshape map ready for the target character rig
+	 *
+	 * Example:
+	 * - Input: {"jawOpen": 0.5}
+	 * - BlendshapeMap: {"jawOpen" -> TargetNames: ["CTRL_expressions_mouthOpen"], Multiplier: 2.0, Offset: 0.1}
+	 * - GlobalMultiplier: 1.0, GlobalOffset: 0.0
+	 * - Output: {"CTRL_expressions_mouthOpen": 1.1}  // (0.5 * 2.0 * 1.0) + 0.1 + 0.0
+	 */
+	UFUNCTION(BlueprintPure, Category = "Convai|Blendshapes")
 	static TMap<FName, float> MapBlendshapes(const TMap<FName,float>& InputBlendshapes, const TMap<FName, FConvaiBlendshapeParameters>& BlendshapeMap, float GlobalMultiplier, float GlobalOffset);
+
+
+	/**
+	 * Splits a blendshape map into two maps based on a list of keys.
+	 * Keys found in SplitKeys are moved to OutSplitMap and removed from InOutOriginalMap.
+	 *
+	 * This is useful for:
+	 * - Separating blendshapes that need different blend modes (additive vs replace)
+	 * - Isolating specific facial regions (eyes, mouth, etc.) for independent control
+	 * - Creating layered animation systems
+	 *
+	 * Performance: O(n) where n is the number of blendshapes in the original map
+	 * Uses TSet internally for O(1) key lookups
+	 *
+	 * @param InOutOriginalMap The original map. Keys matching SplitKeys will be removed from this map.
+	 * @param SplitKeys Array of blendshape names to extract from the original map.
+	 * @param OutSplitMap Output map containing only the key-value pairs whose keys are in SplitKeys.
+	 *
+	 * Example:
+	 * - InOutOriginalMap: {"eyeBlinkL": 0.5, "jawOpen": 0.3, "eyeBlinkR": 0.5}
+	 * - SplitKeys: ["eyeBlinkL", "eyeBlinkR"]
+	 * - After execution:
+	 *   - InOutOriginalMap: {"jawOpen": 0.3}
+	 *   - OutSplitMap: {"eyeBlinkL": 0.5, "eyeBlinkR": 0.5}
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Convai|Blendshapes", meta = (DisplayName = "Split Blendshape Map by Keys"))
+	static void SplitBlendshapeMapByKeys(
+		UPARAM(ref) TMap<FName, float>& InOutOriginalMap,
+		const TArray<FName>& SplitKeys,
+		TMap<FName, float>& OutSplitMap
+	);
+
+	/**
+	 * Merges two blendshape maps together.
+	 * If a key exists in both maps, the value from OverrideMap takes precedence.
+	 *
+	 * This is useful for:
+	 * - Combining blendshapes from multiple sources (AI + manual animation)
+	 * - Applying corrective blendshapes on top of base animation
+	 * - Layering different animation systems
+	 *
+	 * @param BaseMap The base map to merge into.
+	 * @param OverrideMap The map whose values will override the base map.
+	 * @return A new map containing all key-value pairs from both maps.
+	 *
+	 * Example:
+	 * - BaseMap: {"eyeBlinkL": 0.3, "jawOpen": 0.5}
+	 * - OverrideMap: {"eyeBlinkL": 0.8, "browUp": 0.2}
+	 * - Result: {"eyeBlinkL": 0.8, "jawOpen": 0.5, "browUp": 0.2}
+	 */
+	UFUNCTION(BlueprintPure, Category = "Convai|Blendshapes", meta = (DisplayName = "Merge Blendshape Maps"))
+	static TMap<FName, float> MergeBlendshapeMaps(
+		const TMap<FName, float>& BaseMap,
+		const TMap<FName, float>& OverrideMap
+	);
 
 	static TArray<uint8> ExtractPCMDataFromSoundWave(USoundWave* SoundWave, int32& OutSampleRate, int32& OutNumChannels);
 
