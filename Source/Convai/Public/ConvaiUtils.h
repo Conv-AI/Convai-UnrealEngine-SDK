@@ -329,7 +329,7 @@ public:
 };
 
 UCLASS()
-class UCommandLineUtils : public UBlueprintFunctionLibrary
+class CONVAI_API UCommandLineUtils : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
