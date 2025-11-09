@@ -22,10 +22,12 @@ bool UConvaiURL::bURLConfigInitialized = false;
 
 void UConvaiURL::InitializeURLConfig()
 {
+#if UE_BUILD_SHIPPING
     if (bURLConfigInitialized)
     {
         return;
     }
+#endif
 
     // First check settings
     FString SettingsBetaURL = Convai::Get().GetConvaiSettings()->CustomBetaURL;
