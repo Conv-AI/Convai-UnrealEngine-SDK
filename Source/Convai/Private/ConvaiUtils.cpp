@@ -1119,25 +1119,13 @@ void UConvaiUtils::SplitBlendshapeMapByKeys(
 	// Pre-reserve memory for the split map
 	OutSplitMap.Empty(SplitKeys.Num());
 
-	// Collect keys to remove
-	TArray<FName> KeysToRemove;
-	KeysToRemove.Reserve(SplitKeys.Num());
-
-	for (const auto& Pair : InOutOriginalMap)
+	for (const FName& Key : SplitKeys)
 	{
-		if (SplitKeySet.Contains(Pair.Key))
+		float Value;
+		if (InOutOriginalMap.RemoveAndCopyValue(Key, Value))
 		{
-			// Add to split map
-			OutSplitMap.Add(Pair.Key, Pair.Value);
-			// Mark for removal from original map
-			KeysToRemove.Add(Pair.Key);
+			OutSplitMap.Add(Key, Value);
 		}
-	}
-
-	// Remove the keys from the original map
-	for (const FName& Key : KeysToRemove)
-	{
-		InOutOriginalMap.Remove(Key);
 	}
 }
 
