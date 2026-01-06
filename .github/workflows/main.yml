@@ -89,35 +89,42 @@ jobs:
           echo "::set-output name=plugin_path::$plugin_path"
         shell: pwsh
 
-      - name: Extract and Copy Dependencies
+      - name: Build and package for Unreal versions 5.2 to 5.7
         run: |
           try {
-            $dependencies_dir = "E:/Dependencies"
+            $versions = @("5.7", "5.6", "5.5", "5.4","5.3","5.2")
             $plugin_dir = "${{ github.workspace }}"
-            $content_zip = "$dependencies_dir/Content.zip"
-            $thirdparty_zip = "$dependencies_dir/ThirdParty.zip"
             $plugin_content_dir = "$plugin_dir/Content"
             $plugin_thirdparty_dir = "$plugin_dir/Source/ThirdParty"
-            if (Test-Path $plugin_content_dir) {
-                Remove-Item -Recurse -Force $plugin_content_dir
-            }
-            if (Test-Path $plugin_thirdparty_dir) {
-                Remove-Item -Recurse -Force $plugin_thirdparty_dir
-            }
-            Expand-Archive -Path $content_zip -DestinationPath $plugin_dir
-            Expand-Archive -Path $thirdparty_zip -DestinationPath "$plugin_dir/Source"
-            Write-Host "Dependencies extracted and copied successfully."
-          } catch {
-            Write-Host "Failed to extract and copy dependencies. Error: $_"
-            exit 1
-          }
-        shell: pwsh
 
-      - name: Build and package for Unreal versions 5.2 to 5.6
-        run: |
-          try {
-            $versions = @("5.6", "5.5", "5.4","5.3","5.2")
             foreach ($version in $versions) {
+                # Determine which dependencies to use based on version
+                if ([version]$version -ge [version]"5.6") {
+                    $dependencies_dir = "E:/Dependencies_MH_fix"
+                    Write-Host "Using MetaHuman fix dependencies for UE_$version"
+                } else {
+                    $dependencies_dir = "E:/Dependencies"
+                    Write-Host "Using standard dependencies for UE_$version"
+                }
+
+                # Extract and copy dependencies for this version
+                $content_zip = "$dependencies_dir/Content.zip"
+                $thirdparty_zip = "$dependencies_dir/ThirdParty.zip"
+
+                Write-Host "Cleaning previous dependencies..."
+                if (Test-Path $plugin_content_dir) {
+                    Remove-Item -Recurse -Force $plugin_content_dir
+                }
+                if (Test-Path $plugin_thirdparty_dir) {
+                    Remove-Item -Recurse -Force $plugin_thirdparty_dir
+                }
+
+                Write-Host "Extracting dependencies from $dependencies_dir..."
+                Expand-Archive -Path $content_zip -DestinationPath $plugin_dir -Force
+                Expand-Archive -Path $thirdparty_zip -DestinationPath "$plugin_dir/Source" -Force
+                Write-Host "Dependencies extracted successfully for UE_$version"
+
+                # Build and package
                 $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_$version"
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version/Convai"
                 if (Test-Path $output_path) {
@@ -200,7 +207,7 @@ jobs:
       - name: Zip Plugin for each version
         run: |
           try {
-            $versions = @("5.6","5.5","5.4","5.3","5.2")
+            $versions = @("5.7","5.6","5.5","5.4","5.3","5.2")
             foreach ($version in $versions) {
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
                 Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip" -Force
@@ -325,6 +332,7 @@ jobs:
           name: "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
           body: ${{ steps.extract_notes.outputs.release_notes }}
           files: |
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.7.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.6.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.5.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
