@@ -89,42 +89,50 @@ jobs:
           echo "::set-output name=plugin_path::$plugin_path"
         shell: pwsh
 
-      - name: Build and package for Unreal versions 5.2 to 5.7
+      - name: Extract and Copy Dependencies
         run: |
           try {
-            $versions = @("5.7", "5.6", "5.5", "5.4","5.3","5.2")
+            $dependencies_dir = "E:/Dependencies"
+            $dependencies_mh_fix_dir = "E:/Dependencies_MH_fix"
             $plugin_dir = "${{ github.workspace }}"
+            $content_zip = "$dependencies_dir/Content.zip"
+            $thirdparty_zip = "$dependencies_dir/ThirdParty.zip"
             $plugin_content_dir = "$plugin_dir/Content"
             $plugin_thirdparty_dir = "$plugin_dir/Source/ThirdParty"
 
+            # Remove existing directories
+            if (Test-Path $plugin_content_dir) {
+                Remove-Item -Recurse -Force $plugin_content_dir
+            }
+            if (Test-Path $plugin_thirdparty_dir) {
+                Remove-Item -Recurse -Force $plugin_thirdparty_dir
+            }
+
+            # Extract base dependencies
+            Expand-Archive -Path $content_zip -DestinationPath $plugin_dir
+            Expand-Archive -Path $thirdparty_zip -DestinationPath "$plugin_dir/Source"
+            Write-Host "Base dependencies extracted and copied successfully."
+
+            # For UE 5.6 and above, apply MetaHuman fixes
+            $mh_fix_content = "$dependencies_mh_fix_dir/Content"
+            if (Test-Path $mh_fix_content) {
+                Write-Host "Applying MetaHuman fixes from $mh_fix_content to $plugin_content_dir..."
+                Copy-Item -Path "$mh_fix_content/*" -Destination $plugin_content_dir -Recurse -Force
+                Write-Host "MetaHuman fixes applied successfully."
+            } else {
+                Write-Host "Warning: MetaHuman fix directory not found at $mh_fix_content"
+            }
+          } catch {
+            Write-Host "Failed to extract and copy dependencies. Error: $_"
+            exit 1
+          }
+        shell: pwsh
+
+      - name: Build and package for Unreal versions 5.2 to 5.7
+        run: |
+          try {
+            $versions = @("5.7", "5.6", "5.5", "5.4", "5.3", "5.2")
             foreach ($version in $versions) {
-                # Determine which dependencies to use based on version
-                if ([version]$version -ge [version]"5.6") {
-                    $dependencies_dir = "E:/Dependencies_MH_fix"
-                    Write-Host "Using MetaHuman fix dependencies for UE_$version"
-                } else {
-                    $dependencies_dir = "E:/Dependencies"
-                    Write-Host "Using standard dependencies for UE_$version"
-                }
-
-                # Extract and copy dependencies for this version
-                $content_zip = "$dependencies_dir/Content.zip"
-                $thirdparty_zip = "$dependencies_dir/ThirdParty.zip"
-
-                Write-Host "Cleaning previous dependencies..."
-                if (Test-Path $plugin_content_dir) {
-                    Remove-Item -Recurse -Force $plugin_content_dir
-                }
-                if (Test-Path $plugin_thirdparty_dir) {
-                    Remove-Item -Recurse -Force $plugin_thirdparty_dir
-                }
-
-                Write-Host "Extracting dependencies from $dependencies_dir..."
-                Expand-Archive -Path $content_zip -DestinationPath $plugin_dir -Force
-                Expand-Archive -Path $thirdparty_zip -DestinationPath "$plugin_dir/Source" -Force
-                Write-Host "Dependencies extracted successfully for UE_$version"
-
-                # Build and package
                 $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_$version"
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version/Convai"
                 if (Test-Path $output_path) {
@@ -207,7 +215,7 @@ jobs:
       - name: Zip Plugin for each version
         run: |
           try {
-            $versions = @("5.7","5.6","5.5","5.4","5.3","5.2")
+            $versions = @("5.7", "5.6", "5.5", "5.4", "5.3", "5.2")
             foreach ($version in $versions) {
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
                 Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip" -Force
