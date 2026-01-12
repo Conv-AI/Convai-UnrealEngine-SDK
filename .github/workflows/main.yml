@@ -140,29 +140,9 @@ jobs:
                 if ($version -eq "5.7") {
                     $env:LINUX_MULTIARCH_ROOT = "C:\UnrealToolchains\v26_clang-20.1.8-rockylinux8"
                     Write-Host "Set LINUX_MULTIARCH_ROOT to $env:LINUX_MULTIARCH_ROOT for UE 5.7"
-
-                    # Copy ConvAI.uplugin for UE 5.7
-                    $uplugin_source = "$dependencies_mh_fix_dir/57/ConvAI.uplugin"
-                    $uplugin_dest = "$plugin_dir/ConvAI.uplugin"
-                    if (Test-Path $uplugin_source) {
-                        Copy-Item -Path $uplugin_source -Destination $uplugin_dest -Force
-                        Write-Host "Copied ConvAI.uplugin from $uplugin_source for UE 5.7"
-                    } else {
-                        Write-Host "Warning: ConvAI.uplugin not found at $uplugin_source"
-                    }
                 } else {
                     $env:LINUX_MULTIARCH_ROOT = "C:\UnrealToolchains\v25_clang-18.1.0-rockylinux8"
                     Write-Host "Set LINUX_MULTIARCH_ROOT to $env:LINUX_MULTIARCH_ROOT for UE $version"
-
-                    # Copy ConvAI.uplugin for UE 5.6 and below
-                    $uplugin_source = "$dependencies_mh_fix_dir/56below/ConvAI.uplugin"
-                    $uplugin_dest = "$plugin_dir/ConvAI.uplugin"
-                    if (Test-Path $uplugin_source) {
-                        Copy-Item -Path $uplugin_source -Destination $uplugin_dest -Force
-                        Write-Host "Copied ConvAI.uplugin from $uplugin_source for UE $version"
-                    } else {
-                        Write-Host "Warning: ConvAI.uplugin not found at $uplugin_source"
-                    }
                 }
 
                 $ue_version_path = "${{ steps.paths.outputs.ue_root }}/UE_$version"
@@ -220,13 +200,6 @@ jobs:
 
       - name: Test packaging for Android UE 5.6
         run: |
-          # Set NDK environment variables
-          $env:NDK_ROOT = "C:\Users\convaidev\AppData\Local\Android\Sdk\ndk\27.2.12479018"
-          $env:NDKROOT = "C:\Users\convaidev\AppData\Local\Android\Sdk\ndk\27.2.12479018"
-
-          Write-Host "NDK_ROOT set to: $env:NDK_ROOT"
-          Write-Host "NDKROOT set to: $env:NDKROOT"
-
           $UE_PATH = "${{ steps.paths.outputs.ue_root }}/UE_5.6/Engine/Build/BatchFiles/RunUAT.bat"
           $TEST_PROJECT_PATH = "E:/Software/TestProject"
           $PLUGIN_FOLDER = "$TEST_PROJECT_PATH/Plugins"

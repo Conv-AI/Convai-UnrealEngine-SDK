@@ -55,7 +55,7 @@ static void InitDefaultsscc_info_ARKitBlendShapes_arkit_5fblend_5fshapes_2eproto
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ARKitBlendShapes_arkit_5fblend_5fshapes_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_ARKitBlendShapes_arkit_5fblend_5fshapes_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_ARKitBlendShapes_arkit_5fblend_5fshapes_2eproto}, {}};
 
 static void InitDefaultsscc_info_ARKitBlendShapesData_arkit_5fblend_5fshapes_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -68,7 +68,7 @@ static void InitDefaultsscc_info_ARKitBlendShapesData_arkit_5fblend_5fshapes_2ep
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_ARKitBlendShapesData_arkit_5fblend_5fshapes_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_ARKitBlendShapesData_arkit_5fblend_5fshapes_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 1, 0, InitDefaultsscc_info_ARKitBlendShapesData_arkit_5fblend_5fshapes_2eproto}, {
       &scc_info_ARKitBlendShapes_arkit_5fblend_5fshapes_2eproto.base,}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_arkit_5fblend_5fshapes_2eproto[2];

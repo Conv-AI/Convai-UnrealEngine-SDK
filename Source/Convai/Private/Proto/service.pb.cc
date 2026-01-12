@@ -189,7 +189,7 @@ static void InitDefaultsscc_info_ActionConfig_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_ActionConfig_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_ActionConfig_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 2, 0, InitDefaultsscc_info_ActionConfig_service_2eproto}, {
       &scc_info_ActionConfig_Character_service_2eproto.base,
       &scc_info_ActionConfig_Object_service_2eproto.base,}};
 
@@ -204,7 +204,7 @@ static void InitDefaultsscc_info_ActionConfig_Character_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ActionConfig_Character_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_ActionConfig_Character_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_ActionConfig_Character_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_ActionConfig_Object_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -217,7 +217,7 @@ static void InitDefaultsscc_info_ActionConfig_Object_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ActionConfig_Object_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_ActionConfig_Object_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_ActionConfig_Object_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_AudioConfig_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -230,7 +230,7 @@ static void InitDefaultsscc_info_AudioConfig_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_AudioConfig_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_AudioConfig_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_AudioConfig_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_BlendShapesData_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -243,7 +243,7 @@ static void InitDefaultsscc_info_BlendShapesData_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_BlendShapesData_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_BlendShapesData_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_BlendShapesData_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_DynamicInfoConfig_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -256,7 +256,7 @@ static void InitDefaultsscc_info_DynamicInfoConfig_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_DynamicInfoConfig_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_DynamicInfoConfig_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_DynamicInfoConfig_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_EmotionResponse_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -269,7 +269,7 @@ static void InitDefaultsscc_info_EmotionResponse_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_EmotionResponse_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_EmotionResponse_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_EmotionResponse_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_FeedbackRequest_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -282,7 +282,7 @@ static void InitDefaultsscc_info_FeedbackRequest_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_FeedbackRequest_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_FeedbackRequest_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 1, 0, InitDefaultsscc_info_FeedbackRequest_service_2eproto}, {
       &scc_info_FeedbackRequest_Feedback_service_2eproto.base,}};
 
 static void InitDefaultsscc_info_FeedbackRequest_Feedback_service_2eproto() {
@@ -296,7 +296,7 @@ static void InitDefaultsscc_info_FeedbackRequest_Feedback_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_FeedbackRequest_Feedback_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_FeedbackRequest_Feedback_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_FeedbackRequest_Feedback_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_FeedbackResponse_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -309,7 +309,7 @@ static void InitDefaultsscc_info_FeedbackResponse_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_FeedbackResponse_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_FeedbackResponse_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_FeedbackResponse_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_GetResponseRequest_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -322,7 +322,7 @@ static void InitDefaultsscc_info_GetResponseRequest_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_GetResponseRequest_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_GetResponseRequest_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 2, 0, InitDefaultsscc_info_GetResponseRequest_service_2eproto}, {
       &scc_info_GetResponseRequest_GetResponseConfig_service_2eproto.base,
       &scc_info_GetResponseRequest_GetResponseData_service_2eproto.base,}};
 
@@ -337,7 +337,7 @@ static void InitDefaultsscc_info_GetResponseRequest_GetResponseConfig_service_2e
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<5> scc_info_GetResponseRequest_GetResponseConfig_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 5, 0, InitDefaultsscc_info_GetResponseRequest_GetResponseConfig_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 5, 0, InitDefaultsscc_info_GetResponseRequest_GetResponseConfig_service_2eproto}, {
       &scc_info_AudioConfig_service_2eproto.base,
       &scc_info_ActionConfig_service_2eproto.base,
       &scc_info_GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse_service_2eproto.base,
@@ -354,7 +354,7 @@ static void InitDefaultsscc_info_GetResponseRequest_GetResponseConfig_NarrativeT
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_GetResponseRequest_GetResponseConfig_NarrativeTemplateKeysEntry_DoNotUse_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_GetResponseRequest_GetResponseData_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -367,7 +367,7 @@ static void InitDefaultsscc_info_GetResponseRequest_GetResponseData_service_2epr
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GetResponseRequest_GetResponseData_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_GetResponseRequest_GetResponseData_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 1, 0, InitDefaultsscc_info_GetResponseRequest_GetResponseData_service_2eproto}, {
       &scc_info_TriggerConfig_service_2eproto.base,}};
 
 static void InitDefaultsscc_info_GetResponseRequestSingle_service_2eproto() {
@@ -381,7 +381,7 @@ static void InitDefaultsscc_info_GetResponseRequestSingle_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GetResponseRequestSingle_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_GetResponseRequestSingle_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 1, 0, InitDefaultsscc_info_GetResponseRequestSingle_service_2eproto}, {
       &scc_info_GetResponseRequest_service_2eproto.base,}};
 
 static void InitDefaultsscc_info_GetResponseResponse_service_2eproto() {
@@ -395,7 +395,7 @@ static void InitDefaultsscc_info_GetResponseResponse_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<4> scc_info_GetResponseResponse_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 4, 0, InitDefaultsscc_info_GetResponseResponse_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 4, 0, InitDefaultsscc_info_GetResponseResponse_service_2eproto}, {
       &scc_info_GetResponseResponse_ActionResponse_service_2eproto.base,
       &scc_info_GetResponseResponse_AudioResponse_service_2eproto.base,
       &scc_info_GetResponseResponse_UserTranscript_service_2eproto.base,
@@ -412,7 +412,7 @@ static void InitDefaultsscc_info_GetResponseResponse_ActionResponse_service_2epr
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GetResponseResponse_ActionResponse_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_GetResponseResponse_ActionResponse_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_GetResponseResponse_ActionResponse_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_GetResponseResponse_AudioResponse_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -425,7 +425,7 @@ static void InitDefaultsscc_info_GetResponseResponse_AudioResponse_service_2epro
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<5> scc_info_GetResponseResponse_AudioResponse_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 5, 0, InitDefaultsscc_info_GetResponseResponse_AudioResponse_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 5, 0, InitDefaultsscc_info_GetResponseResponse_AudioResponse_service_2eproto}, {
       &scc_info_AudioConfig_service_2eproto.base,
       &scc_info_VisemesData_service_2eproto.base,
       &scc_info_BlendShapesData_service_2eproto.base,
@@ -443,7 +443,7 @@ static void InitDefaultsscc_info_GetResponseResponse_BehaviorTreeResponse_servic
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GetResponseResponse_BehaviorTreeResponse_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_GetResponseResponse_BehaviorTreeResponse_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_GetResponseResponse_BehaviorTreeResponse_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_GetResponseResponse_UserTranscript_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -456,7 +456,7 @@ static void InitDefaultsscc_info_GetResponseResponse_UserTranscript_service_2epr
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GetResponseResponse_UserTranscript_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_GetResponseResponse_UserTranscript_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_GetResponseResponse_UserTranscript_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_HelloRequest_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -469,7 +469,7 @@ static void InitDefaultsscc_info_HelloRequest_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_HelloRequest_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_HelloRequest_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_HelloRequest_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_HelloResponse_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -482,7 +482,7 @@ static void InitDefaultsscc_info_HelloResponse_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_HelloResponse_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_HelloResponse_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_HelloResponse_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_STTRequest_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -495,7 +495,7 @@ static void InitDefaultsscc_info_STTRequest_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_STTRequest_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_STTRequest_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 1, 0, InitDefaultsscc_info_STTRequest_service_2eproto}, {
       &scc_info_AudioConfig_service_2eproto.base,}};
 
 static void InitDefaultsscc_info_STTResponse_service_2eproto() {
@@ -509,7 +509,7 @@ static void InitDefaultsscc_info_STTResponse_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_STTResponse_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_STTResponse_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_STTResponse_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_TriggerConfig_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -522,7 +522,7 @@ static void InitDefaultsscc_info_TriggerConfig_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_TriggerConfig_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_TriggerConfig_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_TriggerConfig_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_Viseme_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -535,7 +535,7 @@ static void InitDefaultsscc_info_Viseme_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Viseme_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Viseme_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_Viseme_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_VisemesData_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -548,7 +548,7 @@ static void InitDefaultsscc_info_VisemesData_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_VisemesData_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_VisemesData_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 1, 0, InitDefaultsscc_info_VisemesData_service_2eproto}, {
       &scc_info_Viseme_service_2eproto.base,}};
 
 static void InitDefaultsscc_info_VisionInput_service_2eproto() {
@@ -562,7 +562,7 @@ static void InitDefaultsscc_info_VisionInput_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_VisionInput_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_VisionInput_service_2eproto}, {
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 2, 0, InitDefaultsscc_info_VisionInput_service_2eproto}, {
       &scc_info_VisionInput_ImageData_service_2eproto.base,
       &scc_info_VisionInput_VideoData_service_2eproto.base,}};
 
@@ -577,7 +577,7 @@ static void InitDefaultsscc_info_VisionInput_ImageData_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_VisionInput_ImageData_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_VisionInput_ImageData_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_VisionInput_ImageData_service_2eproto}, {}};
 
 static void InitDefaultsscc_info_VisionInput_VideoData_service_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -590,7 +590,7 @@ static void InitDefaultsscc_info_VisionInput_VideoData_service_2eproto() {
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_VisionInput_VideoData_service_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_VisionInput_VideoData_service_2eproto}, {}};
+    {{::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized, 0, 0, InitDefaultsscc_info_VisionInput_VideoData_service_2eproto}, {}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_service_2eproto[30];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_service_2eproto[1];
