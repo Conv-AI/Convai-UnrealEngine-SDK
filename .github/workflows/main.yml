@@ -89,6 +89,23 @@ jobs:
           echo "::set-output name=plugin_path::$plugin_path"
         shell: pwsh
 
+      - name: Debug - Check Runner User and Environment
+        run: |
+          Write-Host "=== Runner User Information ==="
+          Write-Host "Current User: $env:USERNAME"
+          Write-Host "User Profile: $env:USERPROFILE"
+          Write-Host "Computer Name: $env:COMPUTERNAME"
+          Write-Host ""
+          Write-Host "=== Android Environment Variables ==="
+          Write-Host "ANDROID_HOME: $env:ANDROID_HOME"
+          Write-Host "ANDROID_SDK_ROOT: $env:ANDROID_SDK_ROOT"
+          Write-Host "NDK_ROOT: $env:NDK_ROOT"
+          Write-Host "NDKROOT: $env:NDKROOT"
+          Write-Host ""
+          Write-Host "=== All Environment Variables with 'android' or 'ndk' ==="
+          Get-ChildItem Env: | Where-Object { $_.Name -match 'android|ndk' -or $_.Value -match 'android|ndk' } | Format-Table -AutoSize
+        shell: pwsh
+
       - name: Extract and Copy Dependencies
         run: |
           try {
@@ -136,6 +153,11 @@ jobs:
             $dependencies_mh_fix_dir = "E:/Dependencies_MH_fix"
 
             foreach ($version in $versions) {
+                # Set Android NDK environment variables
+                $env:NDK_ROOT = "C:\Users\convaidev\AppData\Local\Android\Sdk\ndk\27.2.12479018"
+                $env:NDKROOT = "C:\Users\convaidev\AppData\Local\Android\Sdk\ndk\27.2.12479018"
+                Write-Host "Set NDK_ROOT and NDKROOT to: $env:NDK_ROOT"
+
                 # Set LINUX_MULTIARCH_ROOT based on Unreal version
                 if ($version -eq "5.7") {
                     $env:LINUX_MULTIARCH_ROOT = "C:\UnrealToolchains\v26_clang-20.1.8-rockylinux8"
