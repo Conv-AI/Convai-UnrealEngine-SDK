@@ -1,9 +1,9 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "3.6.9",
+	"VersionName": "3.6.9-hotfix-1",
 	"FriendlyName": "Convai",
-	"Description": "Add 5.7 support and fix Metahuman in 5.6 and above",
+	"Description": "Fix Metahuman issue for 5.5 and below",
 	"Category": "Runtime",
 	"CreatedBy": "Convai Inc.",
 	"CreatedByURL": "https://convai.com/",

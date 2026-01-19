@@ -112,16 +112,6 @@ jobs:
             Expand-Archive -Path $content_zip -DestinationPath $plugin_dir
             Expand-Archive -Path $thirdparty_zip -DestinationPath "$plugin_dir/Source"
             Write-Host "Base dependencies extracted and copied successfully."
-
-            # For UE 5.6 and above, apply MetaHuman fixes
-            $mh_fix_content = "$dependencies_mh_fix_dir/Content"
-            if (Test-Path $mh_fix_content) {
-                Write-Host "Applying MetaHuman fixes from $mh_fix_content to $plugin_content_dir..."
-                Copy-Item -Path "$mh_fix_content/*" -Destination $plugin_content_dir -Recurse -Force
-                Write-Host "MetaHuman fixes applied successfully."
-            } else {
-                Write-Host "Warning: MetaHuman fix directory not found at $mh_fix_content"
-            }
           } catch {
             Write-Host "Failed to extract and copy dependencies. Error: $_"
             exit 1
@@ -131,11 +121,26 @@ jobs:
       - name: Build and package for Unreal versions 5.2 to 5.7
         run: |
           try {
-            $versions = @("5.7", "5.6", "5.5", "5.4", "5.3", "5.2")
+            $versions = @("5.2", "5.3", "5.4", "5.5", "5.6", "5.7")
             $plugin_dir = "${{ github.workspace }}"
             $dependencies_mh_fix_dir = "E:/Dependencies_MH_fix"
+            $mh_fix_applied = $false
 
             foreach ($version in $versions) {
+                # Apply MetaHuman fixes when reaching 5.6 (for 5.6 and above)
+                if ($version -eq "5.6" -and -not $mh_fix_applied) {
+                    $mh_fix_content = "$dependencies_mh_fix_dir/Content"
+                    $plugin_content_dir = "$plugin_dir/Content"
+                    if (Test-Path $mh_fix_content) {
+                        Write-Host "Applying MetaHuman fixes from $mh_fix_content to $plugin_content_dir..."
+                        Copy-Item -Path "$mh_fix_content/*" -Destination $plugin_content_dir -Recurse -Force
+                        Write-Host "MetaHuman fixes applied successfully for UE 5.6 and above."
+                        $mh_fix_applied = $true
+                    } else {
+                        Write-Host "Warning: MetaHuman fix directory not found at $mh_fix_content"
+                    }
+                }
+
                 # Set Android NDK environment variables based on UE version
                 if ($version -eq "5.6" -or $version -eq "5.7") {
                     $env:NDK_ROOT = "C:\Users\convaidev\AppData\Local\Android\Sdk\ndk\27.2.12479018"
