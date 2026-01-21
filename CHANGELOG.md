@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+
+# Release 3.6.9-hotfix-2
+- Fixed Metahuman issue for 5.6 and above.
+
 # Release 3.6.7-Beta
 - Add UseSystemCertificates option for SSL configuration on Windows.
 - Fixed Convai logging not showing after packaging.

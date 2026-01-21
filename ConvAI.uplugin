@@ -1,9 +1,9 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "3.6.9-hotfix-1",
+	"VersionName": "3.6.9-hotfix-2",
 	"FriendlyName": "Convai",
-	"Description": "Fix Metahuman issue for 5.5 and below",
+	"Description": "Fix Metahuman issue for 5.6 and above",
 	"Category": "Runtime",
 	"CreatedBy": "Convai Inc.",
 	"CreatedByURL": "https://convai.com/",
