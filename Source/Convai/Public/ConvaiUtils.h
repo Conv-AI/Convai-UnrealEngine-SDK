@@ -85,6 +85,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Convai|Utilities")
 	static void GetPlatformInfo(FString& EngineVersion, FString& PlatformName);
+	
+	UFUNCTION(BlueprintPure, Category = "Convai|Utilities")
+	static FString GetDeviceUniqueIdentifier();
 
 	/**
 	 * Maps and transforms blendshapes from one naming convention/rig to another.

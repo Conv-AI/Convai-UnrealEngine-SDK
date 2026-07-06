@@ -203,9 +203,20 @@ private:
 	// Storage for the status of the RPC upon completion.
 	grpc::Status status;
 
-	std::unique_ptr<::grpc::ClientAsyncReaderWriter< service::GetResponseRequest, service::GetResponseResponse>> stream_handler;
+	// ORDER-SENSITIVE gRPC members. C++ destroys members in reverse declaration
+	// order, so these MUST be declared so the async stream tears down BEFORE the
+	// ClientContext and Stub it depends on. The ClientAsyncReaderWriter holds a
+	// Call/CallOpSet referencing the grpc_call owned by client_context; if the
+	// context is destroyed first, stream_handler's destructor writes into freed
+	// call memory -> EXCEPTION_ACCESS_VIOLATION during GC.
+	// Required destruction order: stream_handler -> client_context -> stub_.
+	// (declared first => destroyed last)
+	std::unique_ptr<service::ConvaiService::Stub> stub_;
 
 	grpc::ClientContext client_context;
+
+	// declared last among the gRPC members => destroyed first
+	std::unique_ptr<::grpc::ClientAsyncReaderWriter< service::GetResponseRequest, service::GetResponseResponse>> stream_handler;
 
 	// True if we are writing audio to the server, false if we are in the receiving stage
 	bool StreamInProgress = false;
@@ -213,8 +224,6 @@ private:
 	bool FailAlreadyExecuted = false;
 
 	bool FinishedWritingToStream = false;
-
-	std::unique_ptr<service::ConvaiService::Stub> stub_;
 
 	grpc::CompletionQueue* cq_;
 

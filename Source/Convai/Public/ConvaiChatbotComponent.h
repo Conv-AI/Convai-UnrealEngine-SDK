@@ -367,7 +367,9 @@ public:
 private:
 	UConvaiChatBotGetDetailsProxy* ConvaiGetDetails();
 
-	TScriptDelegate<FWeakObjectPtr> ConvaiChatBotGetDetailsDelegate;
+	// UE 5.8 changed TScriptDelegate's template param to a thread-safety mode.
+	// FScriptDelegate resolves to the correct default on every engine version.
+	FScriptDelegate ConvaiChatBotGetDetailsDelegate;
 
 	UFUNCTION()
 	void OnConvaiGetDetailsCompleted(FString ReceivedCharacterName, FString ReceivedVoiceType, FString ReceivedBackstory, FString ReceivedLanguageCode, bool HasReadyPlayerMeLink, FString ReceivedReadyPlayerMeLink, FString ReceivedAvatarImageLink);

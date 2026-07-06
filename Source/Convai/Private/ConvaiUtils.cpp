@@ -601,6 +601,26 @@ void UConvaiUtils::GetPlatformInfo(FString& EngineVersion, FString& PlatformName
 #endif
 }
 
+FString UConvaiUtils::GetDeviceUniqueIdentifier()
+{
+	// Try GetDeviceId first - provides unique device identifier on most platforms
+	FString DeviceId = FPlatformMisc::GetDeviceId();
+	
+	// Fall back to GetOperatingSystemId - unique ID for the OS installation
+	if (DeviceId.IsEmpty())
+	{
+		DeviceId = FPlatformMisc::GetOperatingSystemId();
+	}
+	
+	// Fall back to GetLoginId - unique per user account on the machine
+	if (DeviceId.IsEmpty())
+	{
+		DeviceId = FPlatformMisc::GetLoginId();
+	}
+	
+	return DeviceId;
+}
+
 namespace
 {
 	// This struct contains information about the sound buffer.
@@ -936,15 +956,15 @@ TArray<FAnimationFrame> UConvaiUtils::ParseJsonToBlendShapeData(const FString& J
 			TSharedPtr<FJsonObject> FrameObj = FrameVal->AsObject();
 			FAnimationFrame NewFrame;
 
-			NewFrame.FrameIndex = FrameObj->GetIntegerField("FrameIndex");
+			NewFrame.FrameIndex = FrameObj->GetIntegerField(TEXT("FrameIndex"));
 
-			TArray<TSharedPtr<FJsonValue>> BlendShapeArray = FrameObj->GetArrayField("BlendShapes");
+			TArray<TSharedPtr<FJsonValue>> BlendShapeArray = FrameObj->GetArrayField(TEXT("BlendShapes"));
 			for (auto BlendShapeVal : BlendShapeArray)
 			{
 				TSharedPtr<FJsonObject> BlendShapeObj = BlendShapeVal->AsObject();
-				FName name = FName(BlendShapeObj->GetStringField("name"));
+				FName name = FName(BlendShapeObj->GetStringField(TEXT("name")));
 				double score;
-				bool Success = BlendShapeObj->TryGetNumberField("score", score);
+				bool Success = BlendShapeObj->TryGetNumberField(TEXT("score"), score);
 				if (!Success)
 					score = 0;
 

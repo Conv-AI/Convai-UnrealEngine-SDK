@@ -198,12 +198,12 @@ void UConvaiChatBotQueryProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 	FString AudioContentString, SampleRateStr;
 	if (FJsonSerializer::Deserialize(Reader, JsonValue)) {
 		// Get the value of the json object by field name
-		BotText = JsonValue->AsObject()->GetStringField("text");
-		NewSessionID = JsonValue->AsObject()->GetStringField("sessionID");
+		BotText = JsonValue->AsObject()->GetStringField(TEXT("text"));
+		NewSessionID = JsonValue->AsObject()->GetStringField(TEXT("sessionID"));
 		if (VoiceResponse)
 		{
-			AudioContentString = JsonValue->AsObject()->GetStringField("audio");
-			SampleRateStr = JsonValue->AsObject()->GetStringField("sample_rate");
+			AudioContentString = JsonValue->AsObject()->GetStringField(TEXT("audio"));
+			SampleRateStr = JsonValue->AsObject()->GetStringField(TEXT("sample_rate"));
 			TArray<uint8> OutByteArray;
 			if (!FBase64::Decode(AudioContentString, OutByteArray))
 			{
@@ -234,7 +234,7 @@ void UConvaiChatBotQueryProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr,
 		ClassifiedAction = "";
 		if (Classification)
 		{
-			ClassifiedAction = JsonValue->AsObject()->GetStringField("tag");
+			ClassifiedAction = JsonValue->AsObject()->GetStringField(TEXT("tag"));
 		}
 	}
 	else
@@ -532,14 +532,14 @@ void UConvaiChatBotQueryFromAudioProxy::onHttpRequestComplete(FHttpRequestPtr Re
 	FString AudioContentString, SampleRateStr;
 	if (FJsonSerializer::Deserialize(Reader, JsonValue)) {
 		// Get the value of the json object by field name
-		BotText = JsonValue->AsObject()->GetStringField("text");
-		NewSessionID = JsonValue->AsObject()->GetStringField("sessionID");
-		UserQuery = JsonValue->AsObject()->GetStringField("UserQuery");
+		BotText = JsonValue->AsObject()->GetStringField(TEXT("text"));
+		NewSessionID = JsonValue->AsObject()->GetStringField(TEXT("sessionID"));
+		UserQuery = JsonValue->AsObject()->GetStringField(TEXT("UserQuery"));
 
 		if (VoiceResponse)
 		{
-			AudioContentString = JsonValue->AsObject()->GetStringField("audio");
-			SampleRateStr = JsonValue->AsObject()->GetStringField("sample_rate");
+			AudioContentString = JsonValue->AsObject()->GetStringField(TEXT("audio"));
+			SampleRateStr = JsonValue->AsObject()->GetStringField(TEXT("sample_rate"));
 			TArray<uint8> OutByteArray;
 			if (!FBase64::Decode(AudioContentString, OutByteArray))
 			{
@@ -568,7 +568,7 @@ void UConvaiChatBotQueryFromAudioProxy::onHttpRequestComplete(FHttpRequestPtr Re
 			ClassifiedAction = "";
 			if (Classification)
 			{
-				ClassifiedAction = JsonValue->AsObject()->GetStringField("tag");
+				ClassifiedAction = JsonValue->AsObject()->GetStringField(TEXT("tag"));
 			}
 		}
 	}
@@ -717,7 +717,7 @@ void UConvaiChatBotCreateProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 
 	if (FJsonSerializer::Deserialize(Reader, JsonValue)) {
 		// Get the value of the json object by field name
-		CharID = JsonValue->AsObject()->GetStringField("charID");
+		CharID = JsonValue->AsObject()->GetStringField(TEXT("charID"));
 		if (CharID.Len() == 0)
 		{
 			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to receive CharID, Response:%s"), *Response);
@@ -885,7 +885,7 @@ void UConvaiChatBotUpdateProxy::onHttpRequestComplete(FHttpRequestPtr RequestPtr
 
 	if (FJsonSerializer::Deserialize(Reader, JsonValue)) {
 		// Get the value of the json object by field name
-		FString status = JsonValue->AsObject()->GetStringField("STATUS");
+		FString status = JsonValue->AsObject()->GetStringField(TEXT("STATUS"));
 		if (status.Len() == 0)
 		{
 			CONVAI_LOG(ConvaiBotHttpLog, Warning, TEXT("Failed to receive status, Response:%s"), *Response);
@@ -1044,13 +1044,13 @@ void UConvaiChatBotGetDetailsProxy::onHttpRequestComplete(FHttpRequestPtr Reques
 
 	if (FJsonSerializer::Deserialize(Reader, JsonValue)) {
 		// Get the value of the json object by field name
-		character_name	= JsonValue->AsObject()->GetStringField("character_name");
+		character_name	= JsonValue->AsObject()->GetStringField(TEXT("character_name"));
 		//user_id			= JsonValue->AsObject()->GetStringField("user_id");
-		FString character_id	= JsonValue->AsObject()->GetStringField("character_id");
-		voice_type		= JsonValue->AsObject()->GetStringField("voice_type");
+		FString character_id	= JsonValue->AsObject()->GetStringField(TEXT("character_id"));
+		voice_type		= JsonValue->AsObject()->GetStringField(TEXT("voice_type"));
 		//timestamp		= JsonValue->AsObject()->GetStringField("timestamp");
-		backstory		= JsonValue->AsObject()->GetStringField("backstory");
-		LanguageCode = JsonValue->AsObject()->GetStringField("language_code");
+		backstory		= JsonValue->AsObject()->GetStringField(TEXT("backstory"));
+		LanguageCode = JsonValue->AsObject()->GetStringField(TEXT("language_code"));
 		AvatarImageLink = FString("https://convai.com/_next/static/images/placeholder-3d-cab6463359f6ccedb4cda311c4056788.jpg");
 
 		const TSharedPtr<FJsonObject>* model_details;
@@ -1218,12 +1218,12 @@ void UConvaiChatBotGetCharsProxy::onHttpRequestComplete(FHttpRequestPtr RequestP
 	if (FJsonSerializer::Deserialize(Reader, JsonValue)) {
 		// Get the value of the json object by field name
 		const TArray< TSharedPtr<FJsonValue> > *OutArray;
-		if (JsonValue->AsObject()->TryGetArrayField("characters", OutArray))
+		if (JsonValue->AsObject()->TryGetArrayField(TEXT("characters"), OutArray))
 		{
 			for (int i = 0; i < OutArray->Num(); i++)
 			{
 				FString CharID;
-				if ((*OutArray)[i]->AsObject()->TryGetStringField("character_id", CharID))
+				if ((*OutArray)[i]->AsObject()->TryGetStringField(TEXT("character_id"), CharID))
 				{
 					CharIDs.Add(CharID);
 				}

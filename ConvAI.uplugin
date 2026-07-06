@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "3.6.9-hotfix-2",
+	"VersionName": "3.6.10",
 	"FriendlyName": "Convai",
 	"Description": "Fix Metahuman issue for 5.6 and above",
 	"Category": "Runtime",
