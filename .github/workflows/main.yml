@@ -118,10 +118,10 @@ jobs:
           }
         shell: pwsh
 
-      - name: Build and package for Unreal versions 5.2 to 5.7
+      - name: Build and package for Unreal versions 5.3 to 5.8
         run: |
           try {
-            $versions = @("5.2", "5.3", "5.4", "5.5", "5.6", "5.7")
+            $versions = @("5.3", "5.4", "5.5", "5.6", "5.7", "5.8")
             $plugin_dir = "${{ github.workspace }}"
             $dependencies_mh_fix_dir = "E:/Dependencies_MH_fix"
             $mh_fix_applied = $false
@@ -142,7 +142,7 @@ jobs:
                 }
 
                 # Set Android NDK environment variables based on UE version
-                if ($version -eq "5.6" -or $version -eq "5.7") {
+                if ($version -eq "5.6" -or $version -eq "5.7" -or $version -eq "5.8") {
                     $env:NDK_ROOT = "C:\Users\convaidev\AppData\Local\Android\Sdk\ndk\27.2.12479018"
                     $env:NDKROOT = "C:\Users\convaidev\AppData\Local\Android\Sdk\ndk\27.2.12479018"
                     Write-Host "Set NDK to 27.2.12479018 for UE $version"
@@ -153,9 +153,9 @@ jobs:
                 }
 
                 # Set LINUX_MULTIARCH_ROOT based on Unreal version
-                if ($version -eq "5.7") {
+                if ($version -eq "5.7" -or $version -eq "5.8") {
                     $env:LINUX_MULTIARCH_ROOT = "C:\UnrealToolchains\v26_clang-20.1.8-rockylinux8"
-                    Write-Host "Set LINUX_MULTIARCH_ROOT to $env:LINUX_MULTIARCH_ROOT for UE 5.7"
+                    Write-Host "Set LINUX_MULTIARCH_ROOT to $env:LINUX_MULTIARCH_ROOT for UE $version"
                 } else {
                     $env:LINUX_MULTIARCH_ROOT = "C:\UnrealToolchains\v25_clang-18.1.0-rockylinux8"
                     Write-Host "Set LINUX_MULTIARCH_ROOT to $env:LINUX_MULTIARCH_ROOT for UE $version"
@@ -248,7 +248,7 @@ jobs:
       - name: Zip Plugin for each version
         run: |
           try {
-            $versions = @("5.7", "5.6", "5.5", "5.4", "5.3", "5.2")
+            $versions = @("5.8", "5.7", "5.6", "5.5", "5.4", "5.3")
             foreach ($version in $versions) {
                 $output_path = "${{ steps.paths.outputs.output_root }}/V$version"
                 Compress-Archive -Path "$output_path" -DestinationPath "$output_path.zip" -Force
@@ -373,11 +373,11 @@ jobs:
           name: "Convai Unreal Engine SDK Version ${{ needs.checkout-code.outputs.version_name }}"
           body: ${{ steps.extract_notes.outputs.release_notes }}
           files: |
+            E:/Output/${{ github.event.repository.name }}_Binaries/V5.8.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.7.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.6.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.5.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.4.zip
             E:/Output/${{ github.event.repository.name }}_Binaries/V5.3.zip
-            E:/Output/${{ github.event.repository.name }}_Binaries/V5.2.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
